@@ -15,15 +15,9 @@
             <i class="pi pi-bars" />
         </a>
 
-        <h:link id="logo-link" outcome="/index" styleClass="layout-topbar-logo">
-            <p:graphicImage name="images/#{themeCustomiser.lightLogo ? 'logo-roma-white.svg' : 'logo-roma.svg'}" library="roma-layout" />
+        <h:link id="logo-link" outcome="/login" styleClass="layout-topbar-logo">
+            <p:graphicImage name="images/#{themeCustomiser.lightLogo ? 'logo-HoMED-white.svg' : 'logo-HoMED.svg'}" library="roma-layout" />
         </h:link>
-
-        <span class="layout-topbar-search">
-            <i class="pi pi-search"></i>
-            <input type="text" placeholder="Enter your search term"/>
-        </span>
-
         <ul class="topbar-menu fadeInDown">
             <ui:fragment>
                 <li class="user-profile">
@@ -49,12 +43,6 @@
                         </li>
                         <li>
                             <a href="#">
-                                <i class="pi pi-envelope"></i>
-                                <span>Messages</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
                                 <i class="pi pi-bell"></i>
                                 <span>Notifications</span>
                             </a>
@@ -69,51 +57,61 @@
                 <ul>
                     <li role="menuitem">
                         <a href="#">
-                            <p:graphicImage name="images/avatar/avatar-1.png" library="roma-layout" />
                             <div class="topbar-menu-info">
-                                <span class="topbar-menu-name">Bithika Abhedananda</span>
-                                <span class="topbar-menu-role">User interface review is done.</span>
+                                <span class="topbar-menu-name">Notifications to be added</span>
+                                <span class="topbar-menu-role">Notification Message</span>
                             </div>
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href="#">
-                            <p:graphicImage name="images/avatar/avatar-2.png" library="roma-layout" />
-                            <div class="topbar-menu-info">
-                                <span class="topbar-menu-name">Dai Jiang</span>
-                                <span class="topbar-menu-role">Uh, we have sort of a problem here.</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href="#">
-                            <p:graphicImage name="images/avatar/avatar-3.png" library="roma-layout" />
-                            <div class="topbar-menu-info">
-                                <span class="topbar-menu-name">Karlien Nijhuis</span>
-                                <span class="topbar-menu-role">You apparently didn’t put the thing</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href="#">
-                            <p:graphicImage name="images/avatar/avatar-4.png" library="roma-layout" />
-                            <div class="topbar-menu-info">
-                                <span class="topbar-menu-name">Tom Chun</span>
-                                <span class="topbar-menu-role">Please check the files</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li role="menuitem">
-                        <a href="#">
-                            <p:graphicImage name="images/avatar/avatar-5.png" library="roma-layout" />
-                            <div class="topbar-menu-info">
-                                <span class="topbar-menu-name">Maria Trofimova</span>
-                                <span class="topbar-menu-role">Meeting reports attached.</span>
-                            </div>
-
                         </a>
                     </li>
                 </ul>
+                <!--                <ul>
+                                    <li role="menuitem">
+                                        <a href="#">
+                                            <p:graphicImage name="images/avatar/avatar-1.png" library="roma-layout" />
+                                            <div class="topbar-menu-info">
+                                                <span class="topbar-menu-name">Bithika Abhedananda</span>
+                                                <span class="topbar-menu-role">User interface review is done.</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li role="menuitem">
+                                        <a href="#">
+                                            <p:graphicImage name="images/avatar/avatar-2.png" library="roma-layout" />
+                                            <div class="topbar-menu-info">
+                                                <span class="topbar-menu-name">Dai Jiang</span>
+                                                <span class="topbar-menu-role">Uh, we have sort of a problem here.</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li role="menuitem">
+                                        <a href="#">
+                                            <p:graphicImage name="images/avatar/avatar-3.png" library="roma-layout" />
+                                            <div class="topbar-menu-info">
+                                                <span class="topbar-menu-name">Karlien Nijhuis</span>
+                                                <span class="topbar-menu-role">You apparently didn’t put the thing</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li role="menuitem">
+                                        <a href="#">
+                                            <p:graphicImage name="images/avatar/avatar-4.png" library="roma-layout" />
+                                            <div class="topbar-menu-info">
+                                                <span class="topbar-menu-name">Tom Chun</span>
+                                                <span class="topbar-menu-role">Please check the files</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li role="menuitem">
+                                        <a href="#">
+                                            <p:graphicImage name="images/avatar/avatar-5.png" library="roma-layout" />
+                                            <div class="topbar-menu-info">
+                                                <span class="topbar-menu-name">Maria Trofimova</span>
+                                                <span class="topbar-menu-role">Meeting reports attached.</span>
+                                            </div>
+                
+                                        </a>
+                                    </li>
+                                </ul>-->
             </li>
         </ul>
     </div>
