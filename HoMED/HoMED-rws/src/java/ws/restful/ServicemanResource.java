@@ -45,29 +45,6 @@ public class ServicemanResource {
     }
 
     @Path("servicemanLogin")
-    @GET
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response servicemanLogin(@QueryParam("nric") String nric,
-            @QueryParam("password") String password) {
-
-        try {
-            Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(nric, password);
-            System.out.println("=-=-=-=-=-=-=-= Serviceman " + serviceman.getEmail() + " login remotely via web service");
-
-            return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
-        } catch (ServicemanInvalidLoginCredentialException ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
-
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
-        } catch (Exception ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
-
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
-        }
-    }
-   
-    @Path("servicemanLogin")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
