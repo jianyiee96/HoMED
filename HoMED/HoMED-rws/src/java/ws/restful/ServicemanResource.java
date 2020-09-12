@@ -46,7 +46,7 @@ public class ServicemanResource {
     @GET
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response customerLogin(@QueryParam("nric") String nric,
+    public Response servicemanLogin(@QueryParam("nric") String nric,
             @QueryParam("password") String password) {
 
         try {
