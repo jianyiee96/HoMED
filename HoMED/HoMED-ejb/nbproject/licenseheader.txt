@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Project Title: Home Team Medical Board
+${licensePrefix}Project Application: HoMED-ejb
+<#if licenseLast??>
+${licenseLast}
+</#if>

@@ -22,6 +22,7 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(ws.restful.CorsFilter.class);
         resources.add(ws.restful.EmployeeResource.class);
+        resources.add(ws.restful.ServicemanResource.class);
     }
     
 }
