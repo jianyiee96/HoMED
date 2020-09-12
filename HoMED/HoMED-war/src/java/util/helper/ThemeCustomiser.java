@@ -8,16 +8,19 @@ import java.io.Serializable;
 @SessionScoped
 public class ThemeCustomiser implements Serializable {
 
-    // The login page is customised to "Deep Purple" theme, feel free to change.
-    private String componentTheme = "deeppurple";
-    private String topbarColor = "purple";
-    private String menuColor = "light";
+    // The login page is customised to "Cyan" theme, feel free to change.
+    private String componentTheme = "cyan";
+    private String topbarColor = "cyan";
+
+    private final String menuMode = "layout-overlay";
+    private final String menuColor = "light";
+    private final boolean lightLogo = true;
+    private final String inputStyle = "filled";
 
     public String getComponentTheme() {
         return componentTheme;
     }
 
-    // Perform theming based on access rights here, e.g., if admin, then set to bluegrey.
     public void setComponentTheme(String componentTheme) {
         this.componentTheme = componentTheme;
     }
@@ -30,12 +33,20 @@ public class ThemeCustomiser implements Serializable {
         this.topbarColor = topbarColor;
     }
 
+    public String getMenuMode() {
+        return menuMode;
+    }
+
     public String getMenuColor() {
         return menuColor;
     }
 
-    public void setMenuColor(String menuColor) {
-        this.menuColor = menuColor;
+    public boolean isLightLogo() {
+        return lightLogo;
+    }
+
+    public String getInputStyle() {
+        return this.inputStyle.equals("filled") ? "ui-input-filled" : "";
     }
 
 }
