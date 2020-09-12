@@ -1,0 +1,121 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:po="http://primefaces.org/roma">
+
+    <div class="layout-topbar">
+        <a class="layout-right-panel-button layout-topbar-icon" href="#">
+            <i class="pi pi-ellipsis-v" />
+        </a>
+
+        <a class="layout-menu-button layout-topbar-icon" href="#">
+            <i class="pi pi-bars" />
+        </a>
+
+        <h:link id="logo-link" outcome="/index" styleClass="layout-topbar-logo">
+            <p:graphicImage name="images/#{themeCustomiser.lightLogo ? 'logo-roma-white.svg' : 'logo-roma.svg'}" library="roma-layout" />
+        </h:link>
+
+        <span class="layout-topbar-search">
+            <i class="pi pi-search"></i>
+            <input type="text" placeholder="Enter your search term"/>
+        </span>
+
+        <ul class="topbar-menu fadeInDown">
+            <ui:fragment>
+                <li class="user-profile">
+                    <a href="#">
+                        <p:graphicImage name="images/avatar/avatar.png" library="roma-layout" />
+                        <div class="layout-profile-userinfo">
+                            <span class="layout-profile-name">Doctor One</span>
+                            <span class="layout-profile-role">Medical Officer</span>
+                        </div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-user"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-envelope"></i>
+                                <span>Messages</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-bell"></i>
+                                <span>Notifications</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ui:fragment>
+            <li>
+                <a href="#" class="layout-topbar-icon">
+                    <i class="topbar-icon pi pi-bell"></i>
+                </a>
+                <ul>
+                    <li role="menuitem">
+                        <a href="#">
+                            <p:graphicImage name="images/avatar/avatar-1.png" library="roma-layout" />
+                            <div class="topbar-menu-info">
+                                <span class="topbar-menu-name">Bithika Abhedananda</span>
+                                <span class="topbar-menu-role">User interface review is done.</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href="#">
+                            <p:graphicImage name="images/avatar/avatar-2.png" library="roma-layout" />
+                            <div class="topbar-menu-info">
+                                <span class="topbar-menu-name">Dai Jiang</span>
+                                <span class="topbar-menu-role">Uh, we have sort of a problem here.</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href="#">
+                            <p:graphicImage name="images/avatar/avatar-3.png" library="roma-layout" />
+                            <div class="topbar-menu-info">
+                                <span class="topbar-menu-name">Karlien Nijhuis</span>
+                                <span class="topbar-menu-role">You apparently didn’t put the thing</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href="#">
+                            <p:graphicImage name="images/avatar/avatar-4.png" library="roma-layout" />
+                            <div class="topbar-menu-info">
+                                <span class="topbar-menu-name">Tom Chun</span>
+                                <span class="topbar-menu-role">Please check the files</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a href="#">
+                            <p:graphicImage name="images/avatar/avatar-5.png" library="roma-layout" />
+                            <div class="topbar-menu-info">
+                                <span class="topbar-menu-name">Maria Trofimova</span>
+                                <span class="topbar-menu-role">Meeting reports attached.</span>
+                            </div>
+
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</ui:composition>
