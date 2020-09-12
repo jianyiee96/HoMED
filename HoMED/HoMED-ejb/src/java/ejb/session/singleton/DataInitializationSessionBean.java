@@ -6,7 +6,10 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
+import entity.Serviceman;
+import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -14,7 +17,11 @@ import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.enumeration.BloodTypeEnum;
+import util.enumeration.GenderEnum;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ServicemanEmailExistException;
+import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
 
 /**
@@ -32,6 +39,9 @@ public class DataInitializationSessionBean {
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
     
+    @EJB
+    private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
+    
     @PostConstruct
     public void postConstruct() {
         if(employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
@@ -46,7 +56,10 @@ public class DataInitializationSessionBean {
         try {   
             Long id = employeeSessionBeanLocal.createEmployee(new Employee("employee one"));
             System.out.println("Employee id: " + id);
-        } catch (InputDataValidationException | UnknownPersistenceException ex) {
+            
+            Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
+            
+        } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());
         } 
