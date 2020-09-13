@@ -11,12 +11,14 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import ws.datamodel.ErrorRsp;
+import ws.datamodel.ServicemanLoginReq;
 import ws.datamodel.ServicemanLoginRsp;
 
 /**
@@ -43,14 +45,13 @@ public class ServicemanResource {
     }
 
     @Path("servicemanLogin")
-    @GET
-    @Consumes(MediaType.TEXT_PLAIN)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response servicemanLogin(@QueryParam("nric") String nric,
-            @QueryParam("password") String password) {
-
+    public Response servicemanLogin(ServicemanLoginReq servicemanLoginReq) {
+        
         try {
-            Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(nric, password);
+            Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getNric(), servicemanLoginReq.getPassword());
             System.out.println("=-=-=-=-=-=-=-= Serviceman " + serviceman.getEmail() + " login remotely via web service");
 
             return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
