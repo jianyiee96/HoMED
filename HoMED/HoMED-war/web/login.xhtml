@@ -33,9 +33,12 @@
                                 <h:panelGroup>
                                     <label>NRIC/FIN</label>
                                     <div class="login-input">
-                                        <p:inputText id="username" value="#{employeeLoginManagedBean.username}" required="true">
-                                            <f:validateLength minimum="4"/>
-                                        </p:inputText>
+                                        <span class="ui-input-icon-left">
+                                            <i class="pi pi-user"></i>
+                                            <p:inputText id="username" value="#{employeeLoginManagedBean.username}" required="true" style="padding-left: 2rem" >
+                                                <f:validateLength minimum="4"/>
+                                            </p:inputText>
+                                        </span>
                                         <p:message for="username" />
                                     </div>
                                 </h:panelGroup>
@@ -44,9 +47,12 @@
                                 <h:panelGroup>
                                     <label>Password</label>
                                     <div class="login-input">
-                                        <p:password id="password" value="#{employeeLoginManagedBean.password}" required="true">
-                                            <f:validateLength minimum="4" />
-                                        </p:password>
+                                        <span class="ui-input-icon-left">
+                                            <i class="pi pi-lock"></i>
+                                            <p:password id="password" value="#{employeeLoginManagedBean.password}" required="true" style="padding-left: 2rem" >
+                                                <f:validateLength minimum="4" />
+                                            </p:password>
+                                        </span>
                                         <p:message for="password" />
                                     </div>
                                 </h:panelGroup>
