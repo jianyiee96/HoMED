@@ -6,8 +6,10 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
+import entity.FormTemplate;
 import entity.Serviceman;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -42,6 +44,9 @@ public class DataInitializationSessionBean {
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
     
+    @EJB
+    private FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
+    
     @PostConstruct
     public void postConstruct() {
         if(employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
@@ -59,6 +64,10 @@ public class DataInitializationSessionBean {
             
             Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
             
+            Long formTemplateId1 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Health Declaration"));            
+            Long formTemplateId2 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Travel Declaration"));
+            Long formTemplateId3 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Safe Distance Quiz"));
+
         } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());
