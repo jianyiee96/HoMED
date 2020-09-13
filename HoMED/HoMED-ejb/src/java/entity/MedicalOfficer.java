@@ -23,6 +23,7 @@ public class MedicalOfficer extends Employee implements Serializable {
     
     public MedicalOfficer(String name, String nric, String password) {
         super(name, nric, password);
+        this.role = "mo";
     }
 
 

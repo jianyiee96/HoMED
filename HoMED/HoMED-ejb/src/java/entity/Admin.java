@@ -23,6 +23,7 @@ public class Admin extends Employee implements Serializable {
     
     public Admin(String name, String nric, String password) {
         super(name, nric, password);
+        this.role = "admin";
     }
 
 

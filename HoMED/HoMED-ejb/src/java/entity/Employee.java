@@ -25,26 +25,30 @@ public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long employeeId;
+    protected Long employeeId;
 
     @Column(nullable = false, unique = true, length = 9)
     @NotNull(message = "NRIC must be of length 9")
     @Size(min = 9, max = 9, message = "NRIC must be of length 9")
-    private String nric;
+    protected String nric;
     
     @Column(columnDefinition = "CHAR(64) NOT NULL")
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
-    private String password;
+    protected String password;
     
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
     @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
-    private String name;
+    protected String name;
     
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
-    private String salt;
+    protected String salt;
+    
+    @Column
+    @NotNull
+    protected String role;
     
     public Employee() {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
@@ -58,6 +62,14 @@ public class Employee implements Serializable {
         setPassword(password);
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    
     public String getNric() {
         return nric;
     }

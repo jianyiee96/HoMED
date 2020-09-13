@@ -100,7 +100,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 throw new EmployeeInvalidLoginCredentialException("NRIC does not exist or invalid password!");
             }
         } catch (EmployeeNotFoundException ex) {
-            throw new EmployeeInvalidLoginCredentialException("Username does not exist or invalid password!");
+            throw new EmployeeInvalidLoginCredentialException("NRIC does not exist or invalid password!");
         }
     }
 

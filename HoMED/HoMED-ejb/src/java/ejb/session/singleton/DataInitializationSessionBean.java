@@ -8,7 +8,9 @@ package ejb.session.singleton;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Admin;
+import entity.Clerk;
 import entity.Employee;
+import entity.MedicalOfficer;
 import entity.Serviceman;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -58,6 +60,8 @@ public class DataInitializationSessionBean {
         try {   
             Long id = employeeSessionBeanLocal.createEmployee(new Admin("Admin one", "s9771019h", "password"));
             System.out.println("Employee id: " + id);
+            employeeSessionBeanLocal.createEmployee(new Clerk("Clerk one", "s0000000a", "password"));
+            employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO one", "s0000000b", "password"));
             
             Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
             
