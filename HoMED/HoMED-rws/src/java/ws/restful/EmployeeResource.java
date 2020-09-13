@@ -43,16 +43,4 @@ public class EmployeeResource {
         }   
     }
 
-    @PUT
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response createEmployee(String employeeName) {
-
-        try {
-            Long employeeId = this.employeeSessionBeanLocal.createEmployee(new Employee(employeeName));
-            return Response.status(Response.Status.OK).entity("Created Employee: " + employeeName + " id: " + employeeId).build();
-        } catch (InputDataValidationException | UnknownPersistenceException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Unable to create TestEntity").build();
-        }
-    }
 }

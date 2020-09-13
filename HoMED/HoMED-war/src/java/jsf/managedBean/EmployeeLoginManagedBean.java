@@ -1,6 +1,8 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmployeeSessionBeanLocal;
 import java.io.IOException;
+import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -12,14 +14,21 @@ import util.helper.ThemeCustomiser;
 @RequestScoped
 public class EmployeeLoginManagedBean {
 
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    
+    private String username;
+    private String password;
+
     @Inject
     private ThemeCustomiser themeCustomiser;
-
+    
     public EmployeeLoginManagedBean() {
     }
 
     // Method to test dynamic theming, not official login method.
     public void login(ActionEvent event) throws IOException {
+
         System.out.println("Testing.....2");
 
         // To dynamically change theme colours next time.
