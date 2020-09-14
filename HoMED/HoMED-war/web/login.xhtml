@@ -41,10 +41,10 @@
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-user"></i>
                                             <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" 
-                                                         validatorMessage="Invalid NRIC/FIN"
+                                                         validatorMessage="Please provide a valid NRIC/FIN"
                                                          required="true" requiredMessage="Username is required" maxlength="32" 
                                                          style="padding-left: 2rem" >
-                                                <f:validateLength minimum="4"/>
+                                                <f:validateLength minimum="9"/>
                                             </p:inputText>
                                         </span>
                                         <p:message for="nric" />
@@ -60,10 +60,10 @@
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-lock"></i>
                                             <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}"
-                                                        validatorMessage="Invalid Password"
+                                                        validatorMessage="Please provide a valid Password"
                                                         required="true" requiredMessage="Password is required" maxlength="32" 
                                                         style="padding-left: 2rem" >
-                                                <f:validateLength minimum="4" />
+                                                <f:validateLength minimum="8" />
                                             </p:password>
                                         </span>
                                         <p:message for="password" />
