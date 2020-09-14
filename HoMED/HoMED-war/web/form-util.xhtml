@@ -9,25 +9,60 @@
 
 
     <ui:define name="content">
-        <div class="p-col-12">
-            <div class="card">
-                <h1>E-Form Utility Tool</h1>
-                <p>E-Form (!!!)</p>
-                <h:form>     
-                    <p:growl id="message" showDetail="true" />
 
-                    <p:commandButton value="Destroy the World" action="#{dialogView.destroyWorld}" update="message">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                    </p:commandButton>
+        <div class="p-grid">
 
-                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                    </p:confirmDialog>      
+            <div class="p-col-12 p-md-12 p-lg-5">
+                <div class="card">
+                    <h1>E-Form Utility Tool</h1>
+
+                    <h:form id="formAllTemplates">
+
+                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="formTemplate" value="#{formUtilityManagedBean.formTemplates}" reflow="true"
+                                     selection="#{formUtilityManagedBean.selectedForm}" rowKey="#{formTemplate.formTemplateId}" scrollable="true" scrollHeight="500"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">FORM TEMPLATES</span>
+                            </f:facet>
+                            <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                            <p:column headerText="Name" sortBy="#{formTemplate.formTemplateName}">
+                                <h:outputText value="#{formTemplate.formTemplateName}" />
+                            </p:column>
+                            <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
+                                <h:outputText value="#{formTemplate.dateCreated}" />
+                            </p:column>
+                            <p:column headerText="Archive Status" sortBy="#{formTemplate.isArchived}">
+                                <h:outputText value="#{formTemplate.isArchived}" />
+                            </p:column>
+                            <f:facet name="footer">
+                                <p:commandButton process="allFormsDT" update="@form editorForm" icon="pi pi-search" value="View" />
+                            </f:facet>
+                        </p:dataTable>
+
+
+                    </h:form>
+                </div>
+
+            </div>
+
+            <div class="p-col-12 p-md-12 p-lg-7">
+                <h:form id="editorForm">
+
+
+                    <div class="card">
+                        <h1>#{formUtilityManagedBean.selectedForm.formTemplateName} Preview</h1>
+
+                        <h3>Number of fields: #{formUtilityManagedBean.selectedForm.formFields.size()}</h3>
+                    </div>
+
                 </h:form>
             </div>
 
+
         </div>
+
+
 
     </ui:define>
 

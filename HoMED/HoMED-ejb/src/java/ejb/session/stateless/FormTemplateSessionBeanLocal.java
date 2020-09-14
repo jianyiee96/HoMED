@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.FormTemplate;
+import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
@@ -15,7 +16,11 @@ import util.exceptions.UnknownPersistenceException;
  */
 @Local
 public interface FormTemplateSessionBeanLocal {
+    
     public Long createFormTemplate(FormTemplate formTemplate) throws InputDataValidationException, UnknownPersistenceException;
     
     public FormTemplate retrieveFormTemplate(Long id);
+    
+    public List<FormTemplate> retrieveAllFormTemplates();
+    
 }

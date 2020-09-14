@@ -6,11 +6,13 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.FormTemplate;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -56,6 +58,14 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         return formTemplate;
     }
 
+    @Override
+    public List<FormTemplate> retrieveAllFormTemplates() {
+        Query query = em.createQuery("SELECT f FROM FormTemplate f");
+
+        return query.getResultList();
+    }
+    
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<FormTemplate>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {
