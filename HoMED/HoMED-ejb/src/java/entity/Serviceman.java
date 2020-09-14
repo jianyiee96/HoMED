@@ -85,7 +85,6 @@ public class Serviceman implements Serializable {
 
     public Serviceman() {
         this.isActivated = false;
-        this.password = CryptographicHelper.getInstance().generateRandomString(8);
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
@@ -96,8 +95,6 @@ public class Serviceman implements Serializable {
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
-        System.out.println("Serviceman " + nric + " has OTP: " + password);
-        setPassword(password);
         this.email = email;
         this.address = address;
     }
