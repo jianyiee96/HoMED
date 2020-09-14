@@ -47,7 +47,7 @@ public class Serviceman implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
-    private Date ord;
+    private Date rod;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,11 +63,6 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
-
-//    @Column(columnDefinition = "CHAR(64) NOT NULL")
-//    @NotNull(message = "Password must be between length 8 to 64")
-//    @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
-//    private String tempPassword;
     
     @Column(nullable = false, unique = true, length = 64)
     @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
@@ -79,24 +74,30 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Address must be at least of length 8")
     @Size(min = 8, message = "Address must be at least of length 8")
     private String address;
+    
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isActivated;
 
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     private String salt;
 
     public Serviceman() {
+        this.isActivated = false;
+        this.password = CryptographicHelper.getInstance().generateRandomString(8);
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Serviceman(String name, String nric, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String password, String email, String address) {
+    public Serviceman(String name, String nric, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String email, String address) {
         this();
         this.name = name;
         this.nric = nric;
-        this.ord = ord;
+        this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
+        System.out.println("Serviceman " + nric + " has OTP: " + password);
         setPassword(password);
-//        setTempPassword(tempPassword);
         this.email = email;
         this.address = address;
     }
@@ -125,12 +126,12 @@ public class Serviceman implements Serializable {
         this.nric = nric;
     }
 
-    public Date getOrd() {
-        return ord;
+    public Date getRod() {
+        return rod;
     }
 
-    public void setOrd(Date ord) {
-        this.ord = ord;
+    public void setRod(Date rod) {
+        this.rod = rod;
     }
 
     public GenderEnum getGender() {
@@ -160,18 +161,6 @@ public class Serviceman implements Serializable {
             this.password = null;
         }
     }
-
-//    public String getTempPassword() {
-//        return tempPassword;
-//    }
-//
-//    public void setTempPassword(String tempPassword) {
-//        if (tempPassword != null) {
-//            this.tempPassword = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(tempPassword + this.salt));
-//        } else {
-//            this.tempPassword = null;
-//        }
-//    }
     
     public String getEmail() {
         return email;
@@ -195,6 +184,14 @@ public class Serviceman implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public Boolean getIsActivated() {
+        return isActivated;
+    }
+
+    public void setIsActivated(Boolean isActivated) {
+        this.isActivated = isActivated;
     }
 
     @Override
