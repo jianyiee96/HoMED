@@ -17,7 +17,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
+import util.exceptions.ServicemanInvalidPasswordException;
+import util.exceptions.ServicemanNotFoundException;
 import ws.datamodel.ErrorRsp;
+import ws.datamodel.ServicemanChangePassReq;
 import ws.datamodel.ServicemanLoginReq;
 import ws.datamodel.ServicemanLoginRsp;
 
@@ -44,7 +47,7 @@ public class ServicemanResource {
         this.servicemanSessionBeanLocal = this.sessionBeanLookup.lookupServicemanSessionBeanLocal();
     }
 
-    @Path("servicemanLogin")
+    @Path("login")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -64,5 +67,31 @@ public class ServicemanResource {
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
+        
+    }
+    
+    @Path("changePassword")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response servicemanChangePassword(ServicemanChangePassReq servicemanChangePassReq) {
+        
+        if (servicemanChangePassReq != null) {
+
+            try {
+                servicemanSessionBeanLocal.changePassword(servicemanChangePassReq.getNric(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword());
+                
+                return Response.status(Response.Status.OK).build();
+            } catch (ServicemanInvalidPasswordException | ServicemanNotFoundException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+                
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            }
+        } else {
+            ErrorRsp errorRsp = new ErrorRsp("Invalid change password request");
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+        
     }
 }
