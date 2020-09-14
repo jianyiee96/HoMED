@@ -42,7 +42,7 @@ public class SecurityFilter implements Filter {
 
                 if (requestServletPath.equals("/login.xhtml")) {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/homepage.xhtml");
-                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole())) {
+                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) != 2) {
                     chain.doFilter(request, response);
                 } else {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/accessRightError.xhtml");
@@ -59,26 +59,41 @@ public class SecurityFilter implements Filter {
         }
     }
 
-    private Boolean checkAccessRight(String path, EmployeeRoleEnum accessRight) {
+    private Integer checkAccessRight(String path, EmployeeRoleEnum accessRight) {
+        // 0 - Page doesn't exist
+        // 1 - Authorised
+        // 2 - Unauthorized
+
+        String[] pathArr = new String[]{
+            "/homepage.xhtml", // 0
+            "/accessRightError.xhtml", // 1
+            "/medicalCentreManagement.xhtml" // 2
+        };
 
         // Pages that all logged in users can enter
-        if (path.equals("/homepage.xhtml")
-                || path.equals("/accessRightError.xhtml")) {
-            return true;
+        if (path.equals(pathArr[0])
+                || path.equals(pathArr[1])) {
+            return 1;
         }
 
         if (accessRight == EmployeeRoleEnum.ADMIN) {
-            if (path.equals("/medicalCentreManagement.xhtml")) {
-                return true;
+            if (path.equals(pathArr[2])) {
+                return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
 
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
 
         }
-
+        
+        for (String currentPath: pathArr) {
+            if (path.equals(currentPath)) {
+                return 2;
+            }
+        }
+        
         // FOR DEVELOPMENT ==> SET TO TRUE
-        return false;
+        return 0;
     }
 
     private Boolean excludeLoginCheck(String path) {
