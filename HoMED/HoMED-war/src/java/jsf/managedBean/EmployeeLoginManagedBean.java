@@ -58,7 +58,9 @@ public class EmployeeLoginManagedBean {
             FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
         } catch (EmployeeInvalidLoginCredentialException ex) {
             System.out.println("*********** EmployeeInvalidLoginCredentialException caught");
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Contact admin." + ex.getMessage()));
+            System.out.println("*********** Fired 1");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error! Contact admin." + ex.getMessage(), null));
+            System.out.println("*********** Fired 2");
         }
 
         
