@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Medical Centre Management Page</ui:define>
+    <ui:define name="viewname">
+        <li>Pages</li>
+        <li>/</li>
+        <li><p:link outcome="/login">Empty</p:link></li>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="p-grid crud-table">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <div class="buttonbar">
+                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem"
+                                                 actionListener="#{medicalCentreManagementManagedBean.create}" update="panelManageMedicalCentre" oncomplete="PF('dialogManageMedicalCentre').show()" />
+                        </div>
+
+                        <p:dataTable id="dataTableMedicalCentres" widgetVar="dataTableMedicalCentres" var="medicalCentre" value="#{medicalCentreManagementManagedBean.medicalCentres}" 
+                                     reflow="true" styleClass="crud-management-table" rowKey="#{medicalCentre.medicalCentreId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold">MEDICAL CENTRES</span>
+
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search"></i>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dataTableMedicalCentres').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Medical Centre ID" width="12.5%" sortBy="#{medicalCentre.medicalCentreId}" filterBy="#{medicalCentre.medicalCentreId}" filterMatchMode="contains">
+                                <h:outputText value="#{medicalCentre.medicalCentreId}" />
+                            </p:column>
+
+                            <p:column headerText="Name" width="25%" sortBy="#{medicalCentre.name}" filterBy="#{medicalCentre.name}" filterMatchMode="contains">
+                                <h:outputText value="#{medicalCentre.name}" />
+                            </p:column>
+
+                            <p:column headerText="Phone" width="12.5%" sortBy="#{medicalCentre.phone}" filterBy="#{medicalCentre.phone}" filterMatchMode="contains">
+                                <h:outputText value="#{medicalCentre.phone}" />
+                            </p:column>
+
+                            <p:column headerText="Address" width="40%" sortBy="#{medicalCentre.address}" filterBy="#{medicalCentre.address}" filterMatchMode="contains">
+                                #{medicalCentre.foo()}
+                                <h:outputText value="#{medicalCentre.delimitedAddress}" />
+                            </p:column>
+
+                            <p:column headerText="Action" width="10%">
+                                <p:commandButton styleClass="edit-button rounded-button success-button" icon="pi pi-pencil" process="@this">
+
+                                </p:commandButton>
+
+                                <p:commandButton styleClass="warning-button rounded-button" icon="pi pi-trash" process="@this">
+
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <p:dialog id="dialogManageMedicalCentre" widgetVar="dialogManageMedicalCentre" header="Medical Centre Details" showEffect="fade" responsive="true" modal="true" width="450" height="600">
+                            <p:outputPanel id="panelManageMedicalCentre" class="ui-flud">
+                                <p:outputPanel rendered="#{not empty medicalCentreManagementManagedBean.selectedMedicalCentre}">
+                                    <div class="p-field">
+                                        <p:outputLabel for="name">Name</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.name}" style="width: 100%" required="true" requiredMessage="Medical centre name is required" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="phone">Telephone Number</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="phone" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.phone}" style="width: 100%" required="true" requiredMessage="Medical centre telephone number is required" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <h3>Address</h3>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="street-name">Street Name</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="street-name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.streetName}" style="width: 100%" required="true" requiredMessage="Medical centre street name is required" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="unit-number">Unit Number</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="unit-number" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.unitNumber}" style="width: 100%" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="building-name">Building Name</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="building-name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.buildingName}" style="width: 100%" />
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="country">Country</p:outputLabel>
+                                        <br />
+                                        <p:selectOneMenu id="country" style="width: 100%" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.country}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
+                                    </div>
+
+                                    <div class="p-field">
+                                        <p:outputLabel for="postal-code">Postal Code</p:outputLabel>
+                                        <br />
+                                        <p:inputText id="postal-code" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.postal}" style="width: 100%" required="true" requiredMessage="Medical centre postal code is required"/>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{medicalCentreManagementManagedBean.save}" oncomplete="PF('dialogManageMedicalCentre').hide()" update="@form" process="panelManageMedicalCentre @this" />
+                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('dialogManageMedicalCentre').hide()" class="secondary-button" />
+                            </f:facet>
+                        </p:dialog>
+
+
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+        <h:outputStylesheet name="medical-centre-management.css" library="css" />
+
+    </ui:define>
+
+</ui:composition>

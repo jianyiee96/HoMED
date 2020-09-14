@@ -81,8 +81,8 @@ public class DataInitializationSessionBean {
             // Building Name
             // Country
             // Postal Code
-            // Delimited by "|@@|
-            String medicalCentreAddress = "501 OLD CHOA CHU KANG ROAD|@@|#01-00|@@||@@|Singapore|@@|698928";
+            // Delimited by "!!!@@!!!"
+            String medicalCentreAddress = "501 OLD CHOA CHU KANG ROAD!!!@@!!!#01-00!!!@@!!!!!!@@!!!Singapore!!!@@!!!698928";
             List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
             OperatingHours operatingHours;
             operatingHours = new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));

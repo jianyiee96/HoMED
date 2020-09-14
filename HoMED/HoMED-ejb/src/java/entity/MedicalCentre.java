@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -39,6 +40,19 @@ public class MedicalCentre implements Serializable {
     @NotNull(message = "Please provide address for the medical centre")
     @Size(min = 8, message = "Address must be at least of length 8")
     private String address;
+
+    @Transient
+    private String streetName = "";
+    @Transient
+    private String unitNumber = "";
+    @Transient
+    private String buildingName = "";
+    @Transient
+    private String country = "";
+    @Transient
+    private String postal = "";
+    @Transient
+    private String delimitedAddress;
 
     @OneToMany
     private List<OperatingHours> operatingHours;
@@ -80,12 +94,88 @@ public class MedicalCentre implements Serializable {
         this.phone = phone;
     }
 
+    public void foo() {
+        String[] delimitedAddressArray = address.split("!!!@@!!!");
+
+        streetName = delimitedAddressArray[0];
+        unitNumber = delimitedAddressArray[1];
+        buildingName = delimitedAddressArray[2];
+        country = delimitedAddressArray[3];
+        postal = delimitedAddressArray[4];
+
+        delimitedAddress = streetName;
+
+        if (!unitNumber.equals("")) {
+            delimitedAddress += ", " + unitNumber;
+        }
+
+        if (!buildingName.equals("")) {
+            delimitedAddress += ", " + buildingName;
+        }
+
+        if (!country.equals("")) {
+            delimitedAddress += ", " + country;
+        }
+
+        if (!postal.equals("")) {
+            delimitedAddress += " " + postal;
+        }
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    public String getUnitNumber() {
+        return unitNumber;
+    }
+
+    public void setUnitNumber(String unitNumber) {
+        this.unitNumber = unitNumber;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getPostal() {
+        return postal;
+    }
+
+    public void setPostal(String postal) {
+        this.postal = postal;
+    }
+
+    public String getDelimitedAddress() {
+        return delimitedAddress;
+    }
+
+    public void setDelimitedAddress(String delimitedAddress) {
+        this.delimitedAddress = delimitedAddress;
     }
 
     public List<OperatingHours> getOperatingHours() {

@@ -6,11 +6,13 @@ package ejb.session.stateless;
 
 import entity.MedicalCentre;
 import entity.OperatingHours;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -56,6 +58,12 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         em.flush();
         
         return newOperatingHours.getOperatingHoursId();
+    }
+    
+    @Override
+    public List<MedicalCentre> retrieveAllMedicalCentres() {
+        Query query = em.createQuery("SELECT mc FROM MedicalCentre mc ORDER BY mc.name ASC");
+        return query.getResultList();
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {
