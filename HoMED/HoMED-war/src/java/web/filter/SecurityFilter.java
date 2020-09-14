@@ -61,8 +61,9 @@ public class SecurityFilter implements Filter {
 
     private Boolean checkAccessRight(String path, EmployeeRoleEnum accessRight) {
 
-        // Pages that all usaers can enter
-        if (path.equals("/homepage.xhtml")) {
+        // Pages that all logged in users can enter
+        if (path.equals("/homepage.xhtml")
+                || path.equals("/accessRightError.xhtml")) {
             return true;
         }
 
@@ -78,36 +79,10 @@ public class SecurityFilter implements Filter {
 
         // FOR DEVELOPMENT ==> SET TO TRUE
         return false;
-
-//        if (accessRight.equals(AccessRightEnum.CASHIER)) {
-//            if (path.equals("/cashierOperation/checkout.xhtml")
-//                    || path.equals("/cashierOperation/voidRefund.xhtml")
-//                    || path.equals("/cashierOperation/viewMySaleTransactions.xhtml")) {
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        } else if (accessRight.equals(AccessRightEnum.MANAGER)) {
-//            if (path.equals("/cashierOperation/checkout.xhtml")
-//                    || path.equals("/cashierOperation/voidRefund.xhtml")
-//                    || path.equals("/cashierOperation/viewMySaleTransactions.xhtml")
-//                    || path.equals("/systemAdministration/staffManagement.xhtml")
-//                    || path.equals("/systemAdministration/productManagement.xhtml")
-//                    || path.equals("/systemAdministration/searchProductsByName.xhtml")
-//                    || path.equals("/systemAdministration/filterProductsByCategory.xhtml")
-//                    || path.equals("/systemAdministration/filterProductsByTags.xhtml")) {
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        }
-//
-//        return false;
     }
 
     private Boolean excludeLoginCheck(String path) {
-        if (path.equals("/accessRightError.xhtml")
-                || path.startsWith("/javax.faces.resource")
+        if (path.startsWith("/javax.faces.resource")
                 || path.startsWith("/resources/")) {
             return true;
         } else {
