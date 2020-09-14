@@ -40,7 +40,10 @@
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-user"></i>
-                                            <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" required="true" requiredMessage="Username is required" maxlength="32" style="padding-left: 2rem" >
+                                            <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" 
+                                                         validatorMessage="Invalid NRIC/FIN"
+                                                         required="true" requiredMessage="Username is required" maxlength="32" 
+                                                         style="padding-left: 2rem" >
                                                 <f:validateLength minimum="4"/>
                                             </p:inputText>
                                         </span>
@@ -56,7 +59,10 @@
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-lock"></i>
-                                            <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}" required="true" requiredMessage="Password is required" maxlength="32" style="padding-left: 2rem" >
+                                            <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}"
+                                                        validatorMessage="Invalid Password"
+                                                        required="true" requiredMessage="Password is required" maxlength="32" 
+                                                        style="padding-left: 2rem" >
                                                 <f:validateLength minimum="4" />
                                             </p:password>
                                         </span>
