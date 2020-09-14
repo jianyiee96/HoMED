@@ -8,6 +8,7 @@ import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -53,7 +54,7 @@ public class EmployeeLoginManagedBean {
 
             FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
         } catch (EmployeeInvalidLoginCredentialException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error! Contact Admin. " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }
@@ -65,6 +66,23 @@ public class EmployeeLoginManagedBean {
         // Invalidating the session and causes the user to logout
         ((HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true)).invalidate();
         FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml");
+    }
+
+    public void timeoutLogout() throws IOException {
+        FacesContext.getCurrentInstance().getExternalContext().getFlash().put("inactiveSession", true);
+        logout(null);
+    }
+
+    public void idleWarning() {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Session about to expire", "You have been inactive for the past 15 mins. You will be logged out in the next minute."));
+    }
+
+    public void checkInactivity() {
+        System.out.println("CheckINACTIVITY CALLED");
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        if (flash.get("inactiveSession") != null) {
+            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
+        }
     }
 
     public String getNric() {
