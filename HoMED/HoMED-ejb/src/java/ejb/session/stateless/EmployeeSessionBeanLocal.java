@@ -7,6 +7,9 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import javax.ejb.Local;
+import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
 
@@ -16,7 +19,11 @@ import util.exceptions.UnknownPersistenceException;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
-    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException;
+    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
     
     public Employee retrieveEmployee(Long id);
+    
+    public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
+    
+    public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
 }

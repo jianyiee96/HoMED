@@ -14,8 +14,8 @@
                             <a class="layout-profile-button" href="#">
                                 <p:graphicImage name="images/avatar/avatar.png" library="roma-layout" />
                                 <div class="layout-profile-userinfo">
-                                    <span class="layout-profile-name">Doctor One</span>
-                                    <span class="layout-profile-role">Medical Officer</span>
+                                    <span class="layout-profile-name">#{sessionScope.currentEmployee.name}</span>
+                                    <span class="layout-profile-role">#{sessionScope.currentEmployee.role.stringVal}</span>
                                 </div>
                             </a>
                             <ul class="layout-profile-menu">
@@ -35,9 +35,9 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
+                                    <p:commandLink actionListener="#{employeeLoginManagedBean.logout}">
                                         <i class="fa fa-sign-out"></i><span>Sign Out</span>
-                                    </a>
+                                    </p:commandLink>
                                 </li>
                             </ul>
                         </div>
