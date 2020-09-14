@@ -20,6 +20,7 @@ import javax.validation.ValidatorFactory;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
+import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
@@ -78,7 +79,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         try {
             return (Serviceman) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new ServicemanNotFoundException("Serviceman Nric " + nric + " does not exist!");
+            throw new ServicemanNotFoundException("Serviceman NRIC " + nric + " does not exist!");
         }
     }
 
@@ -94,7 +95,26 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 throw new ServicemanInvalidLoginCredentialException("NRIC does not exist or invalid password!");
             }
         } catch (ServicemanNotFoundException ex) {
-            throw new ServicemanInvalidLoginCredentialException("Username does not exist or invalid password!");
+            throw new ServicemanInvalidLoginCredentialException("NRIC does not exist or invalid password!");
+        }
+    }
+        
+    @Override
+    public void changePassword(String nric, String oldPassword, String newPassword) throws ServicemanInvalidPasswordException, ServicemanNotFoundException {
+        try {
+            Serviceman serviceman = retrieveServicemanByNric(nric);
+            String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + serviceman.getSalt()));
+            
+            if (passwordHash.equals(serviceman.getPassword())) {
+                serviceman.setPassword(newPassword);
+                serviceman.setIsActivated(true);
+                em.flush();
+            } else {
+                throw new ServicemanInvalidPasswordException("Entered password do not match password associated with account!");
+            }
+            
+        } catch (ServicemanNotFoundException ex) {
+            throw new ServicemanNotFoundException("Serviceman NRIC " + nric + " does not exist!");
         }
     }
 
