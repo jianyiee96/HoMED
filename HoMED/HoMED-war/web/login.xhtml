@@ -16,6 +16,10 @@
     </h:head>
 
     <h:body styleClass="login-body">
+        <h:form id="inactivityForm">
+            <p:growl id="inactivityGrowl" sticky="true" showDetail="true" />
+            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkInactivity()}"/>
+        </h:form>
         <h:form id="loginForm">
             <p:outputPanel id="grid">
                 <div class="card login-panel ui-fluid">
@@ -36,7 +40,7 @@
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-user"></i>
-                                            <p:inputText id="nric" value="#{employeeLoginManagedBean.nric}" required="true" style="padding-left: 2rem" >
+                                            <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" required="true" requiredMessage="Username is required" maxlength="32" style="padding-left: 2rem" >
                                                 <f:validateLength minimum="4"/>
                                             </p:inputText>
                                         </span>
@@ -52,7 +56,7 @@
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-lock"></i>
-                                            <p:password id="password" value="#{employeeLoginManagedBean.password}" required="true" style="padding-left: 2rem" >
+                                            <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}" required="true" requiredMessage="Password is required" maxlength="32" style="padding-left: 2rem" >
                                                 <f:validateLength minimum="4" />
                                             </p:password>
                                         </span>
@@ -71,9 +75,10 @@
                             </div>
 
                             <div class="p-col-12">
-                                <p:messages id="messages" closable="true">
+                                <p:messages id="messages" for="loginForm" closable="true">
                                     <p:autoUpdate/>
                                 </p:messages>
+                                <!--                                <p:message for="loginForm" />-->
                             </div>
 
                             <div class="p-col-12 p-sm-6 p-md-6">
