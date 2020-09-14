@@ -8,8 +8,11 @@ package ejb.session.singleton;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
+import entity.Admin;
+import entity.Clerk;
 import entity.Employee;
 import entity.FormTemplate;
+import entity.MedicalOfficer;
 import entity.Serviceman;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -21,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanNricExistException;
@@ -59,8 +63,9 @@ public class DataInitializationSessionBean {
     private void initializeData() {
         
         try {   
-            Long id = employeeSessionBeanLocal.createEmployee(new Employee("employee one"));
-            System.out.println("Employee id: " + id);
+            Long empId1 = employeeSessionBeanLocal.createEmployee(new Admin("Admin 1", "s1234567a", "password"));
+            Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
+            Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
             
             Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
             
@@ -68,7 +73,7 @@ public class DataInitializationSessionBean {
             Long formTemplateId2 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Travel Declaration"));
             Long formTemplateId3 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Safe Distance Quiz"));
 
-        } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException ex) {
+        } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());
         } 

@@ -16,46 +16,75 @@
     </h:head>
 
     <h:body styleClass="login-body">
+        <h:form id="loginForm">
+            <p:outputPanel id="grid">
+                <div class="card login-panel ui-fluid">
+                    <div class="login-panel-content">
 
-        <div class="card login-panel ui-fluid">
-            <div class="login-panel-content">
-                <div class="p-grid">
-                    <div class="p-col-12 logo-container">
-                        <img src="./resources/roma-layout/images/logo-HoMED.svg" />
-                        <span class="guest-sign-in">
-                            <h5>Employee Management System</h5>
-                        </span>
-                    </div>
-                    <div class="p-col-12 username-container">
-                        <h:panelGroup>
-                            <label>NRIC/FIN</label>
-                            <div class="login-input">
-                                <p:inputText />
+                        <div class="p-grid">
+                            <div class="p-col-12 logo-container">
+                                <img src="./resources/roma-layout/images/logo-HoMED.svg" />
+                                <span class="guest-sign-in">
+                                    <h5>Employee Management System</h5>
+                                </span>
                             </div>
-                        </h:panelGroup>
-                    </div>
-                    <div class="p-col-12 password-container">
-                        <h:panelGroup>
-                            <label>Password</label>
-                            <div class="login-input">
-                                <p:password />
-                            </div>
-                        </h:panelGroup>
-                    </div>
-                    <div class="p-col-12 p-sm-6 p-md-6 rememberme-container">
-                        <p:selectBooleanCheckbox />
-                        <label>Remember me</label>
-                    </div>
-                    <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
-                        <a href="#" class="forget-password">Forget Password</a>
-                    </div>
 
-                    <div class="p-col-12 p-sm-6 p-md-6">
-                        <p:button outcome="/homepage" value="Sign In" icon="pi pi-user" />
+                            <div class="p-col-12 username-container">
+
+                                <h:panelGroup>
+                                    <label>NRIC/FIN</label>
+                                    <div class="login-input">
+                                        <span class="ui-input-icon-left">
+                                            <i class="pi pi-user"></i>
+                                            <p:inputText id="nric" value="#{employeeLoginManagedBean.nric}" required="true" style="padding-left: 2rem" >
+                                                <f:validateLength minimum="4"/>
+                                            </p:inputText>
+                                        </span>
+                                        <p:message for="nric" />
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+
+                            <div class="p-col-12 password-container">
+                                <h:panelGroup>
+                                    <label>Password</label>
+                                    <div class="login-input">
+                                        <span class="ui-input-icon-left">
+                                            <i class="pi pi-lock"></i>
+                                            <p:password id="password" value="#{employeeLoginManagedBean.password}" required="true" style="padding-left: 2rem" >
+                                                <f:validateLength minimum="4" />
+                                            </p:password>
+                                        </span>
+                                        <p:message for="password" />
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="p-col-12 p-sm-6 p-md-6 rememberme-container">
+                                <p:selectBooleanCheckbox />
+                                <label>Remember me</label>
+                            </div>
+
+                            <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
+                                <a href="#" class="forget-password">Forget Password</a>
+                            </div>
+
+                            <div class="p-col-12">
+                                <p:messages id="messages" closable="true">
+                                    <p:autoUpdate/>
+                                </p:messages>
+                            </div>
+
+                            <div class="p-col-12 p-sm-6 p-md-6">
+                                <p:commandButton type="submit" value="Login" actionListener="#{employeeLoginManagedBean.login}" update="loginForm" icon="pi pi-user" />
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </p:outputPanel>
+        </h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="roma-layout" />
