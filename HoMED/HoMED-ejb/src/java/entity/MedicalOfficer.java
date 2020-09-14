@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import util.enumeration.EmployeeRoleEnum;
 
 /**
  *
@@ -23,7 +24,7 @@ public class MedicalOfficer extends Employee implements Serializable {
     
     public MedicalOfficer(String name, String nric, String password) {
         super(name, nric, password);
-        this.role = "mo";
+        this.role = EmployeeRoleEnum.MEDICAL_OFFICER;
     }
 
 

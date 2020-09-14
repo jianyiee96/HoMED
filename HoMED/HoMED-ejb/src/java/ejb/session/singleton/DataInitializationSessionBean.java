@@ -58,10 +58,9 @@ public class DataInitializationSessionBean {
     private void initializeData() {
         
         try {   
-            Long id = employeeSessionBeanLocal.createEmployee(new Admin("Admin one", "s9771019h", "password"));
-            System.out.println("Employee id: " + id);
-            employeeSessionBeanLocal.createEmployee(new Clerk("Clerk one", "s0000000a", "password"));
-            employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO one", "s0000000b", "password"));
+            Long empId1 = employeeSessionBeanLocal.createEmployee(new Admin("Admin 1", "s1234567a", "password"));
+            Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
+            Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
             
             Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
             

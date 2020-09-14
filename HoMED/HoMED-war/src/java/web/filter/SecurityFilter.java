@@ -1,5 +1,6 @@
 package web.filter;
 
+import entity.Employee;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -14,6 +15,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import util.enumeration.EmployeeRoleEnum;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = {"/*"})
 public class SecurityFilter implements Filter {
@@ -27,19 +29,20 @@ public class SecurityFilter implements Filter {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-//        System.out.println("ENTERED");
+
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         HttpSession httpSession = httpServletRequest.getSession(true);
         String requestServletPath = httpServletRequest.getServletPath();
 
         Boolean isLogin = httpSession.getAttribute("currentEmployee") != null;
-        System.out.println("islogin: " + isLogin);
         if (!excludeLoginCheck(requestServletPath)) {
             if (isLogin == true) {
-//                StaffEntity currentStaffEntity = (StaffEntity) httpSession.getAttribute("currentStaffEntity");
+                Employee currentEmployee = (Employee) httpSession.getAttribute("currentEmployee");
 
-                if (checkAccessRight(requestServletPath, "ACCESS RIGHTS")) {
+                if (requestServletPath.equals("/login.xhtml")) {
+                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/homepage.xhtml");
+                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole())) {
                     chain.doFilter(request, response);
                 } else {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/accessRightError.xhtml");
@@ -56,9 +59,26 @@ public class SecurityFilter implements Filter {
         }
     }
 
-    private Boolean checkAccessRight(String path, String accessRight) {
-//    private Boolean checkAccessRight(String path, AccessRightEnum accessRight) {
-        return true;
+    private Boolean checkAccessRight(String path, EmployeeRoleEnum accessRight) {
+
+        // Pages that all usaers can enter
+        if (path.equals("/homepage.xhtml")) {
+            return true;
+        }
+
+        if (accessRight == EmployeeRoleEnum.ADMIN) {
+            if (path.equals("/medicalCentreManagement.xhtml")) {
+                return true;
+            }
+        } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
+
+        } else if (accessRight == EmployeeRoleEnum.CLERK) {
+
+        }
+
+        // FOR DEVELOPMENT ==> SET TO TRUE
+        return false;
+
 //        if (accessRight.equals(AccessRightEnum.CASHIER)) {
 //            if (path.equals("/cashierOperation/checkout.xhtml")
 //                    || path.equals("/cashierOperation/voidRefund.xhtml")
@@ -87,16 +107,14 @@ public class SecurityFilter implements Filter {
 
     private Boolean excludeLoginCheck(String path) {
         if (path.equals("/accessRightError.xhtml")
-                || path.startsWith("/javax.faces.resource")) {
+                || path.startsWith("/javax.faces.resource")
+                || path.startsWith("/resources/")) {
             return true;
         } else {
             return false;
         }
     }
 
-    /**
-     * Destroy method for this filter
-     */
     public void destroy() {
     }
 

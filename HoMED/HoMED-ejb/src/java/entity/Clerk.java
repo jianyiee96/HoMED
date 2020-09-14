@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import util.enumeration.EmployeeRoleEnum;
 
 /**
  *
@@ -23,7 +24,7 @@ public class Clerk extends Employee implements Serializable {
     
     public Clerk(String name, String nric, String password) {
         super(name, nric, password);
-        this.role = "clerk"; 
+        this.role = EmployeeRoleEnum.CLERK; 
     }
 
 

@@ -30,6 +30,7 @@
                             </div>
 
                             <div class="p-col-12 username-container">
+
                                 <h:panelGroup>
                                     <label>NRIC/FIN</label>
                                     <div class="login-input">
@@ -42,7 +43,9 @@
                                         <p:message for="nric" />
                                     </div>
                                 </h:panelGroup>
+
                             </div>
+
                             <div class="p-col-12 password-container">
                                 <h:panelGroup>
                                     <label>Password</label>
@@ -57,22 +60,26 @@
                                     </div>
                                 </h:panelGroup>
                             </div>
+
                             <div class="p-col-12 p-sm-6 p-md-6 rememberme-container">
                                 <p:selectBooleanCheckbox />
                                 <label>Remember me</label>
                             </div>
+
                             <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
                                 <a href="#" class="forget-password">Forget Password</a>
                             </div>
+
                             <div class="p-col-12">
-                                <p:messages id="messages" showDetail="true" closable="true">
-                                    
+                                <p:messages id="messages" closable="true">
+                                    <p:autoUpdate/>
                                 </p:messages>
                             </div>
+
                             <div class="p-col-12 p-sm-6 p-md-6">
                                 <p:commandButton type="submit" value="Login" actionListener="#{employeeLoginManagedBean.login}" update="loginForm" icon="pi pi-user" />
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>

@@ -8,11 +8,14 @@ package entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.EmployeeRoleEnum;
 import util.security.CryptographicHelper;
 
 /**
@@ -46,9 +49,10 @@ public class Employee implements Serializable {
     @NotNull
     protected String salt;
     
-    @Column
-    @NotNull
-    protected String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Role must be provided")
+    protected EmployeeRoleEnum role;
     
     public Employee() {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
@@ -62,11 +66,11 @@ public class Employee implements Serializable {
         setPassword(password);
     }
 
-    public String getRole() {
+    public EmployeeRoleEnum getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(EmployeeRoleEnum role) {
         this.role = role;
     }
     
