@@ -74,7 +74,7 @@ public class EmployeeLoginManagedBean {
     }
 
     public void idleWarning() {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Session about to expire", "You have been inactive for the past 15 mins"));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Session about to expire", "You have been inactive for the past 15 mins. You will be logged out in the next minute."));
     }
 
     public void checkInactivity() {
