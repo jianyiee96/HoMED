@@ -45,14 +45,17 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public Long createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException {
+    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException {
         try {
+            
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            newServiceman.setPassword(password);
             Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(newServiceman);
 
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
                 em.flush();
-                return newServiceman.getServicemanId();
+                return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
