@@ -4,6 +4,7 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import java.io.IOException;
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.application.FacesMessage;
@@ -26,12 +27,19 @@ public class EmployeeLoginManagedBean implements Serializable {
     private String password;
     private Boolean isActivateMode;
     private Employee currentEmployee;
+    private String activatePassword;
+    private String activateRePassword;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     @Inject
     private ThemeCustomiser themeCustomiser;
+
+    @PostConstruct
+    public void postConstruct() {
+        this.isActivateMode = false;
+    }
 
     public EmployeeLoginManagedBean() {
     }
@@ -52,16 +60,7 @@ public class EmployeeLoginManagedBean implements Serializable {
                     FacesContext.getCurrentInstance().getExternalContext().getSession(true);
                     FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-                    if (currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
-                        themeCustomiser.setComponentTheme("blbluegreyue");
-                        themeCustomiser.setTopbarColor("bluegrey");
-                    } else if (currentEmployee.getRole() == EmployeeRoleEnum.CLERK) {
-                        themeCustomiser.setComponentTheme("magenta");
-                        themeCustomiser.setTopbarColor("magenta");
-                    } else if (currentEmployee.getRole() == EmployeeRoleEnum.MEDICAL_OFFICER) {
-                        themeCustomiser.setComponentTheme("blue");
-                        themeCustomiser.setTopbarColor("blue");
-                    }
+                    setRoleTheme(currentEmployee.getRole());
 
                     FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
                 } else {
@@ -83,6 +82,30 @@ public class EmployeeLoginManagedBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml");
     }
 
+    public void activateAccount(ActionEvent event) throws IOException {
+        if (!activatePassword.equals(activateRePassword)) {
+            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed! Passwords do not match.", null));
+        } else {
+            // HANDLE UPDATE PASSWORD LOGIC HERE
+            // You can update currentEmployee in this ManagedBean
+            // employeeSessionBeanLocal.(updatePasswordMethod).(activatePassword,activateRePassword, currentEmployee)
+            // Make sure that in the session bean you are changing his isActivated status
+
+            this.isActivateMode = false;
+            try {
+                currentEmployee = employeeSessionBeanLocal.employeeLogin(currentEmployee.getNric(), activatePassword);
+                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+
+                setRoleTheme(currentEmployee.getRole());
+
+                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+            } catch (EmployeeInvalidLoginCredentialException ex) {
+                FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
+            }
+        }
+    }
+
     public void timeoutLogout() throws IOException {
         FacesContext.getCurrentInstance().getExternalContext().getFlash().put("inactiveSession", true);
         logout(null);
@@ -97,6 +120,23 @@ public class EmployeeLoginManagedBean implements Serializable {
         if (flash.get("inactiveSession") != null) {
             FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
         }
+    }
+
+    private void setRoleTheme(EmployeeRoleEnum role) {
+        if (role == EmployeeRoleEnum.ADMIN) {
+            themeCustomiser.setComponentTheme("blbluegreyue");
+            themeCustomiser.setTopbarColor("bluegrey");
+        } else if (role == EmployeeRoleEnum.CLERK) {
+            themeCustomiser.setComponentTheme("magenta");
+            themeCustomiser.setTopbarColor("magenta");
+        } else if (role == EmployeeRoleEnum.MEDICAL_OFFICER) {
+            themeCustomiser.setComponentTheme("blue");
+            themeCustomiser.setTopbarColor("blue");
+        }
+    }
+    
+    public void toggleActivateMode() {
+        this.isActivateMode = !this.isActivateMode;
     }
 
     public String getNric() {
@@ -121,6 +161,22 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     public void setIsActivateMode(Boolean isActivateMode) {
         this.isActivateMode = isActivateMode;
+    }
+
+    public String getActivatePassword() {
+        return activatePassword;
+    }
+
+    public void setActivatePassword(String activatePassword) {
+        this.activatePassword = activatePassword;
+    }
+
+    public String getActivateRePassword() {
+        return activateRePassword;
+    }
+
+    public void setActivateRePassword(String activateRePassword) {
+        this.activateRePassword = activateRePassword;
     }
 
 }
