@@ -46,16 +46,65 @@
 
             </div>
 
-            <div class="p-col-12 p-md-12 p-lg-7">
-                <h:form id="editorForm">
+            <div class="p-col-11 p-md-11 p-lg-6">
+                <h:form id="editorForm" >
+                    <p:commandButton value="Add Field" style="width: 100%" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}"/>
+
+                    <p:dataList value="#{formUtilityManagedBean.selectedFormFieldWrappers}" type="definition" var="fieldWrapper">
+                        <f:facet name="header">
+                            #{formUtilityManagedBean.selectedForm.formTemplateName}
+                        </f:facet>
+
+                        <div class="card">
+                            <div class="p-grid">
+                                <div class="p-col-12">
+
+                                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
 
 
-                    <div class="card">
-                        <h1>#{formUtilityManagedBean.selectedForm.formTemplateName} Preview</h1>
+                                        <p:outputLabel value="Question: " /><p:inputText id="float-input" value="#{fieldWrapper.formField.title}"/>
 
-                        <h3>Number of fields: #{formUtilityManagedBean.selectedForm.formFields.size()}</h3>
-                    </div>
+                                        <p:outputLabel value="Input Type: " />
+                                        <p:selectOneMenu id="inputType" immediate="true" value="#{fieldWrapper.formField.inputType}">
+                                            <f:selectItem itemLabel="Select One" itemValue="#{null}" />
+                                            <f:selectItems value="#{formUtilityManagedBean.inputTypes}" />
+                                            <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
 
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel value="Input Options" rendered="#{fieldWrapper.hasInputOption}" />
+                                        <p:chips rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" style="width: 500" />
+
+                                        <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
+                                        <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
+
+                                        <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
+                                        <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
+
+
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="3" cellpadding="5">
+                                        <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" value="Swap up">
+                                            <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                        </p:commandButton>
+                                        <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" value="Swap down">
+                                            <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                        </p:commandButton>
+                                        <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" title="Delete" value="Remove Field">
+                                            <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
+                                        </p:commandButton>
+
+                                    </h:panelGrid>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </p:dataList>
+
+                   
                 </h:form>
             </div>
 

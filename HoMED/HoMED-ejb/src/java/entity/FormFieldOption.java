@@ -5,10 +5,13 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -22,6 +25,11 @@ public class FormFieldOption implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formFieldOptionId;
 
+    @Column(nullable = false, length = 64)
+    @NotNull
+    @Size(max = 64)
+    private String formFieldOptionValue;
+    
     public Long getFormFieldOptionId() {
         return formFieldOptionId;
     }
@@ -30,6 +38,14 @@ public class FormFieldOption implements Serializable {
         this.formFieldOptionId = formFieldOptionId;
     }
 
+    public String getFormFieldOptionValue() {
+        return formFieldOptionValue;
+    }
+
+    public void setFormFieldOptionValue(String formFieldOptionValue) {
+        this.formFieldOptionValue = formFieldOptionValue;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
