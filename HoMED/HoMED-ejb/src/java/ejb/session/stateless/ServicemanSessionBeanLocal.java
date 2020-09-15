@@ -21,7 +21,7 @@ import util.exceptions.UnknownPersistenceException;
 @Local
 public interface ServicemanSessionBeanLocal {
 
-    public Long createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException;
+    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException;
 
     public Serviceman retrieveServicemanByNric(String nric) throws ServicemanNotFoundException;
 
