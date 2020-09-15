@@ -48,7 +48,7 @@ public class DataInitializationSessionBean {
     
     @PostConstruct
     public void postConstruct() {
-        if(employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
+        if(employeeSessionBeanLocal.retrieveEmployeeById(1l) == null) {
            initializeData();
         } else {
             System.out.println("data exists");

@@ -54,6 +54,7 @@ public class Employee implements Serializable {
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
     
+    // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }

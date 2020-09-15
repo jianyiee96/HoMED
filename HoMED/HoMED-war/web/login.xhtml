@@ -42,12 +42,12 @@
                                             <i class="pi pi-user"></i>
                                             <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" 
                                                          validatorMessage="Please provide a valid NRIC/FIN"
-                                                         required="true" requiredMessage="Username is required" maxlength="32" 
+                                                         required="true" requiredMessage="NRIC is required" maxlength="32" 
                                                          style="padding-left: 2rem" >
                                                 <f:validateLength minimum="9"/>
                                             </p:inputText>
                                         </span>
-                                        <p:message for="nric" />
+                                        <p:message for="nric" style="width: 100%; margin: 0"/>
                                     </div>
                                 </h:panelGroup>
 
@@ -66,7 +66,7 @@
                                                 <f:validateLength minimum="8" />
                                             </p:password>
                                         </span>
-                                        <p:message for="password" />
+                                        <p:message for="password" style="width: 100%; margin: 0"/>
                                     </div>
                                 </h:panelGroup>
                             </div>
