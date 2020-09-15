@@ -114,8 +114,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 if(employeeToUpdate.getNric().equals(employee.getNric()))
                 {
                     // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
-                    //employeeToUpdate.setXXX(employee.getXXX());
-                                    
+                    employeeToUpdate.setAddress(employee.getAddress());
+                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     
                 }
                 else
