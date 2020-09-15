@@ -19,11 +19,15 @@ import util.exceptions.UnknownPersistenceException;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
-    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+    
+    public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+    
+    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
     
     public Employee retrieveEmployee(Long id);
     
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
     
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
+
 }

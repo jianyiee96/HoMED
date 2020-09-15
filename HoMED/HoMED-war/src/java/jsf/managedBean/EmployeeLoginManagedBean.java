@@ -3,25 +3,29 @@ package jsf.managedBean;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import java.io.IOException;
+import java.io.Serializable;
 import javax.ejb.EJB;
 import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.event.ActionEvent;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.helper.ThemeCustomiser;
 
 @Named(value = "employeeLoginManagedBean")
-@RequestScoped
-public class EmployeeLoginManagedBean {
+@ViewScoped
+public class EmployeeLoginManagedBean implements Serializable {
 
     private String nric;
     private String password;
+    private Boolean isActivateMode;
+    private Employee currentEmployee;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -34,27 +38,38 @@ public class EmployeeLoginManagedBean {
 
     public void login(ActionEvent event) throws IOException {
 
-        Employee currentEmployee;
         try {
             currentEmployee = employeeSessionBeanLocal.employeeLogin(nric, password);
+            if (isActivateMode) {
+                if (currentEmployee.getIsActivated()) {
+                    FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
+                } else {
+                    // DISPLAY MODAL HERE
+                    PrimeFaces.current().executeScript("PF('dlg').show()");
+                }
+            } else {
+                if (currentEmployee.getIsActivated()) {
+                    FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+                    FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-            FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+                    if (currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
+                        themeCustomiser.setComponentTheme("blbluegreyue");
+                        themeCustomiser.setTopbarColor("bluegrey");
+                    } else if (currentEmployee.getRole() == EmployeeRoleEnum.CLERK) {
+                        themeCustomiser.setComponentTheme("magenta");
+                        themeCustomiser.setTopbarColor("magenta");
+                    } else if (currentEmployee.getRole() == EmployeeRoleEnum.MEDICAL_OFFICER) {
+                        themeCustomiser.setComponentTheme("blue");
+                        themeCustomiser.setTopbarColor("blue");
+                    }
 
-            if (currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
-                themeCustomiser.setComponentTheme("blbluegreyue");
-                themeCustomiser.setTopbarColor("bluegrey");
-            } else if (currentEmployee.getRole() == EmployeeRoleEnum.CLERK) {
-                themeCustomiser.setComponentTheme("magenta");
-                themeCustomiser.setTopbarColor("magenta");
-            } else if (currentEmployee.getRole() == EmployeeRoleEnum.MEDICAL_OFFICER) {
-                themeCustomiser.setComponentTheme("blue");
-                themeCustomiser.setTopbarColor("blue");
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+                } else {
+                    FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account is not yet activated!", null));
+                }
             }
-
-            FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
         } catch (EmployeeInvalidLoginCredentialException ex) {
-            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
         }
 
     }
@@ -78,7 +93,6 @@ public class EmployeeLoginManagedBean {
     }
 
     public void checkInactivity() {
-        System.out.println("CheckINACTIVITY CALLED");
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         if (flash.get("inactiveSession") != null) {
             FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
@@ -100,4 +114,13 @@ public class EmployeeLoginManagedBean {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Boolean getIsActivateMode() {
+        return isActivateMode;
+    }
+
+    public void setIsActivateMode(Boolean isActivateMode) {
+        this.isActivateMode = isActivateMode;
+    }
+
 }

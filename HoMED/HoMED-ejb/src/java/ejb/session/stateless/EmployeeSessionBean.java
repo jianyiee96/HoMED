@@ -44,15 +44,45 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
+    public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
         try {
             Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
 
             if (constraintViolations.isEmpty()) {
+                employee.setIsActivated(true);
                 em.persist(employee);
                 em.flush();
 
                 return employee.getEmployeeId();
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+                    throw new EmployeeNricExistException("Employee NRIC already exists!");
+                } else {
+                    throw new UnknownPersistenceException(ex.getMessage());
+                }
+            } else {
+                throw new UnknownPersistenceException(ex.getMessage());
+            }
+        }
+    }
+
+    // Creation of employee by admin (w OTP)
+    @Override
+    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
+        try {
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            employee.setPassword(password);
+            Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
+            if (constraintViolations.isEmpty()) {
+                em.persist(employee);
+                em.flush();
+
+                return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }

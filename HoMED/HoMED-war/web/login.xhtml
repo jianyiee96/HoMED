@@ -54,8 +54,8 @@
                             </div>
 
                             <div class="p-col-12 password-container">
-                                <h:panelGroup>
-                                    <label>Password</label>
+                                <h:panelGroup id="passwordPanel">
+                                    <label>#{employeeLoginManagedBean.isActivateMode ? "One-Time-Password" : "Password"}</label>
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-lock"></i>
@@ -72,8 +72,10 @@
                             </div>
 
                             <div class="p-col-12 p-sm-6 p-md-6 rememberme-container">
-                                <p:selectBooleanCheckbox />
-                                <label>Remember me</label>
+                                <p:selectBooleanCheckbox value="#{employeeLoginManagedBean.isActivateMode}" >
+                                    <p:ajax update="loginForm:passwordPanel" />
+                                </p:selectBooleanCheckbox>
+                                <label>Activate Account</label>
                             </div>
 
                             <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
@@ -84,17 +86,80 @@
                                 <p:messages id="messages" for="loginForm" closable="true">
                                     <p:autoUpdate/>
                                 </p:messages>
-                                <!--                                <p:message for="loginForm" />-->
                             </div>
 
                             <div class="p-col-12 p-sm-6 p-md-6">
-                                <p:commandButton type="submit" value="Login" actionListener="#{employeeLoginManagedBean.login}" update="loginForm" icon="pi pi-user" />
+                                <p:commandButton type="submit" value="Login" actionListener="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" />
                             </div>
 
                         </div>
                     </div>
                 </div>
             </p:outputPanel>
+        </h:form>
+        <h:form id="dialogForm">
+            <p:dialog header="Account Activation" widgetVar="dlg" id="dlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade">
+                <div class="p-grid">
+                    <div class="p-col-12 password-container">
+                        <div class="p-grid p-justify-center">
+                            <h:panelGroup id="actPasswordPanel">
+                                <label  style="margin:.5em 0 .5em 0; display: block">Enter New Password</label>
+                                <div class="login-input">
+                                    <span class="ui-input-icon-left">
+                                        <i class="pi pi-lock"></i>
+                                        <p:password id="actPassword" label="actPassword" value="#{employeeLoginManagedBean.password}"
+                                                    validatorMessage="Please provide a valid Password"
+                                                    required="true" requiredMessage="Password is required" maxlength="32" 
+                                                    style="padding-left: 2rem" >
+                                            <f:validateLength minimum="8" />
+                                        </p:password>
+                                    </span>
+                                    <p:message for="actPassword" />
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+
+                    <div class="p-col-12 password-container">
+                        <div class="p-grid p-justify-center">
+                            <h:panelGroup id="actRePasswordPanel">
+                                <label  style="margin:.5em 0 .5em 0; display: block">Re-Enter New Password</label>
+                                <div class="login-input">
+                                    <span class="ui-input-icon-left">
+                                        <i class="pi pi-lock"></i>
+                                        <p:password id="actRePassword" label="actRePassword" value="#{employeeLoginManagedBean.password}"
+                                                    validatorMessage="Please provide a valid Password"
+                                                    required="true" requiredMessage="Password Confirmation is required" maxlength="32" 
+                                                    style="padding-left: 2rem" >
+                                            <f:validateLength minimum="8" />
+                                        </p:password>
+                                    </span>
+                                    <p:message for="actRePassword" />
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+
+
+                    <div class="p-col-12">
+                        <div class="p-grid p-justify-center">
+                            <p:messages id="messages" for="dialogForm" closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
+                    </div>
+
+                    <div class="p-col-12">
+                        <div class=" p-grid p-justify-center">
+                            <p:commandButton type="submit" value="Change Password" actionListener="#{employeeLoginManagedBean.login}" update="dialogForm" icon="fa fa-key" />
+                        </div>
+                    </div>
+
+                </div>
+                <f:facet name="footer">
+                    <p:commandButton value="Dismiss" type="button" icon="pi pi-check" styleClass="primary-button text-button" onclick="PF('dlg').hide()" />
+                </f:facet>
+            </p:dialog>
         </h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />

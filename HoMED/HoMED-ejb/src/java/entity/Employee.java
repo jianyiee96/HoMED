@@ -34,36 +34,48 @@ public class Employee implements Serializable {
     @NotNull(message = "NRIC must be of length 9")
     @Size(min = 9, max = 9, message = "NRIC must be of length 9")
     protected String nric;
-    
+
     @Column(columnDefinition = "CHAR(64) NOT NULL")
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     protected String password;
-    
+
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
     @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
     protected String name;
-    
+
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isActivated;
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
-    
+
     public Employee() {
+        this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
-    
+
     public Employee(String name, String nric, String password) {
         this();
         this.name = name;
         this.nric = nric;
         this.password = password;
         setPassword(password);
+    }
+    
+    // Constructor to be used for OTP accounts
+    public Employee(String name, String nric) {
+        this();
+        this.name = name;
+        this.nric = nric;
     }
 
     public EmployeeRoleEnum getRole() {
@@ -73,7 +85,7 @@ public class Employee implements Serializable {
     public void setRole(EmployeeRoleEnum role) {
         this.role = role;
     }
-    
+
     public String getNric() {
         return nric;
     }
@@ -93,7 +105,7 @@ public class Employee implements Serializable {
             this.password = null;
         }
     }
-    
+
     public Long getEmployeeId() {
         return employeeId;
     }
@@ -110,6 +122,14 @@ public class Employee implements Serializable {
         this.name = name;
     }
 
+    public Boolean getIsActivated() {
+        return isActivated;
+    }
+
+    public void setIsActivated(Boolean isActivated) {
+        this.isActivated = isActivated;
+    }
+
     public String getSalt() {
         return salt;
     }
@@ -117,7 +137,7 @@ public class Employee implements Serializable {
     public void setSalt(String salt) {
         this.salt = salt;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -142,5 +162,5 @@ public class Employee implements Serializable {
     public String toString() {
         return "entity.Employee[ id=" + employeeId + " ]";
     }
-    
+
 }

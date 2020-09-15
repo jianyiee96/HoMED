@@ -58,9 +58,12 @@ public class DataInitializationSessionBean {
     private void initializeData() {
         
         try {   
-            Long empId1 = employeeSessionBeanLocal.createEmployee(new Admin("Admin 1", "s1234567a", "password"));
-            Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
-            Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
+            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Admin 1", "s1234567a", "password"));
+            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
+            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clerk 1", "s1234567c", "password"));
+            
+            String employee1OTP = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567d", "password"));
+            System.out.println("Employee NRIC: s1234567d\tOTP " + employee1OTP);
             
             String serviceman1OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "amos@gmail.com", "13 Computing Drive"));
             String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
