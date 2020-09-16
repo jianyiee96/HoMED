@@ -37,8 +37,8 @@
 
                         </div>
 
-                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="formTemplate" value="#{formUtilityManagedBean.formTemplates}" reflow="true"
-                                     rowKey="#{formTemplate.formTemplateId}" scrollable="true" scrollHeight="500"
+                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="formTemplate" value="#{formUtilityManagedBean.formTemplates}"
+                                     rowKey="#{formTemplate.formTemplateId}" scrollable="true" scrollHeight="600"
                                      styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
 
                             <f:facet id="dataViewListHeader" name="header">
@@ -55,7 +55,6 @@
                             </p:column>
 
                             <p:column exportable="false">
-
 
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
                                     <f:attribute name="formToView" value="#{formTemplate}" />
@@ -82,7 +81,7 @@
                 </h:form>
             </div>
 
-            <div class="p-col-11 p-md-11 p-lg-6">
+            <div class="p-col-12 p-md-12 p-lg-6">
 
                 <h:form id="editorForm" >
 
@@ -104,7 +103,7 @@
                                     </p:inplace>
                                 </f:facet>
 
-                                <div class="card">
+                                <div class="card" style="margin-bottom: 5px">
                                     <div class="p-grid">
                                         <div class="p-col-12">
 
