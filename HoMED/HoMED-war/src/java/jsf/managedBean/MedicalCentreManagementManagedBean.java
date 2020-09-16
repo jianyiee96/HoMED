@@ -6,7 +6,10 @@ package jsf.managedBean;
 
 import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import entity.MedicalCentre;
+import entity.OperatingHours;
 import java.io.Serializable;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -14,6 +17,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.PrimeFaces;
+import util.enumeration.DayOfWeekEnum;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
 
@@ -29,12 +34,45 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     private MedicalCentre selectedMedicalCentre;
     private Boolean isEditable;
 
+    private LocalTime mondayOpening;
+    private LocalTime mondayClosing;
+    private LocalTime tuesdayOpening;
+    private LocalTime tuesdayClosing;
+    private LocalTime wednesdayOpening;
+    private LocalTime wednesdayClosing;
+    private LocalTime thursdayOpening;
+    private LocalTime thursdayClosing;
+    private LocalTime fridayOpening;
+    private LocalTime fridayClosing;
+    private LocalTime saturdayOpening;
+    private LocalTime saturdayClosing;
+    private LocalTime sundayOpening;
+    private LocalTime sundayClosing;
+    private LocalTime holidayOpening;
+    private LocalTime holidayClosing;
+
     public MedicalCentreManagementManagedBean() {
     }
 
     @PostConstruct
     public void postConstruct() {
         medicalCentres = medicalCentreSessionBeanLocal.retrieveAllMedicalCentres();
+        mondayOpening = LocalTime.of(8, 30);
+        tuesdayOpening = LocalTime.of(8, 30);
+        wednesdayOpening = LocalTime.of(8, 30);
+        thursdayOpening = LocalTime.of(8, 30);
+        fridayOpening = LocalTime.of(8, 30);
+        saturdayOpening = LocalTime.of(8, 30);
+        sundayOpening = LocalTime.of(8, 30);
+        holidayOpening = LocalTime.of(8, 30);
+        mondayClosing = LocalTime.of(17, 30);
+        tuesdayClosing = LocalTime.of(17, 30);
+        wednesdayClosing = LocalTime.of(17, 30);
+        thursdayClosing = LocalTime.of(17, 30);
+        fridayClosing = LocalTime.of(17, 30);
+        saturdayClosing = LocalTime.of(17, 30);
+        sundayClosing = LocalTime.of(17, 30);
+        holidayClosing = LocalTime.of(17, 30);
     }
 
     public void create() {
@@ -53,38 +91,38 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     public void save() {
         if (selectedMedicalCentre.getMedicalCentreId() == null) {
             try {
-
-                String address = selectedMedicalCentre.getStreetName() + "!!!@@!!!" 
-                        + selectedMedicalCentre.getUnitNumber() + "!!!@@!!!" 
-                        + selectedMedicalCentre.getBuildingName() + "!!!@@!!!" 
-                        + selectedMedicalCentre.getCountry() + "!!!@@!!!" 
+                String address = selectedMedicalCentre.getStreetName() + "!!!@@!!!"
+                        + selectedMedicalCentre.getUnitNumber() + "!!!@@!!!"
+                        + selectedMedicalCentre.getBuildingName() + "!!!@@!!!"
+                        + selectedMedicalCentre.getCountry() + "!!!@@!!!"
                         + selectedMedicalCentre.getPostal();
-                
+
                 selectedMedicalCentre.setAddress(address);
+
+                List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, mondayOpening, mondayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, tuesdayOpening, tuesdayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, wednesdayOpening, wednesdayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, thursdayOpening, thursdayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, fridayOpening, fridayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
+                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, holidayOpening, holidayClosing));
+
+                selectedMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
 
                 Long medicalCentreId = medicalCentreSessionBeanLocal.createNewMedicalCentre(selectedMedicalCentre);
 
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "New medical centre is created successfully!", null));
+                medicalCentres.add(selectedMedicalCentre);
+
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "New medical centre is created!"));
+                PrimeFaces.current().executeScript("PF('dialogManageMedicalCentre').hide()");
 
                 selectedMedicalCentre = new MedicalCentre();
             } catch (InputDataValidationException | UnknownPersistenceException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
             }
         }
-
-//        try {
-//            Long employeeId = employeeSessionBeanLocal.createNewEmployee(employeeToCreate);
-//            employeeToCreate = employeeSessionBeanLocal.retrieveEmployeeById(employeeId);
-//
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "New employee created successfully (Employee ID: " + employeeToCreate.getEmployeeId() + ")", null));
-//
-//            employees.add(employeeToCreate);
-//            postConstruct();
-//
-//            employeeToCreate = new Employee();
-//        } catch (EmployeeUsernameExistException | EmployeeNotFoundException | InputDataValidationException | UnknownPersistenceException ex) {
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new employee: " + ex.getMessage(), null));
-//        }
     }
 
     public List<MedicalCentre> getMedicalCentres() {
@@ -109,6 +147,134 @@ public class MedicalCentreManagementManagedBean implements Serializable {
 
     public void setIsEditable(Boolean isEditable) {
         this.isEditable = isEditable;
+    }
+
+    public LocalTime getMondayOpening() {
+        return mondayOpening;
+    }
+
+    public void setMondayOpening(LocalTime mondayOpening) {
+        this.mondayOpening = mondayOpening;
+    }
+
+    public LocalTime getMondayClosing() {
+        return mondayClosing;
+    }
+
+    public void setMondayClosing(LocalTime mondayClosing) {
+        this.mondayClosing = mondayClosing;
+    }
+
+    public LocalTime getTuesdayOpening() {
+        return tuesdayOpening;
+    }
+
+    public void setTuesdayOpening(LocalTime tuesdayOpening) {
+        this.tuesdayOpening = tuesdayOpening;
+    }
+
+    public LocalTime getTuesdayClosing() {
+        return tuesdayClosing;
+    }
+
+    public void setTuesdayClosing(LocalTime tuesdayClosing) {
+        this.tuesdayClosing = tuesdayClosing;
+    }
+
+    public LocalTime getWednesdayOpening() {
+        return wednesdayOpening;
+    }
+
+    public void setWednesdayOpening(LocalTime wednesdayOpening) {
+        this.wednesdayOpening = wednesdayOpening;
+    }
+
+    public LocalTime getWednesdayClosing() {
+        return wednesdayClosing;
+    }
+
+    public void setWednesdayClosing(LocalTime wednesdayClosing) {
+        this.wednesdayClosing = wednesdayClosing;
+    }
+
+    public LocalTime getThursdayOpening() {
+        return thursdayOpening;
+    }
+
+    public void setThursdayOpening(LocalTime thursdayOpening) {
+        this.thursdayOpening = thursdayOpening;
+    }
+
+    public LocalTime getThursdayClosing() {
+        return thursdayClosing;
+    }
+
+    public void setThursdayClosing(LocalTime thursdayClosing) {
+        this.thursdayClosing = thursdayClosing;
+    }
+
+    public LocalTime getFridayOpening() {
+        return fridayOpening;
+    }
+
+    public void setFridayOpening(LocalTime fridayOpening) {
+        this.fridayOpening = fridayOpening;
+    }
+
+    public LocalTime getFridayClosing() {
+        return fridayClosing;
+    }
+
+    public void setFridayClosing(LocalTime fridayClosing) {
+        this.fridayClosing = fridayClosing;
+    }
+
+    public LocalTime getSaturdayOpening() {
+        return saturdayOpening;
+    }
+
+    public void setSaturdayOpening(LocalTime saturdayOpening) {
+        this.saturdayOpening = saturdayOpening;
+    }
+
+    public LocalTime getSaturdayClosing() {
+        return saturdayClosing;
+    }
+
+    public void setSaturdayClosing(LocalTime saturdayClosing) {
+        this.saturdayClosing = saturdayClosing;
+    }
+
+    public LocalTime getSundayOpening() {
+        return sundayOpening;
+    }
+
+    public void setSundayOpening(LocalTime sundayOpening) {
+        this.sundayOpening = sundayOpening;
+    }
+
+    public LocalTime getSundayClosing() {
+        return sundayClosing;
+    }
+
+    public void setSundayClosing(LocalTime sundayClosing) {
+        this.sundayClosing = sundayClosing;
+    }
+
+    public LocalTime getHolidayOpening() {
+        return holidayOpening;
+    }
+
+    public void setHolidayOpening(LocalTime holidayOpening) {
+        this.holidayOpening = holidayOpening;
+    }
+
+    public LocalTime getHolidayClosing() {
+        return holidayClosing;
+    }
+
+    public void setHolidayClosing(LocalTime holidayClosing) {
+        this.holidayClosing = holidayClosing;
     }
 
 }

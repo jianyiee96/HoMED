@@ -13,8 +13,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import util.enumeration.DayOfWeekEnum;
 
@@ -31,10 +29,12 @@ public class OperatingHours implements Serializable {
     @NotNull(message = "Day of week must be provided")
     private DayOfWeekEnum dayOfWeek;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
+    @NotNull(message = "Opening hours must be provided")
     private LocalTime openingHours;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
+    @NotNull(message = "Closing hours must be provided")
     private LocalTime closingHours;
 
     public OperatingHours() {

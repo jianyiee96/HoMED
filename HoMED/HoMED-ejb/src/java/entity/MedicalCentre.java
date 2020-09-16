@@ -5,7 +5,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -42,15 +41,24 @@ public class MedicalCentre implements Serializable {
     private String address;
 
     @Transient
+    @NotNull(message = "Please provide street name for the address")
+    @Size(min = 6, message = "Street name must be at least of length 6")
     private String streetName = "";
+
     @Transient
     private String unitNumber = "";
+
     @Transient
     private String buildingName = "";
+
     @Transient
     private String country = "";
+
     @Transient
+    @NotNull(message = "Please provide valid postal code")
+    @Size(min = 6, max = 6, message = "Please provide valid postal code")
     private String postal = "";
+
     @Transient
     private String delimitedAddress;
 

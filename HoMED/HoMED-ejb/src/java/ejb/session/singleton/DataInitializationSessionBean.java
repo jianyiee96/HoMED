@@ -69,51 +69,7 @@ public class DataInitializationSessionBean {
             System.out.println("Serviceman 2 : " + serviceman2OTP);
             System.out.println("Serviceman 3 : " + serviceman3OTP);
 
-            String medicalCentreName = "HOME TEAM ACADEMY MEDICAL CENTRE";
-            String medicalCentrePhone = "64653921";
-            // Street Name
-            // Unit Number
-            // Building Name
-            // Country
-            // Postal Code
-            // Delimited by "!!!@@!!!"
-            String medicalCentreAddress = "501 OLD CHOA CHU KANG ROAD!!!@@!!!#01-00!!!@@!!!!!!@@!!!Singapore!!!@@!!!698928";
-            List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
-            OperatingHours operatingHours;
-            operatingHours = new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.THURSDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30));
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.SUNDAY, null, null);
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            operatingHours = new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, null, null);
-            medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-            medicalCentreOperatingHours.add(operatingHours);
-
-            MedicalCentre newMedicalCentre = new MedicalCentre(medicalCentreName, medicalCentrePhone, medicalCentreAddress, medicalCentreOperatingHours);
-            Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
+            initializeMedicalCentres();
 
             System.out.println("End of data init");
         } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException ex) {
@@ -121,5 +77,67 @@ public class DataInitializationSessionBean {
             System.out.println(ex.getMessage());
         }
 
+    }
+
+    private void initializeMedicalCentres() throws InputDataValidationException, UnknownPersistenceException {
+        MedicalCentre newMedicalCentre = new MedicalCentre();
+
+        String medicalCentreName = "HOME TEAM ACADEMY MEDICAL CENTRE";
+        newMedicalCentre.setName(medicalCentreName);
+
+        String medicalCentrePhone = "64653921";
+        newMedicalCentre.setPhone(medicalCentrePhone);
+
+        // Street Name, Unit Number, Building Name, Country, Postal Code
+        // Delimited by "!!!@@!!!"
+        String medicalCentreAddress = "501 OLD CHOA CHU KANG ROAD!!!@@!!!#01-00!!!@@!!!!!!@@!!!Singapore!!!@@!!!698928";
+        newMedicalCentre.setAddress(medicalCentreAddress);
+        newMedicalCentre.foo();
+
+        List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+
+        newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
+
+//        OperatingHours operatingHours;
+//        operatingHours = new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.THURSDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30));
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.SUNDAY, null, null);
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+//
+//        operatingHours = new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, null, null);
+//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
+//        medicalCentreOperatingHours.add(operatingHours);
+        Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
     }
 }
