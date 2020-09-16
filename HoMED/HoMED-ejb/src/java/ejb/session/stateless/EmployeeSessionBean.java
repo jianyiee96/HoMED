@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import entity.Employee;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.validation.Validator;
@@ -20,9 +21,11 @@ import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateEmployeeException;
 import util.security.CryptographicHelper;
 
 /**
@@ -69,6 +72,15 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             }
         }
     }
+    
+    
+    @Override
+    public List<Employee> retrieveAllStaffs()
+    {
+        Query query = em.createQuery("SELECT e FROM Employee e");
+        
+        return query.getResultList();
+    }
 
     // Creation of employee by admin (w OTP)
     @Override
@@ -100,7 +112,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Employee retrieveEmployee(Long id) {
+    public Employee retrieveEmployeeById(Long id) {
         Employee employee = em.find(Employee.class, id);
         return employee;
     }
@@ -118,6 +130,54 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
     }
 
+    @Override
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException
+    {
+        if(employee != null && employee.getEmployeeId()!= null)
+        {
+            Set<ConstraintViolation<Employee>>constraintViolations = validator.validate(employee);
+        
+            if(constraintViolations.isEmpty())
+            {
+                Employee employeeToUpdate = retrieveEmployeeByNric(employee.getNric());
+
+                if(employeeToUpdate.getNric().equals(employee.getNric()))
+                {
+                    // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
+                    employeeToUpdate.setAddress(employee.getAddress());
+                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
+                    
+                }
+                else
+                {
+                    throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new EmployeeNotFoundException("Employee ID not provided for staff to be updated");
+        }
+    }
+    
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException
+    {
+        Employee employeeToRemove = retrieveEmployeeById(employeeId);
+        //for reference when other entities are related to Employee
+//        if(employeeToRemove.getSaleTransactionEntities().isEmpty())
+//        {
+//            entityManager.remove(employeeToRemove);
+//        }
+//        else
+//        {
+//            throw new DeleteStaffException("Staff ID " + employeeId + " is associated with existing sale transaction(s) and cannot be deleted!");
+//        }
+    }
+    
     @Override
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException {
         try {

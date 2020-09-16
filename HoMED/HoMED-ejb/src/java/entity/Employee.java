@@ -13,6 +13,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.EmployeeRoleEnum;
@@ -24,6 +26,7 @@ import util.security.CryptographicHelper;
  */
 @Entity
 public class Employee implements Serializable {
+    // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -49,6 +52,17 @@ public class Employee implements Serializable {
     @NotNull
     private Boolean isActivated;
 
+    @Column(nullable = false, length = 128)
+    @NotNull(message = "Address must be between length 2 to 128")
+    @Size(min = 2, max = 128, message = "Address must be between length 2 to 128")
+    protected String address;
+
+    @Column(nullable = false, unique = true)
+    @NotNull(message = "phone number must be length of 8")
+    @Min(60000000)
+    @Max(99999999)
+    protected int phoneNumber;
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
@@ -58,24 +72,45 @@ public class Employee implements Serializable {
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
 
+    // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password) {
+    public Employee(String name, String nric, String password, String address, int phoneNumber) {
         this();
         this.name = name;
         this.nric = nric;
         this.password = password;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
         setPassword(password);
     }
-    
+
     // Constructor to be used for OTP accounts
-    public Employee(String name, String nric) {
+    public Employee(String name, String nric, String address, int phoneNumber) {
         this();
         this.name = name;
         this.nric = nric;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Integer phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public EmployeeRoleEnum getRole() {
