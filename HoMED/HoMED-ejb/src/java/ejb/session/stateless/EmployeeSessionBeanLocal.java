@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Employee;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.ActivateEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
@@ -35,4 +36,6 @@ public interface EmployeeSessionBeanLocal {
     public List<Employee> retrieveAllStaffs();
 
     public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException;
+
+    public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
 }
