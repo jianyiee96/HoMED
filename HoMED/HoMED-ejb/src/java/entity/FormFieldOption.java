@@ -29,6 +29,15 @@ public class FormFieldOption implements Serializable {
     @NotNull
     @Size(max = 64)
     private String formFieldOptionValue;
+
+    public FormFieldOption() {
+        
+    }
+    
+    public FormFieldOption(String formFieldOptionValue) {
+        this();
+        this.formFieldOptionValue = formFieldOptionValue;
+    }
     
     public Long getFormFieldOptionId() {
         return formFieldOptionId;

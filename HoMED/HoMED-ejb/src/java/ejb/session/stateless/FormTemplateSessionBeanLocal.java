@@ -19,6 +19,14 @@ public interface FormTemplateSessionBeanLocal {
     
     public Long createFormTemplate(FormTemplate formTemplate) throws InputDataValidationException, UnknownPersistenceException;
     
+    public void saveFormTemplate(FormTemplate formTemplate);
+    
+    public boolean publishFormTemplate(Long id);
+
+    public boolean archiveFormTemplate(Long id);
+
+    public boolean deleteFormTemplate(Long id);
+
     public FormTemplate retrieveFormTemplate(Long id);
     
     public List<FormTemplate> retrieveAllFormTemplates();

@@ -1,14 +1,3 @@
-.custom-icon {
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    display: inline-block;
-    -webkit-font-smoothing: antialiased;
-}
-
 .form-status-badge {
     border-radius: 2px;
     padding: .25em .5rem;
@@ -42,9 +31,3 @@
 .button-margin {
     margin: 2px;
 }
-
-/*.medicalCentre-icon {
-    width: 14px;
-    height: 14px;
-    background-image: url("#{resource['images/icons/medicalCentre_icon.svg']}") !important;
-}*/

@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +20,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.FormStatusEnum;
 
 @Entity
 public class FormTemplate implements Serializable {
@@ -37,17 +40,18 @@ public class FormTemplate implements Serializable {
     @NotNull
     private Date dateCreated;
     
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
-    private Boolean isArchived;
+    private FormStatusEnum formStatus;
     
     @OneToMany
     private List<FormField> formFields;
     
     public FormTemplate() {
         this.dateCreated = new Date();
-        this.formFields = new ArrayList<FormField>();
-        this.isArchived = false;
+        this.formFields = new ArrayList<>();
+        this.formStatus = FormStatusEnum.DRAFT;
     }
 
     public FormTemplate(String formTemplateName) {
@@ -79,12 +83,12 @@ public class FormTemplate implements Serializable {
         this.dateCreated = dateCreated;
     }
 
-    public Boolean getIsArchived() {
-        return isArchived;
+    public FormStatusEnum getFormStatus() {
+        return formStatus;
     }
 
-    public void setIsArchived(Boolean isArchived) {
-        this.isArchived = isArchived;
+    public void setFormStatus(FormStatusEnum formStatus) {
+        this.formStatus = formStatus;
     }
 
     public List<FormField> getFormFields() {
@@ -94,10 +98,7 @@ public class FormTemplate implements Serializable {
     public void setFormFields(List<FormField> formFields) {
         this.formFields = formFields;
     }
-    
-    
-    
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

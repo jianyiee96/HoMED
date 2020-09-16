@@ -30,10 +30,6 @@ import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
 
-/**
- *
- * @author User
- */
 @Singleton
 @LocalBean
 @Startup
@@ -71,9 +67,6 @@ public class DataInitializationSessionBean {
             String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
             String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
             
-            Long formTemplateId1 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Health Declaration"));            
-            Long formTemplateId2 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Travel Declaration"));
-            Long formTemplateId3 = formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate("Safe Distance Quiz"));
 
             System.out.println("Serviceman 1 : " + serviceman1OTP);
             System.out.println("Serviceman 2 : " + serviceman2OTP);

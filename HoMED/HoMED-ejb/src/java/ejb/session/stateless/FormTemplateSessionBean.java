@@ -5,6 +5,8 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.FormField;
+import entity.FormFieldOption;
 import entity.FormTemplate;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +19,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.FormStatusEnum;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
 
@@ -51,6 +54,64 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
+    
+    @Override
+    public void saveFormTemplate(FormTemplate formTemplate) {
+        
+        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
+        ft.setFormStatus(formTemplate.getFormStatus());
+        ft.setFormTemplateName(formTemplate.getFormTemplateName());
+        ft.setFormFields(formTemplate.getFormFields());
+        
+        for(FormField ff : ft.getFormFields()){
+            for(FormFieldOption ffo : ff.getFormFieldOptions()) {
+                em.persist(ffo);
+            }
+            em.persist(ff);
+        }
+        
+        em.merge(ft);
+        em.flush();
+    }
+
+    @Override
+    public boolean publishFormTemplate(Long id) {
+        FormTemplate formTemplate = retrieveFormTemplate(id);
+        
+        if(formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
+            formTemplate.setFormStatus(FormStatusEnum.PUBLISHED);
+            em.flush();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean archiveFormTemplate(Long id) {
+        FormTemplate formTemplate = retrieveFormTemplate(id);
+        
+        if(formTemplate.getFormStatus() == FormStatusEnum.PUBLISHED) {
+            formTemplate.setFormStatus(FormStatusEnum.ARCHIVED);
+            em.flush();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteFormTemplate(Long id) {
+        FormTemplate formTemplate = retrieveFormTemplate(id);
+        
+        if(formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
+            formTemplate.setFormStatus(FormStatusEnum.DELETED);
+            em.flush();
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     public FormTemplate retrieveFormTemplate(Long id) {
@@ -64,8 +125,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         return query.getResultList();
     }
-    
-    
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<FormTemplate>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {

@@ -11,26 +11,28 @@ import java.util.List;
 import util.enumeration.InputTypeEnum;
 import util.security.CryptographicHelper;
 
-/**
- *
- * @author User
- */
 public class FormFieldWrapper {
 
-    public List<String> formFieldOptions = new ArrayList<>();
-    public FormField formField;
-    public String formFieldCode;
+    private List<String> formFieldOptions = new ArrayList<>();
+    private FormField formField;
+    private String formFieldCode;
 
     public FormFieldWrapper(FormField formField) {
         this.formFieldCode = CryptographicHelper.getInstance().generateRandomString(32);
         this.formField = formField;
-
-        for (FormFieldOption ffo : formField.getFormFieldOptions()) {
-            formFieldOptions.add(ffo.getFormFieldOptionValue());
+        
+        if(getHasInputOption()) {
+            for (FormFieldOption ffo : formField.getFormFieldOptions()) {
+                formFieldOptions.add(ffo.getFormFieldOptionValue());
+            }
         }
     }
 
-    public List<String> getFormFieldOptions() {
+    public List<String> getFormFieldOptions() {        
+        if(formFieldOptions == null){
+            return new ArrayList<String>();
+        }
+        
         return formFieldOptions;
     }
 
@@ -76,5 +78,4 @@ public class FormFieldWrapper {
         return false;
     }
     
-
 }
