@@ -27,8 +27,8 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem"
-                                             actionListener="#{medicalCentreManagementManagedBean.create}" update="panelManageMedicalCentre" immediate="true" oncomplete="PF('dialogManageMedicalCentre').show()" />
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" actionListener="#{medicalCentreManagementManagedBean.create}" 
+                                             update="panelManageMedicalCentre" immediate="true" oncomplete="PF('dialogManageMedicalCentre').show()" />
                         </div>
 
                         <p:dataTable id="dataTableMedicalCentres" widgetVar="dataTableMedicalCentres" var="medicalCentre" value="#{medicalCentreManagementManagedBean.medicalCentres}" sortBy="#{medicalCentre.medicalCentreId}"
@@ -63,6 +63,11 @@
                             </p:column>
 
                             <p:column headerText="Action" width="10%">
+                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" actionListener="#{medicalCentreManagementManagedBean.view}"
+                                                 update=":formAllMedicalCentres:panelManageMedicalCentre" oncomplete="PF('dialogManageMedicalCentre').show()">
+                                    <f:attribute name="medicalCentreToView" value="#{medicalCentre}" />
+                                </p:commandButton>
+
                                 <p:commandButton styleClass="edit-button rounded-button success-button" icon="pi pi-pencil" process="@this">
 
                                 </p:commandButton>
@@ -85,14 +90,14 @@
                                         <div class="p-field p-col">
                                             <p:outputLabel for="name">Name</p:outputLabel>
                                             <p:inputText id="name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.name}" style="width: 100%" 
-                                                         required="true" requiredMessage="Medical centre name is required" />
+                                                         required="true" requiredMessage="Medical centre name is required" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                             <p:message class="error-message" for="name" />
                                         </div>
 
                                         <div class="p-field p-col">
                                             <p:outputLabel for="phone">Telephone Number</p:outputLabel>
                                             <p:inputText id="phone" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.phone}" style="width: 100%" 
-                                                         required="true" requiredMessage="Medical centre telephone number is required" />
+                                                         required="true" requiredMessage="Medical centre telephone number is required" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                             <p:message class="error-message" for="phone" />
                                         </div>
                                     </div>
@@ -102,19 +107,21 @@
                                         <div class="p-field p-col">
                                             <p:outputLabel for="street-name">Street Name</p:outputLabel>
                                             <p:inputText id="street-name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.streetName}" style="width: 100%" 
-                                                         required="true" requiredMessage="Medical centre street name is required" />
+                                                         required="true" requiredMessage="Medical centre street name is required" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                             <p:message class="error-message" for="street-name" />
                                         </div>
 
                                         <div class="p-field p-col">
                                             <p:outputLabel for="unit-number">Unit Number</p:outputLabel>
-                                            <p:inputText id="unit-number" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.unitNumber}" style="width: 100%" />
+                                            <p:inputText id="unit-number" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.unitNumber}" style="width: 100%" 
+                                                         disabled="#{medicalCentreManagementManagedBean.isEditable eq false}"/>
                                             <p:message class="error-message" for="unit-number" />
                                         </div>
 
                                         <div class="p-field p-col">
                                             <p:outputLabel for="building-name">Building Name</p:outputLabel>
-                                            <p:inputText id="building-name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.buildingName}" style="width: 100%" />
+                                            <p:inputText id="building-name" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.buildingName}" style="width: 100%"
+                                                         disabled="#{medicalCentreManagementManagedBean.isEditable eq false}"/>
                                             <p:message class="error-message" for="building-name" />
                                         </div>
                                     </div>
@@ -122,7 +129,8 @@
                                     <div class="p-formgrid p-grid">
                                         <div class="p-field p-col">
                                             <p:outputLabel for="country">Country</p:outputLabel>
-                                            <p:selectOneMenu id="country" style="width: 100%" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.country}">
+                                            <p:selectOneMenu id="country" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.country}" style="width: 100%" 
+                                                             disabled="#{medicalCentreManagementManagedBean.isEditable eq false}">
                                                 <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
                                             </p:selectOneMenu>
                                             <p:message class="error-message" for="country" />
@@ -131,7 +139,7 @@
                                         <div class="p-field p-col">
                                             <p:outputLabel for="postal-code">Postal Code</p:outputLabel>
                                             <p:inputText id="postal-code" value="#{medicalCentreManagementManagedBean.selectedMedicalCentre.postal}" style="width: 100%" 
-                                                         required="true" requiredMessage="Medical centre postal code is required" />
+                                                         required="true" requiredMessage="Medical centre postal code is required" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                             <p:message class="error-message" for="postal-code" />
                                         </div>
                                     </div>
@@ -144,12 +152,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="monday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="monday-opening" value="#{medicalCentreManagementManagedBean.mondayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="monday-opening" value="#{medicalCentreManagementManagedBean.mondayOpening}" timeOnly="true" pattern="HH:mm"
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="monday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="monday-closing" value="#{medicalCentreManagementManagedBean.mondayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="monday-closing" value="#{medicalCentreManagementManagedBean.mondayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -159,12 +169,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="friday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="friday-opening" value="#{medicalCentreManagementManagedBean.fridayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="friday-opening" value="#{medicalCentreManagementManagedBean.fridayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="friday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="friday-closing" value="#{medicalCentreManagementManagedBean.fridayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="friday-closing" value="#{medicalCentreManagementManagedBean.fridayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -177,12 +189,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="tuesday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="tuesday-opening" value="#{medicalCentreManagementManagedBean.tuesdayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="tuesday-opening" value="#{medicalCentreManagementManagedBean.tuesdayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="tuesday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="tuesday-closing" value="#{medicalCentreManagementManagedBean.tuesdayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="tuesday-closing" value="#{medicalCentreManagementManagedBean.tuesdayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -192,12 +206,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="saturday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="saturday-opening" value="#{medicalCentreManagementManagedBean.saturdayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="saturday-opening" value="#{medicalCentreManagementManagedBean.saturdayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="saturday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="saturday-closing" value="#{medicalCentreManagementManagedBean.saturdayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="saturday-closing" value="#{medicalCentreManagementManagedBean.saturdayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -210,12 +226,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="wednesday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="wednesday-opening" value="#{medicalCentreManagementManagedBean.wednesdayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="wednesday-opening" value="#{medicalCentreManagementManagedBean.wednesdayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="wednesday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="wednesday-closing" value="#{medicalCentreManagementManagedBean.wednesdayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="wednesday-closing" value="#{medicalCentreManagementManagedBean.wednesdayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -225,12 +243,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="sunday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="sunday-opening" value="#{medicalCentreManagementManagedBean.sundayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="sunday-opening" value="#{medicalCentreManagementManagedBean.sundayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="sunday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="sunday-closing" value="#{medicalCentreManagementManagedBean.sundayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="sunday-closing" value="#{medicalCentreManagementManagedBean.sundayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -243,12 +263,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="thursday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="thursday-opening" value="#{medicalCentreManagementManagedBean.thursdayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="thursday-opening" value="#{medicalCentreManagementManagedBean.thursdayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="thursday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="thursday-closing" value="#{medicalCentreManagementManagedBean.thursdayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="thursday-closing" value="#{medicalCentreManagementManagedBean.thursdayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -258,12 +280,14 @@
                                             <div class="p-formgrid p-grid">
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="holiday-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="holiday-opening" value="#{medicalCentreManagementManagedBean.holidayOpening}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="holiday-opening" value="#{medicalCentreManagementManagedBean.holidayOpening}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
 
                                                 <div class="p-field p-col">
                                                     <p:outputLabel for="holiday-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="holiday-closing" value="#{medicalCentreManagementManagedBean.holidayClosing}" timeOnly="true" pattern="HH:mm" required="true" hourFormat="12" stepMinute="15" />
+                                                    <p:datePicker id="holiday-closing" value="#{medicalCentreManagementManagedBean.holidayClosing}" timeOnly="true" pattern="HH:mm" 
+                                                                  required="true" hourFormat="12" stepMinute="15" disabled="#{medicalCentreManagementManagedBean.isEditable eq false}" />
                                                 </div>
                                             </div>
                                         </div>
@@ -274,10 +298,8 @@
                             </p:outputPanel>
 
                             <f:facet name="footer">
-                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{medicalCentreManagementManagedBean.save}" 
-                                                 update="dataTableMedicalCentres growl-message panelManageMedicalCentre" >
-                                    <p:ajax rendered="@form"/>
-                                </p:commandButton>
+                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{medicalCentreManagementManagedBean.save}" rendered="#{medicalCentreManagementManagedBean.isEditable eq false}"
+                                                 update="dataTableMedicalCentres growl-message panelManageMedicalCentre" />
                                 <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('dialogManageMedicalCentre').hide()" class="secondary-button" />
                             </f:facet>
 

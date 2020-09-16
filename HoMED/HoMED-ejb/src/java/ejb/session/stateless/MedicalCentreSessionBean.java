@@ -20,6 +20,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UnknownPersistenceException;
 
 @Stateless
@@ -42,12 +43,12 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(newMedicalCentre);
 
             if (constraintViolations.isEmpty()) {
-                
+
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
                     em.persist(oh);
                     em.flush();
-                }                
-                
+                }
+
                 em.persist(newMedicalCentre);
                 em.flush();
 
@@ -59,20 +60,32 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
-    
+
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public Long createNewOperatingHours(OperatingHours newOperatingHours) {
         em.persist(newOperatingHours);
         em.flush();
-        
+
         return newOperatingHours.getOperatingHoursId();
     }
-    
+
     @Override
     public List<MedicalCentre> retrieveAllMedicalCentres() {
         Query query = em.createQuery("SELECT mc FROM MedicalCentre mc ORDER BY mc.name ASC");
         return query.getResultList();
+    }
+
+    @Override
+    public MedicalCentre retrieveMedicalCentreById(Long medicalCentreId) throws MedicalCentreNotFoundException {
+        MedicalCentre medicalCentre = em.find(MedicalCentre.class, medicalCentreId);
+
+        if (medicalCentre != null) {
+            return medicalCentre;
+        } else {
+            throw new MedicalCentreNotFoundException("Medical Centre ID " + medicalCentreId + " does not exist!");
+
+        }
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {

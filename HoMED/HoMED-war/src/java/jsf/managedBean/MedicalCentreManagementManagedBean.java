@@ -15,11 +15,13 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
 import util.enumeration.DayOfWeekEnum;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UnknownPersistenceException;
 
 @Named(value = "medicalCentreManagementManagedBean")
@@ -80,8 +82,9 @@ public class MedicalCentreManagementManagedBean implements Serializable {
         selectedMedicalCentre = new MedicalCentre();
     }
 
-    public void view() {
+    public void view(ActionEvent event) {
         isEditable = false;
+        selectedMedicalCentre = (MedicalCentre) event.getComponent().getAttributes().get("medicalCentreToView");
     }
 
     public void edit() {

@@ -9,6 +9,7 @@ import entity.OperatingHours;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UnknownPersistenceException;
 
 @Local
@@ -19,5 +20,7 @@ public interface MedicalCentreSessionBeanLocal {
     public Long createNewOperatingHours(OperatingHours newOperatingHours);
 
     public List<MedicalCentre> retrieveAllMedicalCentres();
+
+    public MedicalCentre retrieveMedicalCentreById(Long medicalCentreId) throws MedicalCentreNotFoundException;
     
 }
