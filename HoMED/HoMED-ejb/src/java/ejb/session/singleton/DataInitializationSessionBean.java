@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
@@ -35,12 +30,6 @@ import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
 
-/**
- *
- * @author User
- */
-
-
 @Singleton
 @LocalBean
 @Startup
@@ -61,7 +50,7 @@ public class DataInitializationSessionBean {
         if (employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
             initializeData();
         } else {
-            System.out.println("data exists.");
+            System.out.println("data exists");
         }
     }
 
@@ -72,7 +61,13 @@ public class DataInitializationSessionBean {
             Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
             Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
 
-            Long servicemanId1 = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "password", "bob@gmail.com", "13 Computing Drive"));
+            String serviceman1OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "amos@gmail.com", "13 Computing Drive"));
+            String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
+            String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
+
+            System.out.println("Serviceman 1 : " + serviceman1OTP);
+            System.out.println("Serviceman 2 : " + serviceman2OTP);
+            System.out.println("Serviceman 3 : " + serviceman3OTP);
 
             String medicalCentreName = "HOME TEAM ACADEMY MEDICAL CENTRE";
             String medicalCentrePhone = "64653921";
@@ -120,6 +115,7 @@ public class DataInitializationSessionBean {
             MedicalCentre newMedicalCentre = new MedicalCentre(medicalCentreName, medicalCentrePhone, medicalCentreAddress, medicalCentreOperatingHours);
             Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
 
+            System.out.println("End of data init");
         } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());

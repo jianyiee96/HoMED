@@ -19,6 +19,7 @@
             <p:graphicImage name="images/#{themeCustomiser.lightLogo ? 'logo-HoMED-white.svg' : 'logo-HoMED.svg'}" library="roma-layout" />
         </h:link>
         <ul class="topbar-menu fadeInDown">
+
             <ui:fragment>
                 <li class="user-profile">
                     <a href="#">
@@ -29,30 +30,32 @@
                         </div>
                     </a>
                     <ul>
-                        <li>
-                            <a href="#">
-                                <i class="pi pi-user"></i>
-                                <span>Profile</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="pi pi-cog"></i>
-                                <span>Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="pi pi-bell"></i>
-                                <span>Notifications</span>
-                            </a>
-                        </li>
-                        <li>
-                            <p:commandLink actionListener="#{employeeLoginManagedBean.logout}">
-                                <i class="fa fa-sign-out"></i>
-                                <span>Sign Out</span>
-                            </p:commandLink>
-                        </li>
+                        <h:form>
+                            <li>
+                                <a href="#">
+                                    <i class="pi pi-user"></i>
+                                    <span>Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="pi pi-cog"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="pi pi-bell"></i>
+                                    <span>Notifications</span>
+                                </a>
+                            </li>
+                            <li>
+                                <p:commandLink actionListener="#{employeeLoginManagedBean.logout}">
+                                    <i class="fa fa-sign-out"></i>
+                                    <span>Sign Out</span>
+                                </p:commandLink>
+                            </li>
+                        </h:form>
                     </ul>
                 </li>
             </ui:fragment>
