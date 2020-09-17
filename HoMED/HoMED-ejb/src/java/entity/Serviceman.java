@@ -35,18 +35,23 @@ public class Serviceman implements Serializable {
     private Long servicemanId;
 
     @Column(nullable = false, length = 128)
-    @NotNull(message = "Name must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
+    @NotNull(message = "Name must be provided")
+    @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     private String name;
 
     @Column(nullable = false, unique = true, length = 9)
-    @NotNull(message = "NRIC must be of length 9")
+    @NotNull(message = "NRIC must be of provided")
     @Size(min = 9, max = 9, message = "NRIC must be of length 9")
     private String nric;
 
+    @Column(nullable = false, unique = true, length = 8)
+    @NotNull(message = "Phone Number must be provided")
+    @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
+    private String phoneNumber;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    @NotNull
+    @NotNull(message = "ROD must be provided")
     private Date rod;
 
     @Enumerated(EnumType.STRING)
@@ -60,18 +65,18 @@ public class Serviceman implements Serializable {
     private BloodTypeEnum bloodType;
 
     @Column(columnDefinition = "CHAR(64) NOT NULL")
-    @NotNull(message = "Password must be between length 8 to 64")
+    @NotNull(message = "Password must be provided")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
 
     @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
-    @Email(message = "Proper formatted email with length no more than 64 must be provided")
+    @NotNull(message = "Proper formatted email address must be provided")
+    @Size(min = 9, max = 64, message = "Proper formatted email address must be between 9 to 64")
+    @Email(message = "Email must be properly formatted")
     private String email;
 
     @Column(nullable = false)
-    @NotNull(message = "Address must be at least of length 8")
+    @NotNull(message = "Address must be provided")
     @Size(min = 8, message = "Address must be at least of length 8")
     private String address;
 
@@ -88,10 +93,11 @@ public class Serviceman implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Serviceman(String name, String nric, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String email, String address) {
+    public Serviceman(String name, String nric, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String email, String address) {
         this();
         this.name = name;
         this.nric = nric;
+        this.phoneNumber = phoneNumber;
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
@@ -121,6 +127,14 @@ public class Serviceman implements Serializable {
 
     public void setNric(String nric) {
         this.nric = nric;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Date getRod() {
