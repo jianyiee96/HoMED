@@ -33,7 +33,10 @@ public class MedicalCentreManagementManagedBean implements Serializable {
 
     private List<MedicalCentre> medicalCentres;
 
-    private MedicalCentre selectedMedicalCentre;
+    private MedicalCentre medicalCentreToCreate;
+    private MedicalCentre medicalCentreToManage;
+
+//    private MedicalCentre selectedMedicalCentre;
     private Boolean isEditable;
 
     private LocalTime mondayOpening;
@@ -59,6 +62,14 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         medicalCentres = medicalCentreSessionBeanLocal.retrieveAllMedicalCentres();
+
+        medicalCentreToCreate = new MedicalCentre();
+        System.out.println("medicalCentreToCreate.ops.size() = " + medicalCentreToCreate.getOperatingHours().size());
+        
+        initializeOperatingHours();
+    }
+
+    private void initializeOperatingHours() {
         mondayOpening = LocalTime.of(8, 30);
         tuesdayOpening = LocalTime.of(8, 30);
         wednesdayOpening = LocalTime.of(8, 30);
@@ -78,13 +89,58 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     }
 
     public void create() {
-        isEditable = true;
-        selectedMedicalCentre = new MedicalCentre();
+        System.out.println("Calling create....");
+
+        try {
+            String address = medicalCentreToCreate.getStreetName() + "!!!@@!!!"
+                    + medicalCentreToCreate.getUnitNumber() + "!!!@@!!!"
+                    + medicalCentreToCreate.getBuildingName() + "!!!@@!!!"
+                    + medicalCentreToCreate.getCountry() + "!!!@@!!!"
+                    + medicalCentreToCreate.getPostal();
+
+            medicalCentreToCreate.setAddress(address);
+            
+            for (OperatingHours ohs : medicalCentreToCreate.getOperatingHours()) {
+                System.out.println(ohs.getDayOfWeek() + ": " + ohs.getOpeningHours() + " --> " + ohs.getClosingHours());
+            }
+
+//            List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, mondayOpening, mondayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, tuesdayOpening, tuesdayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, wednesdayOpening, wednesdayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, thursdayOpening, thursdayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, fridayOpening, fridayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
+//            medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, holidayOpening, holidayClosing));
+//
+//            medicalCentreToCreate.setOperatingHours(medicalCentreOperatingHours);
+
+            Long medicalCentreId = medicalCentreSessionBeanLocal.createNewMedicalCentre(medicalCentreToCreate);
+
+            medicalCentres.add(medicalCentreToCreate);
+
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "New medical centre is created!"));
+            PrimeFaces.current().executeScript("PF('dialogCreateNewMedicalCentre').hide()");
+
+            medicalCentreToCreate = new MedicalCentre();
+            initializeOperatingHours();
+        } catch (InputDataValidationException | UnknownPersistenceException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
+        }
+
     }
 
-    public void view(ActionEvent event) {
+    public void view(MedicalCentre medicalCentre) {
+        System.out.println("Calling view....");
+
         isEditable = false;
-        selectedMedicalCentre = (MedicalCentre) event.getComponent().getAttributes().get("medicalCentreToView");
+        
+//        selectedMedicalCentre = medicalCentre;
+        medicalCentreToManage = medicalCentre;
+        
+        mondayOpening = medicalCentreToManage.getOperatingHours().get(0).getOpeningHours();
+        mondayClosing = medicalCentreToManage.getOperatingHours().get(0).getClosingHours();
     }
 
     public void edit() {
@@ -92,40 +148,9 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     }
 
     public void save() {
-        if (selectedMedicalCentre.getMedicalCentreId() == null) {
-            try {
-                String address = selectedMedicalCentre.getStreetName() + "!!!@@!!!"
-                        + selectedMedicalCentre.getUnitNumber() + "!!!@@!!!"
-                        + selectedMedicalCentre.getBuildingName() + "!!!@@!!!"
-                        + selectedMedicalCentre.getCountry() + "!!!@@!!!"
-                        + selectedMedicalCentre.getPostal();
+//        if (selectedMedicalCentre.getMedicalCentreId() == null) {
 
-                selectedMedicalCentre.setAddress(address);
-
-                List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, mondayOpening, mondayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, tuesdayOpening, tuesdayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, wednesdayOpening, wednesdayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, thursdayOpening, thursdayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, fridayOpening, fridayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
-                medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, holidayOpening, holidayClosing));
-
-                selectedMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
-
-                Long medicalCentreId = medicalCentreSessionBeanLocal.createNewMedicalCentre(selectedMedicalCentre);
-
-                medicalCentres.add(selectedMedicalCentre);
-
-                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "New medical centre is created!"));
-                PrimeFaces.current().executeScript("PF('dialogManageMedicalCentre').hide()");
-
-                selectedMedicalCentre = new MedicalCentre();
-            } catch (InputDataValidationException | UnknownPersistenceException ex) {
-                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
-            }
-        }
+//        }
     }
 
     public List<MedicalCentre> getMedicalCentres() {
@@ -136,14 +161,29 @@ public class MedicalCentreManagementManagedBean implements Serializable {
         this.medicalCentres = medicalCentres;
     }
 
-    public MedicalCentre getSelectedMedicalCentre() {
-        return selectedMedicalCentre;
+    public MedicalCentre getMedicalCentreToCreate() {
+        return medicalCentreToCreate;
     }
 
-    public void setSelectedMedicalCentre(MedicalCentre selectedMedicalCentre) {
-        this.selectedMedicalCentre = selectedMedicalCentre;
+    public void setMedicalCentreToCreate(MedicalCentre medicalCentreToCreate) {
+        this.medicalCentreToCreate = medicalCentreToCreate;
     }
 
+    public MedicalCentre getMedicalCentreToManage() {
+        return medicalCentreToManage;
+    }
+
+    public void setMedicalCentreToManage(MedicalCentre medicalCentreToManage) {
+        this.medicalCentreToManage = medicalCentreToManage;
+    }
+
+//    public MedicalCentre getSelectedMedicalCentre() {
+//        return selectedMedicalCentre;
+//    }
+//
+//    public void setSelectedMedicalCentre(MedicalCentre selectedMedicalCentre) {
+//        this.selectedMedicalCentre = selectedMedicalCentre;
+//    }
     public Boolean getIsEditable() {
         return isEditable;
     }

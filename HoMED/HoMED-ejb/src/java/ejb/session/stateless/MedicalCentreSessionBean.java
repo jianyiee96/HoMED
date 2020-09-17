@@ -73,7 +73,13 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     @Override
     public List<MedicalCentre> retrieveAllMedicalCentres() {
         Query query = em.createQuery("SELECT mc FROM MedicalCentre mc ORDER BY mc.name ASC");
-        return query.getResultList();
+        List<MedicalCentre> medicalCentres = query.getResultList();
+        
+        for (MedicalCentre mc : medicalCentres) {
+            mc.getOperatingHours().size();
+        }
+        
+        return medicalCentres;
     }
 
     @Override
@@ -81,6 +87,7 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         MedicalCentre medicalCentre = em.find(MedicalCentre.class, medicalCentreId);
 
         if (medicalCentre != null) {
+            medicalCentre.getOperatingHours().size();
             return medicalCentre;
         } else {
             throw new MedicalCentreNotFoundException("Medical Centre ID " + medicalCentreId + " does not exist!");

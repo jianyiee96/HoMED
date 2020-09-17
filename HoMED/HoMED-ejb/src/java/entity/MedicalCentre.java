@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.DayOfWeekEnum;
 
 @Entity
 public class MedicalCentre implements Serializable {
@@ -66,7 +68,35 @@ public class MedicalCentre implements Serializable {
     private List<OperatingHours> operatingHours;
 
     public MedicalCentre() {
-        this.operatingHours = new ArrayList<>();
+        this.operatingHours = new ArrayList<>(8);
+
+        LocalTime mondayOpening = LocalTime.of(8, 30);
+        LocalTime tuesdayOpening = LocalTime.of(8, 30);
+        LocalTime wednesdayOpening = LocalTime.of(8, 30);
+        LocalTime thursdayOpening = LocalTime.of(8, 30);
+        LocalTime fridayOpening = LocalTime.of(8, 30);
+        LocalTime saturdayOpening = LocalTime.of(8, 30);
+        LocalTime sundayOpening = LocalTime.of(8, 30);
+        LocalTime holidayOpening = LocalTime.of(8, 30);
+        LocalTime mondayClosing = LocalTime.of(17, 30);
+        LocalTime tuesdayClosing = LocalTime.of(17, 30);
+        LocalTime wednesdayClosing = LocalTime.of(17, 30);
+        LocalTime thursdayClosing = LocalTime.of(17, 30);
+        LocalTime fridayClosing = LocalTime.of(17, 30);
+        LocalTime saturdayClosing = LocalTime.of(17, 30);
+        LocalTime sundayClosing = LocalTime.of(17, 30);
+        LocalTime holidayClosing = LocalTime.of(17, 30);
+
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, mondayOpening, mondayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, tuesdayOpening, tuesdayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, wednesdayOpening, wednesdayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, thursdayOpening, thursdayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, fridayOpening, fridayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, holidayOpening, holidayClosing));
+        System.out.println("medicalCentre.ops.size() = " + this.getOperatingHours().size());
+
     }
 
     public MedicalCentre(String name, String phone, String address, List<OperatingHours> operatingHours) {

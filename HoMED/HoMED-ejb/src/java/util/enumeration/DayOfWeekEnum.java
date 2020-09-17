@@ -12,5 +12,5 @@ public enum DayOfWeekEnum {
     THURSDAY,
     FRIDAY,
     SATURDAY,
-    PUBLIC_HOLIDAY
+    HOLIDAY
 }

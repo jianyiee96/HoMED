@@ -102,7 +102,7 @@ public class DataInitializationSessionBean {
         medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
         medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
         medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
 
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
 
