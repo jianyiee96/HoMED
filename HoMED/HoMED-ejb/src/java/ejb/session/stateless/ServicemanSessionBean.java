@@ -25,6 +25,7 @@ import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateServicemanException;
 import util.security.CryptographicHelper;
 
 /**
@@ -71,15 +72,18 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
 
         } catch (PersistenceException ex) {
-            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new ServicemanNricExistException("Serviceman NRIC already exists!");
-                } else {
-                    throw new UnknownPersistenceException(ex.getMessage());
-                }
-            } else {
-                throw new UnknownPersistenceException(ex.getMessage());
-            }
+            throw new UnknownPersistenceException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException {
+        Serviceman serviceman = em.find(Serviceman.class, servicemanId);
+
+        if (serviceman != null) {
+            return serviceman;
+        } else {
+            throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
 
@@ -128,6 +132,39 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
         } catch (ServicemanNotFoundException ex) {
             throw new ServicemanNotFoundException("Serviceman NRIC " + nric + " does not exist!");
+        }
+    }
+
+    @Override
+    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException {
+        if (serviceman != null && serviceman.getServicemanId() != null) {
+
+            Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
+            try {
+                if (constraintViolations.isEmpty()) {
+                    Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
+                    if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
+
+                        servicemanToUpdate.setEmail(serviceman.getEmail());
+                        servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
+                        servicemanToUpdate.setAddress(serviceman.getAddress());
+
+                        em.merge(servicemanToUpdate);
+                        em.flush();
+
+                        return servicemanToUpdate;
+
+                    } else {
+                        throw new UpdateServicemanException("NRIC of serviceman record to be updated does not match the existing record!");
+                    }
+                } else {
+                    throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                }
+            } catch (PersistenceException ex) {
+                throw new UnknownPersistenceException(ex.getMessage());
+            }
+        } else {
+            throw new ServicemanNotFoundException("Serviceman ID not provided for serviceman to be updated!");
         }
     }
 
