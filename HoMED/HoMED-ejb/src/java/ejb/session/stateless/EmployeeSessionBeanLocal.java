@@ -6,12 +6,15 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.ActivateEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateEmployeeException;
 
 /**
  *
@@ -19,11 +22,20 @@ import util.exceptions.UnknownPersistenceException;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
-    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
     
-    public Employee retrieveEmployee(Long id);
+    public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+    
+    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+    
+    public Employee retrieveEmployeeById(Long id);
     
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
     
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
+    
+    public List<Employee> retrieveAllStaffs();
+
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException;
+
+    public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
 }

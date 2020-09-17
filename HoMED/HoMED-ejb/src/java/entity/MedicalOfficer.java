@@ -18,16 +18,18 @@ import util.enumeration.EmployeeRoleEnum;
 @Entity
 public class MedicalOfficer extends Employee implements Serializable {
 
-    
-    public MedicalOfficer(){
+    public MedicalOfficer() {
     }
-    
-    public MedicalOfficer(String name, String nric, String password) {
-        super(name, nric, password);
+
+    public MedicalOfficer(String name, String nric, String password, String address, int phoneNumber) {
+        super(name, nric, password, address, phoneNumber);
         this.role = EmployeeRoleEnum.MEDICAL_OFFICER;
     }
 
-
+    public MedicalOfficer(String name, String nric, String address, int phoneNumber) {
+        super(name, nric, address, phoneNumber);
+        this.role = EmployeeRoleEnum.MEDICAL_OFFICER;
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -46,5 +48,5 @@ public class MedicalOfficer extends Employee implements Serializable {
     public String toString() {
         return "entity.MedicalOfficer[ id=" + super.getEmployeeId() + " ]";
     }
-    
+
 }
