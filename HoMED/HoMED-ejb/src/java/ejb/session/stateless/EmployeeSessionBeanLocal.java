@@ -27,6 +27,8 @@ public interface EmployeeSessionBeanLocal {
 
     public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
 
+    public List<Employee> retrieveAllEmployees();
+    
     public Employee retrieveEmployeeById(Long id);
 
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
