@@ -13,11 +13,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.GenderEnum;
 import util.security.CryptographicHelper;
 
 /**
@@ -71,6 +73,18 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Gender must be provided")
+    protected GenderEnum gender;
+    
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
+    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
+    @Email(message = "Proper formatted email with length no more than 64 must be provided")
+    protected String email;
+            
 
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
@@ -78,13 +92,15 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password, String address, int phoneNumber) {
+    public Employee(String name, String nric, String password, String address, int phoneNumber, String email, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.nric = nric;
         this.password = password;
         this.address = address;
         this.phoneNumber = phoneNumber;
+        this.gender = genderEnum;
+        this.email = email;
         setPassword(password);
     }
 
@@ -97,6 +113,24 @@ public class Employee implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public GenderEnum getGender() {
+        return gender;
+    }
+
+    public void setGender(GenderEnum gender) {
+        this.gender = gender;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    
+    
     public String getAddress() {
         return address;
     }

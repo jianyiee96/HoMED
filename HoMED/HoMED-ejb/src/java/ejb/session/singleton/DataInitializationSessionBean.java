@@ -59,9 +59,9 @@ public class DataInitializationSessionBean {
 
         try {
 
-            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Admin 1", "s1234567a", "password", "1 Computing Drive", 98765432));
-            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Medical Officer 1", "s1234567b", "password", "10 Heng Mui Kee", 81234567));
-            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clerk 1", "s1234567c", "password", "28 Jalan Klinik", 88888888));
+            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Admin 1", "s1234567a", "password", "1 Computing Drive", 98765432, "abc@gmail.com",GenderEnum.MALE));
+            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Medical Officer 1", "s1234567b", "password", "10 Heng Mui Kee", 81234567, "abc@hotmail.com", GenderEnum.MALE));
+            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clerk 1", "s1234567c", "password", "28 Jalan Klinik", 88888888, "abc@outlook.com", GenderEnum.FEMALE));
 
             String employee1OTP = employeeSessionBeanLocal.createEmployee(new Admin("Admin OTP", "s1234567d", "30 Jalan Klinik", 94362875));
             String employee2OTP = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO OTP", "s1234567e", "50 Jalan Jalan", 94360875));

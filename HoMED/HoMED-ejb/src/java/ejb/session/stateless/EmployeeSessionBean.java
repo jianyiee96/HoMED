@@ -24,7 +24,9 @@ import javax.validation.ValidatorFactory;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 import util.security.CryptographicHelper;
@@ -35,28 +37,28 @@ import util.security.CryptographicHelper;
  */
 @Stateless
 public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-    
+
     public EmployeeSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
-    
+
     @Override
     public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
         try {
             Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
-            
+
             if (constraintViolations.isEmpty()) {
                 employee.setIsActivated(true);
                 em.persist(employee);
                 em.flush();
-                
+
                 return employee.getEmployeeId();
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -73,11 +75,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             }
         }
     }
-    
+
     @Override
     public List<Employee> retrieveAllStaffs() {
         Query query = em.createQuery("SELECT e FROM Employee e");
-        
+
         return query.getResultList();
     }
 
@@ -85,14 +87,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
         try {
-            
+
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             employee.setPassword(password);
             Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
             if (constraintViolations.isEmpty()) {
                 em.persist(employee);
                 em.flush();
-                
+
                 return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -109,39 +111,41 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             }
         }
     }
-    
+
     @Override
     public Employee retrieveEmployeeById(Long id) {
         Employee employee = em.find(Employee.class, id);
         return employee;
     }
-    
+
     @Override
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException {
-        
+
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.nric = :inNric");
         query.setParameter("inNric", nric);
-        
+
         try {
             return (Employee) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new EmployeeNotFoundException("Serviceman Nric " + nric + " does not exist!");
         }
     }
-    
+
     @Override
     public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException {
         if (employee != null && employee.getEmployeeId() != null) {
             Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
-            
+
             if (constraintViolations.isEmpty()) {
                 Employee employeeToUpdate = retrieveEmployeeByNric(employee.getNric());
-                
+
                 if (employeeToUpdate.getNric().equals(employee.getNric())) {
                     // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
                     employeeToUpdate.setAddress(employee.getAddress());
                     employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
-                    
+                    employeeToUpdate.setEmail(employee.getEmail());
+                    employeeToUpdate.setGender(employee.getGender());
+
                 } else {
                     throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
                 }
@@ -152,7 +156,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new EmployeeNotFoundException("Employee ID not provided for staff to be updated");
         }
     }
-    
+
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException {
         Employee employeeToRemove = retrieveEmployeeById(employeeId);
         //for reference when other entities are related to Employee
@@ -165,13 +169,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 //            throw new DeleteStaffException("Staff ID " + employeeId + " is associated with existing sale transaction(s) and cannot be deleted!");
 //        }
     }
-    
+
     @Override
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException {
         try {
             Employee employee = retrieveEmployeeByNric(nric);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + employee.getSalt()));
-            
+
             if (employee.getPassword().equals(passwordHash)) {
                 return employee;
             } else {
@@ -181,17 +185,17 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new EmployeeInvalidLoginCredentialException("NRIC does not exist or invalid password!");
         }
     }
-    
+
     @Override
     public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException {
         if (!password.equals(rePassword)) {
             throw new ActivateEmployeeException("Passwords do not match!");
         }
-        
+
         try {
             Employee employee = retrieveEmployeeByNric(nric);
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND
-            
+
             employee.setPassword(password);
             employee.setIsActivated(true);
             return employee;
@@ -199,7 +203,26 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new ActivateEmployeeException("NRIC does not exist in our system! Please try again.");
         }
     }
-    
+
+    @Override
+    public void changePassword(String nric, String oldPassword, String newPassword) throws EmployeeInvalidPasswordException, EmployeeNotFoundException {
+        try {
+            Employee employee = retrieveEmployeeByNric(nric);
+            String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + employee.getSalt()));
+
+            if (passwordHash.equals(employee.getPassword())) {
+                employee.setPassword(newPassword);
+                employee.setIsActivated(true);
+                em.flush();
+            } else {
+                throw new EmployeeInvalidPasswordException("Entered password do not match password associated with account!");
+            }
+
+        } catch (EmployeeNotFoundException ex) {
+            throw new EmployeeNotFoundException("Serviceman NRIC " + nric + " does not exist!");
+        }
+    }
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {
@@ -207,9 +230,9 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
         return msg;
     }
-    
+
     public void persist(Object object) {
         em.persist(object);
     }
-    
+
 }

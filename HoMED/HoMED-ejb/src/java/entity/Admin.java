@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.GenderEnum;
 
 /**
  *
@@ -21,8 +22,8 @@ public class Admin extends Employee implements Serializable {
     public Admin() {
     }
 
-    public Admin(String name, String nric, String password, String address, int phoneNumber) {
-        super(name, nric, password, address, phoneNumber);
+    public Admin(String name, String nric, String password, String address, int phoneNumber, String email, GenderEnum gender) {
+        super(name, nric, password, address, phoneNumber, email, gender);
         this.role = EmployeeRoleEnum.ADMIN;
     }
 
