@@ -74,11 +74,11 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     public List<MedicalCentre> retrieveAllMedicalCentres() {
         Query query = em.createQuery("SELECT mc FROM MedicalCentre mc ORDER BY mc.name ASC");
         List<MedicalCentre> medicalCentres = query.getResultList();
-        
+
         for (MedicalCentre mc : medicalCentres) {
             mc.getOperatingHours().size();
         }
-        
+
         return medicalCentres;
     }
 
@@ -95,6 +95,56 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         }
     }
 
+    @Override
+    public void updateMedicalCentre(MedicalCentre medicalCentre) throws MedicalCentreNotFoundException, InputDataValidationException {
+        if (medicalCentre != null && medicalCentre.getMedicalCentreId() != null) {
+            Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(medicalCentre);
+
+            if (constraintViolations.isEmpty()) {
+                MedicalCentre medicalCentreToUpdate = retrieveMedicalCentreById(medicalCentre.getMedicalCentreId());
+
+                medicalCentreToUpdate.setName(medicalCentre.getName());
+                medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
+                medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
+
+                List<OperatingHours> ohs = medicalCentre.getOperatingHours();
+                List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
+                for (int i = 0; i < ohsToUpdate.size(); i++) {
+                    ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
+                    ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
+                }
+
+                medicalCentreToUpdate.foo();
+            } else {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } else {
+            throw new MedicalCentreNotFoundException("Medical Centre ID is not provided to update!");
+        }
+    }
+
+//    @Override
+//    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException {
+//        Employee employeeToRemove = retrieveEmployeeById(employeeId);
+//
+//        if (employeeToRemove.getPaymentTransactions().isEmpty()) {
+//            em.remove(employeeToRemove);
+//        } else {
+//            throw new DeleteEmployeeException("Employee ID " + employeeId + " is associated with existing payment transaction(s) and cannot be deleted!");
+//        }
+//    }
+
+    @Override
+    public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException {
+        MedicalCentre medicalCentreToRemove = retrieveMedicalCentreById(medicalCentreId);
+        
+        for (OperatingHours ohs : medicalCentreToRemove.getOperatingHours()) {
+            em.remove(ohs);
+        }
+        
+        em.remove(medicalCentreToRemove);
+    }
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {
         String msg = "Input data validation error!:";
 

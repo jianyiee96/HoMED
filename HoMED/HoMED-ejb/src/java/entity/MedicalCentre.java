@@ -95,8 +95,6 @@ public class MedicalCentre implements Serializable {
         operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
         operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
         operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, holidayOpening, holidayClosing));
-        System.out.println("medicalCentre.ops.size() = " + this.getOperatingHours().size());
-
     }
 
     public MedicalCentre(String name, String phone, String address, List<OperatingHours> operatingHours) {

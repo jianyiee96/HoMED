@@ -22,5 +22,9 @@ public interface MedicalCentreSessionBeanLocal {
     public List<MedicalCentre> retrieveAllMedicalCentres();
 
     public MedicalCentre retrieveMedicalCentreById(Long medicalCentreId) throws MedicalCentreNotFoundException;
+
+    public void updateMedicalCentre(MedicalCentre medicalCentre) throws MedicalCentreNotFoundException, InputDataValidationException;
+
+    public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException;
     
 }
