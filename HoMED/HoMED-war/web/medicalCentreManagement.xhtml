@@ -141,63 +141,67 @@
                                 </div>
 
                                 <h4>OPERATING HOURS</h4>                
-                                <p:repeat value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours}" var="operatingHours" step="2" varStatus="status">
-                                    <div class="p-formgrid p-grid">
-                                        <div class="p-field p-col">
-                                            <h5>#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).dayOfWeek}</h5>
+                                <h:panelGroup id="create-group">
+                                    <p:repeat value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours}" var="operatingHours" step="2" varStatus="status">
 
-                                            <h5>
-                                                <p:outputLabel for="create-hours-switch">Close?</p:outputLabel>&#160;
-                                                <p:inputSwitch id="create-hours-switch" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}">
-                                                    <p:ajax update="formAllMedicalCentres:panelCreateNewMedicalCentre" />
-                                                </p:inputSwitch>
-                                            </h5>
+                                        <div class="p-formgrid p-grid">
+                                            <div class="p-field p-col">
+                                                <h5>#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).dayOfWeek}</h5>
 
-                                            <div class="p-formgrid p-grid">
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="create-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="create-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).openingHours}" 
-                                                                  disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}"
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                <h5>
+                                                    <p:outputLabel for="create-hours-switch">Close?</p:outputLabel>&#160;
+                                                    <p:inputSwitch id="create-hours-switch" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}">
+                                                        <p:ajax update="formAllMedicalCentres:create-group" />
+                                                    </p:inputSwitch>
+                                                </h5>
+
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="create-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="create-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).openingHours}" 
+                                                                      disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}"
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="create-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="create-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).closingHours}" 
+                                                                      disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}" 
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
                                                 </div>
+                                            </div>
 
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="create-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="create-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).closingHours}" 
-                                                                  disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index).isClose}" 
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                            <div class="p-field p-col">                                            
+                                                <h5>#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).dayOfWeek}</h5>
+
+                                                <h5>
+                                                    <p:outputLabel for="create-alt-hours-switch">Close?</p:outputLabel>&#160;
+                                                    <p:inputSwitch id="create-alt-hours-switch" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}">
+                                                        <p:ajax update="formAllMedicalCentres:create-group" />
+                                                    </p:inputSwitch>
+                                                </h5>
+
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="create-alt-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="create-alt-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).openingHours}" 
+                                                                      disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}" 
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="create-alt-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="create-alt-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).closingHours}" 
+                                                                      disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}" 
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="p-field p-col">                                            
-                                            <h5>#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).dayOfWeek}</h5>
-
-                                            <h5>
-                                                <p:outputLabel for="create-alt-hours-switch">Close?</p:outputLabel>&#160;
-                                                <p:inputSwitch id="create-alt-hours-switch" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}">
-                                                    <p:ajax update="formAllMedicalCentres:panelCreateNewMedicalCentre" />
-                                                </p:inputSwitch>
-                                            </h5>
-
-                                            <div class="p-formgrid p-grid">
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="create-alt-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="create-alt-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).openingHours}" 
-                                                                  disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}" 
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
-                                                </div>
-
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="create-alt-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="create-alt-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).closingHours}" 
-                                                                  disabled="#{medicalCentreManagementManagedBean.medicalCentreToCreate.operatingHours.get(status.index + 1).isClose}" 
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </p:repeat>
+                                    </p:repeat>
+                                </h:panelGroup>
 
                             </p:outputPanel>
 
@@ -274,66 +278,68 @@
                                     </div>
                                 </div>
 
-                                <h4>OPERATING HOURS</h4>                
-                                <p:repeat value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours}" var="operatingHours" step="2" varStatus="status">
-                                    <div class="p-formgrid p-grid">
-                                        <div class="p-field p-col">
-                                            <h5>#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).dayOfWeek}</h5>
+                                <h4>OPERATING HOURS</h4>
+                                <h:panelGroup id="manage-group">
+                                    <p:repeat value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours}" var="operatingHours" step="2" varStatus="status">
+                                        <div class="p-formgrid p-grid">
+                                            <div class="p-field p-col">
+                                                <h5>#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).dayOfWeek}</h5>
 
-                                            <h5>
-                                                <p:outputLabel for="manage-hours-switch">Close?</p:outputLabel>&#160;
-                                                <p:inputSwitch id="manage-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
-                                                               value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}">
-                                                    <p:ajax update="formAllMedicalCentres:panelManageMedicalCentre" />
-                                                </p:inputSwitch>
-                                            </h5>
+                                                <h5>
+                                                    <p:outputLabel for="manage-hours-switch">Close?</p:outputLabel>&#160;
+                                                    <p:inputSwitch id="manage-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
+                                                                   value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}">
+                                                        <p:ajax update="manage-group" />
+                                                    </p:inputSwitch>
+                                                </h5>
 
-                                            <div class="p-formgrid p-grid">
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="manage-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="manage-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).openingHours}" 
-                                                                  disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}"
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).openingHours}" 
+                                                                      disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}"
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).closingHours}" 
+                                                                      disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}"
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
                                                 </div>
+                                            </div>
 
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="manage-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="manage-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).closingHours}" 
-                                                                  disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}"
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                            <div class="p-field p-col">
+                                                <h5>#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).dayOfWeek}</h5>
+
+                                                <h5>
+                                                    <p:outputLabel for="manage-alt-hours-switch">Close?</p:outputLabel>&#160;
+                                                    <p:inputSwitch id="manage-alt-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
+                                                                   value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}">
+                                                        <p:ajax update="manage-group" />
+                                                    </p:inputSwitch>
+                                                </h5>
+
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-alt-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-alt-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).openingHours}" 
+                                                                      disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}"
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-alt-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-alt-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).closingHours}" 
+                                                                      disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}"
+                                                                      timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="p-field p-col">
-                                            <h5>#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).dayOfWeek}</h5>
-
-                                            <h5>
-                                                <p:outputLabel for="manage-alt-hours-switch">Close?</p:outputLabel>&#160;
-                                                <p:inputSwitch id="manage-alt-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
-                                                               value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}">
-                                                    <p:ajax update="formAllMedicalCentres:panelManageMedicalCentre" />
-                                                </p:inputSwitch>
-                                            </h5>
-
-                                            <div class="p-formgrid p-grid">
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="manage-alt-opening">Opening Hours</p:outputLabel>
-                                                    <p:datePicker id="manage-alt-opening" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).openingHours}" 
-                                                                  disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}"
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
-                                                </div>
-
-                                                <div class="p-field p-col">
-                                                    <p:outputLabel for="manage-alt-closing">Closing Hours</p:outputLabel>
-                                                    <p:datePicker id="manage-alt-closing" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).closingHours}" 
-                                                                  disabled="#{not medicalCentreManagementManagedBean.isEditable or medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}"
-                                                                  timeOnly="true" pattern="HH:mm" hourFormat="12" stepMinute="15" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </p:repeat>
+                                    </p:repeat>
+                                </h:panelGroup>
 
                             </p:outputPanel>
 
