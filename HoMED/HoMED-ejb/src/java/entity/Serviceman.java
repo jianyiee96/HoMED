@@ -26,7 +26,7 @@ import util.security.CryptographicHelper;
  *
  * @author Keith Lim <https://github.com/keithlim>
  */
-    @Entity
+@Entity
 public class Serviceman implements Serializable {
 
     private static final long serialVersionUID = 1L;
