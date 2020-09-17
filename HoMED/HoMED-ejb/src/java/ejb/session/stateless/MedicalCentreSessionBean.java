@@ -123,17 +123,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         }
     }
 
-//    @Override
-//    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException {
-//        Employee employeeToRemove = retrieveEmployeeById(employeeId);
-//
-//        if (employeeToRemove.getPaymentTransactions().isEmpty()) {
-//            em.remove(employeeToRemove);
-//        } else {
-//            throw new DeleteEmployeeException("Employee ID " + employeeId + " is associated with existing payment transaction(s) and cannot be deleted!");
-//        }
-//    }
-
     @Override
     public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException {
         MedicalCentre medicalCentreToRemove = retrieveMedicalCentreById(medicalCentreId);

@@ -95,49 +95,17 @@ public class DataInitializationSessionBean {
         newMedicalCentre.foo();
 
         List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
-        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, LocalTime.of(8, 30), LocalTime.of(13, 30)));
-
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.TRUE, null, null));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
+        
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
 
-//        OperatingHours operatingHours;
-//        operatingHours = new OperatingHours(DayOfWeekEnum.MONDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.TUESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.WEDNESDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.THURSDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.FRIDAY, LocalTime.of(8, 30), LocalTime.of(17, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.SATURDAY, LocalTime.of(8, 30), LocalTime.of(13, 30));
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.SUNDAY, null, null);
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
-//
-//        operatingHours = new OperatingHours(DayOfWeekEnum.PUBLIC_HOLIDAY, null, null);
-//        medicalCentreSessionBeanLocal.createNewOperatingHours(operatingHours);
-//        medicalCentreOperatingHours.add(operatingHours);
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
     }
 }

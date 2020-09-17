@@ -70,31 +70,14 @@ public class MedicalCentre implements Serializable {
     public MedicalCentre() {
         this.operatingHours = new ArrayList<>(8);
 
-        LocalTime mondayOpening = LocalTime.of(8, 30);
-        LocalTime tuesdayOpening = LocalTime.of(8, 30);
-        LocalTime wednesdayOpening = LocalTime.of(8, 30);
-        LocalTime thursdayOpening = LocalTime.of(8, 30);
-        LocalTime fridayOpening = LocalTime.of(8, 30);
-        LocalTime saturdayOpening = LocalTime.of(8, 30);
-        LocalTime sundayOpening = LocalTime.of(8, 30);
-        LocalTime holidayOpening = LocalTime.of(8, 30);
-        LocalTime mondayClosing = LocalTime.of(17, 30);
-        LocalTime tuesdayClosing = LocalTime.of(17, 30);
-        LocalTime wednesdayClosing = LocalTime.of(17, 30);
-        LocalTime thursdayClosing = LocalTime.of(17, 30);
-        LocalTime fridayClosing = LocalTime.of(17, 30);
-        LocalTime saturdayClosing = LocalTime.of(17, 30);
-        LocalTime sundayClosing = LocalTime.of(17, 30);
-        LocalTime holidayClosing = LocalTime.of(17, 30);
-
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, mondayOpening, mondayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, tuesdayOpening, tuesdayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, wednesdayOpening, wednesdayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, thursdayOpening, thursdayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, fridayOpening, fridayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, saturdayOpening, saturdayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, sundayOpening, sundayClosing));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, holidayOpening, holidayClosing));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(13, 30)));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
     }
 
     public MedicalCentre(String name, String phone, String address, List<OperatingHours> operatingHours) {

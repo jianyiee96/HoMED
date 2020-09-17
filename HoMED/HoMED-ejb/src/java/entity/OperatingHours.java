@@ -30,18 +30,20 @@ public class OperatingHours implements Serializable {
     private DayOfWeekEnum dayOfWeek;
 
     @Column(nullable = false)
-    @NotNull(message = "Opening hours must be provided")
+    private Boolean isClose;
+
+    @Column(nullable = true)
     private LocalTime openingHours;
 
-    @Column(nullable = false)
-    @NotNull(message = "Closing hours must be provided")
+    @Column(nullable = true)
     private LocalTime closingHours;
 
     public OperatingHours() {
     }
 
-    public OperatingHours(DayOfWeekEnum dayOfWeek, LocalTime openingHours, LocalTime closingHours) {
+    public OperatingHours(DayOfWeekEnum dayOfWeek, Boolean isClose, LocalTime openingHours, LocalTime closingHours) {
         this.dayOfWeek = dayOfWeek;
+        this.isClose = isClose;
         this.openingHours = openingHours;
         this.closingHours = closingHours;
     }
@@ -60,6 +62,22 @@ public class OperatingHours implements Serializable {
 
     public void setDayOfWeek(DayOfWeekEnum dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
+    }
+
+    public Boolean getIsClose() {
+        return isClose;
+    }
+
+    public void setIsClose(Boolean isClose) {
+        this.isClose = isClose;
+        
+        if (isClose) {
+            openingHours = null;
+            closingHours = null;
+        } else {
+            openingHours = LocalTime.of(8, 30);
+            closingHours = LocalTime.of(17, 30);
+        }
     }
 
     public LocalTime getOpeningHours() {
