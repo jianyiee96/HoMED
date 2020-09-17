@@ -77,9 +77,9 @@
                                 </p:commandLink>
                             </div>
 
-                            <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
-                                <a class="forget-password">Forget Password</a>
-                            </div>
+                            <!--                            <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
+                                                            <a class="forget-password">Forget Password</a>
+                                                        </div>-->
 
                             <div class="p-col-12">
                                 <p:messages id="messages" for="loginForm" closable="true">
@@ -96,7 +96,7 @@
                 </div>
             </p:outputPanel>
         </h:form>
-        
+
         <h:form id="dialogForm">
             <p:dialog header="Account Activation" widgetVar="dlg" id="dlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade">
                 <p:outputPanel id="actPanel">
@@ -144,16 +144,20 @@
                                 </div>
 
                                 <div class="p-col-12">
-                                    <div class="p-grid p-justify-center">
-                                        <p:messages id="messages" for="dialogForm" closable="true">
-                                            <p:autoUpdate/>
-                                        </p:messages>
-                                    </div>
+                                    <p:selectBooleanCheckbox value="#{employeeLoginManagedBean.isLoginAfterActivate}"/>
+                                    <label>Login after activation</label>
                                 </div>
+                                
+                                <div class="p-col-12">
+                                    <p:messages id="messages" for="dialogForm" closable="true">
+                                        <p:autoUpdate/>
+                                    </p:messages>
+                                </div>
+                                
                                 <div class="p-col-12">
                                     <div class="p-grid p-justify-center">
                                         <div class="p-col-8">
-                                            <p:commandButton type="submit" value="Change Password" actionListener="#{employeeLoginManagedBean.activateAccount}"
+                                            <p:commandButton type="submit" value="Activate Account" actionListener="#{employeeLoginManagedBean.activateAccount}"
                                                              update="actPanel" icon="fa fa-key"/>
                                         </div>
                                     </div>
@@ -163,9 +167,6 @@
                         </div>
                     </div>
                 </p:outputPanel>
-                <f:facet name="footer">
-                    <p:commandButton value="Dismiss" type="button" icon="pi pi-check" styleClass="primary-button text-button" onclick="PF('dlg').hide()" />
-                </f:facet>
             </p:dialog>
         </h:form>
 

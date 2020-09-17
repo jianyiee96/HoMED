@@ -27,6 +27,7 @@ public class EmployeeLoginManagedBean implements Serializable {
     private String nric;
     private String password;
     private Boolean isActivateMode;
+    private Boolean isLoginAfterActivate;
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
@@ -40,6 +41,7 @@ public class EmployeeLoginManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         this.isActivateMode = false;
+        this.isLoginAfterActivate = false;
     }
 
     public EmployeeLoginManagedBean() {
@@ -83,21 +85,27 @@ public class EmployeeLoginManagedBean implements Serializable {
     }
 
     public void activateAccount(ActionEvent event) throws IOException {
-        if (!activatePassword.equals(activateRePassword)) {
+        if (currentEmployee.getIsActivated()) {
+            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
+        } else if (!activatePassword.equals(activateRePassword)) {
             FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed! Passwords do not match.", null));
         } else {
             try {
                 currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
-                this.isActivateMode = false;
-                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+                if (this.isLoginAfterActivate) {
+                    this.isActivateMode = false;
+                    FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+                    FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-                setRoleTheme(currentEmployee.getRole());
+                    setRoleTheme(currentEmployee.getRole());
 
-                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
-                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+                    FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+                } else {
+                    FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account", null));
+                }
             } catch (ActivateEmployeeException ex) {
-                FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
+                FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed " + ex.getMessage(), null));
             }
         }
     }
@@ -180,6 +188,14 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     public void setActivateRePassword(String activateRePassword) {
         this.activateRePassword = activateRePassword;
+    }
+
+    public Boolean getIsLoginAfterActivate() {
+        return isLoginAfterActivate;
+    }
+
+    public void setIsLoginAfterActivate(Boolean isLoginAfterActivate) {
+        this.isLoginAfterActivate = isLoginAfterActivate;
     }
 
 }
