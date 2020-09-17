@@ -42,40 +42,47 @@ public class DataInitializationSessionBean {
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
-    
+
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
-    
+
     @PostConstruct
     public void postConstruct() {
-        if(employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
-           initializeData();
+        if (employeeSessionBeanLocal.retrieveEmployeeById(1l) == null) {
+            initializeData();
         } else {
             System.out.println("data exists");
         }
     }
 
     private void initializeData() {
-        
-        try {   
-            Long empId1 = employeeSessionBeanLocal.createEmployee(new Admin("Admin 1", "s1234567a", "password"));
-            Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
-            Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
-            
+
+        try {
+
+            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Admin 1", "s1234567a", "password", "1 Computing Drive", 98765432));
+            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Medical Officer 1", "s1234567b", "password", "10 Heng Mui Kee", 81234567));
+            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clerk 1", "s1234567c", "password", "28 Jalan Klinik", 88888888));
+
+            String employee1OTP = employeeSessionBeanLocal.createEmployee(new Admin("Admin OTP", "s1234567d", "30 Jalan Klinik", 94362875));
+            String employee2OTP = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO OTP", "s1234567e", "50 Jalan Jalan", 94360875));
+            String employee3OTP = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk OTP", "s1234567f", "120 Jalan Bedok", 94326975));
+            System.out.println("Employee NRIC: s1234567d\tOTP " + employee1OTP);
+            System.out.println("Employee NRIC: s1234567e\tOTP " + employee2OTP);
+            System.out.println("Employee NRIC: s1234567f\tOTP " + employee3OTP);
+
             String serviceman1OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "amos@gmail.com", "13 Computing Drive"));
             String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
             String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
-            
+
             System.out.println("Serviceman 1 : " + serviceman1OTP);
             System.out.println("Serviceman 2 : " + serviceman2OTP);
             System.out.println("Serviceman 3 : " + serviceman3OTP);
-            
+
             System.out.println("End of data init");
         } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());
-        } 
-        
-        
+        }
+
     }
 }

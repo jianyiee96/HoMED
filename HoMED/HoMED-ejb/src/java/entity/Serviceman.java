@@ -63,7 +63,7 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
-    
+
     @Column(nullable = false, unique = true, length = 64)
     @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
     @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
@@ -74,7 +74,7 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Address must be at least of length 8")
     @Size(min = 8, message = "Address must be at least of length 8")
     private String address;
-    
+
     @Column(nullable = false)
     @NotNull
     private Boolean isActivated;
@@ -158,7 +158,7 @@ public class Serviceman implements Serializable {
             this.password = null;
         }
     }
-    
+
     public String getEmail() {
         return email;
     }
