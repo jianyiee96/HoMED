@@ -289,7 +289,7 @@
                                                     <p:outputLabel for="manage-hours-switch">Close?</p:outputLabel>&#160;
                                                     <p:inputSwitch id="manage-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
                                                                    value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index).isClose}">
-                                                        <p:ajax update="manage-group" />
+                                                        <p:ajax update="formAllMedicalCentres:manage-group" />
                                                     </p:inputSwitch>
                                                 </h5>
 
@@ -317,7 +317,7 @@
                                                     <p:outputLabel for="manage-alt-hours-switch">Close?</p:outputLabel>&#160;
                                                     <p:inputSwitch id="manage-alt-hours-switch" disabled="#{not medicalCentreManagementManagedBean.isEditable}" 
                                                                    value="#{medicalCentreManagementManagedBean.medicalCentreToManage.operatingHours.get(status.index + 1).isClose}">
-                                                        <p:ajax update="manage-group" />
+                                                        <p:ajax update="formAllMedicalCentres:manage-group" />
                                                     </p:inputSwitch>
                                                 </h5>
 

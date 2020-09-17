@@ -71,13 +71,13 @@ public class OperatingHours implements Serializable {
     public void setIsClose(Boolean isClose) {
         this.isClose = isClose;
         
-        if (isClose) {
-            openingHours = null;
-            closingHours = null;
-        } else {
-            openingHours = LocalTime.of(8, 30);
-            closingHours = LocalTime.of(17, 30);
-        }
+//        if (isClose) {
+//            openingHours = null;
+//            closingHours = null;
+//        } else {
+//            openingHours = LocalTime.of(8, 30);
+//            closingHours = LocalTime.of(17, 30);
+//        }
     }
 
     public LocalTime getOpeningHours() {

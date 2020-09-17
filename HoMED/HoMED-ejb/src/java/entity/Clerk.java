@@ -18,16 +18,18 @@ import util.enumeration.EmployeeRoleEnum;
 @Entity
 public class Clerk extends Employee implements Serializable {
 
-    
-    public Clerk(){
-    }
-    
-    public Clerk(String name, String nric, String password) {
-        super(name, nric, password);
-        this.role = EmployeeRoleEnum.CLERK; 
+    public Clerk() {
     }
 
+    public Clerk(String name, String nric, String password, String address, int phoneNumber) {
+        super(name, nric, password, address, phoneNumber);
+        this.role = EmployeeRoleEnum.CLERK;
+    }
 
+    public Clerk(String name, String nric, String address, int phoneNumber) {
+        super(name, nric, address, phoneNumber);
+        this.role = EmployeeRoleEnum.CLERK;
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -46,5 +48,5 @@ public class Clerk extends Employee implements Serializable {
     public String toString() {
         return "entity.Clerk[ id=" + super.getEmployeeId() + " ]";
     }
-    
+
 }
