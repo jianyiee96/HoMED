@@ -57,14 +57,16 @@ public class DataInitializationSessionBean {
 
     private void initializeData() {
         
-        try {   
+        try {
+            System.out.println("Start of data init");
+            
             Long empId1 = employeeSessionBeanLocal.createEmployee(new Admin("Admin 1", "s1234567a", "password"));
             Long empId2 = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Medical Officer 1", "s1234567b", "password"));
             Long empId3 = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk 1", "s1234567c", "password"));
             
-            String serviceman1OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "amos@gmail.com", "13 Computing Drive"));
-            String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
-            String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
+            String serviceman1OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Amos Tan Ah Kow", "S9876543Z", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "amos@gmail.com", "13 Computing Drive"));
+            String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
+            String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", "98765435", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
             
             System.out.println("Serviceman 1 : " + serviceman1OTP);
             System.out.println("Serviceman 2 : " + serviceman2OTP);
