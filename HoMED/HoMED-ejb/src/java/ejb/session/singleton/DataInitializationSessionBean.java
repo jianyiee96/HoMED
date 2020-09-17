@@ -57,7 +57,7 @@ public class DataInitializationSessionBean {
     private void initializeData() {
 
         try {
-        System.out.println("Start of data init");    
+            System.out.println("Start of data init");    
         
             Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Admin 1", "s1234567a", "password", "vwqegwegm@hotmail.com", "1 Computing Drive", 98765432));
             Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Medical Officer 1", "s1234567b", "password", "eqeee@hotmail.com", "10 Heng Mui Kee", 81234567));
