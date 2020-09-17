@@ -67,7 +67,8 @@ public class SecurityFilter implements Filter {
         String[] pathArr = new String[]{
             "/homepage.xhtml", // 0
             "/accessRightError.xhtml", // 1
-            "/medicalCentreManagement.xhtml" // 2
+            "/medicalCentreManagement.xhtml", // 2
+            "/form-util.xhtml" //3
         };
 
         // Pages that all logged in users can enter
@@ -77,7 +78,8 @@ public class SecurityFilter implements Filter {
         }
 
         if (accessRight == EmployeeRoleEnum.ADMIN) {
-            if (path.equals(pathArr[2])) {
+            if (path.equals(pathArr[2]) 
+                    || path.equals(pathArr[3])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {

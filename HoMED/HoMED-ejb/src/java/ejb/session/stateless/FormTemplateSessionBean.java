@@ -4,7 +4,6 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
@@ -58,7 +57,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public void saveFormTemplate(FormTemplate formTemplate) {
         
-        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
+        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());        
         ft.setFormStatus(formTemplate.getFormStatus());
         ft.setFormTemplateName(formTemplate.getFormTemplateName());
         ft.setFormFields(formTemplate.getFormFields());

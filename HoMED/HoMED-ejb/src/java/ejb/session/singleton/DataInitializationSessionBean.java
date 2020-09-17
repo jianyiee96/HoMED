@@ -6,12 +6,9 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
-import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Admin;
 import entity.Clerk;
-import entity.Employee;
-import entity.FormTemplate;
 import entity.MedicalOfficer;
 import entity.Serviceman;
 import java.util.Date;
@@ -44,9 +41,6 @@ public class DataInitializationSessionBean {
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
     
-    @EJB
-    private FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
-    
     @PostConstruct
     public void postConstruct() {
         if(employeeSessionBeanLocal.retrieveEmployee(1l) == null) {
@@ -67,7 +61,6 @@ public class DataInitializationSessionBean {
             String serviceman2OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Brandon Tan Ah Kow", "S9876544Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "brandon@gmail.com", "14 Computing Drive"));
             String serviceman3OTP = servicemanSessionBeanLocal.createNewServiceman(new Serviceman("Charles Tan Ah Kow", "S9876545Z", new Date(), GenderEnum.MALE, BloodTypeEnum.BP, "charles@gmail.com", "15 Computing Drive"));
             
-
             System.out.println("Serviceman 1 : " + serviceman1OTP);
             System.out.println("Serviceman 2 : " + serviceman2OTP);
             System.out.println("Serviceman 3 : " + serviceman3OTP);
