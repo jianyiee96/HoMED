@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Address;
 import entity.MedicalCentre;
 import entity.OperatingHours;
 import java.util.List;
@@ -47,6 +48,23 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
                     em.persist(oh);
                     em.flush();
+                }
+
+                Address medicalCentreAddress = newMedicalCentre.getAddress();
+                if (medicalCentreAddress.getStreetName() != null) {
+                    medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+                }
+                if (medicalCentreAddress.getUnitNumber() != null) {
+                    medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
+                }
+                if (medicalCentreAddress.getBuildingName() != null) {
+                    medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
+                }
+                if (medicalCentreAddress.getCountry() != null) {
+                    medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
+                }
+                if (medicalCentreAddress.getPostal() != null) {
+                    medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
                 }
 
                 em.persist(newMedicalCentre);
@@ -107,6 +125,23 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                 medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
                 medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
 
+                Address medicalCentreAddress = medicalCentreToUpdate.getAddress();
+                if (medicalCentreAddress.getStreetName() != null) {
+                    medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+                }
+                if (medicalCentreAddress.getUnitNumber() != null) {
+                    medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
+                }
+                if (medicalCentreAddress.getBuildingName() != null) {
+                    medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
+                }
+                if (medicalCentreAddress.getCountry() != null) {
+                    medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
+                }
+                if (medicalCentreAddress.getPostal() != null) {
+                    medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+                }
+
                 List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                 List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
                 for (int i = 0; i < ohsToUpdate.size(); i++) {
@@ -114,7 +149,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
                 }
 
-                medicalCentreToUpdate.foo();
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
@@ -126,14 +160,14 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     @Override
     public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException {
         MedicalCentre medicalCentreToRemove = retrieveMedicalCentreById(medicalCentreId);
-        
+
         for (OperatingHours ohs : medicalCentreToRemove.getOperatingHours()) {
             em.remove(ohs);
         }
-        
+
         em.remove(medicalCentreToRemove);
     }
-    
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {
         String msg = "Input data validation error!:";
 

@@ -58,8 +58,7 @@
                             </p:column>
 
                             <p:column headerText="Address" width="45%" sortBy="#{medicalCentre.address}" filterBy="#{medicalCentre.address}" filterMatchMode="contains">
-                                #{medicalCentre.foo()}
-                                <h:outputText value="#{medicalCentre.delimitedAddress}" />
+                                <h:outputText value="#{medicalCentre.address}" />
                             </p:column>
 
                             <p:column headerText="Action" width="10%">
@@ -104,20 +103,20 @@
                                 <div class="p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-street-name">Street Name</p:outputLabel>
-                                        <p:inputText id="create-street-name" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.streetName}" style="width: 100%" 
+                                        <p:inputText id="create-street-name" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.streetName}" style="width: 100%" 
                                                      required="true" requiredMessage="Medical centre street name is required" />
                                         <p:message class="error-message" for="create-street-name" />
                                     </div>
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-unit-number">Unit Number</p:outputLabel>
-                                        <p:inputText id="create-unit-number" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.unitNumber}" style="width: 100%" />
+                                        <p:inputText id="create-unit-number" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.unitNumber}" style="width: 100%" />
                                         <p:message class="error-message" for="create-unit-number" />
                                     </div>
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-building-name">Building Name</p:outputLabel>
-                                        <p:inputText id="create-building-name" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.buildingName}" style="width: 100%" />
+                                        <p:inputText id="create-building-name" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.buildingName}" style="width: 100%" />
                                         <p:message class="error-message" for="create-building-name" />
                                     </div>
                                 </div>
@@ -125,7 +124,7 @@
                                 <div class="p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-country">Country</p:outputLabel>
-                                        <p:selectOneMenu id="create-country" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.country}" style="width: 100%">
+                                        <p:selectOneMenu id="create-country" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.country}" style="width: 100%">
                                             <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
                                         </p:selectOneMenu>
                                         <p:message class="error-message" for="create-country" />
@@ -133,7 +132,7 @@
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-postal-code">Postal Code</p:outputLabel>
-                                        <p:inputText id="create-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.postal}" style="width: 100%" placeholder="329560"
+                                        <p:inputText id="create-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.postal}" style="width: 100%" placeholder="329560"
                                                      required="true" requiredMessage="Medical centre postal code is required" validatorMessage="Please input valid postal code!">
                                             <f:validateLongRange minimum="000000" maximum="999999" />
                                         </p:inputText>
@@ -238,20 +237,20 @@
                                 <div class="p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-street-name">Street Name</p:outputLabel>
-                                        <p:inputText id="manage-street-name" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.streetName}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}"
+                                        <p:inputText id="manage-street-name" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.streetName}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}"
                                                      required="true" requiredMessage="Medical centre street name is required" />
                                         <p:message class="error-message" for="manage-street-name" />
                                     </div>
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-unit-number">Unit Number</p:outputLabel>
-                                        <p:inputText id="manage-unit-number" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.unitNumber}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" />
+                                        <p:inputText id="manage-unit-number" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.unitNumber}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" />
                                         <p:message class="error-message" for="manage-unit-number" />
                                     </div>
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-building-name">Building Name</p:outputLabel>
-                                        <p:inputText id="manage-building-name" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.buildingName}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" />
+                                        <p:inputText id="manage-building-name" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.buildingName}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" />
                                         <p:message class="error-message" for="manage-building-name" />
                                     </div>
                                 </div>
@@ -259,13 +258,15 @@
                                 <div class="p-formgrid p-grid">
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-country">Country</p:outputLabel>
-                                        <p:inputText id="manage-country" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.country}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" />
+                                        <p:selectOneMenu id="manage-country" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.country}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
                                         <p:message class="error-message" for="manage-country" />
                                     </div>
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-postal-code">Postal Code</p:outputLabel>
-                                        <p:inputText id="manage-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.postal}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" placeholder="329560"
+                                        <p:inputText id="manage-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.postal}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" placeholder="329560"
                                                      required="true" requiredMessage="Medical centre postal code is required" validatorMessage="Please input valid postal code!">
                                             <f:validateLongRange minimum="000000" maximum="999999" />
                                         </p:inputText>
@@ -365,9 +366,8 @@
 
                                 <div class="p-formgrid p-grid">
                                     <div class="p-field p-col">
-                                        #{medicalCentreManagementManagedBean.medicalCentreToDelete.foo()}
                                         <p:outputLabel for='delete-address'>Address</p:outputLabel>
-                                        <p:inputTextarea id="delete-address" value='#{medicalCentreManagementManagedBean.medicalCentreToDelete.delimitedAddress}' style='width: 100%' disabled="true" />
+                                        <p:inputTextarea id="delete-address" value='#{medicalCentreManagementManagedBean.medicalCentreToDelete.address}' style='width: 100%' disabled="true" />
                                     </div>
                                 </div>
 

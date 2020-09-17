@@ -45,14 +45,6 @@ public class MedicalCentreManagementManagedBean implements Serializable {
 
     public void create() {
         try {
-            String address = medicalCentreToCreate.getStreetName() + "!!!@@!!!"
-                    + medicalCentreToCreate.getUnitNumber() + "!!!@@!!!"
-                    + medicalCentreToCreate.getBuildingName() + "!!!@@!!!"
-                    + medicalCentreToCreate.getCountry() + "!!!@@!!!"
-                    + medicalCentreToCreate.getPostal();
-
-            medicalCentreToCreate.setAddress(address);
-
             Long medicalCentreId = medicalCentreSessionBeanLocal.createNewMedicalCentre(medicalCentreToCreate);
 
             medicalCentres.add(medicalCentreToCreate);
@@ -78,15 +70,6 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     public void saveEdit() {
         try {
             isEditable = false;
-
-            String address = medicalCentreToManage.getStreetName() + "!!!@@!!!"
-                    + medicalCentreToManage.getUnitNumber() + "!!!@@!!!"
-                    + medicalCentreToManage.getBuildingName() + "!!!@@!!!"
-                    + medicalCentreToManage.getCountry() + "!!!@@!!!"
-                    + medicalCentreToManage.getPostal();
-
-            medicalCentreToManage.setAddress(address);
-
             medicalCentreSessionBeanLocal.updateMedicalCentre(medicalCentreToManage);
 
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "Medical centre [ID: " + medicalCentreToManage.getMedicalCentreId() + "] is updated!"));

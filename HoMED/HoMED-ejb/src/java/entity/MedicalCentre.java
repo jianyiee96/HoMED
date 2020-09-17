@@ -9,12 +9,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.DayOfWeekEnum;
@@ -37,37 +37,16 @@ public class MedicalCentre implements Serializable {
     @Size(min = 8, max = 8, message = "Telephone number must be of length 8")
     private String phone;
 
+    @Embedded
     @Column(nullable = false)
-    @NotNull(message = "Please provide address for the medical centre")
-    @Size(min = 8, message = "Address must be at least of length 8")
-    private String address;
-
-    @Transient
-    @NotNull(message = "Please provide street name for the address")
-    @Size(min = 6, message = "Street name must be at least of length 6")
-    private String streetName = "";
-
-    @Transient
-    private String unitNumber = "";
-
-    @Transient
-    private String buildingName = "";
-
-    @Transient
-    private String country = "";
-
-    @Transient
-    @NotNull(message = "Please provide valid postal code")
-    @Size(min = 6, max = 6, message = "Please provide valid postal code")
-    private String postal = "";
-
-    @Transient
-    private String delimitedAddress;
+    @NotNull
+    private Address address;
 
     @OneToMany
     private List<OperatingHours> operatingHours;
 
     public MedicalCentre() {
+        this.address = new Address();
         this.operatingHours = new ArrayList<>(8);
 
         operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
@@ -80,9 +59,9 @@ public class MedicalCentre implements Serializable {
         operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
     }
 
-    public MedicalCentre(String name, String phone, String address, List<OperatingHours> operatingHours) {
+    public MedicalCentre(String name, String phone, Address address, List<OperatingHours> operatingHours) {
         this();
-
+        
         this.name = name;
         this.phone = phone;
         this.address = address;
@@ -113,88 +92,12 @@ public class MedicalCentre implements Serializable {
         this.phone = phone;
     }
 
-    public void foo() {
-        String[] delimitedAddressArray = address.split("!!!@@!!!");
-
-        streetName = delimitedAddressArray[0];
-        unitNumber = delimitedAddressArray[1];
-        buildingName = delimitedAddressArray[2];
-        country = delimitedAddressArray[3];
-        postal = delimitedAddressArray[4];
-
-        delimitedAddress = streetName;
-
-        if (!unitNumber.equals("")) {
-            delimitedAddress += ", " + unitNumber;
-        }
-
-        if (!buildingName.equals("")) {
-            delimitedAddress += ", " + buildingName;
-        }
-
-        if (!country.equals("")) {
-            delimitedAddress += ", " + country;
-        }
-
-        if (!postal.equals("")) {
-            delimitedAddress += " " + postal;
-        }
-    }
-
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public String getStreetName() {
-        return streetName;
-    }
-
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
-
-    public String getUnitNumber() {
-        return unitNumber;
-    }
-
-    public void setUnitNumber(String unitNumber) {
-        this.unitNumber = unitNumber;
-    }
-
-    public String getBuildingName() {
-        return buildingName;
-    }
-
-    public void setBuildingName(String buildingName) {
-        this.buildingName = buildingName;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getPostal() {
-        return postal;
-    }
-
-    public void setPostal(String postal) {
-        this.postal = postal;
-    }
-
-    public String getDelimitedAddress() {
-        return delimitedAddress;
-    }
-
-    public void setDelimitedAddress(String delimitedAddress) {
-        this.delimitedAddress = delimitedAddress;
     }
 
     public List<OperatingHours> getOperatingHours() {
