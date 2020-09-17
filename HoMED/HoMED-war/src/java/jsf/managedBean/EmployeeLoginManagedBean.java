@@ -1,6 +1,5 @@
 package jsf.managedBean;
 
-import ejb.session.stateless.EmailSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import java.io.IOException;
@@ -19,7 +18,7 @@ import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
-import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.ResetEmployeePasswordException;
 import util.helper.ThemeCustomiser;
 
 @Named(value = "employeeLoginManagedBean")
@@ -33,9 +32,8 @@ public class EmployeeLoginManagedBean implements Serializable {
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
-
-    @EJB
-    private EmailSessionBeanLocal emailSessionBean;
+    private String forgetPasswordNric;
+    private String forgetPasswordEmail;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -63,6 +61,7 @@ public class EmployeeLoginManagedBean implements Serializable {
                     PrimeFaces.current().executeScript("PF('dlg').show()");
                 }
             } else {
+                System.out.println(currentEmployee.getIsActivated());
                 if (currentEmployee.getIsActivated()) {
                     FacesContext.getCurrentInstance().getExternalContext().getSession(true);
                     FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
@@ -112,6 +111,15 @@ public class EmployeeLoginManagedBean implements Serializable {
             } catch (ActivateEmployeeException ex) {
                 FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed " + ex.getMessage(), null));
             }
+        }
+    }
+
+    public void sendOtp() {
+        try {
+            employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);
+            FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password. Do check your email for the new OTP", null));
+        } catch (ResetEmployeePasswordException ex) {
+            FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -201,6 +209,22 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     public void setIsLoginAfterActivate(Boolean isLoginAfterActivate) {
         this.isLoginAfterActivate = isLoginAfterActivate;
+    }
+
+    public String getForgetPasswordNric() {
+        return forgetPasswordNric;
+    }
+
+    public void setForgetPasswordNric(String forgetPasswordNric) {
+        this.forgetPasswordNric = forgetPasswordNric;
+    }
+
+    public String getForgetPasswordEmail() {
+        return forgetPasswordEmail;
+    }
+
+    public void setForgetPasswordEmail(String forgetPasswordEmail) {
+        this.forgetPasswordEmail = forgetPasswordEmail;
     }
 
 }
