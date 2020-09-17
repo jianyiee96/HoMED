@@ -22,17 +22,17 @@ import util.exceptions.UpdateEmployeeException;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
-    
+
     public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
-    
+
     public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
-    
+
     public Employee retrieveEmployeeById(Long id);
-    
+
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
-    
+
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
-    
+
     public List<Employee> retrieveAllStaffs();
 
     public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException;

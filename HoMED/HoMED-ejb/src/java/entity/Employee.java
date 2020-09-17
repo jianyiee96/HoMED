@@ -13,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -42,6 +43,12 @@ public class Employee implements Serializable {
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     protected String password;
+
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
+    @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
+    @Email(message = "Proper formatted email with length no more than 64 must be provided")
+    private String email;
 
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
@@ -78,21 +85,23 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password, String address, int phoneNumber) {
+    public Employee(String name, String nric, String password, String email, String address, int phoneNumber) {
         this();
         this.name = name;
         this.nric = nric;
         this.password = password;
+        this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
         setPassword(password);
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String nric, String address, int phoneNumber) {
+    public Employee(String name, String nric, String email, String address, int phoneNumber) {
         this();
         this.name = name;
         this.nric = nric;
+        this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
     }
@@ -163,6 +172,14 @@ public class Employee implements Serializable {
 
     public void setIsActivated(Boolean isActivated) {
         this.isActivated = isActivated;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getSalt() {

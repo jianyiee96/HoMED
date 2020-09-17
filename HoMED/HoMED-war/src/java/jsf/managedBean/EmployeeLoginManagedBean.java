@@ -1,5 +1,6 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmailSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeNotFoundException;
 import util.helper.ThemeCustomiser;
 
 @Named(value = "employeeLoginManagedBean")
@@ -31,6 +33,9 @@ public class EmployeeLoginManagedBean implements Serializable {
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
+
+    @EJB
+    private EmailSessionBeanLocal emailSessionBean;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
