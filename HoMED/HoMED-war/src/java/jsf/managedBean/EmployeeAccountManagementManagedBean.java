@@ -12,25 +12,33 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
-    
+import javax.inject.Inject;
+
 @Named(value = "employeeAccountManagementManagedBean")
 @ViewScoped
 public class EmployeeAccountManagementManagedBean implements Serializable {
 
-    
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
-    
+
+    @Inject
+    private ViewEmployeeManagedBean viewEmployeeManagedBean;
+
     private List<Employee> employees;
-    
+
     public EmployeeAccountManagementManagedBean() {
     }
-    
+
     @PostConstruct
     public void postConstruct() {
 
         employees = employeeSessionBeanLocal.retrieveAllEmployees();
-        
+
+    }
+
+    public void doViewEmployee(Employee employee) {
+        this.viewEmployeeManagedBean.setEmployeeToView(employee);
+        this.viewEmployeeManagedBean.init();
     }
 
     public List<Employee> getEmployees() {
@@ -40,7 +48,12 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
-    
-    
-    
+
+    public ViewEmployeeManagedBean getViewEmployeeManagedBean() {
+        return viewEmployeeManagedBean;
+    }
+
+    public void setViewEmployeeManagedBean(ViewEmployeeManagedBean viewEmployeeManagedBean) {
+        this.viewEmployeeManagedBean = viewEmployeeManagedBean;
+    }
 }

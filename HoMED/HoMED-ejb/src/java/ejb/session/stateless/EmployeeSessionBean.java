@@ -125,12 +125,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public List<Employee> retrieveAllEmployees(){
+    public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
 
         return query.getResultList();
     }
-    
+
     @Override
     public Employee retrieveEmployeeById(Long id) {
         Employee employee = em.find(Employee.class, id);
@@ -176,6 +176,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
     }
 
+    @Override
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException {
         Employee employeeToRemove = retrieveEmployeeById(employeeId);
         //for reference when other entities are related to Employee
@@ -187,6 +188,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 //        {
 //            throw new DeleteStaffException("Staff ID " + employeeId + " is associated with existing sale transaction(s) and cannot be deleted!");
 //        }
+        // for now just remove employee
+        em.remove(employeeToRemove);
     }
 
     @Override
@@ -264,7 +267,29 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
         }
     }
-    
+
+    @Override
+    public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException {
+        try {
+            Employee employee = retrieveEmployeeByNric(currentEmployee.getNric());
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            employee.setPassword(password);
+            employee.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
+                return employee;
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetEmployeePasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (EmployeeNotFoundException ex) {
+            throw new ResetEmployeePasswordException("Employee does not exist in our system! Please try again.");
+
+        }
+    }
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {

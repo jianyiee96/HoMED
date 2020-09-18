@@ -9,6 +9,7 @@ import entity.Employee;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.ActivateEmployeeException;
+import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.EmployeeNotFoundException;
@@ -46,5 +47,9 @@ public interface EmployeeSessionBeanLocal {
     public void changePassword(String nric, String oldPassword, String newPassword) throws EmployeeInvalidPasswordException, EmployeeNotFoundException;
 
     public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException;
+
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
+
+    public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException;
 
 }

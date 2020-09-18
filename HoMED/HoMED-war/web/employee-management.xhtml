@@ -20,7 +20,7 @@
             }
         </style>
 
-        <ezcomp:viewEmployee id="ccViewEmployee" />
+        <ezcomp:viewEmployee id="ccViewEmployee"/>
 
         <h:form id="formAllEmployees">
             <div class="p-grid crud-table">
@@ -34,17 +34,12 @@
                             <!--EDIT HERE = PF DIALOG, PANEL-->
                         </div>
 
-                        <!--                        <p:confirmDialog global="true">
-                                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                                                </p:confirmDialog>-->
-
                         <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"
                                      styleClass="crud-management-table" rowKey="#{employee.employeeId}" paginator="true" rows="10" paginatorPosition="bottom">
 
                             <f:facet name="header">
                                 <div class="crud-table-header">
-                                    <span style="font-weight: bold">MEDICAL CENTRES</span>
+                                    <span style="font-weight: bold">EMPLOYEES</span>
 
                                     <span class="filter-container ui-input-icon-left">
                                         <i class="pi pi-search" />
@@ -53,50 +48,45 @@
                                 </div>
                             </f:facet>
 
-                            <p:column headerText="ID" width="10%" sortBy="#{employee.employeeId}" filterBy="#{employee.employeeId}" filterMatchMode="contains">
+                            <p:column headerText="ID" width="3%" sortBy="#{employee.employeeId}" filterBy="#{employee.employeeId}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.employeeId}" />
                             </p:column>
 
-                            <p:column headerText="Nric" width="10%" sortBy="#{employee.nric}" filterBy="#{employee.nric}" filterMatchMode="contains">
+                            <p:column headerText="Nric" width="5%" sortBy="#{employee.nric}" filterBy="#{employee.nric}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.nric}" />
                             </p:column>
 
-                            <p:column headerText="Name" width="10%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
+                            <p:column headerText="Name" width="15%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.name}" />
                             </p:column>
 
-                            <p:column headerText="Role" width="10%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
+                            <p:column headerText="Role" width="7%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.role}" />
                             </p:column>
 
-                            <p:column headerText="Email" width="10%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">
+                            <p:column headerText="Email" width="15%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.email}" />
                             </p:column>
 
-                            <p:column headerText="Activated" width="10%" sortBy="#{employee.isActivated}" filterBy="#{employee.isActivated}" filterMatchMode="contains">
+                            <p:column headerText="Activated" width="7%" sortBy="#{employee.isActivated}" filterBy="#{employee.isActivated}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.isActivated}" />
                             </p:column>
 
-                            <p:column headerText="Gender" width="10%" sortBy="#{employee.gender}" filterBy="#{employee.gender}" filterMatchMode="contains">
+                            <p:column headerText="Gender" width="5%" sortBy="#{employee.gender}" filterBy="#{employee.gender}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.gender}" />
                             </p:column>
 
-                            <p:column headerText="Address" width="10%" sortBy="#{employee.address}" filterBy="#{employee.address}" filterMatchMode="contains">
+                            <p:column headerText="Address" width="15%" sortBy="#{employee.address}" filterBy="#{employee.address}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.address}" />
                             </p:column>
 
-                            <p:column headerText="PhoneNumber" width="10%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
+                            <p:column headerText="PhoneNumber" width="7%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.phoneNumber}" />
                             </p:column>
 
-                            <p:column headerText="Action" width="10%">
-                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View" action="#{medicalCentreManagementManagedBean.view(medicalCentre)}"
-                                                 update="formAllMedicalCentres:dialogManageMedicalCentre" process="@this" oncomplete="PF('dialogManageMedicalCentre').show()" />
-
-                                <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" 
-                                                 update="formAllMedicalCentres:dialogDeleteMedicalCentre" process="@this" oncomplete="PF('dialogDeleteMedicalCentre').show()">
-                                    <f:setPropertyActionListener value="#{medicalCentre}" target="#{medicalCentreManagementManagedBean.medicalCentreToDelete}" />
-                                </p:commandButton>
+                            <p:column headerText="Action" width="3%">
+                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
+                                                 update="ccViewEmployee:formViewEmployee:panelViewEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogViewEmployee').show()" />
                             </p:column>
 
                         </p:dataTable>
