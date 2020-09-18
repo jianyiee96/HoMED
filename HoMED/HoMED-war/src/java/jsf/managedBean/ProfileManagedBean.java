@@ -16,8 +16,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import util.enumeration.GenderEnum;
 import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.EmployeeNotFoundException;
@@ -42,6 +40,7 @@ public class ProfileManagedBean implements Serializable {
     private String confirmNewPassword;
     private GenderEnum male;
     private GenderEnum female;
+    private boolean disabled;
 
     /**
      * Creates a new instance of profileManagedBean
@@ -56,6 +55,7 @@ public class ProfileManagedBean implements Serializable {
     public void PostConstruct() {
         this.employee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         System.out.println("******************NRIC is: " + this.employee.getNric());
+        this.disabled = true;
     }
 
     public void updateProfile(ActionEvent actionEvent) {
@@ -141,4 +141,12 @@ public class ProfileManagedBean implements Serializable {
         this.confirmNewPassword = confirmNewPassword;
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+    
 }
