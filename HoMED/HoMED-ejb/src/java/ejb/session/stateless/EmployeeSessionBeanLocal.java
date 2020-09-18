@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
@@ -40,5 +41,8 @@ public interface EmployeeSessionBeanLocal {
 
     public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
 
+    public void changePassword(String nric, String oldPassword, String newPassword) throws EmployeeInvalidPasswordException, EmployeeNotFoundException;
+
     public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException;
+
 }
