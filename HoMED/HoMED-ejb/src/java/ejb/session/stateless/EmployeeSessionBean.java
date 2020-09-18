@@ -26,6 +26,7 @@ import util.exceptions.ActivateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 import util.security.CryptographicHelper;
@@ -96,7 +97,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
                 em.persist(employee);
                 em.flush();
-                
+
                 // COMMENT THIS CHUNCK TO PREVENT EMAIL
                 try {
                     emailSessionBean.emailEmployeeOtpAsync(employee, password);
@@ -208,6 +209,29 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             return employee;
         } catch (EmployeeNotFoundException ex) {
             throw new ActivateEmployeeException("NRIC does not exist in our system! Please try again.");
+        }
+    }
+
+    @Override
+    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException {
+        try {
+            Employee employee = retrieveEmployeeByNric(nric);
+            if (!email.equals(employee.getEmail())) {
+                throw new ResetEmployeePasswordException("Email does not match account's email! Please try again.");
+            }
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            employee.setPassword(password);
+            employee.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailEmployeeOtpAsync(employee, password);
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetEmployeePasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (EmployeeNotFoundException ex) {
+            throw new ResetEmployeePasswordException("NRIC does not exist in our system! Please try again.");
         }
     }
 

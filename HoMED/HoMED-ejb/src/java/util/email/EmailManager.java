@@ -37,7 +37,7 @@ public class EmailManager {
         try {
             Session session = createSession();
             // REMOVE COMMENTS HERE
-            session.setDebug(true);
+            session.setDebug(false);
             Message msg = new MimeMessage(session);
 
             if (msg != null) {
@@ -73,7 +73,7 @@ public class EmailManager {
         try {
             Session session = createSession();
             // REMOVE COMMENTS HERE
-            session.setDebug(true);
+            session.setDebug(false);
             Message msg = new MimeMessage(session);
 
             if (msg != null) {

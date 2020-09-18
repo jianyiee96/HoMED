@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.Serviceman;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -18,7 +19,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetEmployeePasswordException;
+import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanInvalidPasswordException;
@@ -165,6 +169,29 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
         } else {
             throw new ServicemanNotFoundException("Serviceman ID not provided for serviceman to be updated!");
+        }
+    }
+
+    @Override
+    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
+        try {
+            Serviceman serviceman = retrieveServicemanByNric(nric);
+            if (!email.equals(serviceman.getEmail())) {
+                throw new ResetServicemanPasswordException("Email does not match account's email! Please try again.");
+            }
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            serviceman.setPassword(password);
+            serviceman.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailServicemanOtpAsync(serviceman, password);
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetServicemanPasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (ServicemanNotFoundException ex) {
+            throw new ResetServicemanPasswordException("NRIC does not exist in our system! Please try again.");
         }
     }
 
