@@ -39,9 +39,27 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
     @Asynchronous
     @Override
+    public Future<Boolean> emailEmployeeResetPasswordAsync(Employee employee, String otp) throws InterruptedException {
+        EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
+        Boolean result = emailManager.emailEmployeeResetPassword(employee, otp, FROM_EMAIL);
+
+        return new AsyncResult<>(result);
+    }
+
+    @Asynchronous
+    @Override
     public Future<Boolean> emailServicemanOtpAsync(Serviceman serviceman, String otp) throws InterruptedException {
         EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
         Boolean result = emailManager.emailServicemanOtp(serviceman, otp, FROM_EMAIL);
+
+        return new AsyncResult<>(result);
+    }
+
+    @Asynchronous
+    @Override
+    public Future<Boolean> emailServicemanResetPasswordAsync(Serviceman serviceman, String otp) throws InterruptedException {
+        EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
+        Boolean result = emailManager.emailServicemanResetPassword(serviceman, otp, FROM_EMAIL);
 
         return new AsyncResult<>(result);
     }

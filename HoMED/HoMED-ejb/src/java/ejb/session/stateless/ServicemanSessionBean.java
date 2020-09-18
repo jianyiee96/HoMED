@@ -185,7 +185,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             serviceman.setIsActivated(false);
 
             try {
-                emailSessionBean.emailServicemanOtpAsync(serviceman, password);
+                emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
             } catch (InterruptedException ex) {
                 // EMAIL NOT SENT OUT SUCCESSFULLY
                 throw new ResetServicemanPasswordException("Email was not sent out successfully! Please try again.");
