@@ -3,109 +3,110 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="template/template.xhtml">
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
 
     <ui:define name="title">Employee Account Management</ui:define>
 
 
     <ui:define name="content">
 
-        <div class="p-grid">
+        <style type="text/css">
+            .error-message {
+                margin: 0.5rem 0rem 0rem 0rem !important;
+            }
+            .boolean-button {
+                width: 20% !important;
+            }
+        </style>
 
-            <div class="p-col-12">
+        <ezcomp:viewEmployee id="ccViewEmployee" />
 
-                <h:form id="formEmployee">
-                    <p:growl id="growl" globalOnly="true" showDetail="true" />
-                    <p:confirmDialog global="true">
-                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                    </p:confirmDialog>     
-
+        <h:form id="formAllEmployees">
+            <div class="p-grid crud-table">
+                <div class="p-col-12">
                     <div class="card">
-                        <h1>Employee Account Management</h1>
+                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
+                        <div class="buttonbar">
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
+                                             update="ccViewEmployee:formViewEmployee:panelViewEmployee" process="@this" immediate="true" oncomplete="PF('dialogViewEmployee').show()" />
+                            <!--EDIT HERE = PF DIALOG, PANEL-->
+                        </div>
 
+                        <!--                        <p:confirmDialog global="true">
+                                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                                </p:confirmDialog>-->
 
+                        <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"
+                                     styleClass="crud-management-table" rowKey="#{employee.employeeId}" paginator="true" rows="10" paginatorPosition="bottom">
 
-                        <p:dataTable widgetVar="employeesDT" id="employeesDT" var="employee" value="#{employeeAccountManagementManagedBean.employees}"
-                                     rowKey="#{employee.employeeId}" scrollable="true" scrollHeight="600"
-                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold">MEDICAL CENTRES</span>
 
-                            <f:facet id="dataViewListHeader" name="header">
-                                <span style="font-weight: bold">EMPLOYEES</span>
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('dataTableEmployees').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
                             </f:facet>
-                            <p:column headerText="ID" style="width: 50px" sortBy="#{employee.employeeId}">
+
+                            <p:column headerText="ID" width="10%" sortBy="#{employee.employeeId}" filterBy="#{employee.employeeId}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.employeeId}" />
                             </p:column>
-                            
-                            <p:column headerText="Nric" sortBy="#{employee.nric}">
+
+                            <p:column headerText="Nric" width="10%" sortBy="#{employee.nric}" filterBy="#{employee.nric}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.nric}" />
                             </p:column>
-                            
-                            <p:column headerText="Name" sortBy="#{employee.name}">
+
+                            <p:column headerText="Name" width="10%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.name}" />
                             </p:column>
-                            
-                            <p:column headerText="Role" sortBy="#{employee.role}">
+
+                            <p:column headerText="Role" width="10%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.role}" />
                             </p:column>
-                            
-                            <p:column headerText="Email" sortBy="#{employee.email}">
+
+                            <p:column headerText="Email" width="10%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.email}" />
                             </p:column>
-                            
-                            <p:column headerText="Activated" sortBy="#{employee.isActivated}">
+
+                            <p:column headerText="Activated" width="10%" sortBy="#{employee.isActivated}" filterBy="#{employee.isActivated}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.isActivated}" />
                             </p:column>
-                            
-                            <p:column headerText="Gender" sortBy="#{employee.isActivated}">
-                                <h:outputText value="#{employee.isActivated}" />
+
+                            <p:column headerText="Gender" width="10%" sortBy="#{employee.gender}" filterBy="#{employee.gender}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.gender}" />
                             </p:column>
-                            
-                            <p:column headerText="Address" sortBy="#{employee.address}">
+
+                            <p:column headerText="Address" width="10%" sortBy="#{employee.address}" filterBy="#{employee.address}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.address}" />
                             </p:column>
-                            
-                            <p:column headerText="PhoneNumber" sortBy="#{employee.phoneNumber}">
+
+                            <p:column headerText="PhoneNumber" width="10%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.phoneNumber}" />
                             </p:column>
-                            
-<!--                            <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
-                                <h:outputText value="#{formUtilityManagedBean.renderDate(formTemplate.dateCreated)}" />
-                            </p:column>
-                            <p:column  headerText="Status" sortBy="#{formTemplate.formStatus}">
-                                <span class="form-status-badge status-#{formTemplate.formStatus.text.toLowerCase()}">#{formTemplate.formStatus.text}</span>
-                            </p:column>-->
 
-<!--                            <p:column exportable="false">
+                            <p:column headerText="Action" width="10%">
+                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View" action="#{medicalCentreManagementManagedBean.view(medicalCentre)}"
+                                                 update="formAllMedicalCentres:dialogManageMedicalCentre" process="@this" oncomplete="PF('dialogManageMedicalCentre').show()" />
 
-                                <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View">
-                                    <f:attribute name="formToView" value="#{formTemplate}" />
-                                </p:commandButton> 
-                                <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish">
-                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
-                                    <p:confirm header="Publish Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton> 
-                                <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
-                                    <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
-                                    <p:confirm header="Delete Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton> 
-                                <p:commandButton disabled="#{formTemplate.formStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
-                                    <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
-                                    <p:confirm header="Archive Template" message="Users will no longer be able to use this form. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" 
+                                                 update="formAllMedicalCentres:dialogDeleteMedicalCentre" process="@this" oncomplete="PF('dialogDeleteMedicalCentre').show()">
+                                    <f:setPropertyActionListener value="#{medicalCentre}" target="#{medicalCentreManagementManagedBean.medicalCentreToDelete}" />
                                 </p:commandButton>
+                            </p:column>
 
-
-                            </p:column>-->
                         </p:dataTable>
 
                     </div>
+                </div>
 
-                </h:form>
             </div>
+        </h:form>
 
-        </div>
-
+        <h:outputStylesheet name="crud-tables.css" library="css" />
     </ui:define>
-
 </ui:composition>

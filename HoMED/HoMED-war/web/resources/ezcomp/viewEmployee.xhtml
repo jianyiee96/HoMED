@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <cc:interface>
+    </cc:interface>
+
+    <cc:implementation>
+
+        <h:form id="formViewEmployee">
+
+            <p:dialog id="dialogViewEmployee" widgetVar="dialogViewEmployee" header="View Employee Details" showEffect="fade"
+                      responsive="true" draggable="false" modal="true">
+                <p:outputPanel id="panelViewEmployee" class="ui-fluid">
+                    <div class="p-formgrid p-grid">
+                        <div class="p-field p-col">
+                            <p:outputLabel for="view-name">Name</p:outputLabel>
+                            <p:inputText id="view-name" value="#{viewEmployeeManagedBean.employeeToView.name}" style="width: 100%" disabled="true" />
+                        </div>
+                    </div>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+
+    </cc:implementation>
+</html>
