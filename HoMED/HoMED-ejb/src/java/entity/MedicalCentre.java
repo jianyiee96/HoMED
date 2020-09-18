@@ -34,7 +34,7 @@ public class MedicalCentre implements Serializable {
 
     @Column(nullable = false)
     @NotNull(message = "Please provide a telephone number for the medical centre")
-    @Size(min = 8, max = 8, message = "Telephone number must be of length 8")
+    @Size(min = 9, max = 9, message = "Telephone number must be of length 8")
     private String phone;
 
     @Embedded
@@ -49,22 +49,14 @@ public class MedicalCentre implements Serializable {
         this.address = new Address();
         this.operatingHours = new ArrayList<>(8);
 
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-        operatingHours.add(new OperatingHours());
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(13, 30)));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.TRUE, null, null));
-//        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
     }
 
     public MedicalCentre(String name, String phone, Address address, List<OperatingHours> operatingHours) {

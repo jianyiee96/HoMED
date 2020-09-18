@@ -91,7 +91,7 @@ public class DataInitializationSessionBean {
         String medicalCentreName = "HOME TEAM ACADEMY MEDICAL CENTRE";
         newMedicalCentre.setName(medicalCentreName);
 
-        String medicalCentrePhone = "64653921";
+        String medicalCentrePhone = "6465-3921";
         newMedicalCentre.setPhone(medicalCentrePhone);
 
         // Street Name, Unit Number, Building Name, Country, Postal Code
