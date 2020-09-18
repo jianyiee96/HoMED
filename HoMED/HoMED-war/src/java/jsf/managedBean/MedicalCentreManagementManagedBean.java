@@ -61,6 +61,8 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     public void view(MedicalCentre medicalCentre) {
         isEditable = false;
         medicalCentreToManage = medicalCentre;
+        this.medicalCentreToCreate = new MedicalCentre();
+        this.medicalCentreToDelete = new MedicalCentre();
     }
 
     public void edit() {
