@@ -21,87 +21,122 @@
             <div class="p-grid">
 
 
-                <div class="p-col-12 p-md-6">
+                <div class="p-col-12 p-md-6 p-lg-6">
                     <div class="card ui-fluid">
-                        <h5>Personal Particular</h5>
+                        <h5>Personal Particulars</h5>
                         <div class="p-field">
-                            <p:outputLabel for="nric">Nric</p:outputLabel>
-                            <p:inputText disabled="true" id="nric" value="#{profileManagedBean.employee.nric}" />
+                            <p:outputLabel for="nric">Name</p:outputLabel>
+                            <p:inputText disabled="true" id="nric" value="#{profileManagedBean.employee.name}" />
                         </div>
                         <div class="p-field">
-                            <p:outputLabel for="name">Name</p:outputLabel>
-                            <p:inputText disabled="true" id="name" value="#{profileManagedBean.employee.name}" />
+                            <p:outputLabel for="name">Nric</p:outputLabel>
+                            <p:inputText disabled="true" id="name" value="#{profileManagedBean.employee.nric}" />
                         </div>
+
+
                         <div class="p-field">
                             <p:outputLabel for="gender">Gender</p:outputLabel>
-                            <p:selectOneMenu disabled="true" id="gender" value="#{profileManagedBean.employee.gender}">
-                                <f:selectItem itemLabel="Female" itemValue="#{profileManagedBean.female}" />
-                                <f:selectItem itemLabel="Male" itemValue="#{profileManagedBean.male}" />
-                            </p:selectOneMenu> 
+                            <p:inputText disabled="true" id="gender" value="#{profileManagedBean.employee.gender}" />
 
                         </div> 
                     </div>
+                    <div class="card ui-fluid">
+                        <h5>Password</h5>
+
+                        
+                            <div class="p-field">                       
+                                <p:commandButton value="Change password" oncomplete="PF('dialogUpdatePassword').show()"/>
+                            </div>
+                            
+                    </div>
+
+
                 </div>
-                <div class="p-col-12 p-md-6">
+
+                <div class="p-col-12 p-md-6  p-lg-6">
 
                     <div class="card ui-fluid">
                         <h5>Contact Details</h5>
                         <div class="p-field">
-                            <p:outputLabel value="Phone"/>
-                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.phoneNumber}" />
+                            <p:outputLabel value="Mobile Number"/>
+                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.phoneNumber}" />
                         </div>
 
                         <div class="p-field">
-                            <p:outputLabel value="Email"/>
-                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.email}" />
+                            <p:outputLabel value="Email Address"/>
+                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.email}" />
                         </div>
                         <div class="p-field">
                             <p:outputLabel value="Address"/>
-                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.address}" />
+                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.address}" />
                         </div>
                         <p:messages id="messagesUpdateProfile" redisplay="false" />
-                        <div class="p-field p-col">
-                            <p:commandButton rendered="#{profileManagedBean.disabled}" value="Edit" update="formUpdateProfile" />
-                            <p:commandButton rendered="#{!profileManagedBean.disabled}" value="Cancel" update="formUpdateProfile" />
+                        <div class="p-field">
+                            <p:commandButton rendered="#{profileManagedBean.fieldsDisabled}" value="Edit" action="#{profileManagedBean.editMode}" update="formUpdateProfile" />
+                            <p:commandButton rendered="#{!profileManagedBean.fieldsDisabled}" value="Cancel" action="#{profileManagedBean.cancelEdit}" update="formUpdateProfile" />
                         </div>
-                        <div class="p-field p-col">
-                            <p:commandButton value="Save Changes" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />
-                        </div>
-                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-                            </p:confirmDialog>
-                        </div>
-                    </div>
 
-                </div>
-
-                <div class="p-col-12">
-                    <div class="card ui-fluid">
-                        <p:commandButton value="Change password" oncomplete="PF('dialogUpdatePassword').show()"/>
+                        <p:commandButton value="Save Changes" rendered="#{!profileManagedBean.fieldsDisabled}" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />
                     </div>
                 </div>
 
-            
+            </div>
+
+
+
         </h:form>
 
         <h:form id="formUpdatePassword">
-            <p:dialog id="dialogUpdatePassword" widgetVar="dialogUpdatePassword" header="Update Password" closable="true"> 
-                <div class="card ui-fluid">                <div class="p-field">
+            <p:dialog id="dialogUpdatePassword" resizable="false" draggable="false" widgetVar="dialogUpdatePassword" header="Update Password" modal="true" responsive="true" width="550" closable="true"> 
+                <div class="card ui-fluid">                
+                    <div class="p-field">
                         <p:outputLabel value="Old password" />
-                        <p:inputText value="#{profileManagedBean.oldPassword}" />
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="oldPassword" value="#{profileManagedBean.oldPassword}"
+                                        validatorMessage="Please provide a valid Password"
+                                        required="true" requiredMessage="Old Password is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
                     </div>
                     <div class="p-field">
                         <p:outputLabel value="New password" />
-                        <p:inputText value="#{profileManagedBean.newPassword}" />
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="newPassword" value="#{profileManagedBean.newPassword}"
+                                        validatorMessage="Please provide a valid Password"
+                                        required="true" requiredMessage="New Password is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
                     </div>
                     <div class="p-field">
                         <p:outputLabel value="Confirm new password" />
-                        <p:inputText value="#{profileManagedBean.confirmNewPassword}" />
+
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="confirmNewPassword" value="#{profileManagedBean.confirmNewPassword}"
+                                        validatorMessage="Please provide a valid Confirmation Password"
+                                        required="true" requiredMessage="Password Confirmation is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
                     </div>
                     <div class="p-field">
-                        <p:messages id="messagesUpdatePassword" redisplay="false" />
-                        <p:commandButton value="Update Password" update="messagesUpdatePassword" actionListener="#{profileManagedBean.updatePassword}"  icon="pi pi-save" />
+                        <p:messages id="messagesUpdatePassword" redisplay="false" >
+                            <p:autoUpdate></p:autoUpdate>
+                        </p:messages>
+                        <p:commandButton value="Update Password" update="oldPassword newPassword confirmNewPassword" actionListener="#{profileManagedBean.updatePassword}"  icon="pi pi-save" />
 
                         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                             <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />

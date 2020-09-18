@@ -38,30 +38,27 @@ public class ProfileManagedBean implements Serializable {
     private String oldPassword;
     private String newPassword;
     private String confirmNewPassword;
-    private GenderEnum male;
-    private GenderEnum female;
-    private boolean disabled;
+    private boolean fieldsDisabled;
 
     /**
      * Creates a new instance of profileManagedBean
      */
     public ProfileManagedBean() {
         employee = new Employee();
-        this.male = GenderEnum.MALE;
-        this.female = GenderEnum.FEMALE;
     }
 
     @PostConstruct
     public void PostConstruct() {
-        this.employee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
-        System.out.println("******************NRIC is: " + this.employee.getNric());
-        this.disabled = true;
+        Employee e = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
+        employee = employeeSessionBean.retrieveEmployeeById(e.getEmployeeId());
+        this.fieldsDisabled = true;
     }
 
     public void updateProfile(ActionEvent actionEvent) {
-        System.out.println("Update profile called");
         try {
             employeeSessionBean.updateEmployee(employee);
+            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
+            cancelEdit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile updated successfully", null));
         } catch (EmployeeNotFoundException ex) {
             Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,24 +70,45 @@ public class ProfileManagedBean implements Serializable {
 
     }
 
+    public void editMode() {
+        this.fieldsDisabled = false;
+    }
+
+    public void cancelEdit() {
+        this.employee = employeeSessionBean.retrieveEmployeeById(employee.getEmployeeId());
+        this.fieldsDisabled = true;
+    }
+
     public void updatePassword(ActionEvent event) {
         try {
-            System.out.println("********Update Password called");
             if (!newPassword.equals(confirmNewPassword)) {
                 throw new PasswordsDoNotMatchException();
+            } else if (oldPassword.equals(newPassword)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Please input a different new password", null));
             } else {
                 employeeSessionBean.changePassword(employee.getNric(), oldPassword, newPassword);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Password updated successfully", null));
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
+                oldPassword = "";
+                newPassword = "";
+                confirmNewPassword = "";
             }
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Password updated successfully", null));
-            System.out.println("********password changed successfully");
-        } catch (PasswordsDoNotMatchException ex){
+        } catch (PasswordsDoNotMatchException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "New passwords do not match.", null));
         } catch (EmployeeInvalidPasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Old password is incorrect.", null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Old password is incorrect", null));
         } catch (EmployeeNotFoundException ex) {
             Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public String getOldPassword() {
@@ -109,30 +127,6 @@ public class ProfileManagedBean implements Serializable {
         this.newPassword = newPassword;
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public GenderEnum getMale() {
-        return male;
-    }
-
-    public void setMale(GenderEnum male) {
-        this.male = male;
-    }
-
-    public GenderEnum getFemale() {
-        return female;
-    }
-
-    public void setFemale(GenderEnum female) {
-        this.female = female;
-    }
-
     public String getConfirmNewPassword() {
         return confirmNewPassword;
     }
@@ -141,12 +135,12 @@ public class ProfileManagedBean implements Serializable {
         this.confirmNewPassword = confirmNewPassword;
     }
 
-    public boolean isDisabled() {
-        return disabled;
+    public boolean isFieldsDisabled() {
+        return fieldsDisabled;
     }
 
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
+    public void setFieldsDisabled(boolean fieldsDisabled) {
+        this.fieldsDisabled = fieldsDisabled;
     }
-    
+
 }

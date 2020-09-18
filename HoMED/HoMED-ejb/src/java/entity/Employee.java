@@ -67,7 +67,7 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, unique = true)
     @NotNull(message = "phone number must be length of 8")
-    @Min(60000000)
+    @Min(80000000)
     @Max(99999999)
     protected Integer phoneNumber;
 
