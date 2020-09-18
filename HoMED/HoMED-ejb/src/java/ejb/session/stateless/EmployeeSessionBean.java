@@ -224,14 +224,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
             if (passwordHash.equals(employee.getPassword())) {
                 employee.setPassword(newPassword);
-                employee.setIsActivated(true);
                 em.flush();
             } else {
                 throw new EmployeeInvalidPasswordException("Entered password do not match password associated with account!");
             }
 
         } catch (EmployeeNotFoundException ex) {
-            throw new EmployeeNotFoundException("Serviceman NRIC " + nric + " does not exist!");
+            throw new EmployeeNotFoundException("Employee NRIC " + nric + " does not exist!");
         }
     }
 
