@@ -113,18 +113,17 @@ public class EmployeeLoginManagedBean implements Serializable {
             }
         }
     }
-    
+
     public void openForgotPasswordForm() {
         this.forgetPasswordNric = "";
         this.forgetPasswordEmail = "";
     }
-            
+
     public void sendOtp() {
         try {
             employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);
-            FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password. Do check your email for the new OTP", null));
-            this.forgetPasswordEmail = "";
-            this.forgetPasswordNric = "";
+            PrimeFaces.current().executeScript("PF('forgotDlg').hide()");
+            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
             FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }

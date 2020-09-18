@@ -225,7 +225,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             employee.setIsActivated(false);
 
             try {
-                emailSessionBean.emailEmployeeOtpAsync(employee, password);
+                emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
             } catch (InterruptedException ex) {
                 // EMAIL NOT SENT OUT SUCCESSFULLY
                 throw new ResetEmployeePasswordException("Email was not sent out successfully! Please try again.");
