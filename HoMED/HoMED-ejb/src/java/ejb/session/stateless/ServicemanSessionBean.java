@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -79,6 +80,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
+    
+    @Override
+    public List<Serviceman> retrieveAllServicemen() {
+        Query query = em.createQuery("SELECT s FROM Serviceman s");
+
+        return query.getResultList();
+    }
+    
 
     @Override
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException {

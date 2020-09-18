@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Employee Account Management</ui:define>
+
+
+    <ui:define name="content">
+
+        <div class="p-grid">
+
+            <div class="p-col-12">
+
+                <h:form id="formEmployee">
+                    <p:growl id="growl" globalOnly="true" showDetail="true" />
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog>     
+
+                    <div class="card">
+                        <h1>Employee Account Management</h1>
+
+
+
+
+                        <p:dataTable widgetVar="employeesDT" id="employeesDT" var="employee" value="#{employeeAccountManagementManagedBean.employees}"
+                                     rowKey="#{employee.employeeId}" scrollable="true" scrollHeight="600"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">EMPLOYEES</span>
+                            </f:facet>
+                            <p:column headerText="ID" style="width: 50px" sortBy="#{employee.employeeId}">
+                                <h:outputText value="#{employee.employeeId}" />
+                            </p:column>
+                            
+                            <p:column headerText="Nric" sortBy="#{employee.nric}">
+                                <h:outputText value="#{employee.nric}" />
+                            </p:column>
+                            
+                            <p:column headerText="Name" sortBy="#{employee.name}">
+                                <h:outputText value="#{employee.name}" />
+                            </p:column>
+                            
+                            <p:column headerText="Role" sortBy="#{employee.role}">
+                                <h:outputText value="#{employee.role}" />
+                            </p:column>
+                            
+                            <p:column headerText="Email" sortBy="#{employee.email}">
+                                <h:outputText value="#{employee.email}" />
+                            </p:column>
+                            
+                            <p:column headerText="Activated" sortBy="#{employee.isActivated}">
+                                <h:outputText value="#{employee.isActivated}" />
+                            </p:column>
+                            
+                            <p:column headerText="Gender" sortBy="#{employee.isActivated}">
+                                <h:outputText value="#{employee.isActivated}" />
+                            </p:column>
+                            
+                            <p:column headerText="Address" sortBy="#{employee.address}">
+                                <h:outputText value="#{employee.address}" />
+                            </p:column>
+                            
+                            <p:column headerText="PhoneNumber" sortBy="#{employee.phoneNumber}">
+                                <h:outputText value="#{employee.phoneNumber}" />
+                            </p:column>
+                            
+<!--                            <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
+                                <h:outputText value="#{formUtilityManagedBean.renderDate(formTemplate.dateCreated)}" />
+                            </p:column>
+                            <p:column  headerText="Status" sortBy="#{formTemplate.formStatus}">
+                                <span class="form-status-badge status-#{formTemplate.formStatus.text.toLowerCase()}">#{formTemplate.formStatus.text}</span>
+                            </p:column>-->
+
+<!--                            <p:column exportable="false">
+
+                                <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View">
+                                    <f:attribute name="formToView" value="#{formTemplate}" />
+                                </p:commandButton> 
+                                <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish">
+                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Publish Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
+                                    <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Delete Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                <p:commandButton disabled="#{formTemplate.formStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
+                                    <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Archive Template" message="Users will no longer be able to use this form. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+
+
+                            </p:column>-->
+                        </p:dataTable>
+
+                    </div>
+
+                </h:form>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>
