@@ -13,6 +13,7 @@ import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 
@@ -38,4 +39,6 @@ public interface EmployeeSessionBeanLocal {
     public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException;
 
     public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
+
+    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException;
 }
