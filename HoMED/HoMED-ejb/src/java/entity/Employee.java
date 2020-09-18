@@ -63,7 +63,7 @@ public class Employee implements Serializable {
     @NotNull(message = "phone number must be length of 8")
     @Min(60000000)
     @Max(99999999)
-    protected int phoneNumber;
+    protected Integer phoneNumber;
 
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
@@ -139,7 +139,7 @@ public class Employee implements Serializable {
         this.address = address;
     }
 
-    public int getPhoneNumber() {
+    public Integer getPhoneNumber() {
         return phoneNumber;
     }
 

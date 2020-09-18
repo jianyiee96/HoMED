@@ -12,11 +12,10 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.view.ViewScoped;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import util.enumeration.GenderEnum;
@@ -31,7 +30,7 @@ import util.exceptions.UpdateEmployeeException;
  * @author sunag
  */
 @Named(value = "profileManagedBean")
-@SessionScoped
+@ViewScoped
 public class ProfileManagedBean implements Serializable {
 
     @EJB
@@ -60,6 +59,7 @@ public class ProfileManagedBean implements Serializable {
     }
 
     public void updateProfile(ActionEvent actionEvent) {
+        System.out.println("Update profile called");
         try {
             employeeSessionBean.updateEmployee(employee);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile updated successfully", null));
