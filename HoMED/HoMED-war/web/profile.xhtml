@@ -48,19 +48,21 @@
                         <h5>Contact Details</h5>
                         <div class="p-field">
                             <p:outputLabel value="Phone"/>
-                            <p:inputText value="#{profileManagedBean.employee.phoneNumber}" />
+                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.phoneNumber}" />
                         </div>
 
                         <div class="p-field">
                             <p:outputLabel value="Email"/>
-                            <p:inputText value="#{profileManagedBean.employee.email}" />
+                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.email}" />
                         </div>
                         <div class="p-field">
                             <p:outputLabel value="Address"/>
-                            <p:inputText value="#{profileManagedBean.employee.address}" />
+                            <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.address}" />
                         </div>
                         <div class="p-field">
                             <p:messages id="messagesUpdateProfile" redisplay="false" />
+                            <p:commandButton rendered="#{profileManagedBean.disabled}" value="Edit" actionListener="#{profileManagedBean.enableEdit}" update="formUpdateProfile" />
+                            <p:commandButton rendered="#{!profileManagedBean.disabled}" value="Cancel" actionListener="#{profileManagedBean.cancelEdit}" update="formUpdateProfile" />
                             <p:commandButton value="Save Changes" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />
                             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
