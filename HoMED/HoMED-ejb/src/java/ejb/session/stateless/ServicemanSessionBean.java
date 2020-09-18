@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Serviceman;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -34,6 +35,9 @@ import util.security.CryptographicHelper;
 @Stateless
 public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
+    @EJB
+    private EmailSessionBeanLocal emailSessionBean;
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -56,6 +60,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
                 em.flush();
+                // COMMENT THIS CHUNCK TO PREVENT EMAIL
+                try {
+                    emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
+                } catch (InterruptedException ex) {
+                    // EMAIL NOT SENT OUT SUCCESSFULLY
+                }
                 return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
