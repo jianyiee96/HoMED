@@ -12,14 +12,6 @@
         <param-name>primefaces.FONT_AWESOME</param-name>
         <param-value>true</param-value>
     </context-param>
-    <context-param>
-        <param-name>primefaces.THEME</param-name>
-        <param-value>roma-#{themeCustomiser.componentTheme}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>primefaces.FONT_AWESOME</param-name>
-        <param-value>true</param-value>
-    </context-param>
     <listener>
         <description>ServletContextListener</description>
         <listener-class>web.listener.WebApplicationListener</listener-class>

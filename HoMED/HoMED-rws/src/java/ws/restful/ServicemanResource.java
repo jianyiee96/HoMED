@@ -14,6 +14,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
@@ -22,6 +23,7 @@ import ws.datamodel.ErrorRsp;
 import ws.datamodel.ServicemanChangePassReq;
 import ws.datamodel.ServicemanLoginReq;
 import ws.datamodel.ServicemanLoginRsp;
+import ws.datamodel.ServicemanResetPassReq;
 import ws.datamodel.ServicemanUpdateReq;
 import ws.datamodel.ServicemanUpdateRsp;
 
@@ -122,6 +124,40 @@ public class ServicemanResource {
         } else {
 
             ErrorRsp errorRsp = new ErrorRsp("Invalid update serviceman request");
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+    }
+
+    @Path("resetPassword")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(ServicemanResetPassReq servicemanResetPassReq) {
+        if (servicemanResetPassReq != null) {
+
+            try {
+
+                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getNric(), servicemanResetPassReq.getEmail());
+                return Response.status(Response.Status.OK).build();
+
+            } catch (ResetServicemanPasswordException ex) {
+
+                System.out.println(ex);
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+
+            } catch (Exception ex) {
+                System.out.println(ex);
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            }
+
+        } else {
+
+            ErrorRsp errorRsp = new ErrorRsp("Invalid reset password request");
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }

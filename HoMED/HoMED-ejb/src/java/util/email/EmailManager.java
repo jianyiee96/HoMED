@@ -5,6 +5,7 @@ import entity.Serviceman;
 import java.util.Date;
 import java.util.Properties;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -33,57 +34,75 @@ public class EmailManager {
     public Boolean emailEmployeeOtp(Employee employee, String otp, String fromEmailAddress) {
         String toEmail = employee.getEmail();
         String emailSubject = "HoMED Employee Account Activation Required";
-        String emailBody = createEmailBodyEmployeeOtp(employee, otp);
-        try {
-            Session session = createSession();
-            // REMOVE COMMENTS HERE
-            session.setDebug(true);
-            Message msg = new MimeMessage(session);
+        String recipientName = employee.getName();
+        String header1 = "HoMED Employee Management System";
+        String header2 = "Activate your account";
+        String header3 = "OTP: " + otp;
+        String body = "The admin has created a new account for you. Please proceed to activate your account at the HoMED Employee Management System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
 
-            if (msg != null) {
-                msg.setFrom(InternetAddress.parse(fromEmailAddress, false)[0]);
-                msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-                msg.setSubject(emailSubject);
-                MimeBodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText(emailBody, "UTF-8", "html");
-                Multipart multipart = new MimeMultipart();
-                multipart.addBodyPart(messageBodyPart);
-                msg.setContent(multipart);
-                msg.setHeader("X-Mailer", mailer);
-                Date timeStamp = new Date();
-                msg.setSentDate(timeStamp);
+        String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
 
-                Transport.send(msg);
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
 
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public Boolean emailEmployeeResetPassword(Employee employee, String otp, String fromEmailAddress) {
+        String toEmail = employee.getEmail();
+        String emailSubject = "HoMED Employee Account Password Reset";
+        String recipientName = employee.getName();
+        String header1 = "HoMED Employee Management System";
+        String header2 = "Password Reset";
+        String header3 = "OTP: " + otp;
+        String body = "The admin has received a request to reset your password. Please proceed to reset your account at the HoMED Employee Management System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
 
-            return false;
-        }
+        String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
     }
 
     public Boolean emailServicemanOtp(Serviceman serviceman, String otp, String fromEmailAddress) {
         String toEmail = serviceman.getEmail();
         String emailSubject = "HoMED Serviceman Account Activation Required";
-        String emailBody = createEmailBodyServicemanOtp(serviceman, otp);
+        String recipientName = serviceman.getName();
+        String header1 = "HoMED Serviceman System";
+        String header2 = "Activate your account";
+        String header3 = "OTP: " + otp;
+        String body = "The admin has created a new account for you. Please proceed to activate your account at the HoMED Serviceman System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
+
+        String emailBody = createEmailBodyServiceman(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
+    
+    public Boolean emailServicemanResetPassword(Serviceman serviceman, String otp, String fromEmailAddress) {
+        String toEmail = serviceman.getEmail();
+        String emailSubject = "HoMED Serviceman Account Password Reset";
+        String recipientName = serviceman.getName();
+        String header1 = "HoMED Serviceman System";
+        String header2 = "Password Reset";
+        String header3 = "OTP: " + otp;
+        String body = "The admin has received a request to reset your password. Please proceed to reset your account at the HoMED Serviceman System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
+
+        String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
+
+    private boolean sendEmail(String fromEmailAddress, String toEmail, String emailSubject, String emailBody) {
         try {
             Session session = createSession();
             // REMOVE COMMENTS HERE
-            session.setDebug(true);
+            session.setDebug(false);
             Message msg = new MimeMessage(session);
 
             if (msg != null) {
                 msg.setFrom(InternetAddress.parse(fromEmailAddress, false)[0]);
                 msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
                 msg.setSubject(emailSubject);
-                MimeBodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText(emailBody, "UTF-8", "html");
-                Multipart multipart = new MimeMultipart();
-                multipart.addBodyPart(messageBodyPart);
+                Multipart multipart = createMultipart(emailBody);
                 msg.setContent(multipart);
                 msg.setHeader("X-Mailer", mailer);
                 Date timeStamp = new Date();
@@ -117,7 +136,16 @@ public class EmailManager {
         return session;
     }
 
-    private String createEmailBodyServicemanOtp(Serviceman serviceman, String otp) {
+    private Multipart createMultipart(String emailBody) throws MessagingException {
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setText(emailBody, "UTF-8", "html");
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(messageBodyPart);
+
+        return multipart;
+    }
+
+    private String createEmailBodyServiceman(String recipientName, String header1, String header2, String header3, String body, String disclaimer) {
         return "<div>\n"
                 + "   <style>\n"
                 + "      <!--\n"
@@ -198,7 +226,7 @@ public class EmailManager {
                 + "                                                   <tbody>\n"
                 + "                                                      <tr>\n"
                 + "                                                         <td class=\"x_shop-name__cell\" style=\"\">\n"
-                + "                                                            <h1 class=\"x_shop-name__text\" style=\"font-weight:normal; font-size:30px; color:#333; margin:0 \">HoMED Serviceman System</h1>\n"
+                + "                                                            <h1 class=\"x_shop-name__text\" style=\"font-weight:normal; font-size:30px; color:#333; margin:0 \">" + header1 + "</h1>\n"
                 + "                                                         </td>\n"
                 + "                                                      </tr>\n"
                 + "                                                   </tbody>\n"
@@ -221,8 +249,8 @@ public class EmailManager {
                 + "                                       <tbody>\n"
                 + "                                          <tr>\n"
                 + "                                             <td style=\"\">\n"
-                + "                                                <h2 style=\"font-weight:normal; font-size:24px; margin:0 0 10px\">Activate your account<h1>OTP: " + otp + "</h1></h2>\n"
-                + "                                                <p style=\"color:#777; line-height:150%; font-size:16px; margin:0\">Dear " + serviceman.getName() + ", the admin has created a new account for you. Please proceed to activate your account at the HoMED Serviceman System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.</p>\n"
+                + "                                                <h2 style=\"font-weight:normal; font-size:24px; margin:0 0 10px\">" + header2 + "<h1>" + header3 + "</h1></h2>\n"
+                + "                                                <p style=\"color:#777; line-height:150%; font-size:16px; margin:0\"><h4>Dear " + recipientName + ",</h4>" + body + "</p>\n"
                 + "                                                <table class=\"x_row x_actions\" style=\"width:100%; border-spacing:0; border-collapse:collapse; margin-top:20px\">\n"
                 + "                                                   <tbody>\n"
                 + "                                                      <tr>\n"
@@ -258,7 +286,7 @@ public class EmailManager {
                 + "                                       <tbody>\n"
                 + "                                          <tr>\n"
                 + "                                             <td style=\"\">\n"
-                + "                                                <p class=\"x_disclaimer__subtext\" style=\"color:#999; line-height:150%; font-size:14px; margin:0\">Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system. <a href=\"mailto:HoMED.mailer@gmail.com\" target=\"_blank\" rel=\"noopener noreferrer\" data-auth=\"NotApplicable\" style=\"font-size:14px; text-decoration:none; color:#1990C6\">HoMED.mailer@gmail.com</a></p>\n"
+                + "                                                <p class=\"x_disclaimer__subtext\" style=\"color:#999; line-height:150%; font-size:14px; margin:0\">" + disclaimer + " <a href=\"mailto:HoMED.mailer@gmail.com\" target=\"_blank\" rel=\"noopener noreferrer\" data-auth=\"NotApplicable\" style=\"font-size:14px; text-decoration:none; color:#1990C6\">HoMED.mailer@gmail.com</a></p>\n"
                 + "                                             </td>\n"
                 + "                                          </tr>\n"
                 + "                                       </tbody>\n"
@@ -277,7 +305,7 @@ public class EmailManager {
                 + "</div>";
     }
 
-    private String createEmailBodyEmployeeOtp(Employee employee, String otp) {
+    private String createEmailBodyEmployee(String recipientName, String header1, String header2, String header3, String body, String disclaimer) {
         return "<div>\n"
                 + "   <style>\n"
                 + "      <!--\n"
@@ -358,7 +386,7 @@ public class EmailManager {
                 + "                                                   <tbody>\n"
                 + "                                                      <tr>\n"
                 + "                                                         <td class=\"x_shop-name__cell\" style=\"\">\n"
-                + "                                                            <h1 class=\"x_shop-name__text\" style=\"font-weight:normal; font-size:30px; color:#333; margin:0 \">HoMED Employee Management System</h1>\n"
+                + "                                                            <h1 class=\"x_shop-name__text\" style=\"font-weight:normal; font-size:30px; color:#333; margin:0 \">" + header1 + "</h1>\n"
                 + "                                                         </td>\n"
                 + "                                                      </tr>\n"
                 + "                                                   </tbody>\n"
@@ -381,8 +409,8 @@ public class EmailManager {
                 + "                                       <tbody>\n"
                 + "                                          <tr>\n"
                 + "                                             <td style=\"\">\n"
-                + "                                                <h2 style=\"font-weight:normal; font-size:24px; margin:0 0 10px\">Activate your account<h1>OTP: " + otp + "</h1></h2>\n"
-                + "                                                <p style=\"color:#777; line-height:150%; font-size:16px; margin:0\">Dear " + employee.getName() + ", the admin has created a new account for you. Please proceed to activate your account at the HoMED Employee Management System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.</p>\n"
+                + "                                                <h2 style=\"font-weight:normal; font-size:24px; margin:0 0 10px\">" + header2 + "<h1>" + header3 + "</h1></h2>\n"
+                + "                                                <p style=\"color:#777; line-height:150%; font-size:16px; margin:0\"><h4>Dear " + recipientName + ",</h4>" + body + "</p>\n"
                 + "                                                <table class=\"x_row x_actions\" style=\"width:100%; border-spacing:0; border-collapse:collapse; margin-top:20px\">\n"
                 + "                                                   <tbody>\n"
                 + "                                                      <tr>\n"
@@ -419,7 +447,7 @@ public class EmailManager {
                 + "                                       <tbody>\n"
                 + "                                          <tr>\n"
                 + "                                             <td style=\"\">\n"
-                + "                                                <p class=\"x_disclaimer__subtext\" style=\"color:#999; line-height:150%; font-size:14px; margin:0\">Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system. <a href=\"mailto:HoMED.mailer@gmail.com\" target=\"_blank\" rel=\"noopener noreferrer\" data-auth=\"NotApplicable\" style=\"font-size:14px; text-decoration:none; color:#1990C6\">HoMED.mailer@gmail.com</a></p>\n"
+                + "                                                <p class=\"x_disclaimer__subtext\" style=\"color:#999; line-height:150%; font-size:14px; margin:0\">" + disclaimer + " <a href=\"mailto:HoMED.mailer@gmail.com\" target=\"_blank\" rel=\"noopener noreferrer\" data-auth=\"NotApplicable\" style=\"font-size:14px; text-decoration:none; color:#1990C6\">HoMED.mailer@gmail.com</a></p>\n"
                 + "                                             </td>\n"
                 + "                                          </tr>\n"
                 + "                                       </tbody>\n"

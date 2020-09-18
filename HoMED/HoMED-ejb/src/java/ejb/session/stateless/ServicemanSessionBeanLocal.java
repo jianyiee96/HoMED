@@ -8,6 +8,7 @@ import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanInvalidPasswordException;
@@ -36,5 +37,7 @@ public interface ServicemanSessionBeanLocal {
     public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException;
 
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
+
+    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException;
 
 }
