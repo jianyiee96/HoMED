@@ -10,6 +10,7 @@ import util.exceptions.EmployeeNricExistException;
 import entity.Employee;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.validation.Validator;
 import javax.persistence.EntityManager;
@@ -27,6 +28,7 @@ import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 import util.security.CryptographicHelper;
@@ -37,6 +39,9 @@ import util.security.CryptographicHelper;
  */
 @Stateless
 public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
+
+    @EJB
+    private EmailSessionBeanLocal emailSessionBean;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -95,6 +100,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 em.persist(employee);
                 em.flush();
 
+                // COMMENT THIS CHUNCK TO PREVENT EMAIL
+                try {
+                    emailSessionBean.emailEmployeeOtpAsync(employee, password);
+                } catch (InterruptedException ex) {
+                    // EMAIL NOT SENT OUT SUCCESSFULLY
+                }
+
                 return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -127,7 +139,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         try {
             return (Employee) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new EmployeeNotFoundException("Serviceman Nric " + nric + " does not exist!");
+            throw new EmployeeNotFoundException("Employee Nric " + nric + " does not exist!");
         }
     }
 
@@ -142,8 +154,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 if (employeeToUpdate.getNric().equals(employee.getNric())) {
                     // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
                     employeeToUpdate.setAddress(employee.getAddress());
-                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     employeeToUpdate.setEmail(employee.getEmail());
+                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     employeeToUpdate.setGender(employee.getGender());
 
                 } else {
@@ -223,6 +235,30 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
     }
 
+    @Override
+    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException {
+        try {
+            Employee employee = retrieveEmployeeByNric(nric);
+            if (!email.equals(employee.getEmail())) {
+                throw new ResetEmployeePasswordException("Email does not match account's email! Please try again.");
+            }
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            employee.setPassword(password);
+            employee.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetEmployeePasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (EmployeeNotFoundException ex) {
+            throw new ResetEmployeePasswordException("NRIC does not exist in our system! Please try again.");
+
+        }
+    }
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {

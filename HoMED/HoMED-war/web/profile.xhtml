@@ -61,8 +61,8 @@
                         </div>
                         <p:messages id="messagesUpdateProfile" redisplay="false" />
                         <div class="p-field p-col">
-                            <p:commandButton rendered="#{profileManagedBean.disabled}" value="Edit" actionListener="#{profileManagedBean.enableEdit}" update="formUpdateProfile" />
-                            <p:commandButton rendered="#{!profileManagedBean.disabled}" value="Cancel" actionListener="#{profileManagedBean.cancelEdit}" update="formUpdateProfile" />
+                            <p:commandButton rendered="#{profileManagedBean.disabled}" value="Edit" update="formUpdateProfile" />
+                            <p:commandButton rendered="#{!profileManagedBean.disabled}" value="Cancel" update="formUpdateProfile" />
                         </div>
                         <div class="p-field p-col">
                             <p:commandButton value="Save Changes" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />

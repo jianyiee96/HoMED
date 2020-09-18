@@ -45,6 +45,12 @@ public class Employee implements Serializable {
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     protected String password;
 
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
+    @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
+    @Email(message = "Proper formatted email with length no more than 64 must be provided")
+    private String email;
+
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
     @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
@@ -65,6 +71,11 @@ public class Employee implements Serializable {
     @Max(99999999)
     protected Integer phoneNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Gender must be provided")
+    protected GenderEnum gender;
+    
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
@@ -73,18 +84,7 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @NotNull(message = "Gender must be provided")
-    protected GenderEnum gender;
-    
-    @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
-    @Email(message = "Proper formatted email with length no more than 64 must be provided")
-    protected String email;
-            
+         
 
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
@@ -92,67 +92,35 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password, String address, int phoneNumber, String email, GenderEnum genderEnum) {
+    public Employee(String name, String nric, String password, String email, String address, int phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.nric = nric;
         this.password = password;
+        this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.gender = genderEnum;
-        this.email = email;
         setPassword(password);
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String nric, String address, int phoneNumber) {
+    public Employee(String name, String nric, String email, String address, int phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.nric = nric;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-    }
-
-    public GenderEnum getGender() {
-        return gender;
-    }
-
-    public void setGender(GenderEnum gender) {
-        this.gender = gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    
-    
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
         this.address = address;
-    }
-
-    public Integer getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(Integer phoneNumber) {
         this.phoneNumber = phoneNumber;
+        this.gender = genderEnum;
     }
 
-    public EmployeeRoleEnum getRole() {
-        return role;
+    public Long getEmployeeId() {
+        return employeeId;
     }
 
-    public void setRole(EmployeeRoleEnum role) {
-        this.role = role;
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
     }
 
     public String getNric() {
@@ -175,12 +143,12 @@ public class Employee implements Serializable {
         }
     }
 
-    public Long getEmployeeId() {
-        return employeeId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmployeeId(Long id) {
-        this.employeeId = id;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -199,6 +167,30 @@ public class Employee implements Serializable {
         this.isActivated = isActivated;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Integer getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Integer phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public GenderEnum getGender() {
+        return gender;
+    }
+
+    public void setGender(GenderEnum gender) {
+        this.gender = gender;
+    }
+
     public String getSalt() {
         return salt;
     }
@@ -206,6 +198,16 @@ public class Employee implements Serializable {
     public void setSalt(String salt) {
         this.salt = salt;
     }
+
+    public EmployeeRoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(EmployeeRoleEnum role) {
+        this.role = role;
+    }
+
+
 
     @Override
     public int hashCode() {

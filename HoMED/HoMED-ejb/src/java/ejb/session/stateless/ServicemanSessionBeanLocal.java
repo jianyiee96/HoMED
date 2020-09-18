@@ -7,12 +7,14 @@ package ejb.session.stateless;
 import entity.Serviceman;
 import javax.ejb.Local;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateServicemanException;
 
 /**
  *
@@ -28,5 +30,11 @@ public interface ServicemanSessionBeanLocal {
     public Serviceman servicemanLogin(String nric, String password) throws ServicemanInvalidLoginCredentialException;
 
     public void changePassword(String nric, String oldPassword, String newPassword) throws ServicemanInvalidPasswordException, ServicemanNotFoundException;
-    
+
+    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException;
+
+    public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
+
+    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException;
+
 }

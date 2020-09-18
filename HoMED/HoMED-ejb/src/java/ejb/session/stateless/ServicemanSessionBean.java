@@ -4,8 +4,10 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.Serviceman;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -17,13 +19,17 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetEmployeePasswordException;
+import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.ServicemanNricExistException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateServicemanException;
 import util.security.CryptographicHelper;
 
 /**
@@ -32,6 +38,9 @@ import util.security.CryptographicHelper;
  */
 @Stateless
 public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
+
+    @EJB
+    private EmailSessionBeanLocal emailSessionBean;
 
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
@@ -47,7 +56,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     @Override
     public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException {
         try {
-            
+
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             newServiceman.setPassword(password);
             Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(newServiceman);
@@ -55,21 +64,30 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
                 em.flush();
+                // COMMENT THIS CHUNCK TO PREVENT EMAIL
+                try {
+                    emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
+                } catch (InterruptedException ex) {
+                    // EMAIL NOT SENT OUT SUCCESSFULLY
+                }
                 return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
 
         } catch (PersistenceException ex) {
-            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new ServicemanNricExistException("Serviceman NRIC already exists!");
-                } else {
-                    throw new UnknownPersistenceException(ex.getMessage());
-                }
-            } else {
-                throw new UnknownPersistenceException(ex.getMessage());
-            }
+            throw new UnknownPersistenceException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException {
+        Serviceman serviceman = em.find(Serviceman.class, servicemanId);
+
+        if (serviceman != null) {
+            return serviceman;
+        } else {
+            throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
 
@@ -101,13 +119,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanInvalidLoginCredentialException("NRIC does not exist or invalid password!");
         }
     }
-        
+
     @Override
     public void changePassword(String nric, String oldPassword, String newPassword) throws ServicemanInvalidPasswordException, ServicemanNotFoundException {
         try {
             Serviceman serviceman = retrieveServicemanByNric(nric);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + serviceman.getSalt()));
-            
+
             if (passwordHash.equals(serviceman.getPassword())) {
                 serviceman.setPassword(newPassword);
                 serviceman.setIsActivated(true);
@@ -115,9 +133,65 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             } else {
                 throw new ServicemanInvalidPasswordException("Entered password do not match password associated with account!");
             }
-            
+
         } catch (ServicemanNotFoundException ex) {
             throw new ServicemanNotFoundException("Serviceman NRIC " + nric + " does not exist!");
+        }
+    }
+
+    @Override
+    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException {
+        if (serviceman != null && serviceman.getServicemanId() != null) {
+
+            Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
+            try {
+                if (constraintViolations.isEmpty()) {
+                    Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
+                    if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
+
+                        servicemanToUpdate.setEmail(serviceman.getEmail());
+                        servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
+                        servicemanToUpdate.setAddress(serviceman.getAddress());
+
+                        em.merge(servicemanToUpdate);
+                        em.flush();
+
+                        return servicemanToUpdate;
+
+                    } else {
+                        throw new UpdateServicemanException("NRIC of serviceman record to be updated does not match the existing record!");
+                    }
+                } else {
+                    throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                }
+            } catch (PersistenceException ex) {
+                throw new UnknownPersistenceException(ex.getMessage());
+            }
+        } else {
+            throw new ServicemanNotFoundException("Serviceman ID not provided for serviceman to be updated!");
+        }
+    }
+
+    @Override
+    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
+        try {
+            Serviceman serviceman = retrieveServicemanByNric(nric);
+            if (!email.equals(serviceman.getEmail())) {
+                throw new ResetServicemanPasswordException("Email does not match account's email! Please try again.");
+            }
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            serviceman.setPassword(password);
+            serviceman.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetServicemanPasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (ServicemanNotFoundException ex) {
+            throw new ResetServicemanPasswordException("NRIC does not exist in our system! Please try again.");
         }
     }
 
