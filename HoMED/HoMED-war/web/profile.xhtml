@@ -59,11 +59,14 @@
                             <p:outputLabel value="Address"/>
                             <p:inputText disabled="#{profileManagedBean.disabled}" value="#{profileManagedBean.employee.address}" />
                         </div>
-                        <div class="p-field">
-                            <p:messages id="messagesUpdateProfile" redisplay="false" />
+                        <p:messages id="messagesUpdateProfile" redisplay="false" />
+                        <div class="p-field p-col">
                             <p:commandButton rendered="#{profileManagedBean.disabled}" value="Edit" actionListener="#{profileManagedBean.enableEdit}" update="formUpdateProfile" />
                             <p:commandButton rendered="#{!profileManagedBean.disabled}" value="Cancel" actionListener="#{profileManagedBean.cancelEdit}" update="formUpdateProfile" />
+                        </div>
+                        <div class="p-field p-col">
                             <p:commandButton value="Save Changes" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />
+                        </div>
                             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
@@ -79,7 +82,7 @@
                     </div>
                 </div>
 
-            </div>
+            
         </h:form>
 
         <h:form id="formUpdatePassword">
