@@ -25,7 +25,9 @@ import javax.validation.ValidatorFactory;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
@@ -104,6 +106,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 } catch (InterruptedException ex) {
                     // EMAIL NOT SENT OUT SUCCESSFULLY
                 }
+
                 return password;
             } else {
                 throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -160,6 +163,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employeeToUpdate.setAddress(employee.getAddress());
                     employeeToUpdate.setEmail(employee.getEmail());
                     employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
+                    employeeToUpdate.setGender(employee.getGender());
 
                 } else {
                     throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
@@ -220,6 +224,24 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
+    public void changePassword(String nric, String oldPassword, String newPassword) throws EmployeeInvalidPasswordException, EmployeeNotFoundException {
+        try {
+            Employee employee = retrieveEmployeeByNric(nric);
+            String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + employee.getSalt()));
+
+            if (passwordHash.equals(employee.getPassword())) {
+                employee.setPassword(newPassword);
+                em.flush();
+            } else {
+                throw new EmployeeInvalidPasswordException("Entered password do not match password associated with account!");
+            }
+
+        } catch (EmployeeNotFoundException ex) {
+            throw new EmployeeNotFoundException("Employee NRIC " + nric + " does not exist!");
+        }
+    }
+
+    @Override
     public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException {
         try {
             Employee employee = retrieveEmployeeByNric(nric);
@@ -239,9 +261,10 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             }
         } catch (EmployeeNotFoundException ex) {
             throw new ResetEmployeePasswordException("NRIC does not exist in our system! Please try again.");
+
         }
     }
-
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
         String msg = "Input data validation error!:";
         for (ConstraintViolation constraintViolation : constraintViolations) {
