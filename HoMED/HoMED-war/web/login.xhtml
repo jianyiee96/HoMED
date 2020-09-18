@@ -78,7 +78,7 @@
                             </div>
 
                             <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
-                                <p:commandLink update="forgotPasswordForm" oncomplete="PF('forgotDlg').show()">
+                                <p:commandLink update="forgotPasswordForm" actionListener="#{employeeLoginManagedBean.openForgotPasswordForm}" oncomplete="PF('forgotDlg').show()">
                                     Forgot Password
                                 </p:commandLink>
                             </div>

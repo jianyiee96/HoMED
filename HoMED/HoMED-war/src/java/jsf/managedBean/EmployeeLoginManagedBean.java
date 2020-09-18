@@ -113,7 +113,12 @@ public class EmployeeLoginManagedBean implements Serializable {
             }
         }
     }
-
+    
+    public void openForgotPasswordForm() {
+        this.forgetPasswordNric = "";
+        this.forgetPasswordEmail = "";
+    }
+            
     public void sendOtp() {
         try {
             employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);
