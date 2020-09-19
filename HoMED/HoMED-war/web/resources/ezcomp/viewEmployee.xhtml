@@ -67,8 +67,7 @@
                                 <div class="p-field">
                                     <p:outputLabel for="view-gender" value="Gender"/>
                                     <p:selectOneMenu disabled="#{not viewEmployeeManagedBean.isEditMode}" id="view-gender" value="#{viewEmployeeManagedBean.employeeToView.gender}">
-                                        <f:selectItem itemLabel="MALE" itemValue="MALE"/>
-                                        <f:selectItem itemLabel="FEMALE" itemValue="FEMALE"/>
+                                        <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
                                     </p:selectOneMenu>
                                 </div> 
                             </div>
@@ -84,7 +83,10 @@
 
                                 <div class="p-field">
                                     <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" disabled="#{not viewEmployeeManagedBean.isEditMode}" value="#{viewEmployeeManagedBean.employeeToView.email}" />
+                                    <p:inputText id="view-email" disabled="#{not viewEmployeeManagedBean.isEditMode}" value="#{viewEmployeeManagedBean.employeeToView.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
                                 </div>
                                 <div class="p-field">
                                     <p:outputLabel for="view-address" value="Address"/>
@@ -112,7 +114,7 @@
                                             <p:commandButton actionListener="#{viewEmployeeManagedBean.doResetPassword}" update="panelViewEmployee" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
                                                 <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
-                                            <p:commandButton actionListener="#{viewEmployeeManagedBean.doDelete}" update="panelViewEmployee" type="submit" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
+                                            <p:commandButton actionListener="#{viewEmployeeManagedBean.doDelete}" update="panelViewEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
                                                 <p:confirm header="Confirmation" message="Are you sure you want to delete this employee? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
                                             <p:commandButton actionListener="#{viewEmployeeManagedBean.doCancel}" update="panelViewEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2"/>

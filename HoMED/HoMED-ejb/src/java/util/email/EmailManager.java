@@ -86,7 +86,7 @@ public class EmailManager {
         String body = "The admin has received a request to reset your password. Please proceed to reset your account at the HoMED Serviceman System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
         String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
 
-        String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
+        String emailBody = createEmailBodyServiceman(recipientName, header1, header2, header3, body, disclaimer);
 
         return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
     }
