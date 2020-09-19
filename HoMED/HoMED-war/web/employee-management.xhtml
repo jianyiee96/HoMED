@@ -31,8 +31,8 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
-                                             update="ccViewEmployee:formViewEmployee:panelViewEmployee" process="@this" immediate="true" oncomplete="PF('dialogViewEmployee').show()" />
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{employeeAccountManagementManagedBean.doCreateEmployee}"
+                                             update="formCreateEmployee" process="@this" immediate="true" oncomplete="PF('dialogCreateEmployee').show()" />
                         </div>
 
                         <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"
@@ -96,6 +96,85 @@
                 </div>
 
             </div>
+        </h:form>
+        <h:form id="formCreateEmployee">
+            <p:dialog id="dialogCreateEmployee" widgetVar="dialogCreateEmployee" header="Create Employee" showEffect="fade"
+                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
+                <p:outputPanel id="panelCreateEmployee" rendered="#{not empty employeeAccountManagementManagedBean.employeeToCreate}">
+                    <div class="p-grid">
+                        <div class="p-col-12 p-grid p-justify-center">
+                            <p:selectOneMenu id="create-role" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.role}">
+                                <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Personal Particulars</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-name" value="Name"/>
+                                    <p:inputText id="create-name" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.name}" />
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-nric" value="Nric"/>
+                                    <p:inputText id="create-nric" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.nric}" />
+                                </div>
+
+
+                                <div class="p-field">
+                                    <p:outputLabel for="create-gender" value="Gender"/>
+                                    <p:selectOneMenu id="create-gender" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.gender}">
+                                        <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
+                                    </p:selectOneMenu>
+                                </div> 
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Contact Details</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
+                                    <p:inputText id="create-phoneNumber" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.phoneNumber}" />
+                                </div>
+
+                                <div class="p-field">
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-address" value="Address"/>
+                                    <p:inputText id="create-address" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.address}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-col-12">
+                            <p:messages closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
+                        <ui:fragment rendered="#{employeeAccountManagementManagedBean.isEditableCreateEmployee}">
+                            <div class="p-col-12">
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <h5>Admin Rights</h5>
+                                    </f:facet>
+                                    <f:facet name="right">
+                                        <p:commandButton actionListener="#{employeeAccountManagementManagedBean.createEmployee}" update="panelCreateEmployee formAllEmployees" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                    </f:facet>
+                                </p:toolbar>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </p:outputPanel>
+
+            </p:dialog>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
         </h:form>
 
         <h:outputStylesheet name="crud-tables.css" library="css" />

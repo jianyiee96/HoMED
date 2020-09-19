@@ -47,7 +47,7 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, unique = true, length = 64)
     @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
+    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
     @Email(message = "Proper formatted email with length no more than 64 must be provided")
     private String email;
 

@@ -93,6 +93,7 @@ public class ViewEmployeeManagedBean implements Serializable {
                 employeeSessionBean.deleteEmployee(this.employeeToView.getEmployeeId());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted employee!", null));
                 this.isDeleted = true;
+                this.isEditMode = false;
             } catch (DeleteEmployeeException | EmployeeNotFoundException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while deleting the employee: " + ex.getMessage(), null));
             } catch (Exception ex) {
