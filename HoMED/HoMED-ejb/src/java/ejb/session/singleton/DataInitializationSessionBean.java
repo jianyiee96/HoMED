@@ -10,6 +10,9 @@ import entity.MedicalCentre;
 import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.Serviceman;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,11 +51,31 @@ public class DataInitializationSessionBean {
     @PostConstruct
     public void postConstruct() {
 
+        initializeReadFile();
+
         if (employeeSessionBeanLocal.retrieveEmployeeById(1l) == null) {
             initializeData();
         } else {
             System.out.println("data exists");
         }
+    }
+
+    private void initializeReadFile() {
+        System.out.println("Initializing files....");
+        
+        String csvFile = "C:\\Users\\tanwk\\servicemen-accounts.csv";
+        String line = "";
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                String[] servicemen = line.split(",");
+                
+                System.out.println("Name = " + servicemen[0] + " ; " + "NRIC = " + servicemen[1]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
     }
 
     private void initializeData() {

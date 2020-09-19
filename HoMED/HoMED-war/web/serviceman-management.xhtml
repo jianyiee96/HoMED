@@ -24,6 +24,10 @@
                     <div class="card">
                         <h1>Serviceman Account Management</h1>
 
+                        <h:form enctype="multipart/form-data">        
+                            <p:fileUpload value="#{servicemanAccountManagementManagedBean.csvFile}" mode="simple" skinSimple="true" />
+                            <p:commandButton value="Submit" ajax="false" action="#{servicemanAccountManagementManagedBean.uploadCsv}" />
+                        </h:form>
 
 
 
