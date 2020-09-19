@@ -15,8 +15,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import util.enumeration.DayOfWeekEnum;
+import util.validators.OpeningHours;
 
 @Entity
+@OpeningHours(message = "Opening hour has to be befoe closing hour!")
 public class OperatingHours implements Serializable {
 
     private static final long serialVersionUID = 1L;

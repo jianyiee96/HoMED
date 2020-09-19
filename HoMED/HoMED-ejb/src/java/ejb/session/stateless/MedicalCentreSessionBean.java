@@ -43,8 +43,12 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         try {
             Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(newMedicalCentre);
 
+            System.out.println("before constraints");
+            
             if (constraintViolations.isEmpty()) {
 
+                System.out.println("after constraints");
+                
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
                     em.persist(oh);
                     em.flush();
@@ -82,9 +86,12 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public Long createNewOperatingHours(OperatingHours newOperatingHours) {
+        System.out.println("******* create new operaring hour 1");
+        
         em.persist(newOperatingHours);
         em.flush();
-
+        
+        System.out.println("******* create new operaring hour 2");
         return newOperatingHours.getOperatingHoursId();
     }
 
