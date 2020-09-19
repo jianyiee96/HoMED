@@ -3,13 +3,87 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="template/template.xhtml">
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
 
     <ui:define name="title">Serviceman Account Management</ui:define>
 
-
     <ui:define name="content">
 
+        <style type="text/css">
+            .error-message {
+                margin: 0.5rem 0rem 0rem 0rem !important;
+            }
+        </style>
+
+        <!--        <ezcomp>
+                    
+                </ezcomp>-->
+
+        <h:form id="formAllServicemen">
+            <div class="p-grid crud-table">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+                        <div class="buttonbar">
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
+                                             update="ccViewEmployee:formViewEmployee:panelViewEmployee" process="@this" immediate="true" oncomplete="PF('dialogViewEmployee').show()" />
+                        </div>
+
+                        <p:dataTable widgetVar="dataTableServicemen" id="dataTableServicemen" var="servicid="dataTableServicemen"eman" value="#{servicemanAccountManagementManagedBean.servicemen}"
+                                     rowKey="#{serviceman.servicemanId}" scrollable="true" scrollHeight="600"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">SERVICEMEN</span>
+                            </f:facet>
+                            <p:column headerText="ID" style="width: 50px" sortBy="#{serviceman.servicemanId}">
+                                <h:outputText value="#{serviceman.servicemanId}" />
+                            </p:column>
+
+                            <p:column headerText="Nric" sortBy="#{serviceman.nric}">
+                                <h:outputText value="#{serviceman.nric}" />
+                            </p:column>
+
+                            <p:column headerText="Name" sortBy="#{serviceman.name}">
+                                <h:outputText value="#{serviceman.name}" />
+                            </p:column>
+
+                            <p:column headerText="Email" sortBy="#{serviceman.email}">
+                                <h:outputText value="#{serviceman.email}" />
+                            </p:column>
+
+                            <p:column headerText="Blood Type" sortBy="#{serviceman.bloodType}">
+                                <h:outputText value="#{serviceman.bloodType}" />
+                            </p:column>
+
+                            <p:column headerText="Gender" sortBy="#{serviceman.gender}">
+                                <h:outputText value="#{serviceman.gender}" />
+                            </p:column>
+
+                            <p:column headerText="ROD Date" sortBy="#{serviceman.rod}">
+                                <h:outputText value="#{servicemanAccountManagementManagedBean.renderDate(serviceman.rod)}" />
+                            </p:column>
+
+
+                            <p:column headerText="Activated" sortBy="#{serviceman.isActivated}">
+                                <h:outputText value="#{serviceman.isActivated}" />
+                            </p:column>
+
+                            <p:column headerText="Address" sortBy="#{serviceman.address}">
+                                <h:outputText value="#{serviceman.address}" />
+                            </p:column>
+
+                            <p:column headerText="PhoneNumber" sortBy="#{serviceman.phoneNumber}">
+                                <h:outputText value="#{serviceman.phoneNumber}" />
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+        </h:form>
         <div class="p-grid">
 
             <div class="p-col-12">
@@ -75,34 +149,6 @@
                                 <h:outputText value="#{serviceman.phoneNumber}" />
                             </p:column>
 
-
-<!--                            <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
-            <h:outputText value="#{formUtilityManagedBean.renderDate(formTemplate.dateCreated)}" />
-        </p:column>
-        <p:column  headerText="Status" sortBy="#{formTemplate.formStatus}">
-            <span class="form-status-badge status-#{formTemplate.formStatus.text.toLowerCase()}">#{formTemplate.formStatus.text}</span>
-        </p:column>-->
-
-                            <!--                            <p:column exportable="false">
-                            
-                                                            <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View">
-                                                                <f:attribute name="formToView" value="#{formTemplate}" />
-                                                            </p:commandButton> 
-                                                            <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish">
-                                                                <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
-                                                                <p:confirm header="Publish Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
-                                                            </p:commandButton> 
-                                                            <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
-                                                                <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
-                                                                <p:confirm header="Delete Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
-                                                            </p:commandButton> 
-                                                            <p:commandButton disabled="#{formTemplate.formStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
-                                                                <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
-                                                                <p:confirm header="Archive Template" message="Users will no longer be able to use this form. Are you sure?" icon="pi pi-exclamation-triangle" />
-                                                            </p:commandButton>
-                            
-                            
-                                                        </p:column>-->
                         </p:dataTable>
 
                     </div>
