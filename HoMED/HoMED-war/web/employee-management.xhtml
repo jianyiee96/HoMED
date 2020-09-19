@@ -20,7 +20,9 @@
             }
         </style>
 
-        <ezcomp:viewEmployee id="ccViewEmployee"/>
+        <ezcomp:viewEmployee id="ccViewEmployee">
+            <f:ajax event="dialogCloseEvent" listener="#{employeeAccountManagementManagedBean.dialogActionListener}"/>
+        </ezcomp:viewEmployee>
 
         <h:form id="formAllEmployees">
             <div class="p-grid crud-table">
@@ -31,7 +33,6 @@
                         <div class="buttonbar">
                             <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
                                              update="ccViewEmployee:formViewEmployee:panelViewEmployee" process="@this" immediate="true" oncomplete="PF('dialogViewEmployee').show()" />
-                            <!--EDIT HERE = PF DIALOG, PANEL-->
                         </div>
 
                         <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"

@@ -13,6 +13,7 @@ import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import org.primefaces.PrimeFaces;
 
 @Named(value = "employeeAccountManagementManagedBean")
 @ViewScoped
@@ -34,6 +35,12 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
 
         employees = employeeSessionBeanLocal.retrieveAllEmployees();
 
+    }
+
+    public void dialogActionListener() {
+        
+        employees = employeeSessionBeanLocal.retrieveAllEmployees();
+        PrimeFaces.current().ajax().update("formAllEmployees:dataTableEmployees");
     }
 
     public void doViewEmployee(Employee employee) {

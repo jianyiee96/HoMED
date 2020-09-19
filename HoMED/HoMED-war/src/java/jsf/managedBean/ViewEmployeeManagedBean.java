@@ -73,10 +73,10 @@ public class ViewEmployeeManagedBean implements Serializable {
 
     public void doResetPassword() {
         try {
-            Employee newEmployee = employeeSessionBean.resetEmployeePasswordByAdmin(currentEmployee);
             // isActivated is changed
-            this.employeeToView = newEmployee;
+            this.employeeToView.setIsActivated(false);
             this.originalEmployeeToView = new Employee(this.employeeToView);
+            employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset employee's password! Please inform employee that OTP has been sent to their email.", null));
         } catch (ResetEmployeePasswordException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while resetting employee password: " + ex.getMessage(), null));
