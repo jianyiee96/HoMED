@@ -158,6 +158,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
                     if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
 
+                        servicemanToUpdate.setName(serviceman.getName());
+                        servicemanToUpdate.setNric(serviceman.getNric());
+                        servicemanToUpdate.setRod(serviceman.getRod());
+                        servicemanToUpdate.setGender(serviceman.getGender());
+                        servicemanToUpdate.setBloodType(serviceman.getBloodType());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
                         servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                         servicemanToUpdate.setAddress(serviceman.getAddress());
@@ -186,7 +191,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         Serviceman servicemanToRemove = retrieveServicemanById(servicemanId);
         em.remove(servicemanToRemove);
     }
-    
+
     @Override
     public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
         try {
