@@ -66,8 +66,10 @@
 
                                 <div class="p-field">
                                     <p:outputLabel for="view-gender" value="Gender"/>
-                                    <p:inputText disabled="#{not viewEmployeeManagedBean.isEditMode}" id="view-gender" value="#{viewEmployeeManagedBean.employeeToView.gender}" />
-
+                                    <p:selectOneMenu disabled="#{not viewEmployeeManagedBean.isEditMode}" id="view-gender" value="#{viewEmployeeManagedBean.employeeToView.gender}">
+                                        <f:selectItem itemLabel="MALE" itemValue="MALE"/>
+                                        <f:selectItem itemLabel="FEMALE" itemValue="FEMALE"/>
+                                    </p:selectOneMenu>
                                 </div> 
                             </div>
                         </div>
