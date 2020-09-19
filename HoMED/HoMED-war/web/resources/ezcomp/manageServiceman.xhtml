@@ -22,7 +22,7 @@
                                 <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}" />
                             </ui:fragment>
                         </div>
-                        
+
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
                                 <h5>Personal Particulars</h5>
@@ -65,6 +65,25 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h5>Other Information</h5>
+                                <div class="p-grid">
+                                    <div class="p-col-6 p-field">
+                                        <p:outputLabel for="manage-bloodtype" value="Blood Type" />
+                                        <p:selectOneMenu id="manage-bloodtype" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.bloodType}">
+                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.bloodTypes}" var="bloodType" itemLabel="#{bloodType.bloodTypeString}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="p-col-6 p-field">
+                                        <p:outputLabel for="manage-rod" value="ROD" />
+                                        <p:datePicker id="manage-rod" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.rod}" pattern="dd/MM/yyyy" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="p-col-12">
                             <p:messages closable="true">
                                 <p:autoUpdate/>
