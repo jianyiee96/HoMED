@@ -16,9 +16,9 @@
             }
         </style>
 
-        <!--        <ezcomp>
-                    
-                </ezcomp>-->
+        <ezcomp:manageServiceman id="ccManageServiceman">
+            <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
+        </ezcomp:manageServiceman>
 
         <h:form id="formAllServicemen">
             <div class="p-grid crud-table">
@@ -27,137 +27,153 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
-                                             update="ccViewEmployee:formViewEmployee:panelViewEmployee" process="@this" immediate="true" oncomplete="PF('dialogViewEmployee').show()" />
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{servicemanAccountManagementManagedBean.doCreateServiceman}"
+                                             update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()" />
                         </div>
 
-                        <p:dataTable widgetVar="dataTableServicemen" id="dataTableServicemen" var="servicid="dataTableServicemen"eman" value="#{servicemanAccountManagementManagedBean.servicemen}"
-                                     rowKey="#{serviceman.servicemanId}" scrollable="true" scrollHeight="600"
-                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+                        <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"  var="serviceman" value="#{servicemanAccountManagementManagedBean.servicemen}" sortBy="#{serviceman.servicemanId}"
+                                     styleClass="crud-management-table" rowKey="#{serviceman.servicemanId}" paginator="true" rows="10" paginatorPosition="bottom">
 
-                            <f:facet id="dataViewListHeader" name="header">
-                                <span style="font-weight: bold">SERVICEMEN</span>
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold">SERVICEMEN</span>
+
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('dataTableServicemen').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
                             </f:facet>
-                            <p:column headerText="ID" style="width: 50px" sortBy="#{serviceman.servicemanId}">
+
+                            <p:column headerText="ID" width="5%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.servicemanId}" />
                             </p:column>
 
-                            <p:column headerText="Nric" sortBy="#{serviceman.nric}">
+                            <p:column headerText="NRIC" width="5%" sortBy="#{serviceman.nric}" filterBy="#{serviceman.nric}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.nric}" />
                             </p:column>
 
-                            <p:column headerText="Name" sortBy="#{serviceman.name}">
+                            <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.name}" />
                             </p:column>
 
-                            <p:column headerText="Email" sortBy="#{serviceman.email}">
+                            <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.email}" />
                             </p:column>
 
-                            <p:column headerText="Blood Type" sortBy="#{serviceman.bloodType}">
-                                <h:outputText value="#{serviceman.bloodType}" />
-                            </p:column>
-
-                            <p:column headerText="Gender" sortBy="#{serviceman.gender}">
+                            <p:column headerText="Gender" width="5%" sortBy="#{serviceman.gender}" filterBy="#{serviceman.gender}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.gender}" />
                             </p:column>
 
-                            <p:column headerText="ROD Date" sortBy="#{serviceman.rod}">
-                                <h:outputText value="#{servicemanAccountManagementManagedBean.renderDate(serviceman.rod)}" />
-                            </p:column>
-
-
-                            <p:column headerText="Activated" sortBy="#{serviceman.isActivated}">
-                                <h:outputText value="#{serviceman.isActivated}" />
-                            </p:column>
-
-                            <p:column headerText="Address" sortBy="#{serviceman.address}">
-                                <h:outputText value="#{serviceman.address}" />
-                            </p:column>
-
-                            <p:column headerText="PhoneNumber" sortBy="#{serviceman.phoneNumber}">
+                            <p:column headerText="Phone Number" width="7%" sortBy="#{serviceman.phoneNumber}" filterBy="#{serviceman.phoneNumber}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.phoneNumber}" />
                             </p:column>
 
+                            <p:column headerText="Action" width="3%">
+                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
+                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" actionListener="#{servicemanAccountManagementManagedBean.doViewServiceman(serviceman)}" process="@this" oncomplete="PF('dialogManageServiceman').show()" />
+                            </p:column>
+
                         </p:dataTable>
+
                     </div>
                 </div>
             </div>
         </h:form>
-        <div class="p-grid">
 
-            <div class="p-col-12">
+        <h:form id="formCreateServiceman">
+            <p:dialog id="dialogCreateServiceman" widgetVar="dialogCreateServiceman" header="Create Serviceman" showEffect="fade"
+                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
+                <p:outputPanel id="panelCreateServiceman" rendered="#{not empty servicemanAccountManagementManagedBean.servicemanToCreate}">
+                    <div class="p-grid">
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Personal Particulars</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-name" value="Name" />
+                                    <p:inputText id="create-name" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.name}" />
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-nric" value="NRIC"/>
+                                    <p:inputText id="create-nric" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.nric}" />
+                                </div>
 
-                <h:form id="formEmployee">
-                    <p:growl id="growl" globalOnly="true" showDetail="true" />
-                    <p:confirmDialog global="true">
-                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                    </p:confirmDialog>     
+                                <div class="p-field">
+                                    <p:outputLabel for="create-gender" value="Gender"/>
+                                    <p:selectOneMenu id="create-gender" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.gender}">
+                                        <f:selectItems value="#{servicemanAccountManagementManagedBean.genders}"/>
+                                    </p:selectOneMenu>
+                                </div> 
+                            </div>
+                        </div>
 
-                    <div class="card">
-                        <h1>Serviceman Account Management</h1>
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Contact Details</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
+                                    <p:inputText id="create-phoneNumber" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.phoneNumber}" />
+                                </div>
 
+                                <div class="p-field">
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-address" value="Address"/>
+                                    <p:inputText id="create-address" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.address}" />
+                                </div>
+                            </div>
+                        </div>
 
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h5>Other Information</h5>
+                                <div class="p-grid">
+                                    <div class="p-col-6 p-field">
+                                        <p:outputLabel for="create-bloodtype" value="Blood Type" />
+                                        <p:selectOneMenu id="create-bloodtype" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.bloodType}">
+                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.bloodTypes}" var="bloodType" itemLabel="#{bloodType.bloodTypeString}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="p-col-6 p-field">
+                                        <p:outputLabel for="create-rod" value="ROD" />
+                                        <p:datePicker id="create-rod" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.rod}" pattern="dd/MM/yyyy" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-
-                        <p:dataTable widgetVar="servicemenDT" id="servicemenDT" var="serviceman" value="#{servicemanAccountManagementManagedBean.servicemen}"
-                                     rowKey="#{serviceman.servicemanId}" scrollable="true" scrollHeight="600"
-                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
-
-                            <f:facet id="dataViewListHeader" name="header">
-                                <span style="font-weight: bold">SERVICEMEN</span>
-                            </f:facet>
-                            <p:column headerText="ID" style="width: 50px" sortBy="#{serviceman.servicemanId}">
-                                <h:outputText value="#{serviceman.servicemanId}" />
-                            </p:column>
-
-                            <p:column headerText="Nric" sortBy="#{serviceman.nric}">
-                                <h:outputText value="#{serviceman.nric}" />
-                            </p:column>
-
-                            <p:column headerText="Name" sortBy="#{serviceman.name}">
-                                <h:outputText value="#{serviceman.name}" />
-                            </p:column>
-
-                            <p:column headerText="Email" sortBy="#{serviceman.email}">
-                                <h:outputText value="#{serviceman.email}" />
-                            </p:column>
-
-                            <p:column headerText="Blood Type" sortBy="#{serviceman.bloodType}">
-                                <h:outputText value="#{serviceman.bloodType}" />
-                            </p:column>
-
-                            <p:column headerText="Gender" sortBy="#{serviceman.gender}">
-                                <h:outputText value="#{serviceman.gender}" />
-                            </p:column>
-
-                            <p:column headerText="ROD Date" sortBy="#{serviceman.rod}">
-                                <h:outputText value="#{servicemanAccountManagementManagedBean.renderDate(serviceman.rod)}" />
-                            </p:column>
-
-
-                            <p:column headerText="Activated" sortBy="#{serviceman.isActivated}">
-                                <h:outputText value="#{serviceman.isActivated}" />
-                            </p:column>
-
-                            <p:column headerText="Address" sortBy="#{serviceman.address}">
-                                <h:outputText value="#{serviceman.address}" />
-                            </p:column>
-
-                            <p:column headerText="PhoneNumber" sortBy="#{serviceman.phoneNumber}">
-                                <h:outputText value="#{serviceman.phoneNumber}" />
-                            </p:column>
-
-                        </p:dataTable>
-
+                        <div class="p-col-12">
+                            <p:messages closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
+                        <ui:fragment rendered="#{servicemanAccountManagementManagedBean.isEditableCreateServiceman}">
+                            <div class="p-col-12">
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <h5>Admin Rights</h5>
+                                    </f:facet>
+                                    <f:facet name="right">
+                                        <p:commandButton actionListener="#{servicemanAccountManagementManagedBean.createServiceman}" update="panelCreateServiceman formAllServicemen" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                    </f:facet>
+                                </p:toolbar>
+                            </div>
+                        </ui:fragment>
                     </div>
+                </p:outputPanel>
 
-                </h:form>
-            </div>
+            </p:dialog>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
 
-        </div>
-
+        <h:outputStylesheet name="crud-tables.css" library="css" />
     </ui:define>
-
 </ui:composition>

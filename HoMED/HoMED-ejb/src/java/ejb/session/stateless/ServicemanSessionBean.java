@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exceptions.DeleteServicemanException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetEmployeePasswordException;
@@ -80,14 +81,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
-    
+
     @Override
     public List<Serviceman> retrieveAllServicemen() {
         Query query = em.createQuery("SELECT s FROM Serviceman s");
 
         return query.getResultList();
     }
-    
 
     @Override
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException {
@@ -182,6 +182,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
+    public void deleteServiceman(Long servicemanId) throws ServicemanNotFoundException, DeleteServicemanException {
+        Serviceman servicemanToRemove = retrieveServicemanById(servicemanId);
+        em.remove(servicemanToRemove);
+    }
+    
+    @Override
     public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
         try {
             Serviceman serviceman = retrieveServicemanByNric(nric);
@@ -201,6 +207,27 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException("NRIC does not exist in our system! Please try again.");
+        }
+    }
+
+    @Override
+    public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException {
+        try {
+            Serviceman serviceman = retrieveServicemanByNric(currentServiceman.getNric());
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            serviceman.setPassword(password);
+            serviceman.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailServicemanOtpAsync(serviceman, password);
+                return serviceman;
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetServicemanPasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (ServicemanNotFoundException ex) {
+            throw new ResetServicemanPasswordException("Serviceman does not exist in our system! Please try again.");
         }
     }
 
