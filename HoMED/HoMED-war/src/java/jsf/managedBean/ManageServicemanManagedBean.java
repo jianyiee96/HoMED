@@ -4,6 +4,7 @@
  */
 package jsf.managedBean;
 
+
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
 import entity.Serviceman;
@@ -16,6 +17,7 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.DeleteServicemanException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanNotFoundException;
@@ -67,7 +69,7 @@ public class ManageServicemanManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated serviceman!", null));
             this.isEditMode = false;
             this.originalServicemanToView = new Serviceman(servicemanToView);
-        } catch (ServicemanNotFoundException | UpdateServicemanException | InputDataValidationException ex) {
+        } catch (ServicemanNotFoundException | UpdateServicemanException | InputDataValidationException | DuplicateEntryExistsException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the serviceman: " + ex.getMessage(), null));
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));

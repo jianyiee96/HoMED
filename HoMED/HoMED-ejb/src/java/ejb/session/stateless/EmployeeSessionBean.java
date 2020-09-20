@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import entity.Employee;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -24,6 +25,7 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.InputDataValidationException;
@@ -90,7 +92,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
     // Creation of employee by admin (w OTP)
     @Override
-    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException {
+    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, DuplicateEntryExistsException {
         try {
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
@@ -114,13 +116,21 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         } catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new EmployeeNricExistException("Employee NRIC already exists!");
+
+                    if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same email address!");
+                    } else if (ex.getCause().getCause().getMessage().contains("PHONE")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same phone number!");
+                    } else if (ex.getCause().getCause().getMessage().contains("NRIC")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same NRIC!");
+                    }
+
                 } else {
-                    throw new UnknownPersistenceException(ex.getMessage());
+                    throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
                 }
-            } else {
-                throw new UnknownPersistenceException(ex.getMessage());
             }
+            throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
+
         }
     }
 
@@ -151,33 +161,58 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException {
-        if (employee != null && employee.getEmployeeId() != null) {
-            Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException, DuplicateEntryExistsException, UnknownPersistenceException {
+        try {
+            if (employee != null && employee.getEmployeeId() != null) {
+                Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
 
-            if (constraintViolations.isEmpty()) {
-                Employee employeeToUpdate = retrieveEmployeeByNric(employee.getNric());
+                if (constraintViolations.isEmpty()) {
+                    Employee employeeToUpdate = retrieveEmployeeByNric(employee.getNric());
 
-                if (employeeToUpdate.getNric().equals(employee.getNric())) {
-                    // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
-                    
-                    employeeToUpdate.setName(employee.getName());
-                    employeeToUpdate.setNric(employee.getNric());
-                    employeeToUpdate.setIsActivated(employee.getIsActivated());
-                    
-                    employeeToUpdate.setAddress(employee.getAddress());
-                    employeeToUpdate.setEmail(employee.getEmail());
-                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
-                    employeeToUpdate.setGender(employee.getGender());
+                    if (employeeToUpdate.getNric().equals(employee.getNric())) {
+                        // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
 
+                        employeeToUpdate.setName(employee.getName());
+                        employeeToUpdate.setNric(employee.getNric());
+                        employeeToUpdate.setIsActivated(employee.getIsActivated());
+
+                        employeeToUpdate.setAddress(employee.getAddress());
+                        employeeToUpdate.setEmail(employee.getEmail());
+                        employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
+                        employeeToUpdate.setGender(employee.getGender());
+                        
+                        em.flush();
+
+                    } else {
+                        throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
+                    }
                 } else {
-                    throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
+                    
+                    throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                    
                 }
             } else {
-                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                throw new EmployeeNotFoundException("Employee ID not provided for staff to be updated");
             }
-        } else {
-            throw new EmployeeNotFoundException("Employee ID not provided for staff to be updated");
+        } catch (Exception ex)  {
+            System.out.println("************** HERE");
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+
+                    if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same email address!");
+                    } else if (ex.getCause().getCause().getMessage().contains("PHONE")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same phone number!");
+                    } else if (ex.getCause().getCause().getMessage().contains("NRIC")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same NRIC!");
+                    }
+
+                } else {
+                    throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
+                }
+            }
+            throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
+
         }
     }
 

@@ -131,13 +131,14 @@
                                 <div class="p-field">
                                     <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="create-phoneNumber" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.phoneNumber}" />
+                                        
                                 </div>
 
                                 <div class="p-field">
                                     <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
+                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
                                         <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"  />
                                     </p:inputText>
                                 </div>
                                 <div class="p-field">
