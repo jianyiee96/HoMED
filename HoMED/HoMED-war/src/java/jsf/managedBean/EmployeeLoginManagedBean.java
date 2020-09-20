@@ -10,7 +10,6 @@ import javax.inject.Named;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
-import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -79,7 +78,7 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     }
 
-    public void logout(ActionEvent event) throws IOException {
+    public void logout() throws IOException {
         themeCustomiser.setComponentTheme("cyan");
         themeCustomiser.setTopbarColor("cyan");
 
@@ -88,7 +87,7 @@ public class EmployeeLoginManagedBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml");
     }
 
-    public void activateAccount(ActionEvent event) throws IOException {
+    public void activateAccount() throws IOException {
         if (currentEmployee.getIsActivated()) {
             FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
         } else if (!activatePassword.equals(activateRePassword)) {
@@ -126,22 +125,6 @@ public class EmployeeLoginManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
             FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        }
-    }
-
-    public void timeoutLogout() throws IOException {
-        FacesContext.getCurrentInstance().getExternalContext().getFlash().put("inactiveSession", true);
-        logout(null);
-    }
-
-    public void idleWarning() {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Session about to expire", "You have been inactive for the past 15 mins. You will be logged out in the next minute."));
-    }
-
-    public void checkActivate() {
-        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        if (flash.get("activatedAccount") != null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful Activation", "You have successfully activated your account! Password has been reset."));
         }
     }
 
