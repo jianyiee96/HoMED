@@ -55,7 +55,7 @@
 
                             <div class="p-col-12 password-container">
                                 <h:panelGroup id="passwordPanel">
-                                    <h:outputLabel id="passwordLabel">#{employeeLoginManagedBean.isActivateMode ? "One-Time-Password" : "Password"}</h:outputLabel>
+                                    <h:outputLabel id="passwordLabel">Password / OTP</h:outputLabel>
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
                                             <i class="pi pi-lock"></i>
@@ -71,16 +71,14 @@
                                 </h:panelGroup>
                             </div>
 
-                            <div class="p-col-12 p-sm-6 p-md-6">
-                                <p:commandLink update="@form:passwordLabel @this" immediate="true" action="#{employeeLoginManagedBean.toggleActivateMode()}">
-                                    #{employeeLoginManagedBean.isActivateMode ? "Already Activated Account" : "First Time User / Reset?"}
-                                </p:commandLink>
-                            </div>
-
-                            <div class="p-col-12 p-sm-6 p-md-6 forgetpassword-container">
+                            <div class="p-col-12 forgetpassword-container">
                                 <p:commandLink update="forgotPasswordForm" actionListener="#{employeeLoginManagedBean.openForgotPasswordForm}" oncomplete="PF('forgotDlg').show()">
                                     Forgot Password
                                 </p:commandLink>
+                            </div>
+                            
+                            <div class="p-col-12">
+                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" />
                             </div>
 
                             <div class="p-col-12">
@@ -88,11 +86,6 @@
                                     <p:autoUpdate/>
                                 </p:messages>
                             </div>
-
-                            <div class="p-col-12 p-sm-6 p-md-6">
-                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" />
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -143,11 +136,6 @@
                                         </div>
                                     </h:panelGroup>
 
-                                </div>
-
-                                <div class="p-col-12">
-                                    <p:selectBooleanCheckbox value="#{employeeLoginManagedBean.isLoginAfterActivate}"/>
-                                    <label>Login after activation</label>
                                 </div>
 
                                 <div class="p-col-12">

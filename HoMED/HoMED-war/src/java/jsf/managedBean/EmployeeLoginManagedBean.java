@@ -10,7 +10,6 @@ import javax.inject.Named;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
-import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -27,8 +26,6 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     private String nric;
     private String password;
-    private Boolean isActivateMode;
-    private Boolean isLoginAfterActivate;
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
@@ -43,8 +40,6 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        this.isActivateMode = false;
-        this.isLoginAfterActivate = false;
     }
 
     public EmployeeLoginManagedBean() {
@@ -54,24 +49,15 @@ public class EmployeeLoginManagedBean implements Serializable {
 
         try {
             currentEmployee = employeeSessionBeanLocal.employeeLogin(nric, password);
-            if (isActivateMode) {
-                if (currentEmployee.getIsActivated()) {
-                    FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
-                } else {
-                    PrimeFaces.current().executeScript("PF('dlg').show()");
-                }
+            if (currentEmployee.getIsActivated()) {
+                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+
+                setRoleTheme(currentEmployee.getRole());
+
+                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
             } else {
-                System.out.println(currentEmployee.getIsActivated());
-                if (currentEmployee.getIsActivated()) {
-                    FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-                    FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
-
-                    setRoleTheme(currentEmployee.getRole());
-
-                    FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
-                } else {
-                    FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account is not yet activated!", null));
-                }
+                PrimeFaces.current().executeScript("PF('dlg').show()");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
             FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
@@ -79,7 +65,7 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     }
 
-    public void logout(ActionEvent event) throws IOException {
+    public void logout() throws IOException {
         themeCustomiser.setComponentTheme("cyan");
         themeCustomiser.setTopbarColor("cyan");
 
@@ -88,7 +74,7 @@ public class EmployeeLoginManagedBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml");
     }
 
-    public void activateAccount(ActionEvent event) throws IOException {
+    public void activateAccount() throws IOException {
         if (currentEmployee.getIsActivated()) {
             FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
         } else if (!activatePassword.equals(activateRePassword)) {
@@ -96,18 +82,13 @@ public class EmployeeLoginManagedBean implements Serializable {
         } else {
             try {
                 currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
-                if (this.isLoginAfterActivate) {
-                    this.isActivateMode = false;
-                    FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-                    FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-                    setRoleTheme(currentEmployee.getRole());
+                setRoleTheme(currentEmployee.getRole());
 
-                    FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
-                    FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
-                } else {
-                    FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account", null));
-                }
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
+                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
             } catch (ActivateEmployeeException ex) {
                 FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed " + ex.getMessage(), null));
             }
@@ -126,22 +107,6 @@ public class EmployeeLoginManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
             FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        }
-    }
-
-    public void timeoutLogout() throws IOException {
-        FacesContext.getCurrentInstance().getExternalContext().getFlash().put("inactiveSession", true);
-        logout(null);
-    }
-
-    public void idleWarning() {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Session about to expire", "You have been inactive for the past 15 mins. You will be logged out in the next minute."));
-    }
-
-    public void checkActivate() {
-        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        if (flash.get("activatedAccount") != null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful Activation", "You have successfully activated your account! Password has been reset."));
         }
     }
 
@@ -165,10 +130,6 @@ public class EmployeeLoginManagedBean implements Serializable {
         }
     }
 
-    public void toggleActivateMode() {
-        this.isActivateMode = !this.isActivateMode;
-    }
-
     public String getNric() {
         return nric;
     }
@@ -185,14 +146,6 @@ public class EmployeeLoginManagedBean implements Serializable {
         this.password = password;
     }
 
-    public Boolean getIsActivateMode() {
-        return isActivateMode;
-    }
-
-    public void setIsActivateMode(Boolean isActivateMode) {
-        this.isActivateMode = isActivateMode;
-    }
-
     public String getActivatePassword() {
         return activatePassword;
     }
@@ -207,14 +160,6 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     public void setActivateRePassword(String activateRePassword) {
         this.activateRePassword = activateRePassword;
-    }
-
-    public Boolean getIsLoginAfterActivate() {
-        return isLoginAfterActivate;
-    }
-
-    public void setIsLoginAfterActivate(Boolean isLoginAfterActivate) {
-        this.isLoginAfterActivate = isLoginAfterActivate;
     }
 
     public String getForgetPasswordNric() {
