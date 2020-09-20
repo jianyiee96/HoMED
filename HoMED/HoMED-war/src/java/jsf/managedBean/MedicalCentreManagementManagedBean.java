@@ -58,11 +58,8 @@ public class MedicalCentreManagementManagedBean implements Serializable {
         } catch (InputDataValidationException | UnknownPersistenceException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
         } catch (ConstraintViolationException ex) {
-            System.out.println("ex1");
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Constraints: Opening hour has to be before closing hours: " + ex.getMessage(), null));
         } catch (EJBException ex) {
-            System.out.println("ejb");
-            System.out.println(ex.getClass());
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
         }
     }
@@ -90,8 +87,6 @@ public class MedicalCentreManagementManagedBean implements Serializable {
         } catch (MedicalCentreNotFoundException | InputDataValidationException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the medical centre: " + ex.getMessage(), null));
         } catch (EJBException ex) {
-            System.out.println("ejb");
-            System.out.println(ex.getClass());
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
         }
         catch (Exception ex) {

@@ -58,7 +58,6 @@ public class ServicemanResource {
 
         try {
             Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getNric(), servicemanLoginReq.getPassword());
-            System.out.println("=-=-=-=-=-=-=-= Serviceman " + serviceman.getEmail() + " login remotely via web service");
 
             return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
         } catch (ServicemanInvalidLoginCredentialException ex) {
@@ -106,17 +105,14 @@ public class ServicemanResource {
         if (servicemanUpdateReq != null) {
 
             try {
-                System.out.println(servicemanUpdateReq.getServiceman().getNric());
                 Serviceman updatedServiceman = servicemanSessionBeanLocal.updateServiceman(servicemanUpdateReq.getServiceman());
 
                 return Response.status(Response.Status.OK).entity(new ServicemanUpdateRsp(updatedServiceman)).build();
             } catch (UpdateServicemanException ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
             } catch (Exception ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
@@ -143,13 +139,11 @@ public class ServicemanResource {
 
             } catch (ResetServicemanPasswordException ex) {
 
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
 
             } catch (Exception ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();

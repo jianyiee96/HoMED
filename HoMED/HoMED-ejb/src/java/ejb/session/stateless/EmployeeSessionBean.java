@@ -167,35 +167,29 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 Set<ConstraintViolation<Employee>> constraintViolations = validator.validate(employee);
 
                 if (constraintViolations.isEmpty()) {
-                    Employee employeeToUpdate = retrieveEmployeeByNric(employee.getNric());
+                    Employee employeeToUpdate = retrieveEmployeeById(employee.getEmployeeId());
 
-                    if (employeeToUpdate.getNric().equals(employee.getNric())) {
-                        // Nric and password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
+                    // Password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
+                    employeeToUpdate.setName(employee.getName());
+                    employeeToUpdate.setNric(employee.getNric());
+                    employeeToUpdate.setIsActivated(employee.getIsActivated());
 
-                        employeeToUpdate.setName(employee.getName());
-                        employeeToUpdate.setNric(employee.getNric());
-                        employeeToUpdate.setIsActivated(employee.getIsActivated());
+                    employeeToUpdate.setAddress(employee.getAddress());
+                    employeeToUpdate.setEmail(employee.getEmail());
+                    employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
+                    employeeToUpdate.setGender(employee.getGender());
 
-                        employeeToUpdate.setAddress(employee.getAddress());
-                        employeeToUpdate.setEmail(employee.getEmail());
-                        employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
-                        employeeToUpdate.setGender(employee.getGender());
-                        
-                        em.flush();
+                    em.flush();
 
-                    } else {
-                        throw new UpdateEmployeeException("Nric of employee record to be updated does not match the existing record");
-                    }
                 } else {
-                    
+
                     throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
-                    
+
                 }
             } else {
                 throw new EmployeeNotFoundException("Employee ID not provided for staff to be updated");
             }
-        } catch (Exception ex)  {
-            System.out.println("************** HERE");
+        } catch (Exception ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
 

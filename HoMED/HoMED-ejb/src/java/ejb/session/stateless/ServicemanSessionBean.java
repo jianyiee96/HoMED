@@ -4,7 +4,6 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
 import entity.Serviceman;
 import java.util.List;
 import java.util.Set;
@@ -22,9 +21,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exceptions.DeleteServicemanException;
 import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
-import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
@@ -172,7 +169,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             try {
                 if (constraintViolations.isEmpty()) {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
-                    if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
 
                         servicemanToUpdate.setName(serviceman.getName());
                         servicemanToUpdate.setNric(serviceman.getNric());
@@ -188,9 +184,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
                         return servicemanToUpdate;
 
-                    } else {
-                        throw new UpdateServicemanException("NRIC of serviceman record to be updated does not match the existing record!");
-                    }
+                    
                 } else {
                     throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }
