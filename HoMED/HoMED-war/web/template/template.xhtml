@@ -26,12 +26,12 @@
             <p:growl id="inactivityGrowl" sticky="true" showDetail="true" />
             <!--WARNING: 15mins(900000) of inactivity-->
             <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkActivate()}"/>
-            <p:idleMonitor timeout="900000">
+            <p:idleMonitor timeout="5000">
                 <p:ajax event="idle" listener="#{employeeLoginManagedBean.idleWarning}" update="inactivityGrowl" />
                 <p:ajax event="active" update="inactivityGrowl" />
             </p:idleMonitor>
             <!--WARNING: 16mins(960000) of inactivity-->
-            <p:idleMonitor timeout="960000">
+            <p:idleMonitor timeout="10000">
                 <p:ajax event="idle" listener="#{employeeLoginManagedBean.timeoutLogout()}" />
             </p:idleMonitor>
         </h:form>
