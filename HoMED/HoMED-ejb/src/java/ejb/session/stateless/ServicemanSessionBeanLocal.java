@@ -8,6 +8,7 @@ import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.DeleteServicemanException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
@@ -25,7 +26,7 @@ import util.exceptions.UpdateServicemanException;
 @Local
 public interface ServicemanSessionBeanLocal {
 
-    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException;
+    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException, DuplicateEntryExistsException;
 
     public List<Serviceman> retrieveAllServicemen();
     
@@ -35,7 +36,7 @@ public interface ServicemanSessionBeanLocal {
 
     public void changePassword(String nric, String oldPassword, String newPassword) throws ServicemanInvalidPasswordException, ServicemanNotFoundException;
 
-    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException;
+    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException, DuplicateEntryExistsException;
 
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
 

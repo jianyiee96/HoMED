@@ -11,8 +11,8 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.DeleteEmployeeException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeNotFoundException;
-import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
 
@@ -64,7 +64,7 @@ public class ViewEmployeeManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
             this.originalEmployeeToView = new Employee(employeeToView);
-        } catch (EmployeeNotFoundException | UpdateEmployeeException | InputDataValidationException ex) {
+        } catch (EmployeeNotFoundException | UpdateEmployeeException | DuplicateEntryExistsException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the employee: " + ex.getMessage(), null));
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));

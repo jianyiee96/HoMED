@@ -24,6 +24,7 @@ import javax.persistence.PersistenceContext;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.DayOfWeekEnum;
 import util.enumeration.GenderEnum;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ServicemanEmailExistException;
@@ -60,13 +61,15 @@ public class DataInitializationSessionBean {
             System.out.println("Start of data init");
 
 
-            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Adrian Tan", "s1234567a", "password", "adrian_diver@hotmail.com", "1 Computing Drive", 98765432, GenderEnum.MALE));
-            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Melissa Lim", "s1234567b", "password", "melissa_gardening@hotmail.com", "10 Heng Mui Kee", 81234567, GenderEnum.FEMALE));
-            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clyde", "s1234567c", "password", "clyde_clode@hotmail.com", "28 Jalan Klinik", 88888888, GenderEnum.MALE));
 
-            String employee1OTP = employeeSessionBeanLocal.createEmployee(new Admin("Adam Pholo", "s1234567d", "adam_step2@hotmail.com", "30 Jalan Klinik", 94362875, GenderEnum.FEMALE));
-            String employee2OTP = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("Maramamo", "s1234567e", "maramamo_zoro@hotmail.com", "50 Jalan Jalan", 94360875, GenderEnum.MALE));
-            String employee3OTP = employeeSessionBeanLocal.createEmployee(new Clerk("Clint", "s1234567f", "clint_tint@hotmail.com", "120 Jalan Bedok", 94326975, GenderEnum.MALE));
+            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(new Admin("Adrian Tan", "s1234567a", "password", "dummyemailx1@hotmail.com", "1 Computing Drive", "98765432", GenderEnum.MALE));
+            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(new MedicalOfficer("Melissa Lim", "s1234567b", "password", "dummyemailx2@hotmail.com", "10 Heng Mui Kee", "81234567", GenderEnum.FEMALE));
+            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(new Clerk("Clyde", "s1234567c", "password", "dummyemailx3@hotmail.com", "28 Jalan Klinik", "88888888", GenderEnum.MALE));
+
+
+            String employee1OTP = employeeSessionBeanLocal.createEmployee(new Admin("Admin OTP", "s1234567d", "dummyemailxxx11@hotmail.com", "30 Jalan Klinik", "94362875", GenderEnum.FEMALE));
+            String employee2OTP = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO OTP", "s1234567e", "dummyemailxxx12@hotmail.com", "50 Jalan Jalan", "94360875", GenderEnum.MALE));
+            String employee3OTP = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk OTP", "s1234567f", "dummyemailxxx13@hotmail.com", "120 Jalan Bedok", "94326975", GenderEnum.MALE));
 
             System.out.println("Employee NRIC: s1234567d\tOTP " + employee1OTP);
             System.out.println("Employee NRIC: s1234567e\tOTP " + employee2OTP);
@@ -82,7 +85,7 @@ public class DataInitializationSessionBean {
             initializeMedicalCentres();
 
             System.out.println("End of data init");
-        } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException ex) {
+        } catch (InputDataValidationException | UnknownPersistenceException | ServicemanNricExistException | ServicemanEmailExistException | EmployeeNricExistException | DuplicateEntryExistsException ex) {
             //ex.printStackTrace();
             System.out.println(ex.getMessage());
         }

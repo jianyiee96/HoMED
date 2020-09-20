@@ -17,10 +17,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import util.enumeration.GenderEnum;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.PasswordsDoNotMatchException;
+import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 
 /**
@@ -60,12 +62,10 @@ public class ProfileManagedBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
             cancelEdit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile updated successfully", null));
-        } catch (EmployeeNotFoundException ex) {
-            Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UpdateEmployeeException ex) {
-            Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InputDataValidationException ex) {
-            Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EmployeeNotFoundException | UpdateEmployeeException | InputDataValidationException | DuplicateEntryExistsException ex) {
+             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating your profile: " + ex.getMessage(), null));             
+        } catch (UnknownPersistenceException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
         }
 
     }

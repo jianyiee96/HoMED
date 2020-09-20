@@ -65,11 +65,10 @@ public class Employee implements Serializable {
     @Size(min = 2, max = 128, message = "Address must be between length 2 to 128")
     protected String address;
 
-    @Column(nullable = false, unique = true)
-    @NotNull(message = "phone number must be length of 8")
-    @Min(80000000)
-    @Max(99999999)
-    protected Integer phoneNumber;
+    @Column(nullable = false, unique = true, length = 8)
+    @NotNull(message = "Phone Number must be provided")
+    @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
+    protected String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -91,7 +90,7 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password, String email, String address, int phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String nric, String password, String email, String address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.nric = nric;
@@ -104,7 +103,7 @@ public class Employee implements Serializable {
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String nric, String email, String address, int phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String nric, String email, String address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.nric = nric;
@@ -189,11 +188,11 @@ public class Employee implements Serializable {
         this.address = address;
     }
 
-    public Integer getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Integer phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

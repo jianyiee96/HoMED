@@ -43,9 +43,9 @@ public class SecurityFilter implements Filter {
                 if (requestServletPath.equals("/login.xhtml")) {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/homepage.xhtml");
                 } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) == 2) {
-                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/accessRightError.xhtml");
+                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/access-right-error.xhtml");
                 } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) == 0) {
-                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/pageNotFound.xhtml");
+                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/page-not-found.xhtml");
                 } else {
                     chain.doFilter(request, response);
                 }
@@ -68,9 +68,9 @@ public class SecurityFilter implements Filter {
 
         String[] pathArr = new String[]{
             "/homepage.xhtml", // 0
-            "/accessRightError.xhtml", // 1
-            "/pageNotFound.xhtml", // 2
-            "/medicalCentreManagement.xhtml", // 3
+            "/access-right-error.xhtml", // 1
+            "/page-not-found.xhtml", // 2
+            "/medical-centre-management.xhtml", // 3
             "/profile.xhtml", // 4
             "/employee-management.xhtml", // 5
             "/serviceman-management.xhtml" //6

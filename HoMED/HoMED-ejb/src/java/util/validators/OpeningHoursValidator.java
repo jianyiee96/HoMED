@@ -23,8 +23,6 @@ public class OpeningHoursValidator implements ConstraintValidator<OpeningHours, 
     
     @Override
     public boolean isValid(OperatingHours hours, ConstraintValidatorContext context) {
-        System.out.println("*******Opening hours is: " + hours.getOpeningHours());
-        System.out.println("*******Closing hours is: " + hours.getClosingHours());
         if (hours.getOpeningHours() == null && hours.getClosingHours() == null) {
             return true;
         } else if (hours.getOpeningHours().compareTo(hours.getClosingHours()) < 0) {

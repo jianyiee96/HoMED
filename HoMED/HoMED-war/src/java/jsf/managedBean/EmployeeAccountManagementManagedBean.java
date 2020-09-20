@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
@@ -69,8 +70,8 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created Employee! Please inform employee that OTP has been sent to their email.", null));
             this.isEditableCreateEmployee = false;
             this.employees = employeeSessionBeanLocal.retrieveAllEmployees();
-        } catch (EmployeeNricExistException | InputDataValidationException | UnknownPersistenceException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating employee: " + ex.getMessage(), null));
+        } catch (DuplicateEntryExistsException | InputDataValidationException | UnknownPersistenceException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
         }

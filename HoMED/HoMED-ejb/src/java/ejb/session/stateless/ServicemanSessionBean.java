@@ -4,7 +4,6 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
 import entity.Serviceman;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +20,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exceptions.DeleteServicemanException;
-import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.InputDataValidationException;
-import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
@@ -56,7 +54,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException {
+    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException, DuplicateEntryExistsException {
         try {
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
@@ -78,7 +76,22 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
 
         } catch (PersistenceException ex) {
-            throw new UnknownPersistenceException(ex.getMessage());
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+
+                    if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same email address!");
+                    } else if (ex.getCause().getCause().getMessage().contains("PHONE")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same phone number!");
+                    } else if (ex.getCause().getCause().getMessage().contains("NRIC")) {
+                        throw new DuplicateEntryExistsException("There is already an employee with the same NRIC!");
+                    }
+
+                } else {
+                    throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
+                }
+            }
+            throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
         }
     }
 
@@ -149,14 +162,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException {
+    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException, DuplicateEntryExistsException {
         if (serviceman != null && serviceman.getServicemanId() != null) {
 
             Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
             try {
                 if (constraintViolations.isEmpty()) {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
-                    if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
 
                         servicemanToUpdate.setName(serviceman.getName());
                         servicemanToUpdate.setNric(serviceman.getNric());
@@ -172,14 +184,27 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
                         return servicemanToUpdate;
 
-                    } else {
-                        throw new UpdateServicemanException("NRIC of serviceman record to be updated does not match the existing record!");
-                    }
+                    
                 } else {
                     throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }
             } catch (PersistenceException ex) {
-                throw new UnknownPersistenceException(ex.getMessage());
+                if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                    if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+
+                        if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
+                            throw new DuplicateEntryExistsException("There is already an employee with the same email address!");
+                        } else if (ex.getCause().getCause().getMessage().contains("PHONE")) {
+                            throw new DuplicateEntryExistsException("There is already an employee with the same phone number!");
+                        } else if (ex.getCause().getCause().getMessage().contains("NRIC")) {
+                            throw new DuplicateEntryExistsException("There is already an employee with the same NRIC!");
+                        }
+
+                    } else {
+                        throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
+                    }
+                }
+                throw new UnknownPersistenceException("Error occured while creating an account. Contact system admin.");
             }
         } else {
             throw new ServicemanNotFoundException("Serviceman ID not provided for serviceman to be updated!");
