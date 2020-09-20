@@ -19,7 +19,6 @@ import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.UnknownPersistenceException;
 

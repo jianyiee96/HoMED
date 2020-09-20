@@ -10,16 +10,14 @@ import javax.inject.Inject;
 
 @Named(value = "sessionTimeoutManagedBean")
 @ViewScoped
-public class sessionTimeoutManagedBean implements Serializable {
-
+public class SessionTimeoutManagedBean implements Serializable {
     private Boolean isCountdownState;
     private int countdownRemainingSeconds;
-    private String counterString;
 
     @Inject
     private EmployeeLoginManagedBean employeeLoginManagedBean;
 
-    public sessionTimeoutManagedBean() {
+    public SessionTimeoutManagedBean() {
     }
 
     @PostConstruct
@@ -50,7 +48,6 @@ public class sessionTimeoutManagedBean implements Serializable {
     public String getCounterString() {
         int mins = countdownRemainingSeconds / 60;
         int remainder = countdownRemainingSeconds - (mins * 60);
-        int secs = remainder;
         return String.format("%02d:%02d", mins, remainder);
     }
 
