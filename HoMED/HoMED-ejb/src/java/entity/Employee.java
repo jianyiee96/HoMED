@@ -47,7 +47,7 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, unique = true, length = 64)
     @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(max = 64, message = "Proper formatted email with length no more than 64 must be provided")
+    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
     @Email(message = "Proper formatted email with length no more than 64 must be provided")
     private String email;
 
@@ -75,7 +75,7 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Gender must be provided")
     protected GenderEnum gender;
-    
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
@@ -84,7 +84,6 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
-         
 
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
@@ -113,6 +112,21 @@ public class Employee implements Serializable {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.gender = genderEnum;
+    }
+
+    // Cloning of Employee
+    public Employee(Employee another) {
+        this.employeeId = another.employeeId;
+        this.isActivated = another.isActivated;
+        this.salt = another.salt;
+        this.name = another.name;
+        this.nric = another.nric;
+        this.email = another.email;
+        this.address = another.address;
+        this.phoneNumber = another.phoneNumber;
+        this.gender = another.gender;
+        this.password = another.password;
+        this.role = another.role;
     }
 
     public Long getEmployeeId() {
@@ -206,8 +220,6 @@ public class Employee implements Serializable {
     public void setRole(EmployeeRoleEnum role) {
         this.role = role;
     }
-
-
 
     @Override
     public int hashCode() {

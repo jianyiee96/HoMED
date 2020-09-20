@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -19,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exceptions.DeleteServicemanException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetEmployeePasswordException;
@@ -78,6 +80,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         } catch (PersistenceException ex) {
             throw new UnknownPersistenceException(ex.getMessage());
         }
+    }
+
+    @Override
+    public List<Serviceman> retrieveAllServicemen() {
+        Query query = em.createQuery("SELECT s FROM Serviceman s");
+
+        return query.getResultList();
     }
 
     @Override
@@ -149,6 +158,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
                     if (servicemanToUpdate.getNric().equals(serviceman.getNric())) {
 
+                        servicemanToUpdate.setName(serviceman.getName());
+                        servicemanToUpdate.setNric(serviceman.getNric());
+                        servicemanToUpdate.setRod(serviceman.getRod());
+                        servicemanToUpdate.setGender(serviceman.getGender());
+                        servicemanToUpdate.setBloodType(serviceman.getBloodType());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
                         servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                         servicemanToUpdate.setAddress(serviceman.getAddress());
@@ -173,6 +187,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
+    public void deleteServiceman(Long servicemanId) throws ServicemanNotFoundException, DeleteServicemanException {
+        Serviceman servicemanToRemove = retrieveServicemanById(servicemanId);
+        em.remove(servicemanToRemove);
+    }
+
+    @Override
     public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
         try {
             Serviceman serviceman = retrieveServicemanByNric(nric);
@@ -192,6 +212,27 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException("NRIC does not exist in our system! Please try again.");
+        }
+    }
+
+    @Override
+    public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException {
+        try {
+            Serviceman serviceman = retrieveServicemanByNric(currentServiceman.getNric());
+
+            String password = CryptographicHelper.getInstance().generateRandomString(8);
+            serviceman.setPassword(password);
+            serviceman.setIsActivated(false);
+
+            try {
+                emailSessionBean.emailServicemanOtpAsync(serviceman, password);
+                return serviceman;
+            } catch (InterruptedException ex) {
+                // EMAIL NOT SENT OUT SUCCESSFULLY
+                throw new ResetServicemanPasswordException("Email was not sent out successfully! Please try again.");
+            }
+        } catch (ServicemanNotFoundException ex) {
+            throw new ResetServicemanPasswordException("Serviceman does not exist in our system! Please try again.");
         }
     }
 

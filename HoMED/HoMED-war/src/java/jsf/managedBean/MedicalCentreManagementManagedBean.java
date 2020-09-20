@@ -10,10 +10,12 @@ import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.validation.ConstraintViolationException;
 import org.primefaces.PrimeFaces;
 import util.exceptions.InputDataValidationException;
 import util.exceptions.MedicalCentreNotFoundException;
@@ -55,6 +57,13 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             medicalCentreToCreate = new MedicalCentre();
         } catch (InputDataValidationException | UnknownPersistenceException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
+        } catch (ConstraintViolationException ex) {
+            System.out.println("ex1");
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Constraints: Opening hour has to be before closing hours: " + ex.getMessage(), null));
+        } catch (EJBException ex) {
+            System.out.println("ejb");
+            System.out.println(ex.getClass());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
         }
     }
 
@@ -80,7 +89,12 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             medicalCentreToManage = new MedicalCentre();
         } catch (MedicalCentreNotFoundException | InputDataValidationException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the medical centre: " + ex.getMessage(), null));
-        } catch (Exception ex) {
+        } catch (EJBException ex) {
+            System.out.println("ejb");
+            System.out.println(ex.getClass());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
+        }
+        catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
         }
     }

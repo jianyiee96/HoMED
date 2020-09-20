@@ -93,6 +93,21 @@ public class Serviceman implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
+    public Serviceman(Serviceman another) {
+        this.servicemanId = another.servicemanId;
+        this.name = another.name;
+        this.nric = another.nric;
+        this.phoneNumber = another.phoneNumber;
+        this.rod = another.rod;
+        this.gender = another.gender;
+        this.bloodType = another.bloodType;
+        this.password = another.password;
+        this.email = another.email;
+        this.address = another.address;
+        this.isActivated = another.isActivated;
+        this.salt = another.salt;
+    }
+
     public Serviceman(String name, String nric, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String email, String address) {
         this();
         this.name = name;

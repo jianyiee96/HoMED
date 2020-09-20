@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui">
+
+    <cc:interface>
+    </cc:interface>
+
+    <cc:implementation>
+        <h:form id="formSessionTimeout">
+            <p:idleMonitor id="idleTimer" timeout="900000">
+                <p:ajax event="idle" listener="#{sessionTimeoutManagedBean.startCountdown}" process="@this" update="dlgCountdown" oncomplete="PF('dlgCountdown').show()"/>
+            </p:idleMonitor>
+            <p:dialog  id="dlgCountdown" widgetVar="dlgCountdown" header="Session Expiry" showEffect="fade" hideEffect="fade"
+                       responsive="true" draggable="false" width="400" modal="true" fitViewport="true" closable="false">
+                <p:outputPanel id="dlgCountdownPanel" rendered="#{sessionTimeoutManagedBean.isCountdownState}">
+                    <div class="p-grid p-justify-center">
+                        <div class="p-col-12" style="text-align: center">
+                            <h5>You have been inactive for the past 15 mins. Your session is about to expire in</h5>
+                        </div>
+                        <div class="p-col" style="text-align: center">
+                            <p:outputLabel id="labelCounter"><h5 id="header">#{sessionTimeoutManagedBean.counterString}</h5></p:outputLabel>
+                            <p:poll interval="1" listener="#{sessionTimeoutManagedBean.decrease}" update="labelCounter" />
+                        </div>
+                        <div class="p-col-12" style="text-align: center">
+                            <div class="p-grid  p-justify-even">
+                                <p:commandButton value="Sign Out" type="submit" actionListener="#{sessionTimeoutManagedBean.employeeLoginManagedBean.logout}" icon="fa fa-sign-out" styleClass="ui-confirmdialog-yes" />
+                                <p:commandButton value="Extend" type="submit" update="formSessionTimeout" oncomplete="PF('dlgCountdown').hide()" icon="fa fa-sign-in" styleClass="ui-confirmdialog-no"/>
+                            </div>
+                        </div>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </cc:implementation>    
+</html>
+

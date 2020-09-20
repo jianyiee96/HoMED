@@ -42,10 +42,12 @@ public class SecurityFilter implements Filter {
 
                 if (requestServletPath.equals("/login.xhtml")) {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/homepage.xhtml");
-                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) != 2) {
-                    chain.doFilter(request, response);
-                } else {
+                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) == 2) {
                     httpServletResponse.sendRedirect(CONTEXT_ROOT + "/accessRightError.xhtml");
+                } else if (checkAccessRight(requestServletPath, currentEmployee.getRole()) == 0) {
+                    httpServletResponse.sendRedirect(CONTEXT_ROOT + "/pageNotFound.xhtml");
+                } else {
+                    chain.doFilter(request, response);
                 }
             } else {
                 if (requestServletPath.equals("/login.xhtml")) {
@@ -67,17 +69,25 @@ public class SecurityFilter implements Filter {
         String[] pathArr = new String[]{
             "/homepage.xhtml", // 0
             "/accessRightError.xhtml", // 1
-            "/medicalCentreManagement.xhtml" // 2
+            "/pageNotFound.xhtml", // 2
+            "/medicalCentreManagement.xhtml", // 3
+            "/profile.xhtml", // 4
+            "/employee-management.xhtml", // 5
+            "/serviceman-management.xhtml" //6
         };
 
         // Pages that all logged in users can enter
         if (path.equals(pathArr[0])
-                || path.equals(pathArr[1])) {
+                || path.equals(pathArr[1])
+                || path.equals(pathArr[2])
+                || path.equals(pathArr[4])) {
             return 1;
         }
 
         if (accessRight == EmployeeRoleEnum.ADMIN) {
-            if (path.equals(pathArr[2])) {
+            if (path.equals(pathArr[3])
+                    || path.equals(pathArr[5])
+                    || path.equals(pathArr[6])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
@@ -85,13 +95,13 @@ public class SecurityFilter implements Filter {
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
 
         }
-        
-        for (String currentPath: pathArr) {
+
+        for (String currentPath : pathArr) {
             if (path.equals(currentPath)) {
                 return 2;
             }
         }
-        
+
         // FOR DEVELOPMENT ==> SET TO TRUE
         return 0;
     }
