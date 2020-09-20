@@ -13,7 +13,6 @@ import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeNotFoundException;
-import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
 
