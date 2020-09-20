@@ -68,7 +68,7 @@ public class Employee implements Serializable {
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
     @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
-    private String phoneNumber;
+    protected String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
