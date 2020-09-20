@@ -8,7 +8,6 @@ package ejb.session.stateless;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import entity.Employee;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
