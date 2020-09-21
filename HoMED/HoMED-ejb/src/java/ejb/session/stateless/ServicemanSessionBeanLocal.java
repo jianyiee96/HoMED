@@ -7,16 +7,13 @@ package ejb.session.stateless;
 import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.ActivateServicemanException;
+import util.exceptions.ChangeServicemanPasswordException;
+import util.exceptions.CreateServicemanException;
 import util.exceptions.DeleteServicemanException;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetServicemanPasswordException;
-import util.exceptions.ServicemanEmailExistException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
-import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
-import util.exceptions.ServicemanNricExistException;
-import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateServicemanException;
 
 /**
@@ -26,24 +23,26 @@ import util.exceptions.UpdateServicemanException;
 @Local
 public interface ServicemanSessionBeanLocal {
 
-    public String createNewServiceman(Serviceman newServiceman) throws InputDataValidationException, ServicemanNricExistException, ServicemanEmailExistException, UnknownPersistenceException, DuplicateEntryExistsException;
-
     public List<Serviceman> retrieveAllServicemen();
-    
+
+    public String createServiceman(Serviceman newServiceman) throws CreateServicemanException;
+
+    public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
+
     public Serviceman retrieveServicemanByNric(String nric) throws ServicemanNotFoundException;
+
+    public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException;
+
+    public void deleteServiceman(Long servicemanId) throws DeleteServicemanException;
 
     public Serviceman servicemanLogin(String nric, String password) throws ServicemanInvalidLoginCredentialException;
 
-    public void changePassword(String nric, String oldPassword, String newPassword) throws ServicemanInvalidPasswordException, ServicemanNotFoundException;
+    public void activateServiceman(String nric, String password, String rePassword) throws ActivateServicemanException;
 
-    public Serviceman updateServiceman(Serviceman serviceman) throws ServicemanNotFoundException, ServicemanInvalidLoginCredentialException, UpdateServicemanException, InputDataValidationException, UnknownPersistenceException, DuplicateEntryExistsException;
-
-    public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
+    public void changeServicemanPassword(String nric, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException;
 
     public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException;
 
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
-
-    public void deleteServiceman(Long servicemanId) throws ServicemanNotFoundException, DeleteServicemanException;
-
+    
 }

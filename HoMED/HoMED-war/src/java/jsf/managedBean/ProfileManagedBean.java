@@ -7,8 +7,6 @@ package jsf.managedBean;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -16,12 +14,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.EmployeeInvalidPasswordException;
+import util.exceptions.ChangeEmployeePasswordException;
 import util.exceptions.EmployeeNotFoundException;
-import util.exceptions.InputDataValidationException;
-import util.exceptions.PasswordsDoNotMatchException;
-import util.exceptions.UnknownPersistenceException;
 import util.exceptions.UpdateEmployeeException;
 
 /**
@@ -51,8 +45,12 @@ public class ProfileManagedBean implements Serializable {
     @PostConstruct
     public void PostConstruct() {
         Employee e = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
-        employee = employeeSessionBean.retrieveEmployeeById(e.getEmployeeId());
-        this.fieldsDisabled = true;
+        try {
+            this.employee = employeeSessionBean.retrieveEmployeeById(e.getEmployeeId());
+            this.fieldsDisabled = true;
+        } catch (EmployeeNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage() + " Please reload the page or contact system admin.", null));
+        }
     }
 
     public void updateProfile(ActionEvent actionEvent) {
@@ -61,10 +59,8 @@ public class ProfileManagedBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
             cancelEdit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profile updated successfully", null));
-        } catch (EmployeeNotFoundException | UpdateEmployeeException | InputDataValidationException | DuplicateEntryExistsException ex) {
-             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating your profile: " + ex.getMessage(), null));             
-        } catch (UnknownPersistenceException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (UpdateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }
@@ -74,30 +70,24 @@ public class ProfileManagedBean implements Serializable {
     }
 
     public void cancelEdit() {
-        this.employee = employeeSessionBean.retrieveEmployeeById(employee.getEmployeeId());
-        this.fieldsDisabled = true;
+        try {
+            this.employee = employeeSessionBean.retrieveEmployeeById(employee.getEmployeeId());
+            this.fieldsDisabled = true;
+        } catch (EmployeeNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage() + " Please reload the page or contact system admin.", null));
+        }
     }
 
     public void updatePassword(ActionEvent event) {
         try {
-            if (!newPassword.equals(confirmNewPassword)) {
-                throw new PasswordsDoNotMatchException();
-            } else if (oldPassword.equals(newPassword)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Please input a different new password", null));
-            } else {
-                employeeSessionBean.changePassword(employee.getNric(), oldPassword, newPassword);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Password updated successfully", null));
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
-                oldPassword = "";
-                newPassword = "";
-                confirmNewPassword = "";
-            }
-        } catch (PasswordsDoNotMatchException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "New passwords do not match.", null));
-        } catch (EmployeeInvalidPasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Old password is incorrect", null));
-        } catch (EmployeeNotFoundException ex) {
-            Logger.getLogger(ProfileManagedBean.class.getName()).log(Level.SEVERE, null, ex);
+            employeeSessionBean.changeEmployeePassword(employee.getNric(), oldPassword, newPassword, confirmNewPassword);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Password updated successfully", null));
+            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
+            oldPassword = "";
+            newPassword = "";
+            confirmNewPassword = "";
+        } catch (ChangeEmployeePasswordException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage()    , null));
         }
 
     }

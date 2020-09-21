@@ -14,8 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.EmployeeRoleEnum;
@@ -53,7 +51,7 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
+    @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     protected String name;
 
     @Column(nullable = false)

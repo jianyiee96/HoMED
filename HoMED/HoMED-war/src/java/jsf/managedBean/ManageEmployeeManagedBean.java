@@ -11,14 +11,12 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.DeleteEmployeeException;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
 
-@Named(value = "viewEmployeeManagedBean")
+@Named(value = "manageEmployeeManagedBean")
 @ViewScoped
-public class ViewEmployeeManagedBean implements Serializable {
+public class ManageEmployeeManagedBean implements Serializable {
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBean;
@@ -32,7 +30,7 @@ public class ViewEmployeeManagedBean implements Serializable {
     private Boolean isEditMode;
     private Boolean isDeleted;
 
-    public ViewEmployeeManagedBean() {
+    public ManageEmployeeManagedBean() {
         this.employeeToView = new Employee();
     }
 
@@ -64,10 +62,8 @@ public class ViewEmployeeManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
             this.originalEmployeeToView = new Employee(employeeToView);
-        } catch (EmployeeNotFoundException | UpdateEmployeeException | DuplicateEntryExistsException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the employee: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (UpdateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -76,12 +72,12 @@ public class ViewEmployeeManagedBean implements Serializable {
             // isActivated is changed
             this.employeeToView.setIsActivated(false);
             this.originalEmployeeToView = new Employee(this.employeeToView);
+
             employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
+
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset employee's password! Please inform employee that OTP has been sent to their email.", null));
         } catch (ResetEmployeePasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while resetting employee password: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -94,10 +90,8 @@ public class ViewEmployeeManagedBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted employee!", null));
                 this.isDeleted = true;
                 this.isEditMode = false;
-            } catch (DeleteEmployeeException | EmployeeNotFoundException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while deleting the employee: " + ex.getMessage(), null));
-            } catch (Exception ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            } catch (DeleteEmployeeException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
             }
         }
     }

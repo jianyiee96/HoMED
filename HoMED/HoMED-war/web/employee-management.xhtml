@@ -16,9 +16,9 @@
             }
         </style>
 
-        <ezcomp:viewEmployee id="ccViewEmployee">
+        <ezcomp:manageEmployee id="ccManageEmployee">
             <f:ajax event="dialogCloseEvent" listener="#{employeeAccountManagementManagedBean.dialogActionListener}"/>
-        </ezcomp:viewEmployee>
+        </ezcomp:manageEmployee>
 
         <h:form id="formAllEmployees">
             <div class="p-grid crud-table">
@@ -53,7 +53,7 @@
                                 <h:outputText value="#{employee.nric}" />
                             </p:column>
 
-                            <p:column headerText="Name" width="15%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
+                            <p:column headerText="Name" width="10%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.name}" />
                             </p:column>
 
@@ -65,25 +65,17 @@
                                 <h:outputText value="#{employee.email}" />
                             </p:column>
 
-                            <p:column headerText="Activated" width="7%" sortBy="#{employee.isActivated}" filterBy="#{employee.isActivated}" filterMatchMode="contains">
-                                <h:outputText value="#{employee.isActivated}" />
-                            </p:column>
-
                             <p:column headerText="Gender" width="5%" sortBy="#{employee.gender}" filterBy="#{employee.gender}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.gender}" />
                             </p:column>
 
-                            <p:column headerText="Address" width="15%" sortBy="#{employee.address}" filterBy="#{employee.address}" filterMatchMode="contains">
-                                <h:outputText value="#{employee.address}" />
-                            </p:column>
-
-                            <p:column headerText="PhoneNumber" width="7%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
+                            <p:column headerText="PhoneNumber" width="5%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.phoneNumber}" />
                             </p:column>
 
                             <p:column headerText="Action" width="3%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
-                                                 update="ccViewEmployee:formViewEmployee:panelViewEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogViewEmployee').show()" />
+                                                 update="ccManageEmployee:formManageEmployee:panelManageEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogManageEmployee').show()" />
                             </p:column>
 
                         </p:dataTable>
@@ -131,7 +123,7 @@
                                 <div class="p-field">
                                     <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="create-phoneNumber" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.phoneNumber}" />
-                                        
+
                                 </div>
 
                                 <div class="p-field">

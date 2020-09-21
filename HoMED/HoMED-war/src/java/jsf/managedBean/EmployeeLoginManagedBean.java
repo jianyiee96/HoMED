@@ -60,7 +60,7 @@ public class EmployeeLoginManagedBean implements Serializable {
                 PrimeFaces.current().executeScript("PF('dlg').show()");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
-            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }
@@ -75,23 +75,24 @@ public class EmployeeLoginManagedBean implements Serializable {
     }
 
     public void activateAccount() throws IOException {
-        if (currentEmployee.getIsActivated()) {
-            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
-        } else if (!activatePassword.equals(activateRePassword)) {
-            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed! Passwords do not match.", null));
-        } else {
-            try {
-                currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
-                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+        try {
+            currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
+            FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-                setRoleTheme(currentEmployee.getRole());
+            setRoleTheme(currentEmployee.getRole());
 
-                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
-                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
-            } catch (ActivateEmployeeException ex) {
-                FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed " + ex.getMessage(), null));
-            }
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
+            FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+        } catch (ActivateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
+    }
+
+    public void checkIfActivatedUponLogin() {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        if (flash.get("activatedAccount") != null) {
+            FacesContext.getCurrentInstance().addMessage("formTemplateGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account!", "Password has been successfully changed"));
         }
     }
 
