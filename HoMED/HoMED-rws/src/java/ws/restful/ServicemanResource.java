@@ -14,12 +14,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.ActivateServicemanException;
 import util.exceptions.ChangeServicemanPasswordException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
 import ws.datamodel.ErrorRsp;
+import ws.datamodel.ServicemanActivateAccountReq;
 import ws.datamodel.ServicemanChangePassReq;
 import ws.datamodel.ServicemanLoginReq;
 import ws.datamodel.ServicemanLoginRsp;
@@ -91,6 +93,31 @@ public class ServicemanResource {
             }
         } else {
             ErrorRsp errorRsp = new ErrorRsp("Invalid change password request");
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+    }
+    
+    @Path("activateAccount")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response servicemanActivateAccount(ServicemanActivateAccountReq servicemanActivateAccountReq) {
+
+        if (servicemanActivateAccountReq != null) {
+
+            try {
+                servicemanSessionBeanLocal.activateServiceman(servicemanActivateAccountReq.getNric(), servicemanActivateAccountReq.getNewPassword(), servicemanActivateAccountReq.getConfirmNewPassword());
+
+                return Response.status(Response.Status.OK).build();
+            } catch (ActivateServicemanException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            }
+        } else {
+            ErrorRsp errorRsp = new ErrorRsp("Invalid activate account request");
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
