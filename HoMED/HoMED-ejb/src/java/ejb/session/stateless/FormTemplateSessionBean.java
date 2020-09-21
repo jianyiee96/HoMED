@@ -143,7 +143,4 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         return msg;
     }
 
-    public void persist(Object object) {
-        em.persist(object);
-    }
 }
