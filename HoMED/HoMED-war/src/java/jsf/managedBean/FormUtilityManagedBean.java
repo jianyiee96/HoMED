@@ -13,6 +13,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -162,7 +164,7 @@ public class FormUtilityManagedBean implements Serializable {
             ff.setFormFieldOptions(formFieldOptions);
             ff.setPosition(index);
             newFormFields.add(ff);
-
+            index++;
         }
 
         if (!emptyTitle && !emptyOptions && !duplicateTitle) {
@@ -247,6 +249,8 @@ public class FormUtilityManagedBean implements Serializable {
         for (FormField ff : this.selectedForm.getFormFields()) {
             this.selectedFormFieldWrappers.add(new FormFieldWrapper(ff));
         }
+        
+        Collections.sort(selectedFormFieldWrappers); 
 
         if (this.selectedForm.getFormStatus() == FormStatusEnum.DRAFT) {
             this.fieldsDisabled = false;

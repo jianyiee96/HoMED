@@ -60,6 +60,7 @@ public class FormField implements Serializable {
 
     public FormField() {
         this.formFieldOptions = new ArrayList<>();
+        this.position = 1;
     }
     
     public Long getFormFieldId() {

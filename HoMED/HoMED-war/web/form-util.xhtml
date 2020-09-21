@@ -117,42 +117,46 @@
                                 <div class="card" style="margin-bottom: 5px">
                                     <div class="p-grid">
                                         <div class="p-col-11 p-md-11 p-lg-11">
+                                            <div style="max-width: 380px">
 
-                                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                                <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
 
-                                                <p:outputLabel value="Question: " /><p:inputText size="27" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.title}"/>
+                                                    <p:outputLabel value="Question: " />
+                                                    
+                                                    <p:inputText style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.title}"/>
 
-                                                <p:outputLabel value="Input Type: " />
-                                                <p:selectOneMenu style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
-                                                    <f:selectItems value="#{formUtilityManagedBean.inputTypes}" />
-                                                    <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
+                                                    <p:outputLabel value="Input Type: " />
+                                                    <p:selectOneMenu style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
+                                                        <f:selectItems value="#{formUtilityManagedBean.inputTypes}" />
+                                                        <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
+                                                    </p:selectOneMenu>
 
-                                                </p:selectOneMenu>
+                                                    <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
+                                                    <p:chips disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
 
-                                                <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
-                                                <p:chips disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" style="width: 500" />
+                                                    <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
+                                                    <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
 
-                                                <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
-                                                <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
+                                                    <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
+                                                    <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
 
-                                                <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
-                                                <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
+                                                </h:panelGrid>
+                                                <h:panelGrid columns="1" cellpadding="5">
 
-                                            </h:panelGrid>
-                                            <h:panelGrid columns="1" cellpadding="5">
+                                                    <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" title="Delete" value="Remove Field">
+                                                        <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
+                                                    </p:commandButton>
 
-                                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" title="Delete" value="Remove Field">
-                                                    <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
-                                                </p:commandButton>
+                                                </h:panelGrid>
 
-                                            </h:panelGrid>
+                                            </div>
 
                                         </div>
-                                        <div class="p-col-1">
+                                        <div class="p-col-1" style="float: right; text-align: right">
                                             <p:commandButton style="height: 50%; margin: 1px; float: right" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" icon="fa fa-arrow-up">
                                                 <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
                                             </p:commandButton>
-                                            
+
                                             <p:commandButton style="height: 50%; margin: 1px; float: right" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" icon="fa fa-arrow-down">
                                                 <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
                                             </p:commandButton>

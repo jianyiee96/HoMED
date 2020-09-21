@@ -11,7 +11,7 @@ import java.util.List;
 import util.enumeration.InputTypeEnum;
 import util.security.CryptographicHelper;
 
-public class FormFieldWrapper {
+public class FormFieldWrapper implements Comparable<FormFieldWrapper> {
 
     private List<String> formFieldOptions = new ArrayList<>();
     private FormField formField;
@@ -20,19 +20,19 @@ public class FormFieldWrapper {
     public FormFieldWrapper(FormField formField) {
         this.formFieldCode = CryptographicHelper.getInstance().generateRandomString(32);
         this.formField = formField;
-        
-        if(getHasInputOption()) {
+
+        if (getHasInputOption()) {
             for (FormFieldOption ffo : formField.getFormFieldOptions()) {
                 formFieldOptions.add(ffo.getFormFieldOptionValue());
             }
         }
     }
 
-    public List<String> getFormFieldOptions() {        
-        if(formFieldOptions == null){
+    public List<String> getFormFieldOptions() {
+        if (formFieldOptions == null) {
             return new ArrayList<String>();
         }
-        
+
         return formFieldOptions;
     }
 
@@ -57,25 +57,33 @@ public class FormFieldWrapper {
     }
 
     public boolean getHasInputOption() {
-        
+
         InputTypeEnum i = this.formField.getInputType();
-        
-        if(i == InputTypeEnum.CHECK_BOX
+
+        if (i == InputTypeEnum.CHECK_BOX
                 || i == InputTypeEnum.RADIO_BUTTON
                 || i == InputTypeEnum.MULTI_DROPDOWN
-                || i == InputTypeEnum.SINGLE_DROPDOWN){
+                || i == InputTypeEnum.SINGLE_DROPDOWN) {
             return true;
         }
         return false;
     }
-    
+
     public boolean getIsHeader() {
-        
+
         InputTypeEnum i = this.formField.getInputType();
-        if(i == InputTypeEnum.HEADER){
+        if (i == InputTypeEnum.HEADER) {
             return true;
         }
         return false;
     }
-    
+
+    @Override
+    public int compareTo(FormFieldWrapper another) {
+        try {
+            return(this.formField.getPosition() - another.formField.getPosition());
+        } catch (NullPointerException e) {
+            return 0;
+        }
+    }
 }
