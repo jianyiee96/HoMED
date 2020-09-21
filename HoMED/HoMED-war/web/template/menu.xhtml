@@ -20,7 +20,7 @@
                             </a>
                             <ul class="layout-profile-menu">
                                 <li>
-                                    <a href="#">
+                                    <a href="profile.xhtml">
                                         <i class="pi pi-user"></i><span>Profile</span>
                                     </a>
                                 </li>
@@ -43,8 +43,13 @@
                         </div>
                     </ui:fragment>
                     <po:menu widgetVar="RomaMenuWidget">
-                        <p:menuitem id="om_dashboard" value="Dashboard" icon="pi pi-home" outcome="/homepage" />
-                        <p:menuitem value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/homepage" />
+
+                        <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
+                        <p:menuitem value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
+                        <p:submenu label="Users Account Management" icon="fa fa-users">
+                            <p:menuitem value="Employee Account" icon="fa fa-user-md" outcome="/employee-management" />
+                            <p:menuitem value="Serviceman Account" icon="fa fa-user" outcome="/serviceman-management" />
+                        </p:submenu>
                         <p:menuitem value="E-Form Utility" icon="fa fa-wrench" outcome="/form-util" />
                     </po:menu>
                 </h:form>

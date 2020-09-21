@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.GenderEnum;
 
 /**
  *
@@ -18,16 +19,19 @@ import util.enumeration.EmployeeRoleEnum;
 @Entity
 public class Clerk extends Employee implements Serializable {
 
-    
-    public Clerk(){
-    }
-    
-    public Clerk(String name, String nric, String password) {
-        super(name, nric, password);
-        this.role = EmployeeRoleEnum.CLERK; 
+    public Clerk() {
     }
 
 
+    public Clerk(String name, String nric, String password, String email, String address, String phoneNumber, GenderEnum gender) {
+        super(name, nric, password, email, address, phoneNumber, gender);
+        this.role = EmployeeRoleEnum.CLERK;
+    }
+
+    public Clerk(String name, String nric, String email, String address, String phoneNumber, GenderEnum gender) {
+        super(name, nric, email, address, phoneNumber, gender);
+        this.role = EmployeeRoleEnum.CLERK;
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -46,5 +50,5 @@ public class Clerk extends Employee implements Serializable {
     public String toString() {
         return "entity.Clerk[ id=" + super.getEmployeeId() + " ]";
     }
-    
+
 }

@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Employee Account Management</ui:define>
+
+    <ui:define name="content">
+
+        <style type="text/css">
+            .error-message {
+                margin: 0.5rem 0rem 0rem 0rem !important;
+            }
+        </style>
+
+        <ezcomp:viewEmployee id="ccViewEmployee">
+            <f:ajax event="dialogCloseEvent" listener="#{employeeAccountManagementManagedBean.dialogActionListener}"/>
+        </ezcomp:viewEmployee>
+
+        <h:form id="formAllEmployees">
+            <div class="p-grid crud-table">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+                        <div class="buttonbar">
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{employeeAccountManagementManagedBean.doCreateEmployee}"
+                                             update="formCreateEmployee" process="@this" immediate="true" oncomplete="PF('dialogCreateEmployee').show()" />
+                        </div>
+
+                        <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"
+                                     styleClass="crud-management-table" rowKey="#{employee.employeeId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold">EMPLOYEES</span>
+
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('dataTableEmployees').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="ID" width="3%" sortBy="#{employee.employeeId}" filterBy="#{employee.employeeId}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.employeeId}" />
+                            </p:column>
+
+                            <p:column headerText="Nric" width="5%" sortBy="#{employee.nric}" filterBy="#{employee.nric}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.nric}" />
+                            </p:column>
+
+                            <p:column headerText="Name" width="15%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.name}" />
+                            </p:column>
+
+                            <p:column headerText="Role" width="7%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.role}" />
+                            </p:column>
+
+                            <p:column headerText="Email" width="15%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.email}" />
+                            </p:column>
+
+                            <p:column headerText="Activated" width="7%" sortBy="#{employee.isActivated}" filterBy="#{employee.isActivated}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.isActivated}" />
+                            </p:column>
+
+                            <p:column headerText="Gender" width="5%" sortBy="#{employee.gender}" filterBy="#{employee.gender}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.gender}" />
+                            </p:column>
+
+                            <p:column headerText="Address" width="15%" sortBy="#{employee.address}" filterBy="#{employee.address}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.address}" />
+                            </p:column>
+
+                            <p:column headerText="PhoneNumber" width="7%" sortBy="#{employee.phoneNumber}" filterBy="#{employee.phoneNumber}" filterMatchMode="contains">
+                                <h:outputText value="#{employee.phoneNumber}" />
+                            </p:column>
+
+                            <p:column headerText="Action" width="3%">
+                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
+                                                 update="ccViewEmployee:formViewEmployee:panelViewEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogViewEmployee').show()" />
+                            </p:column>
+
+                        </p:dataTable>
+
+                    </div>
+                </div>
+
+            </div>
+        </h:form>
+        <h:form id="formCreateEmployee">
+            <p:dialog id="dialogCreateEmployee" widgetVar="dialogCreateEmployee" header="Create Employee" showEffect="fade"
+                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
+                <p:outputPanel id="panelCreateEmployee" rendered="#{not empty employeeAccountManagementManagedBean.employeeToCreate}">
+                    <div class="p-grid">
+                        <div class="p-col-12 p-grid p-justify-center">
+                            <p:selectOneMenu id="create-role" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.role}">
+                                <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Personal Particulars</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-name" value="Name"/>
+                                    <p:inputText id="create-name" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.name}" />
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-nric" value="Nric"/>
+                                    <p:inputText id="create-nric" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.nric}" />
+                                </div>
+
+
+                                <div class="p-field">
+                                    <p:outputLabel for="create-gender" value="Gender"/>
+                                    <p:selectOneMenu id="create-gender" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.gender}">
+                                        <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
+                                    </p:selectOneMenu>
+                                </div> 
+                            </div>
+                        </div>
+
+                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                            <div class="card ui-fluid">
+                                <h5>Contact Details</h5>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
+                                    <p:inputText id="create-phoneNumber" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.phoneNumber}" />
+                                        
+                                </div>
+
+                                <div class="p-field">
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"  />
+                                    </p:inputText>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="create-address" value="Address"/>
+                                    <p:inputText id="create-address" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.address}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-col-12">
+                            <p:messages closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
+                        <ui:fragment rendered="#{employeeAccountManagementManagedBean.isEditableCreateEmployee}">
+                            <div class="p-col-12">
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <h5>Admin Rights</h5>
+                                    </f:facet>
+                                    <f:facet name="right">
+                                        <p:commandButton actionListener="#{employeeAccountManagementManagedBean.createEmployee}" update="panelCreateEmployee formAllEmployees" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                    </f:facet>
+                                </p:toolbar>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </p:outputPanel>
+
+            </p:dialog>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+    </ui:define>
+</ui:composition>

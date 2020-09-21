@@ -6,12 +6,19 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.ActivateEmployeeException;
+import util.exceptions.DeleteEmployeeException;
+import util.exceptions.DuplicateEntryExistsException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.EmployeeInvalidPasswordException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.EmployeeNricExistException;
 import util.exceptions.InputDataValidationException;
+import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateEmployeeException;
 
 /**
  *
@@ -19,11 +26,31 @@ import util.exceptions.UnknownPersistenceException;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
-    public Long createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+
+    public Long createEmployeeByInit(Employee employee) throws InputDataValidationException, UnknownPersistenceException, EmployeeNricExistException;
+
+    public String createEmployee(Employee employee) throws InputDataValidationException, UnknownPersistenceException, DuplicateEntryExistsException;
+
+    public List<Employee> retrieveAllEmployees();
     
-    public Employee retrieveEmployee(Long id);
-    
+    public Employee retrieveEmployeeById(Long id);
+
     public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
-    
+
     public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
+
+    public List<Employee> retrieveAllStaffs();
+
+    public void updateEmployee(Employee employee) throws EmployeeNotFoundException, UpdateEmployeeException, InputDataValidationException, DuplicateEntryExistsException, UnknownPersistenceException;
+
+    public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
+
+    public void changePassword(String nric, String oldPassword, String newPassword) throws EmployeeInvalidPasswordException, EmployeeNotFoundException;
+
+    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException;
+
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException, DeleteEmployeeException;
+
+    public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException;
+
 }

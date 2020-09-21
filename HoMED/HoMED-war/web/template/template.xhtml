@@ -3,7 +3,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
 
     <h:head>
         <f:facet name="first">
@@ -22,19 +23,10 @@
     </h:head>
 
     <h:body styleClass="#{themeCustomiser.inputStyle}">
-        <h:form>
-            <p:growl id="inactivityGrowl" life="5000" showDetail="true" />
-            <!--WARNING: 15mins(900000) of inactivity-->
-            <p:idleMonitor timeout="900000">
-                <p:ajax event="idle" listener="#{employeeLoginManagedBean.idleWarning}" update="inactivityGrowl" />
-                <p:ajax event="active" update="inactivityGrowl" />
-            </p:idleMonitor>
-            <!--WARNING: 16mins(960000) of inactivity-->
-            <p:idleMonitor timeout="960000">
-                <p:ajax event="idle" listener="#{employeeLoginManagedBean.timeoutLogout()}" />
-            </p:idleMonitor>
-        </h:form>
 
+
+        <ezcomp:sessionTimeout/>
+      
         <div class="layout-wrapper #{themeCustomiser.menuMode} layout-menu-#{themeCustomiser.menuColor} layout-topbar-#{themeCustomiser.topbarColor}">
             <ui:include src="./topbar.xhtml"></ui:include>
             <ui:include src="./menu.xhtml"></ui:include>

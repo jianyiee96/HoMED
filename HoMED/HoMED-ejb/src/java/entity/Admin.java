@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.GenderEnum;
 
 /**
  *
@@ -18,16 +19,19 @@ import util.enumeration.EmployeeRoleEnum;
 @Entity
 public class Admin extends Employee implements Serializable {
 
-    
-    public Admin(){
+    public Admin() {
     }
-    
-    public Admin(String name, String nric, String password) {
-        super(name, nric, password);
+
+
+    public Admin(String name, String nric, String password, String email, String address, String phoneNumber, GenderEnum gender) {
+        super(name, nric, password, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.ADMIN;
     }
 
-
+    public Admin(String name, String nric, String email, String address, String phoneNumber, GenderEnum gender) {
+        super(name, nric, email, address, phoneNumber, gender);
+        this.role = EmployeeRoleEnum.ADMIN;
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -46,5 +50,5 @@ public class Admin extends Employee implements Serializable {
     public String toString() {
         return "entity.Admin[ id=" + super.getEmployeeId() + " ]";
     }
-    
+
 }

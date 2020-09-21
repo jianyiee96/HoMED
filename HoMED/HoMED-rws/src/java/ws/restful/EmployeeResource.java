@@ -34,7 +34,7 @@ public class EmployeeResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public Response getEmployee(@QueryParam("employeeId") String id) {
-        Employee employee = this.employeeSessionBeanLocal.retrieveEmployee(Long.parseLong(id));
+        Employee employee = this.employeeSessionBeanLocal.retrieveEmployeeById(Long.parseLong(id));
         
         if(employee != null){ 
             return Response.status(Response.Status.OK).entity("Found TestEntity with id = " + id + " Name: " + employee.getName()).build();

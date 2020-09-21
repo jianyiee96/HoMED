@@ -8,7 +8,6 @@ import java.io.Serializable;
 @SessionScoped
 public class ThemeCustomiser implements Serializable {
 
-    // The login page is customised to "Cyan" theme, feel free to change.
     private String componentTheme = "cyan";
     private String topbarColor = "cyan";
 
