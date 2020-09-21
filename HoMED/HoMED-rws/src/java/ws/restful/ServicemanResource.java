@@ -14,6 +14,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.ChangeServicemanPasswordException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanNotFoundException;
@@ -80,10 +81,10 @@ public class ServicemanResource {
         if (servicemanChangePassReq != null) {
 
             try {
-                servicemanSessionBeanLocal.changePassword(servicemanChangePassReq.getNric(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword());
+                servicemanSessionBeanLocal.changeServicemanPassword(servicemanChangePassReq.getNric(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword(), servicemanChangePassReq.getConfirmNewPassword());
 
                 return Response.status(Response.Status.OK).build();
-            } catch (ServicemanNotFoundException ex) {
+            } catch (ChangeServicemanPasswordException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
