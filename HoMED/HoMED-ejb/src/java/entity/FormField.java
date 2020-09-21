@@ -7,6 +7,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import util.enumeration.InputTypeEnum;
 
 /**
@@ -32,9 +32,8 @@ public class FormField implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formFieldId;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false)
     @NotNull
-    @Size(max = 64)
     private String title;
     
     @Column(nullable = false)
@@ -55,7 +54,7 @@ public class FormField implements Serializable {
     @NotNull
     private boolean isServicemanEditable;
     
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormFieldOption> formFieldOptions;
     
 

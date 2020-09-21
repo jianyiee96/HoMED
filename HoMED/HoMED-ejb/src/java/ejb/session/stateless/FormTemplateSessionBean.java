@@ -4,9 +4,11 @@
  */
 package ejb.session.stateless;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -53,22 +55,30 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             throw new UnknownPersistenceException(ex.getMessage());
         }
     }
-    
+
     @Override
     public void saveFormTemplate(FormTemplate formTemplate) {
+
+        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
+
+        for (FormField oldFF : ft.getFormFields()) {
+            oldFF.setFormFieldOptions(new ArrayList<>());
+        }
+        ft.setFormFields(new ArrayList<>());
+        em.flush();
         
-        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());        
+
         ft.setFormStatus(formTemplate.getFormStatus());
         ft.setFormTemplateName(formTemplate.getFormTemplateName());
         ft.setFormFields(formTemplate.getFormFields());
-        
-        for(FormField ff : ft.getFormFields()){
-            for(FormFieldOption ffo : ff.getFormFieldOptions()) {
+
+        for (FormField ff : ft.getFormFields()) {
+            for (FormFieldOption ffo : ff.getFormFieldOptions()) {
                 em.persist(ffo);
             }
             em.persist(ff);
         }
-        
+
         em.merge(ft);
         em.flush();
     }
@@ -76,8 +86,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public boolean publishFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
-        
-        if(formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
+
+        if (formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
             formTemplate.setFormStatus(FormStatusEnum.PUBLISHED);
             em.flush();
             return true;
@@ -89,8 +99,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public boolean archiveFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
-        
-        if(formTemplate.getFormStatus() == FormStatusEnum.PUBLISHED) {
+
+        if (formTemplate.getFormStatus() == FormStatusEnum.PUBLISHED) {
             formTemplate.setFormStatus(FormStatusEnum.ARCHIVED);
             em.flush();
             return true;
@@ -102,8 +112,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public boolean deleteFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
-        
-        if(formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
+
+        if (formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
             formTemplate.setFormStatus(FormStatusEnum.DELETED);
             em.flush();
             return true;

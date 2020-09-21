@@ -5,8 +5,8 @@
 package util.enumeration;
 
 public enum InputTypeEnum {
-    HEADER,
     TEXT,
+    HEADER,
     NUMBER,
     DATE,
     TIME,
