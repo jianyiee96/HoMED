@@ -57,7 +57,7 @@ public class EmployeeLoginManagedBean implements Serializable {
 
                 FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
             } else {
-                PrimeFaces.current().executeScript("PF('dlg').show()");
+                PrimeFaces.current().executeScript("PF('dlgActivatePassword').show()");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
             FacesContext.getCurrentInstance().addMessage("formLogin", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
@@ -85,7 +85,7 @@ public class EmployeeLoginManagedBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
             FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
         } catch (ActivateEmployeeException ex) {
-            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("formActivatePassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -99,17 +99,17 @@ public class EmployeeLoginManagedBean implements Serializable {
     public void sendOtp() {
         try {
             employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordEmail, forgetPasswordPhoneNumber);
-            PrimeFaces.current().executeScript("PF('forgotDlg').hide()");
+            PrimeFaces.current().executeScript("PF('dlgForgetPassword').hide()");
             FacesContext.getCurrentInstance().addMessage("formInactivity", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("formForgetPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
     public void checkInactivity() {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         if (flash.get("inactiveSession") != null) {
-            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
+            FacesContext.getCurrentInstance().addMessage("formInactivity", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
         }
     }
 

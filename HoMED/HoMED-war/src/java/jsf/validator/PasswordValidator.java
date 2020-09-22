@@ -17,7 +17,7 @@ public class PasswordValidator implements Validator {
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
         String strValue = value.toString();
 
-        if (strValue == null || strValue.equals("")) {
+        if (value == null || strValue.equals("")) {
             throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error",
                     "Password is required"));
         }
