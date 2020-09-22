@@ -57,20 +57,27 @@ public class ServicemanResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response servicemanLogin(ServicemanLoginReq servicemanLoginReq) {
+        
+        if (servicemanLoginReq != null) {
+            
+            try {
+                Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getEmail(), servicemanLoginReq.getPassword());
 
-        try {
-            Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getNric(), servicemanLoginReq.getPassword());
+                return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
+            } catch (ServicemanInvalidLoginCredentialException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
-            return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
-        } catch (ServicemanInvalidLoginCredentialException ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
-        } catch (Exception ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            }
+        } else {
+            ErrorRsp errorRsp = new ErrorRsp("Invalid login request");
 
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
-        }
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }          
 
     }
 
@@ -83,13 +90,17 @@ public class ServicemanResource {
         if (servicemanChangePassReq != null) {
 
             try {
-                servicemanSessionBeanLocal.changeServicemanPassword(servicemanChangePassReq.getNric(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword(), servicemanChangePassReq.getConfirmNewPassword());
+                servicemanSessionBeanLocal.changeServicemanPassword(servicemanChangePassReq.getEmail(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword(), servicemanChangePassReq.getConfirmNewPassword());
 
                 return Response.status(Response.Status.OK).build();
             } catch (ChangeServicemanPasswordException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
             }
         } else {
             ErrorRsp errorRsp = new ErrorRsp("Invalid change password request");
@@ -108,14 +119,19 @@ public class ServicemanResource {
         if (servicemanActivateAccountReq != null) {
 
             try {
-                servicemanSessionBeanLocal.activateServiceman(servicemanActivateAccountReq.getNric(), servicemanActivateAccountReq.getNewPassword(), servicemanActivateAccountReq.getConfirmNewPassword());
+                servicemanSessionBeanLocal.activateServiceman(servicemanActivateAccountReq.getEmail(), servicemanActivateAccountReq.getNewPassword(), servicemanActivateAccountReq.getConfirmNewPassword());
 
                 return Response.status(Response.Status.OK).build();
             } catch (ActivateServicemanException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
             }
+            
         } else {
             ErrorRsp errorRsp = new ErrorRsp("Invalid activate account request");
 
@@ -161,7 +177,7 @@ public class ServicemanResource {
 
             try {
 
-                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getNric(), servicemanResetPassReq.getEmail());
+                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getEmail());
                 return Response.status(Response.Status.OK).build();
 
             } catch (ResetServicemanPasswordException ex) {

@@ -10,7 +10,7 @@ package ws.datamodel;
  */
 public class ServicemanChangePassReq {
 
-    private String nric;
+    private String email;
     private String oldPassword;
     private String newPassword;
     private String confirmNewPassword;
@@ -18,19 +18,19 @@ public class ServicemanChangePassReq {
     public ServicemanChangePassReq() {
     }
 
-    public ServicemanChangePassReq(String nric, String oldPassword, String newPassword, String confirmNewPassword) {
-        this.nric = nric;
+    public ServicemanChangePassReq(String email, String oldPassword, String newPassword, String confirmNewPassword) {
+        this.email = email;
         this.oldPassword = oldPassword;
         this.newPassword = newPassword;
         this.confirmNewPassword = confirmNewPassword;
     }
 
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getOldPassword() {

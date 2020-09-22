@@ -10,25 +10,25 @@ package ws.datamodel;
  */
 public class ServicemanActivateAccountReq {
 
-    private String nric;
+    private String email;
     private String newPassword;
     private String confirmNewPassword;
 
     public ServicemanActivateAccountReq() {
     }
 
-    public ServicemanActivateAccountReq(String nric, String newPassword, String confirmNewPassword) {
-        this.nric = nric;
+    public ServicemanActivateAccountReq(String email, String newPassword, String confirmNewPassword) {
+        this.email = email;
         this.newPassword = newPassword;
         this.confirmNewPassword = confirmNewPassword;
     }
 
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNewPassword() {

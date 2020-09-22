@@ -74,9 +74,9 @@ public class DataInitializationSessionBean {
             String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Bee Am D. You", "s7654321e", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, "bee_board@hotmail.com", "14 Science Drive"));
             String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Merser D.", "s7654321f", "98765435", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, "merser_master@hotmail.com", "15 Enigineering Drive"));
 
-            System.out.println("Serviceman NRIC: s7654321d\tOTP : " + serviceman1OTP);
-            System.out.println("Serviceman NRIC: s7654321e\tOTP : " + serviceman2OTP);
-            System.out.println("Serviceman NRIC: s7654321f\tOTP : " + serviceman3OTP);
+            System.out.println("Serviceman EMAIL: audi_keynote@hotmail.com\tOTP : " + serviceman1OTP);
+            System.out.println("Serviceman EMAIL: bee_board@hotmail.com\tOTP : " + serviceman2OTP);
+            System.out.println("Serviceman EMAIL: merser_master@hotmail.com\tOTP : " + serviceman3OTP);
             initializeMedicalCentres();
 
             System.out.println("End of data init");
