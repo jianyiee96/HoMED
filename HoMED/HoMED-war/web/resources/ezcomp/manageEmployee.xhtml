@@ -58,9 +58,13 @@
                                     <p:outputLabel for="view-name" value="Name"/>
                                     <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" />
                                 </div>
+                                
                                 <div class="p-field">
-                                    <p:outputLabel for="view-nric" value="Nric"/>
-                                    <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-nric" value="#{manageEmployeeManagedBean.employeeToView.nric}" />
+                                    <p:outputLabel for="view-email" value="Email Address"/>
+                                    <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
                                 </div>
 
 
@@ -80,14 +84,7 @@
                                     <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="view-phoneNumber" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" />
                                 </div>
-
-                                <div class="p-field">
-                                    <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
+                                
                                 <div class="p-field">
                                     <p:outputLabel for="view-address" value="Address"/>
                                     <p:inputText id="view-address" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address}" />

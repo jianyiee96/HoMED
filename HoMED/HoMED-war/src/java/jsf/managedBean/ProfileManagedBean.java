@@ -80,14 +80,14 @@ public class ProfileManagedBean implements Serializable {
 
     public void updatePassword(ActionEvent event) {
         try {
-            employeeSessionBean.changeEmployeePassword(employee.getNric(), oldPassword, newPassword, confirmNewPassword);
+            employeeSessionBean.changeEmployeePassword(employee.getEmail(), oldPassword, newPassword, confirmNewPassword);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Password updated successfully", null));
             FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", this.employee);
             oldPassword = "";
             newPassword = "";
             confirmNewPassword = "";
         } catch (ChangeEmployeePasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage()    , null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }

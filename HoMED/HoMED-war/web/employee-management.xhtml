@@ -51,10 +51,6 @@
                                 <h:outputText value="#{employee.employeeId}" />
                             </p:column>
 
-                            <p:column headerText="Nric" width="5%" sortBy="#{employee.nric}" filterBy="#{employee.nric}" filterMatchMode="contains">
-                                <h:outputText value="#{employee.nric}" />
-                            </p:column>
-
                             <p:column headerText="Name" width="10%" sortBy="#{employee.name}" filterBy="#{employee.name}" filterMatchMode="contains">
                                 <h:outputText value="#{employee.name}" />
                             </p:column>
@@ -104,11 +100,14 @@
                                     <p:outputLabel for="create-name" value="Name"/>
                                     <p:inputText id="create-name" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.name}" />
                                 </div>
-                                <div class="p-field">
-                                    <p:outputLabel for="create-nric" value="Nric"/>
-                                    <p:inputText id="create-nric" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.nric}" />
-                                </div>
 
+                                <div class="p-field">
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"  />
+                                    </p:inputText>
+                                </div>
 
                                 <div class="p-field">
                                     <p:outputLabel for="create-gender" value="Gender"/>
@@ -128,13 +127,6 @@
 
                                 </div>
 
-                                <div class="p-field">
-                                    <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"  />
-                                    </p:inputText>
-                                </div>
                                 <div class="p-field">
                                     <p:outputLabel for="create-address" value="Address"/>
                                     <p:inputText id="create-address" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.address}" />

@@ -24,13 +24,13 @@ import util.helper.ThemeCustomiser;
 @ViewScoped
 public class EmployeeLoginManagedBean implements Serializable {
 
-    private String nric;
+    private String email;
     private String password;
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
-    private String forgetPasswordNric;
     private String forgetPasswordEmail;
+    private String forgetPasswordPhoneNumber;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -48,7 +48,7 @@ public class EmployeeLoginManagedBean implements Serializable {
     public void login() throws IOException {
 
         try {
-            currentEmployee = employeeSessionBeanLocal.employeeLogin(nric, password);
+            currentEmployee = employeeSessionBeanLocal.employeeLogin(email, password);
             if (currentEmployee.getIsActivated()) {
                 FacesContext.getCurrentInstance().getExternalContext().getSession(true);
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
@@ -76,7 +76,7 @@ public class EmployeeLoginManagedBean implements Serializable {
 
     public void activateAccount() throws IOException {
         try {
-            currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
+            currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getEmail(), activatePassword, activateRePassword);
             FacesContext.getCurrentInstance().getExternalContext().getSession(true);
             FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
@@ -95,10 +95,10 @@ public class EmployeeLoginManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("formTemplateGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account!", "Password has been successfully changed"));
         }
     }
-    
+
     public void sendOtp() {
         try {
-            employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);
+            employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordEmail, forgetPasswordPhoneNumber);
             PrimeFaces.current().executeScript("PF('forgotDlg').hide()");
             FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
@@ -126,12 +126,12 @@ public class EmployeeLoginManagedBean implements Serializable {
         }
     }
 
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -158,20 +158,20 @@ public class EmployeeLoginManagedBean implements Serializable {
         this.activateRePassword = activateRePassword;
     }
 
-    public String getForgetPasswordNric() {
-        return forgetPasswordNric;
-    }
-
-    public void setForgetPasswordNric(String forgetPasswordNric) {
-        this.forgetPasswordNric = forgetPasswordNric;
-    }
-
     public String getForgetPasswordEmail() {
         return forgetPasswordEmail;
     }
 
     public void setForgetPasswordEmail(String forgetPasswordEmail) {
         this.forgetPasswordEmail = forgetPasswordEmail;
+    }
+
+    public String getForgetPasswordPhoneNumber() {
+        return forgetPasswordPhoneNumber;
+    }
+
+    public void setForgetPasswordPhoneNumber(String forgetPasswordPhoneNumber) {
+        this.forgetPasswordPhoneNumber = forgetPasswordPhoneNumber;
     }
 
 }

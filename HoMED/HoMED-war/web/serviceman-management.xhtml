@@ -51,10 +51,6 @@
                                 <h:outputText value="#{serviceman.servicemanId}" />
                             </p:column>
 
-                            <p:column headerText="NRIC" width="5%" sortBy="#{serviceman.nric}" filterBy="#{serviceman.nric}" filterMatchMode="contains">
-                                <h:outputText value="#{serviceman.nric}" />
-                            </p:column>
-
                             <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.name}" />
                             </p:column>
@@ -95,9 +91,13 @@
                                     <p:outputLabel for="create-name" value="Name" />
                                     <p:inputText id="create-name" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.name}" />
                                 </div>
+
                                 <div class="p-field">
-                                    <p:outputLabel for="create-nric" value="NRIC"/>
-                                    <p:inputText id="create-nric" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.nric}" />
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
                                 </div>
 
                                 <div class="p-field">
@@ -118,13 +118,6 @@
 
                                 </div>
 
-                                <div class="p-field">
-                                    <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
                                 <div class="p-field">
                                     <p:outputLabel for="create-address" value="Address"/>
                                     <p:inputText id="create-address" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.address}" />

@@ -66,9 +66,9 @@ public class DataInitializationSessionBean {
             String employee2OTP = employeeSessionBeanLocal.createEmployee(new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", "50 Jalan Jalan", "94360875", GenderEnum.MALE));
             String employee3OTP = employeeSessionBeanLocal.createEmployee(new Clerk("Clerk OTP", "dummyemailxxx13@hotmail.com", "120 Jalan Bedok", "94326975", GenderEnum.MALE));
 
-            System.out.println("Employee NRIC: dummyemailxxx11@hotmail.com\tOTP " + employee1OTP);
-            System.out.println("Employee NRIC: dummyemailxxx12@hotmail.com\tOTP " + employee2OTP);
-            System.out.println("Employee NRIC: dummyemailxxx13@hotmail.com\tOTP " + employee3OTP);
+            System.out.println("Employee EMAIL: dummyemailxxx11@hotmail.com\tOTP " + employee1OTP);
+            System.out.println("Employee EMAIL: dummyemailxxx12@hotmail.com\tOTP " + employee2OTP);
+            System.out.println("Employee EMAIL: dummyemailxxx13@hotmail.com\tOTP " + employee3OTP);
 
             String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Audi More", "s7654321d", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, "audi_keynote@hotmail.com", "13 Computing Drive"));
             String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Bee Am D. You", "s7654321e", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, "bee_board@hotmail.com", "14 Science Drive"));

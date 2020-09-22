@@ -30,9 +30,13 @@
                                     <p:outputLabel for="view-name" value="Name"/>
                                     <p:inputText disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-name" value="#{manageServicemanManagedBean.servicemanToView.name}" />
                                 </div>
+
                                 <div class="p-field">
-                                    <p:outputLabel for="view-nric" value="Nric"/>
-                                    <p:inputText disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-nric" value="#{manageServicemanManagedBean.servicemanToView.nric}" />
+                                    <p:outputLabel for="view-email" value="Email Address"/>
+                                    <p:inputText disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-email"  value="#{manageServicemanManagedBean.servicemanToView.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
                                 </div>
 
                                 <div class="p-field">
@@ -53,19 +57,12 @@
                                 </div>
 
                                 <div class="p-field">
-                                    <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
-                                <div class="p-field">
                                     <p:outputLabel for="view-address" value="Address"/>
                                     <p:inputText id="view-address" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.address}" />
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="p-col-12">
                             <div class="card ui-fluid">
                                 <h5>Other Information</h5>
@@ -83,7 +80,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="p-col-12">
                             <p:messages closable="true">
                                 <p:autoUpdate/>

@@ -25,12 +25,15 @@
                     <div class="card ui-fluid">
                         <h5>Personal Particulars</h5>
                         <div class="p-field">
-                            <p:outputLabel for="nric">Name</p:outputLabel>
-                            <p:inputText disabled="true" id="nric" value="#{profileManagedBean.employee.name}" />
+                            <p:outputLabel for="name">Name</p:outputLabel>
+                            <p:inputText disabled="true" id="name" value="#{profileManagedBean.employee.name}" />
                         </div>
                         <div class="p-field">
-                            <p:outputLabel for="name">Nric</p:outputLabel>
-                            <p:inputText disabled="true" id="name" value="#{profileManagedBean.employee.nric}" />
+                            <p:outputLabel for="email" value="Email Address"/>
+                            <p:inputText disabled="true" id="email" value="#{profileManagedBean.employee.email}" >
+                                <f:validateRegex
+                                    pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                            </p:inputText>
                         </div>
 
 
@@ -43,11 +46,11 @@
                     <div class="card ui-fluid">
                         <h5>Password</h5>
 
-                        
-                            <div class="p-field">                       
-                                <p:commandButton value="Change password" oncomplete="PF('dialogUpdatePassword').show()"/>
-                            </div>
-                            
+
+                        <div class="p-field">                       
+                            <p:commandButton value="Change password" oncomplete="PF('dialogUpdatePassword').show()"/>
+                        </div>
+
                     </div>
 
 
@@ -62,10 +65,6 @@
                             <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.phoneNumber}" />
                         </div>
 
-                        <div class="p-field">
-                            <p:outputLabel value="Email Address"/>
-                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.email}" />
-                        </div>
                         <div class="p-field">
                             <p:outputLabel value="Address"/>
                             <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.address}" />
