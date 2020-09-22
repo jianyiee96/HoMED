@@ -28,7 +28,9 @@
 
                         <div class="buttonbar">
                             <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{employeeAccountManagementManagedBean.doCreateEmployee}"
-                                             update="formCreateEmployee" process="@this" immediate="true" oncomplete="PF('dialogCreateEmployee').show()" />
+                                             update="formCreateEmployee" process="@this" immediate="true" oncomplete="PF('dialogCreateEmployee').show()" >
+                                <p:resetInput target="formCreateEmployee" />
+                            </p:commandButton>
                         </div>
 
                         <p:dataTable id="dataTableEmployees" widgetVar="dataTableEmployees"  var="employee" value="#{employeeAccountManagementManagedBean.employees}" sortBy="#{employee.employeeId}"

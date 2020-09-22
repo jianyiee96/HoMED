@@ -95,12 +95,7 @@ public class EmployeeLoginManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("formTemplateGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account!", "Password has been successfully changed"));
         }
     }
-
-    public void openForgotPasswordForm() {
-        this.forgetPasswordNric = "";
-        this.forgetPasswordEmail = "";
-    }
-
+    
     public void sendOtp() {
         try {
             employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);

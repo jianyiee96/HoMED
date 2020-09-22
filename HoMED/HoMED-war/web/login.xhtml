@@ -72,13 +72,16 @@
                             </div>
 
                             <div class="p-col-12 forgetpassword-container">
-                                <p:commandLink update="forgotPasswordForm" actionListener="#{employeeLoginManagedBean.openForgotPasswordForm}" oncomplete="PF('forgotDlg').show()">
+                                <p:commandLink update="forgotPasswordForm" oncomplete="PF('forgotDlg').show()" process="@this" >
                                     Forgot Password
+                                    <p:resetInput target="forgotPasswordForm" />
                                 </p:commandLink>
                             </div>
-                            
+
                             <div class="p-col-12">
-                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" />
+                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" >
+                                    <p:resetInput target="dialogForm" />
+                                </p:commandButton>
                             </div>
 
                             <div class="p-col-12">
@@ -161,7 +164,7 @@
         </h:form>
 
         <h:form id="forgotPasswordForm">
-            <p:dialog header="Forgot Password" widgetVar="forgotDlg" id="forgotDlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade">
+            <p:dialog header="Forgot Password" widgetVar="forgotDlg" id="forgotDlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false">
                 <p:outputPanel id="forgotPanel">
                     <div class="ui-fluid">
                         <div class="login-panel-content">
@@ -217,7 +220,7 @@
                                     <div class="p-grid p-justify-center">
                                         <div class="p-col-8">
                                             <p:commandButton type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp()}"
-                                                             update="forgotPanel inactivityForm" icon="fa fa-send-o"/>
+                                                             update="forgotPanel" icon="fa fa-send-o"/>
                                         </div>
                                     </div>
                                 </div>
