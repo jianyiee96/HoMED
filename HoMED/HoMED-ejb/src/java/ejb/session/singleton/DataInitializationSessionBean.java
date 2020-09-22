@@ -70,9 +70,9 @@ public class DataInitializationSessionBean {
             System.out.println("Employee NRIC: dummyemailxxx12@hotmail.com\tOTP " + employee2OTP);
             System.out.println("Employee NRIC: dummyemailxxx13@hotmail.com\tOTP " + employee3OTP);
 
-            String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Audi More", "s7654321d", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, "audi_keynote@hotmail.com", "13 Computing Drive"));
-            String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Bee Am D. You", "s7654321e", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, "bee_board@hotmail.com", "14 Science Drive"));
-            String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Merser D.", "s7654321f", "98765435", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, "merser_master@hotmail.com", "15 Enigineering Drive"));
+            String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Audi More", "audi_keynote@hotmail.com", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE,  "13 Computing Drive"));
+            String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Bee Am D. You", "bee_board@hotmail.com", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, "14 Science Drive"));
+            String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(new Serviceman("Merser D.", "merser_master@hotmail.com", "98765435", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, "15 Enigineering Drive"));
 
             System.out.println("Serviceman EMAIL: audi_keynote@hotmail.com\tOTP : " + serviceman1OTP);
             System.out.println("Serviceman EMAIL: bee_board@hotmail.com\tOTP : " + serviceman2OTP);

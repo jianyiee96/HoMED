@@ -28,8 +28,6 @@ public interface ServicemanSessionBeanLocal {
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException;
 
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
-
-    public Serviceman retrieveServicemanByNric(String nric) throws ServicemanNotFoundException;
     
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException;
 
@@ -43,7 +41,7 @@ public interface ServicemanSessionBeanLocal {
 
     public void changeServicemanPassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException;
 
-    public void resetServicemanPassword(String email) throws ResetServicemanPasswordException;
+    public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException;
 
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
     

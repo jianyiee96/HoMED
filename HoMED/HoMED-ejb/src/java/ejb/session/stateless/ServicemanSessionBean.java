@@ -96,21 +96,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
-
-    @Override
-    public Serviceman retrieveServicemanByNric(String nric) throws ServicemanNotFoundException {
-        Query query = em.createQuery("SELECT s FROM Serviceman s WHERE s.nric = :inNric");
-        query.setParameter("inNric", nric);
-
-        try {
-            return (Serviceman) query.getSingleResult();
-        } catch (NoResultException | NonUniqueResultException ex) {
-            throw new ServicemanNotFoundException("Serviceman NRIC " + nric + " does not exist!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new ServicemanNotFoundException(generalUnexpectedErrorMessage + "retrieving serviceman account by NRIC");
-        }
-    }
     
     @Override
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException {
@@ -138,11 +123,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
 
                     servicemanToUpdate.setName(serviceman.getName());
-                    servicemanToUpdate.setNric(serviceman.getNric());
+                    servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setRod(serviceman.getRod());
                     servicemanToUpdate.setGender(serviceman.getGender());
                     servicemanToUpdate.setBloodType(serviceman.getBloodType());
-                    servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                     servicemanToUpdate.setAddress(serviceman.getAddress());
 
@@ -263,12 +247,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public void resetServicemanPassword(String email) throws ResetServicemanPasswordException {
+    public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
         try {
             Serviceman serviceman = retrieveServicemanByEmail(email);
-            if (!email.equals(serviceman.getEmail())) {
-                throw new ResetServicemanPasswordException("Email does not match account's email! Please try again.");
+            if (!phoneNumber.equals(serviceman.getPhoneNumber())) {
+                throw new ResetServicemanPasswordException("Phone number does not match account's phone number!");
             }
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
@@ -295,7 +279,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
         try {
-            Serviceman serviceman = retrieveServicemanByNric(currentServiceman.getNric());
+            Serviceman serviceman = retrieveServicemanByEmail(currentServiceman.getEmail());
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             serviceman.setPassword(password);

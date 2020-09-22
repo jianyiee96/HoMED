@@ -177,7 +177,7 @@ public class ServicemanResource {
 
             try {
 
-                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getEmail());
+                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getEmail(), servicemanResetPassReq.getPhoneNumber());
                 return Response.status(Response.Status.OK).build();
 
             } catch (ResetServicemanPasswordException ex) {
