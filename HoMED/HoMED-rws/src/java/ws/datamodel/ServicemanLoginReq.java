@@ -6,27 +6,27 @@ package ws.datamodel;
 
 public class ServicemanLoginReq {
 
-    private String nric;
+    private String email;
     private String password;
 
     public ServicemanLoginReq() {
     }
 
-    public ServicemanLoginReq(String nric, String password) {
-        this.nric = nric;
+    public ServicemanLoginReq(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     public void setPassword(String password) {
         this.password = password;
     }
     
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {

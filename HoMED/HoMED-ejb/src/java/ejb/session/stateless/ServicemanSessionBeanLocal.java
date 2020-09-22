@@ -30,18 +30,20 @@ public interface ServicemanSessionBeanLocal {
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
 
     public Serviceman retrieveServicemanByNric(String nric) throws ServicemanNotFoundException;
+    
+    public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException;
 
     public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException;
 
     public void deleteServiceman(Long servicemanId) throws DeleteServicemanException;
 
-    public Serviceman servicemanLogin(String nric, String password) throws ServicemanInvalidLoginCredentialException;
+    public Serviceman servicemanLogin(String email, String password) throws ServicemanInvalidLoginCredentialException;
 
-    public void activateServiceman(String nric, String password, String rePassword) throws ActivateServicemanException;
+    public void activateServiceman(String email, String password, String rePassword) throws ActivateServicemanException;
 
-    public void changeServicemanPassword(String nric, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException;
+    public void changeServicemanPassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException;
 
-    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException;
+    public void resetServicemanPassword(String email) throws ResetServicemanPasswordException;
 
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
     

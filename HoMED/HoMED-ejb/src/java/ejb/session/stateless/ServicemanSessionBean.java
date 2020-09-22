@@ -111,6 +111,21 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanNotFoundException(generalUnexpectedErrorMessage + "retrieving serviceman account by NRIC");
         }
     }
+    
+    @Override
+    public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException {
+        Query query = em.createQuery("SELECT s FROM Serviceman s WHERE s.email = :inEmail");
+        query.setParameter("inEmail", email);
+
+        try {
+            return (Serviceman) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new ServicemanNotFoundException("Serviceman EMAIL " + email + " does not exist!");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ServicemanNotFoundException(generalUnexpectedErrorMessage + "retrieving serviceman account by EMAIL");
+        }
+    }
 
     @Override
     public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException {
@@ -168,21 +183,21 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public Serviceman servicemanLogin(String nric, String password) throws ServicemanInvalidLoginCredentialException {
+    public Serviceman servicemanLogin(String email, String password) throws ServicemanInvalidLoginCredentialException {
         String errorMessage = "Failed to Login: ";
         try {
-            Serviceman serviceman = retrieveServicemanByNric(nric);
+            Serviceman serviceman = retrieveServicemanByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + serviceman.getSalt()));
 
             if (serviceman.getPassword().equals(passwordHash)) {
                 return serviceman;
             } else {
-                throw new ServicemanInvalidLoginCredentialException("NRIC does not exist or invalid password!");
+                throw new ServicemanInvalidLoginCredentialException("EMAIL does not exist or invalid password!");
             }
         } catch (ServicemanInvalidLoginCredentialException ex) {
             throw new ServicemanInvalidLoginCredentialException(errorMessage + ex.getMessage());
         } catch (ServicemanNotFoundException ex) {
-            throw new ServicemanInvalidLoginCredentialException(errorMessage + "NRIC does not exist or invalid password!");
+            throw new ServicemanInvalidLoginCredentialException(errorMessage + "EMAIL does not exist or invalid password!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ServicemanInvalidLoginCredentialException(generalUnexpectedErrorMessage + "logging in");
@@ -190,14 +205,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public void activateServiceman(String nric, String password, String rePassword) throws ActivateServicemanException {
+    public void activateServiceman(String email, String password, String rePassword) throws ActivateServicemanException {
         String errorMessage = "Failed to activate Serviceman account: ";
         if (!password.equals(rePassword)) {
             throw new ActivateServicemanException("Passwords do not match!");
         }
 
         try {
-            Serviceman serviceman = retrieveServicemanByNric(nric);
+            Serviceman serviceman = retrieveServicemanByEmail(email);
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND - Password min length
             if (serviceman.getIsActivated()) {
                 throw new ActivateServicemanException("Account has already been activated!");
@@ -216,14 +231,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public void changeServicemanPassword(String nric, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException {
+    public void changeServicemanPassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException {
         String errorMessage = "Failed to change Serviceman password: ";
         if (!newPassword.equals(newRePassword)) {
             throw new ChangeServicemanPasswordException("Passwords do not match!");
         }
 
         try {
-            Serviceman serviceman = retrieveServicemanByNric(nric);
+            Serviceman serviceman = retrieveServicemanByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + serviceman.getSalt()));
 
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND - Password min length
@@ -248,10 +263,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public void resetServicemanPassword(String nric, String email) throws ResetServicemanPasswordException {
+    public void resetServicemanPassword(String email) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
         try {
-            Serviceman serviceman = retrieveServicemanByNric(nric);
+            Serviceman serviceman = retrieveServicemanByEmail(email);
             if (!email.equals(serviceman.getEmail())) {
                 throw new ResetServicemanPasswordException("Email does not match account's email! Please try again.");
             }
