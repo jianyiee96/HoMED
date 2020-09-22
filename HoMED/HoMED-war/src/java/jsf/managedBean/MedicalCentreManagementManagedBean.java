@@ -17,6 +17,7 @@ import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
 import util.exceptions.CreateMedicalCentreException;
 import util.exceptions.DeleteMedicalCentreException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UpdateMedicalCentreException;
 
 @Named(value = "medicalCentreManagementManagedBean")
@@ -59,10 +60,13 @@ public class MedicalCentreManagementManagedBean implements Serializable {
     }
 
     public void view(MedicalCentre medicalCentre) {
-        isEditable = false;
-        medicalCentreToManage = medicalCentre;
-        this.medicalCentreToCreate = new MedicalCentre();
-        this.medicalCentreToDelete = new MedicalCentre();
+        try {
+            // this.medicalCentreToManage = medicalCentre
+            this.medicalCentreToManage = medicalCentreSessionBeanLocal.retrieveMedicalCentreById(medicalCentre.getMedicalCentreId()); // Should not require this if validation does not go through on the front end
+            isEditable = false;
+        } catch (MedicalCentreNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
     }
 
     public void edit() {
@@ -71,13 +75,14 @@ public class MedicalCentreManagementManagedBean implements Serializable {
 
     public void saveEdit() {
         try {
-            isEditable = false;
             medicalCentreSessionBeanLocal.updateMedicalCentre(medicalCentreToManage);
+            isEditable = false;
 
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "Medical centre [ID: " + medicalCentreToManage.getMedicalCentreId() + "] is updated!"));
             PrimeFaces.current().executeScript("PF('dialogManageMedicalCentre').hide()");
 
             medicalCentreToManage = new MedicalCentre();
+            medicalCentres = medicalCentreSessionBeanLocal.retrieveAllMedicalCentres();
         } catch (UpdateMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }

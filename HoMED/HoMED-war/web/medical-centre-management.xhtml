@@ -29,7 +29,9 @@
 
                         <div class="buttonbar">
                             <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create"
-                                             update="panelCreateNewMedicalCentre" process="@this" immediate="true" oncomplete="PF('dialogCreateNewMedicalCentre').show()" />
+                                             update="panelCreateNewMedicalCentre" process="@this" oncomplete="PF('dialogCreateNewMedicalCentre').show()">
+                                <p:resetInput target="dialogCreateNewMedicalCentre" />
+                            </p:commandButton>
                         </div>
 
                         <p:dataTable id="dataTableMedicalCentres" widgetVar="dataTableMedicalCentres" var="medicalCentre" value="#{medicalCentreManagementManagedBean.medicalCentres}" sortBy="#{medicalCentre.medicalCentreId}"
@@ -64,7 +66,9 @@
 
                             <p:column headerText="Action" width="10%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View" action="#{medicalCentreManagementManagedBean.view(medicalCentre)}"
-                                                 update="formAllMedicalCentres:dialogManageMedicalCentre" process="@this" oncomplete="PF('dialogManageMedicalCentre').show()" />
+                                                 update="formAllMedicalCentres:dialogManageMedicalCentre" process="@this" oncomplete="PF('dialogManageMedicalCentre').show()">
+                                    <p:resetInput target="formAllMedicalCentres:dialogManageMedicalCentre" />
+                                </p:commandButton>
 
                                 <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" 
                                                  update="formAllMedicalCentres:dialogDeleteMedicalCentre" process="@this" oncomplete="PF('dialogDeleteMedicalCentre').show()">
@@ -78,7 +82,7 @@
                             Create New Medical Centre 
                         -->
                         <p:dialog id="dialogCreateNewMedicalCentre" widgetVar="dialogCreateNewMedicalCentre" header="New Medical Centre Details" showEffect="fade" responsive="true" 
-                                  draggable="false" modal="true" width="900" height="600">
+                                  draggable="false" modal="true" width="900" height="500" fitViewport="true">
 
                             <p:outputPanel id="panelCreateNewMedicalCentre" class="ui-fluid">
                                 <h4>BASIC INFORMATION</h4>
@@ -92,8 +96,8 @@
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-phone">Telephone Number</p:outputLabel>
-                                        <p:inputMask id="create-phone" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.phone}" style="width: 100%"
-                                                     required="true" requiredMessage="Medical centre telephone number is required" mask="9999-9999" />
+                                        <p:inputText id="create-phone" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.phone}" style="width: 100%" 
+                                                     required="true" requiredMessage="Medical centre telephone number is required" />
                                         <p:message class="error-message" for="create-phone" />
                                     </div>
                                 </div>
@@ -131,8 +135,8 @@
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="create-postal-code">Postal Code</p:outputLabel>
-                                        <p:inputMask id="create-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.postal}" style="width: 100%"
-                                                     required="true" requiredMessage="Medical centre postal code is required" mask="999999" />
+                                        <p:inputText id="create-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToCreate.address.postal}" style="width: 100%" 
+                                                     required="true" requiredMessage="Medical centre postal code is required" />
                                         <p:message class="error-message" for="create-postal-code" />
                                     </div>
                                 </div>
@@ -222,7 +226,7 @@
                             View/Update Medical Centre 
                         -->
                         <p:dialog id="dialogManageMedicalCentre" widgetVar="dialogManageMedicalCentre" header="Medical Centre Details" showEffect="fade" responsive="true" 
-                                  draggable="false" modal="true" width="900" height="600">
+                                  draggable="false" modal="true" width="900" height="500" fitViewport="true">
 
                             <p:outputPanel id="panelManageMedicalCentre" class="ui-fluid">
                                 <h4>Basic Information</h4>
@@ -236,8 +240,8 @@
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-phone">Telephone Number</p:outputLabel>
-                                        <p:inputMask id="manage-phone" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.phone}" style="width: 100%" placeholder="6478-7010" disabled="#{not medicalCentreManagementManagedBean.isEditable}"
-                                                     required="true" requiredMessage="Medical centre telephone number is required" mask="9999-9999" />
+                                        <p:inputText id="manage-phone" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.phone}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}"
+                                                     required="true" requiredMessage="Medical centre telephone number is required" />
                                         <p:message class="error-message" for="manage-phone" />
                                     </div>
                                 </div>
@@ -275,8 +279,8 @@
 
                                     <div class="p-field p-col">
                                         <p:outputLabel for="manage-postal-code">Postal Code</p:outputLabel>
-                                        <p:inputMask id="manage-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.postal}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}" placeholder="329560"
-                                                     required="true" requiredMessage="Medical centre postal code is required" mask="999999" />
+                                        <p:inputText id="manage-postal-code" value="#{medicalCentreManagementManagedBean.medicalCentreToManage.address.postal}" style="width: 100%" disabled="#{not medicalCentreManagementManagedBean.isEditable}"
+                                                     required="true" requiredMessage="Medical centre postal code is required" />
                                         <p:message class="error-message" for="manage-postal-code" />
                                     </div>
                                 </div>

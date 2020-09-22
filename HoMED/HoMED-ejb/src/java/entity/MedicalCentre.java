@@ -5,7 +5,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -34,7 +33,7 @@ public class MedicalCentre implements Serializable {
 
     @Column(nullable = false)
     @NotNull(message = "Please provide a telephone number for the medical centre")
-    @Size(min = 9, max = 9, message = "Telephone number must be of length 8")
+    @Size(min = 8, max = 8, message = "Telephone number must be of length 8")
     private String phone;
 
     @Embedded

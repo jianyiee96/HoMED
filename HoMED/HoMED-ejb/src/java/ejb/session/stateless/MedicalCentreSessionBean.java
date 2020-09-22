@@ -38,6 +38,8 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
     @Override
     public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws CreateMedicalCentreException {
+        String errorMessage = "Failed to create Medical Centre: ";
+
         try {
             Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(newMedicalCentre);
 
@@ -78,7 +80,7 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                 throw new CreateMedicalCentreException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
         } catch (CreateMedicalCentreException ex) {
-            throw new CreateMedicalCentreException(ex.getMessage());
+            throw new CreateMedicalCentreException(errorMessage + ex.getMessage());
         } catch (PersistenceException ex) {
             throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre [Persistence Exception]");
         } catch (Exception ex) {
