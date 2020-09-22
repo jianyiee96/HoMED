@@ -32,19 +32,19 @@ public interface EmployeeSessionBeanLocal {
 
     public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException;
 
-    public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException;
+    public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException;
 
     public Employee updateEmployee(Employee employee) throws UpdateEmployeeException;
 
     public void deleteEmployee(Long employeeId) throws DeleteEmployeeException;
 
-    public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException;
+    public Employee employeeLogin(String email, String password) throws EmployeeInvalidLoginCredentialException;
 
-    public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException;
+    public Employee activateEmployee(String email, String password, String rePassword) throws ActivateEmployeeException;
 
-    public void changeEmployeePassword(String nric, String oldPassword, String newPassword, String newRePassword) throws ChangeEmployeePasswordException;
+    public void changeEmployeePassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeEmployeePasswordException;
 
-    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException;
+    public void resetEmployeePassword(String email, String phoneNumber) throws ResetEmployeePasswordException;
 
     public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException;
 

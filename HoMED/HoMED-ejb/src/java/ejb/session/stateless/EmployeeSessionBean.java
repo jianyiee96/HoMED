@@ -124,17 +124,17 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Employee retrieveEmployeeByNric(String nric) throws EmployeeNotFoundException {
-        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.nric = :inNric");
-        query.setParameter("inNric", nric);
+    public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException {
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.email = :inEmail");
+        query.setParameter("inEmail", email);
 
         try {
             return (Employee) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
-            throw new EmployeeNotFoundException("Employee Nric " + nric + " does not exist!");
+            throw new EmployeeNotFoundException("Employee Email " + email + " does not exist!");
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new EmployeeNotFoundException(generalUnexpectedErrorMessage + "retrieving employee account by NRIC");
+            throw new EmployeeNotFoundException(generalUnexpectedErrorMessage + "retrieving employee account by Email");
         }
     }
 
@@ -150,7 +150,6 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
                     // Password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
                     employeeToUpdate.setName(employee.getName());
-                    employeeToUpdate.setNric(employee.getNric());
                     employeeToUpdate.setIsActivated(employee.getIsActivated());
 
                     employeeToUpdate.setAddress(employee.getAddress());
@@ -205,21 +204,21 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Employee employeeLogin(String nric, String password) throws EmployeeInvalidLoginCredentialException {
+    public Employee employeeLogin(String email, String password) throws EmployeeInvalidLoginCredentialException {
         String errorMessage = "Failed to Login: ";
         try {
-            Employee employee = retrieveEmployeeByNric(nric);
+            Employee employee = retrieveEmployeeByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + employee.getSalt()));
 
             if (employee.getPassword().equals(passwordHash)) {
                 return employee;
             } else {
-                throw new EmployeeInvalidLoginCredentialException("NRIC does not exist or invalid password!");
+                throw new EmployeeInvalidLoginCredentialException("Email does not exist or invalid password!");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
             throw new EmployeeInvalidLoginCredentialException(errorMessage + ex.getMessage());
         } catch (EmployeeNotFoundException ex) {
-            throw new EmployeeInvalidLoginCredentialException(errorMessage + "NRIC does not exist or invalid password!");
+            throw new EmployeeInvalidLoginCredentialException(errorMessage + "Email does not exist or invalid password!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmployeeInvalidLoginCredentialException(generalUnexpectedErrorMessage + "logging in");
@@ -227,14 +226,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Employee activateEmployee(String nric, String password, String rePassword) throws ActivateEmployeeException {
+    public Employee activateEmployee(String email, String password, String rePassword) throws ActivateEmployeeException {
         String errorMessage = "Failed to activate Employee account: ";
         if (!password.equals(rePassword)) {
             throw new ActivateEmployeeException("Passwords do not match!");
         }
 
         try {
-            Employee employee = retrieveEmployeeByNric(nric);
+            Employee employee = retrieveEmployeeByEmail(email);
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND - Password min length
             if (employee.getIsActivated()) {
                 throw new ActivateEmployeeException("Account has already been activated!");
@@ -254,14 +253,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public void changeEmployeePassword(String nric, String oldPassword, String newPassword, String newRePassword) throws ChangeEmployeePasswordException {
+    public void changeEmployeePassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeEmployeePasswordException {
         String errorMessage = "Failed to change Employee password: ";
         if (!newPassword.equals(newRePassword)) {
             throw new ChangeEmployeePasswordException("Passwords do not match!");
         }
 
         try {
-            Employee employee = retrieveEmployeeByNric(nric);
+            Employee employee = retrieveEmployeeByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + employee.getSalt()));
 
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND - Password min length
@@ -286,12 +285,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public void resetEmployeePassword(String nric, String email) throws ResetEmployeePasswordException {
+    public void resetEmployeePassword(String email, String phoneNumber) throws ResetEmployeePasswordException {
         String errorMessage = "Failed to reset Employee password: ";
         try {
-            Employee employee = retrieveEmployeeByNric(nric);
-            if (!email.equals(employee.getEmail())) {
-                throw new ResetEmployeePasswordException("Email does not match account's email!");
+            Employee employee = retrieveEmployeeByEmail(email);
+            if (!phoneNumber.equals(employee.getPhoneNumber())) {
+                throw new ResetEmployeePasswordException("Phone number does not match account's phone number!");
             }
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
@@ -318,7 +317,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException {
         String errorMessage = "Failed to reset Employee password: ";
         try {
-            Employee employee = retrieveEmployeeByNric(currentEmployee.getNric());
+            Employee employee = retrieveEmployeeByEmail(currentEmployee.getEmail());
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             employee.setPassword(password);
