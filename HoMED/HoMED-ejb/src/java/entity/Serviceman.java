@@ -39,10 +39,11 @@ public class Serviceman implements Serializable {
     @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     private String name;
 
-    @Column(nullable = false, unique = true, length = 9)
-    @NotNull(message = "NRIC must be of provided")
-    @Size(min = 9, max = 9, message = "NRIC must be of length 9")
-    private String nric;
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Proper formatted email address must be provided")
+    @Size(min = 9, max = 64, message = "Proper formatted email address must be between 9 to 64")
+    @Email(message = "Email must be properly formatted")
+    private String email;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
@@ -69,12 +70,6 @@ public class Serviceman implements Serializable {
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
 
-    @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email address must be provided")
-    @Size(min = 9, max = 64, message = "Proper formatted email address must be between 9 to 64")
-    @Email(message = "Email must be properly formatted")
-    private String email;
-
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
     @Size(min = 8, message = "Address must be at least of length 8")
@@ -96,27 +91,25 @@ public class Serviceman implements Serializable {
     public Serviceman(Serviceman another) {
         this.servicemanId = another.servicemanId;
         this.name = another.name;
-        this.nric = another.nric;
+        this.email = another.email;
         this.phoneNumber = another.phoneNumber;
         this.rod = another.rod;
         this.gender = another.gender;
         this.bloodType = another.bloodType;
         this.password = another.password;
-        this.email = another.email;
         this.address = another.address;
         this.isActivated = another.isActivated;
         this.salt = another.salt;
     }
 
-    public Serviceman(String name, String nric, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String email, String address) {
+    public Serviceman(String name, String email, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String address) {
         this();
         this.name = name;
-        this.nric = nric;
+        this.email = email;
         this.phoneNumber = phoneNumber;
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
-        this.email = email;
         this.address = address;
     }
 
@@ -136,12 +129,12 @@ public class Serviceman implements Serializable {
         this.name = name;
     }
 
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhoneNumber() {
@@ -188,13 +181,6 @@ public class Serviceman implements Serializable {
         }
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getAddress() {
         return address;
