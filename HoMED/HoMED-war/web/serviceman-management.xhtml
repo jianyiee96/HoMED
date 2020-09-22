@@ -10,11 +10,7 @@
 
     <ui:define name="content">
 
-        <style type="text/css">
-            .error-message {
-                margin: 0.5rem 0rem 0rem 0rem !important;
-            }
-        </style>
+        <h:outputStylesheet name="crud-tables.css" library="css" />
 
         <ezcomp:manageServiceman id="ccManageServiceman">
             <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
@@ -170,6 +166,5 @@
             </p:confirmDialog>
         </h:form>
 
-        <h:outputStylesheet name="crud-tables.css" library="css" />
     </ui:define>
 </ui:composition>

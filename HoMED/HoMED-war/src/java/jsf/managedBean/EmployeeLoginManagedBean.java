@@ -60,7 +60,7 @@ public class EmployeeLoginManagedBean implements Serializable {
                 PrimeFaces.current().executeScript("PF('dlg').show()");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
-            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("formLogin", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }
@@ -100,7 +100,7 @@ public class EmployeeLoginManagedBean implements Serializable {
         try {
             employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordEmail, forgetPasswordPhoneNumber);
             PrimeFaces.current().executeScript("PF('forgotDlg').hide()");
-            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
+            FacesContext.getCurrentInstance().addMessage("formInactivity", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
             FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }

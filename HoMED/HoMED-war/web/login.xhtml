@@ -12,16 +12,17 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
+        <h:outputStylesheet name="default.css" library="css" />
         <title>HoMED Employee Login</title>
     </h:head>
 
     <h:body styleClass="login-body">
-        <h:form id="inactivityForm">
-            <p:growl id="inactivityGrowl" sticky="true" showDetail="true" />
-            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkInactivity()}"/>
+        <h:form id="formInactivity">
+            <p:growl id="growlInactivity" for="formInactivity" sticky="true" showDetail="true" />
+            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkInactivity}"/>
         </h:form>
-        <h:form id="loginForm">
-            <p:outputPanel id="grid">
+        <h:form id="formLogin">
+            <p:outputPanel>
                 <div class="card login-panel ui-fluid">
                     <div class="login-panel-content">
 
@@ -34,40 +35,33 @@
                             </div>
 
                             <div class="p-col-12 username-container">
-
                                 <h:panelGroup>
-                                    <label>Email</label>
+                                    <p:outputLabel value="Email" for="email"/>
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
-                                            <i class="pi pi-user"></i>
-                                            <p:inputText label="Email" id="email" value="#{employeeLoginManagedBean.email}" 
-                                                         validatorMessage="Please provide a valid Email"
-                                                         required="true" requiredMessage="Email is required"
+                                            <i class="pi pi-user"/>
+                                            <p:inputText id="email" value="#{employeeLoginManagedBean.email}"
                                                          style="padding-left: 2rem" >
-                                                <f:validateRegex
-                                                    pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                                <f:validator validatorId="emailValidator"/>
                                             </p:inputText>
                                         </span>
-                                        <p:message for="email" />
+                                        <p:message class="error-message" for="email"/>
                                     </div>
                                 </h:panelGroup>
-
                             </div>
 
                             <div class="p-col-12 password-container">
-                                <h:panelGroup id="passwordPanel">
-                                    <h:outputLabel id="passwordLabel">Password / OTP</h:outputLabel>
+                                <h:panelGroup>
+                                    <h:outputLabel value="Password / OTP" for="password"/>
                                     <div class="login-input">
                                         <span class="ui-input-icon-left">
-                                            <i class="pi pi-lock"></i>
-                                            <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}"
-                                                        validatorMessage="Please provide a valid Password"
-                                                        required="true" requiredMessage="Password is required" maxlength="32" 
+                                            <i class="pi pi-lock"/>
+                                            <p:password id="password" value="#{employeeLoginManagedBean.password}"
                                                         style="padding-left: 2rem" >
-                                                <f:validateLength minimum="8" />
+                                                <f:validator validatorId="passwordValidator"/>
                                             </p:password>
                                         </span>
-                                        <p:message for="password" />
+                                        <p:message class="error-message" for="password" />
                                     </div>
                                 </h:panelGroup>
                             </div>
@@ -80,13 +74,13 @@
                             </div>
 
                             <div class="p-col-12">
-                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" >
+                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="formLogin dialogForm" icon="pi pi-user" >
                                     <p:resetInput target="dialogForm" />
                                 </p:commandButton>
                             </div>
 
                             <div class="p-col-12">
-                                <p:messages id="messages" for="loginForm" closable="true">
+                                <p:messages id="messages" for="formLogin" closable="true">
                                     <p:autoUpdate/>
                                 </p:messages>
                             </div>
@@ -184,7 +178,7 @@
                                                     <f:validateLength minimum="9"/>
                                                 </p:inputText>
                                             </span>
-                                            <p:message id="messageForgetPasswordEmail" for="forgetPasswordEmail"/>
+                                            <p:message id="messageForgetPasswordEmail" for="forgetPasswordEmail" class="error-message"/>
                                         </div>
                                     </h:panelGroup>
 
