@@ -44,8 +44,13 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
 
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    em.persist(oh);
-                    em.flush();
+                    Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
+                    if (constraintViolationsOperatingHours.isEmpty()) {
+                        em.persist(oh);
+                        em.flush();
+                    } else {
+                        throw new CreateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
+                    }
                 }
 
                 Address medicalCentreAddress = newMedicalCentre.getAddress();
@@ -75,10 +80,9 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         } catch (CreateMedicalCentreException ex) {
             throw new CreateMedicalCentreException(ex.getMessage());
         } catch (PersistenceException ex) {
-            // @WK - Double check if there is any possible persistence exception (I can't find any)
-//            throw new UnknownPersistenceException(ex.getMessage());
-            throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre");
+            throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre [Persistence Exception]");
         } catch (Exception ex) {
+            System.out.println(ex.getClass());
             ex.printStackTrace();
             throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre");
         }
@@ -151,6 +155,13 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
                     List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
+                    // Can look to combine these 2 loops, for sake of easy understanding, I have left them separate
+                    for (OperatingHours oh : ohs) {
+                        Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
+                        if (!constraintViolationsOperatingHours.isEmpty()) {
+                            throw new UpdateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
+                        }
+                    }
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
                         ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
                         ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
@@ -190,11 +201,25 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {
-        String msg = "Input data validation error!:";
+        String msg = "";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+            msg += constraintViolation.getMessage() + "\n";
         }
+
+        msg = msg.substring(0, msg.length() - 1);
+
+        return msg;
+    }
+
+    private String prepareOperatingHoursInputDataValidationErrorsMessage(Set<ConstraintViolation<OperatingHours>> constraintViolations) {
+        String msg = "";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += constraintViolation.getMessage() + "\n";
+        }
+
+        msg = msg.substring(0, msg.length() - 1);
 
         return msg;
     }

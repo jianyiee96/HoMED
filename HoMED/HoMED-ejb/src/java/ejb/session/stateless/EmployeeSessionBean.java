@@ -363,11 +363,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Employee>> constraintViolations) {
-        String msg = "Input data validation error!:";
+        String msg = "";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+            msg += constraintViolation.getMessage() + "\n";
         }
+
+        msg = msg.substring(0, msg.length() - 1);
 
         return msg;
     }

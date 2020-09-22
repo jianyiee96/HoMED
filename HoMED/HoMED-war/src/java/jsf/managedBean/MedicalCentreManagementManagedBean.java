@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.ejb.EJBException;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -56,8 +55,6 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             medicalCentreToCreate = new MedicalCentre();
         } catch (CreateMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        } catch (EJBException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
         }
     }
 
@@ -83,9 +80,8 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             medicalCentreToManage = new MedicalCentre();
         } catch (UpdateMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        } catch (EJBException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Operating Hours", "Opening hour has to be before closing hours!"));
         }
+
     }
 
     // Need to check if there is any association with consultations/employees in the future

@@ -2,20 +2,10 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
-import java.util.Date;
-import java.util.Properties;
 import java.util.concurrent.Future;
 import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import util.email.EmailManager;
 
 @Stateless
