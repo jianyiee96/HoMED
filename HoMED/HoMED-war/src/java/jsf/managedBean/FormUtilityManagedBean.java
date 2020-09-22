@@ -209,10 +209,6 @@ public class FormUtilityManagedBean implements Serializable {
         this.selectedFormFieldWrappers = selectedFormFieldWrappers;
     }
 
-    public List<InputTypeEnum> getInputTypes() {
-        return inputTypes;
-    }
-
     public void setInputTypes(List<InputTypeEnum> inputTypes) {
         this.inputTypes = inputTypes;
     }
@@ -342,4 +338,7 @@ public class FormUtilityManagedBean implements Serializable {
         return dateFormat.format(date);
     }
     
+    public InputTypeEnum[] getInputTypes() {
+        return InputTypeEnum.values();
+    }
 }
