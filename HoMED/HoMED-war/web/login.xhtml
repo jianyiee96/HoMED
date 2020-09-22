@@ -61,15 +61,15 @@
                                                 <f:validator validatorId="passwordValidator"/>
                                             </p:password>
                                         </span>
-                                        <p:message class="error-message" for="password" />
+                                        <p:message class="error-message" for="password"/>
                                     </div>
                                 </h:panelGroup>
                             </div>
 
                             <div class="p-col-12 forgetpassword-container">
-                                <p:commandLink update="forgotPasswordForm" oncomplete="PF('forgotDlg').show()" process="@this" >
+                                <p:commandLink update="formForgetPassword" oncomplete="PF('forgotDlg').show()" process="@this" >
                                     Forgot Password
-                                    <p:resetInput target="forgotPasswordForm" />
+                                    <p:resetInput target="formForgetPassword" />
                                 </p:commandLink>
                             </div>
 
@@ -158,7 +158,7 @@
             </p:dialog>
         </h:form>
 
-        <h:form id="forgotPasswordForm">
+        <h:form id="formForgetPassword">
             <p:dialog header="Forgot Password" widgetVar="forgotDlg" id="forgotDlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false">
                 <p:outputPanel id="forgotPanel">
                     <div class="ui-fluid">
@@ -204,7 +204,7 @@
                                 </div>
 
                                 <div class="p-col-12">
-                                    <p:messages id="messages" for="forgotPasswordForm" closable="true">
+                                    <p:messages id="messages" for="formForgetPassword" closable="true">
                                         <p:autoUpdate/>
                                     </p:messages>
                                 </div>
