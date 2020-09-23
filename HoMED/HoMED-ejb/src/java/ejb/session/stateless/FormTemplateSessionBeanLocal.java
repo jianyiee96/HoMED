@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.FormTemplate;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.CreateFormTemplateException;
 
 /**
  *
@@ -15,7 +16,7 @@ import javax.ejb.Local;
 @Local
 public interface FormTemplateSessionBeanLocal {
     
-    public Long createFormTemplate(FormTemplate formTemplate);
+    public Long createFormTemplate(FormTemplate formTemplate) throws CreateFormTemplateException;
     
     public void cloneFormTemplate(Long formTemplateId);
     

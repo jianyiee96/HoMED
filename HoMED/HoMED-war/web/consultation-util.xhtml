@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Consultation Purpose Utility</ui:define>
+
+
+    <ui:define name="content">
+
+
+
+        <div class="p-grid">
+
+            <div class="p-col-12 p-md-12 p-lg-12">
+
+
+
+                <h:form id="formAllConsultationPurposes">
+
+                    <p:growl id="growl" globalOnly="true" showDetail="true" />
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog>    
+
+
+                    <div class="card">
+                        <h1>Consultation Purpose Utility Tool</h1>
+
+
+                        <div style="margin: 6px; float: right"  class="p-field">
+
+                            <p:inputText id="newConsultationPurposeField" value="#{consultationPurposeUtilityManagedBean.createConsultationPurposeName}" placeholder="New Consultation Purpose" >
+                                <p:ajax event="keyup" update="create"/>
+                            </p:inputText>
+                            <p:commandButton id="create" icon="pi pi-plus" update="formAllConsultationPurposes" action="#{consultationPurposeUtilityManagedBean.createConsultationPurpose()}" disabled="#{consultationPurposeUtilityManagedBean.createConsultationPurposeName == null || consultationPurposeUtilityManagedBean.createConsultationPurposeName == ''}" >
+                                <p:confirm header="Create Form Template" message="Confirm create consultation purpose named [#{consultationPurposeUtilityManagedBean.createConsultationPurposeName}]?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+
+                        </div>
+
+                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="consultationPurpose" value="#{consultationPurposeUtilityManagedBean.consultationPurposes}"
+                                     rowKey="#{consultationPurpose.consultationPurposeId}" scrollable="true" scrollHeight="600"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">CONSULTATION PURPOSES</span>
+                            </f:facet>
+                            <p:column headerText="Name" sortBy="#{consultationPurpose.consultationPurposeName}">
+                                <h:outputText value="#{consultationPurpose.consultationPurposeName}" />
+                            </p:column>
+                        </p:dataTable>    
+                    </div>
+
+
+                </h:form>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

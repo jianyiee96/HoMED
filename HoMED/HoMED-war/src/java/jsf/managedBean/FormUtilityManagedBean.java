@@ -26,6 +26,7 @@ import javax.faces.view.ViewScoped;
 import jsf.classes.FormFieldWrapper;
 import util.enumeration.FormStatusEnum;
 import util.enumeration.InputTypeEnum;
+import util.exceptions.CreateFormTemplateException;
 
 @Named(value = "formUtilityManagedBean")
 @ViewScoped
@@ -64,7 +65,6 @@ public class FormUtilityManagedBean implements Serializable {
     }
 
     public void createForm() {
-        System.out.println("Created form");
         try {
             if (this.createFormName != null || !this.createFormName.equals("")) {
                 formTemplateSessionBeanLocal.createFormTemplate(new FormTemplate(this.createFormName));
@@ -73,8 +73,8 @@ public class FormUtilityManagedBean implements Serializable {
                 formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
             }
 
-        } catch (Exception ex) { //Create form template exception TODO: Add a crete form exception
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to create form template!", "Please check the supplied form template name."));
+        } catch (CreateFormTemplateException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to create form template!", ex.getMessage()));
 
         }
 

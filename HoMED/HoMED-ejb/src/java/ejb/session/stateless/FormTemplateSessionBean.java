@@ -14,12 +14,14 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.FormStatusEnum;
+import util.exceptions.CreateFormTemplateException;
 
 @Stateless
 public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
@@ -29,6 +31,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
+    private final String generalUnexpectedErrorMessage = "An unexpected error has occurred while ";
 
     public FormTemplateSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -36,7 +39,9 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     }
 
     @Override
-    public Long createFormTemplate(FormTemplate formTemplate) {
+    public Long createFormTemplate(FormTemplate formTemplate) throws CreateFormTemplateException {
+        String errorMessage = "Failed to create Form Template: ";
+
         try {
             Set<ConstraintViolation<FormTemplate>> constraintViolations = validator.validate(formTemplate);
 
@@ -46,13 +51,18 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
                 return formTemplate.getFormTemplateId();
             } else {
-                System.out.println("Error Error");
-                return null;
+                throw new CreateFormTemplateException(prepareInputDataValidationErrorsMessage(constraintViolations));
 
             }
+        } catch (CreateFormTemplateException ex) {
+            throw new CreateFormTemplateException(errorMessage + ex.getMessage());
+
+        } catch (PersistenceException ex) {
+            throw new CreateFormTemplateException(generalUnexpectedErrorMessage + "creating Form Template [Persistence Exception]");
         } catch (Exception ex) {
-            System.out.println("Error Error");
-            return null;
+            System.out.println(ex.getClass());
+            ex.printStackTrace();
+            throw new CreateFormTemplateException(generalUnexpectedErrorMessage + "creating Form Template");
         }
     }
 
@@ -106,7 +116,6 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         }
         ft.setFormFields(new ArrayList<>());
         em.flush();
-
 
         ft.setFormStatus(formTemplate.getFormStatus());
         ft.setFormTemplateName(formTemplate.getFormTemplateName());
@@ -162,7 +171,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             return false;
         }
     }
-    
+
     @Override
     public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
@@ -185,7 +194,6 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public List<FormTemplate> retrieveAllFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f");
-
         return query.getResultList();
     }
 

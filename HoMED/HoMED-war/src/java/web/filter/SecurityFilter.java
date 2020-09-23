@@ -74,7 +74,8 @@ public class SecurityFilter implements Filter {
             "/profile.xhtml", // 4
             "/employee-management.xhtml", // 5
             "/serviceman-management.xhtml", //6                
-            "/form-util.xhtml" //7
+            "/form-util.xhtml", //7
+            "/consultation-util.xhtml" //8
 
         };
 
@@ -91,7 +92,8 @@ public class SecurityFilter implements Filter {
             if (path.equals(pathArr[3])
                     || path.equals(pathArr[5])
                     || path.equals(pathArr[6])
-                    || path.equals(pathArr[7])) {
+                    || path.equals(pathArr[7])
+                    || path.equals(pathArr[8])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {

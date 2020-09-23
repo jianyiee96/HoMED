@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -56,6 +57,9 @@ public class FormTemplate implements Serializable {
     
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormField> formFields;
+
+    @ManyToMany(mappedBy = "formTemplates")
+    private List<ConsultationPurpose> consultationPurposes;
     
     public FormTemplate() {
         this.dateCreated = new Date();
@@ -123,6 +127,14 @@ public class FormTemplate implements Serializable {
 
     public void setFormFields(List<FormField> formFields) {
         this.formFields = formFields;
+    }
+
+    public List<ConsultationPurpose> getConsultationPurposes() {
+        return consultationPurposes;
+    }
+
+    public void setConsultationPurposes(List<ConsultationPurpose> consultationPurposes) {
+        this.consultationPurposes = consultationPurposes;
     }
 
     @Override
