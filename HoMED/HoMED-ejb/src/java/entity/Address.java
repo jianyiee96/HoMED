@@ -18,8 +18,8 @@ public class Address implements Serializable {
     private String unitNumber;
     private String buildingName;
     private String country;
-    @NotNull(message = "Please provide valid postal code")
-    @Size(min = 6, max = 6, message = "Please provide valid postal code")
+    @NotNull(message = "Please provide a valid postal code")
+    @Size(min = 6, max = 6, message = "Please provide a valid postal code")
     private String postal;
 
     public Address() {

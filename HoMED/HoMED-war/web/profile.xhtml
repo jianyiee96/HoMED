@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Edit Profile</ui:define>
+
+    <ui:define name="viewname">
+        <li>Pages</li>
+        <li>/</li>
+        <li><p:link outcome="/login">Empty</p:link></li>
+    </ui:define>
+
+    <ui:param name="viewname" value="FORM LAYOUT" />
+
+    <ui:define name="content">
+        <h:form id="formUpdateProfile">
+
+            <div class="p-grid">
+
+
+                <div class="p-col-12 p-md-6 p-lg-6">
+                    <div class="card ui-fluid">
+                        <h5>Personal Particulars</h5>
+                        <div class="p-field">
+                            <p:outputLabel for="name">Name</p:outputLabel>
+                            <p:inputText disabled="true" id="name" value="#{profileManagedBean.employee.name}" />
+                        </div>
+                        <div class="p-field">
+                            <p:outputLabel for="email" value="Email Address"/>
+                            <p:inputText disabled="true" id="email" value="#{profileManagedBean.employee.email}" >
+                                <f:validateRegex
+                                    pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                            </p:inputText>
+                        </div>
+
+
+                        <div class="p-field">
+                            <p:outputLabel for="gender">Gender</p:outputLabel>
+                            <p:inputText disabled="true" id="gender" value="#{profileManagedBean.employee.gender}" />
+
+                        </div> 
+                    </div>
+                    <div class="card ui-fluid">
+                        <h5>Password</h5>
+
+
+                        <div class="p-field">                       
+                            <p:commandButton value="Change password" oncomplete="PF('dialogUpdatePassword').show()"/>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="p-col-12 p-md-6  p-lg-6">
+
+                    <div class="card ui-fluid">
+                        <h5>Contact Details</h5>
+                        <div class="p-field">
+                            <p:outputLabel value="Mobile Number"/>
+                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.phoneNumber}" />
+                        </div>
+
+                        <div class="p-field">
+                            <p:outputLabel value="Address"/>
+                            <p:inputText disabled="#{profileManagedBean.fieldsDisabled}" value="#{profileManagedBean.employee.address}" />
+                        </div>
+                        <p:messages id="messagesUpdateProfile" redisplay="false" />
+                        <div class="p-field">
+                            <p:commandButton rendered="#{profileManagedBean.fieldsDisabled}" value="Edit" action="#{profileManagedBean.editMode}" update="formUpdateProfile" />
+                            <p:commandButton rendered="#{!profileManagedBean.fieldsDisabled}" value="Cancel" action="#{profileManagedBean.cancelEdit}" update="formUpdateProfile" />
+                        </div>
+
+                        <p:commandButton value="Save Changes" rendered="#{!profileManagedBean.fieldsDisabled}" actionListener="#{profileManagedBean.updateProfile}" update="formUpdateProfile" icon="pi pi-save" />
+                    </div>
+                </div>
+
+            </div>
+
+
+
+        </h:form>
+
+        <h:form id="formUpdatePassword">
+            <p:dialog id="dialogUpdatePassword" resizable="false" draggable="false" widgetVar="dialogUpdatePassword" header="Update Password" modal="true" responsive="true" width="550" closable="true"> 
+                <div class="card ui-fluid">                
+                    <div class="p-field">
+                        <p:outputLabel value="Old password" />
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="oldPassword" value="#{profileManagedBean.oldPassword}"
+                                        validatorMessage="Please provide a valid Password"
+                                        required="true" requiredMessage="Old Password is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel value="New password" />
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="newPassword" value="#{profileManagedBean.newPassword}"
+                                        validatorMessage="Please provide a valid Password"
+                                        required="true" requiredMessage="New Password is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel value="Confirm new password" />
+
+                        <span class="ui-input-icon-left">
+
+                            <i class="pi pi-lock"></i>
+                            <p:password id="confirmNewPassword" value="#{profileManagedBean.confirmNewPassword}"
+                                        validatorMessage="Please provide a valid Confirmation Password"
+                                        required="true" requiredMessage="Password Confirmation is required" maxlength="32" 
+                                        style="padding-left: 2rem" >
+                                <f:validateLength minimum="8" />
+                            </p:password>
+
+                        </span>
+                    </div>
+                    <div class="p-field">
+                        <p:messages id="messagesUpdatePassword" redisplay="false" >
+                            <p:autoUpdate></p:autoUpdate>
+                        </p:messages>
+                        <p:commandButton value="Update Password" update="oldPassword newPassword confirmNewPassword" actionListener="#{profileManagedBean.updatePassword}"  icon="pi pi-save" />
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+                    </div>
+                </div>
+
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

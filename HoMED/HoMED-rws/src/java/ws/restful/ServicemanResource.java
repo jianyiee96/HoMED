@@ -14,12 +14,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.ActivateServicemanException;
+import util.exceptions.ChangeServicemanPasswordException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
-import util.exceptions.ServicemanInvalidPasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
 import ws.datamodel.ErrorRsp;
+import ws.datamodel.ServicemanActivateAccountReq;
 import ws.datamodel.ServicemanChangePassReq;
 import ws.datamodel.ServicemanLoginReq;
 import ws.datamodel.ServicemanLoginRsp;
@@ -55,21 +57,27 @@ public class ServicemanResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response servicemanLogin(ServicemanLoginReq servicemanLoginReq) {
+        
+        if (servicemanLoginReq != null) {
+            
+            try {
+                Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getEmail(), servicemanLoginReq.getPassword());
 
-        try {
-            Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getNric(), servicemanLoginReq.getPassword());
-            System.out.println("=-=-=-=-=-=-=-= Serviceman " + serviceman.getEmail() + " login remotely via web service");
+                return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
+            } catch (ServicemanInvalidLoginCredentialException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
-            return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
-        } catch (ServicemanInvalidLoginCredentialException ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
-        } catch (Exception ex) {
-            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            }
+        } else {
+            ErrorRsp errorRsp = new ErrorRsp("Invalid login request");
 
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
-        }
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }          
 
     }
 
@@ -82,16 +90,50 @@ public class ServicemanResource {
         if (servicemanChangePassReq != null) {
 
             try {
-                servicemanSessionBeanLocal.changePassword(servicemanChangePassReq.getNric(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword());
+                servicemanSessionBeanLocal.changeServicemanPassword(servicemanChangePassReq.getEmail(), servicemanChangePassReq.getOldPassword(), servicemanChangePassReq.getNewPassword(), servicemanChangePassReq.getConfirmNewPassword());
 
                 return Response.status(Response.Status.OK).build();
-            } catch (ServicemanInvalidPasswordException | ServicemanNotFoundException ex) {
+            } catch (ChangeServicemanPasswordException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
             }
         } else {
             ErrorRsp errorRsp = new ErrorRsp("Invalid change password request");
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+    }
+    
+    @Path("activateAccount")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response servicemanActivateAccount(ServicemanActivateAccountReq servicemanActivateAccountReq) {
+
+        if (servicemanActivateAccountReq != null) {
+
+            try {
+                servicemanSessionBeanLocal.activateServiceman(servicemanActivateAccountReq.getEmail(), servicemanActivateAccountReq.getNewPassword(), servicemanActivateAccountReq.getConfirmNewPassword());
+
+                return Response.status(Response.Status.OK).build();
+            } catch (ActivateServicemanException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+            } catch (Exception ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            }
+            
+        } else {
+            ErrorRsp errorRsp = new ErrorRsp("Invalid activate account request");
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
@@ -106,17 +148,14 @@ public class ServicemanResource {
         if (servicemanUpdateReq != null) {
 
             try {
-                System.out.println(servicemanUpdateReq.getServiceman().getNric());
                 Serviceman updatedServiceman = servicemanSessionBeanLocal.updateServiceman(servicemanUpdateReq.getServiceman());
 
                 return Response.status(Response.Status.OK).entity(new ServicemanUpdateRsp(updatedServiceman)).build();
             } catch (UpdateServicemanException ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
             } catch (Exception ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
@@ -138,18 +177,16 @@ public class ServicemanResource {
 
             try {
 
-                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getNric(), servicemanResetPassReq.getEmail());
+                servicemanSessionBeanLocal.resetServicemanPassword(servicemanResetPassReq.getEmail(), servicemanResetPassReq.getPhoneNumber());
                 return Response.status(Response.Status.OK).build();
 
             } catch (ResetServicemanPasswordException ex) {
 
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
 
             } catch (Exception ex) {
-                System.out.println(ex);
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();

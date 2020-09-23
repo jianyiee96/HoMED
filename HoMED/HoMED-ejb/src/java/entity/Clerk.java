@@ -6,10 +6,8 @@ package entity;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.GenderEnum;
 
 /**
  *
@@ -21,13 +19,13 @@ public class Clerk extends Employee implements Serializable {
     public Clerk() {
     }
 
-    public Clerk(String name, String nric, String password, String email, String address, int phoneNumber) {
-        super(name, nric, password, email, address, phoneNumber);
+    public Clerk(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
+        super(name, password, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.CLERK;
     }
 
-    public Clerk(String name, String nric, String email, String address, int phoneNumber) {
-        super(name, nric, email, address, phoneNumber);
+    public Clerk(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
+        super(name, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.CLERK;
     }
 

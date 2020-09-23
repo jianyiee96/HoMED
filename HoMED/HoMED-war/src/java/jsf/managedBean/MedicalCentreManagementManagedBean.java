@@ -15,9 +15,10 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
-import util.exceptions.InputDataValidationException;
+import util.exceptions.CreateMedicalCentreException;
+import util.exceptions.DeleteMedicalCentreException;
 import util.exceptions.MedicalCentreNotFoundException;
-import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateMedicalCentreException;
 
 @Named(value = "medicalCentreManagementManagedBean")
 @ViewScoped
@@ -53,16 +54,19 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             PrimeFaces.current().executeScript("PF('dialogCreateNewMedicalCentre').hide()");
 
             medicalCentreToCreate = new MedicalCentre();
-        } catch (InputDataValidationException | UnknownPersistenceException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating the new medical centre: " + ex.getMessage(), null));
+        } catch (CreateMedicalCentreException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
     public void view(MedicalCentre medicalCentre) {
-        isEditable = false;
-        medicalCentreToManage = medicalCentre;
-        this.medicalCentreToCreate = new MedicalCentre();
-        this.medicalCentreToDelete = new MedicalCentre();
+        try {
+            // this.medicalCentreToManage = medicalCentre
+            this.medicalCentreToManage = medicalCentreSessionBeanLocal.retrieveMedicalCentreById(medicalCentre.getMedicalCentreId()); // Should not require this if validation does not go through on the front end
+            isEditable = false;
+        } catch (MedicalCentreNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
     }
 
     public void edit() {
@@ -71,18 +75,18 @@ public class MedicalCentreManagementManagedBean implements Serializable {
 
     public void saveEdit() {
         try {
-            isEditable = false;
             medicalCentreSessionBeanLocal.updateMedicalCentre(medicalCentreToManage);
+            isEditable = false;
 
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "Medical centre [ID: " + medicalCentreToManage.getMedicalCentreId() + "] is updated!"));
             PrimeFaces.current().executeScript("PF('dialogManageMedicalCentre').hide()");
 
             medicalCentreToManage = new MedicalCentre();
-        } catch (MedicalCentreNotFoundException | InputDataValidationException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the medical centre: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            medicalCentres = medicalCentreSessionBeanLocal.retrieveAllMedicalCentres();
+        } catch (UpdateMedicalCentreException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
+
     }
 
     // Need to check if there is any association with consultations/employees in the future
@@ -94,10 +98,8 @@ public class MedicalCentreManagementManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre", "Medical centre [ID: " + medicalCentreToDelete.getMedicalCentreId() + "] is deleted!"));
 
             medicalCentreToDelete = new MedicalCentre();
-        } catch (MedicalCentreNotFoundException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while deleting the medical centre: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (DeleteMedicalCentreException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 

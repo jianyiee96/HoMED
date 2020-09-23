@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-ejb
- */
 package ejb.session.stateless;
 
 import entity.Address;
@@ -20,18 +16,20 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exceptions.InputDataValidationException;
+import util.exceptions.CreateMedicalCentreException;
+import util.exceptions.DeleteMedicalCentreException;
 import util.exceptions.MedicalCentreNotFoundException;
-import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateMedicalCentreException;
 
 @Stateless
 public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
-    private final ValidatorFactory validatorFactory;
-    private final Validator validator;
-
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
+
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    private final String generalUnexpectedErrorMessage = "An unexpected error has occurred while ";
 
     public MedicalCentreSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -39,15 +37,22 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     }
 
     @Override
-    public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws InputDataValidationException, UnknownPersistenceException {
+    public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws CreateMedicalCentreException {
+        String errorMessage = "Failed to create Medical Centre: ";
+
         try {
             Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(newMedicalCentre);
 
             if (constraintViolations.isEmpty()) {
 
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    em.persist(oh);
-                    em.flush();
+                    Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
+                    if (constraintViolationsOperatingHours.isEmpty()) {
+                        em.persist(oh);
+                        em.flush();
+                    } else {
+                        throw new CreateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
+                    }
                 }
 
                 Address medicalCentreAddress = newMedicalCentre.getAddress();
@@ -72,16 +77,23 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
                 return newMedicalCentre.getMedicalCentreId();
             } else {
-                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                throw new CreateMedicalCentreException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
+        } catch (CreateMedicalCentreException ex) {
+            throw new CreateMedicalCentreException(errorMessage + ex.getMessage());
         } catch (PersistenceException ex) {
-            throw new UnknownPersistenceException(ex.getMessage());
+            throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre [Persistence Exception]");
+        } catch (Exception ex) {
+            System.out.println(ex.getClass());
+            ex.printStackTrace();
+            throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre");
         }
     }
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public Long createNewOperatingHours(OperatingHours newOperatingHours) {
+
         em.persist(newOperatingHours);
         em.flush();
 
@@ -109,71 +121,107 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             return medicalCentre;
         } else {
             throw new MedicalCentreNotFoundException("Medical Centre ID " + medicalCentreId + " does not exist!");
-
         }
     }
 
     @Override
-    public void updateMedicalCentre(MedicalCentre medicalCentre) throws MedicalCentreNotFoundException, InputDataValidationException {
-        if (medicalCentre != null && medicalCentre.getMedicalCentreId() != null) {
-            Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(medicalCentre);
+    public void updateMedicalCentre(MedicalCentre medicalCentre) throws UpdateMedicalCentreException {
+        String errorMessage = "Failed to update Medical Centre: ";
+        try {
+            if (medicalCentre != null && medicalCentre.getMedicalCentreId() != null) {
+                Set<ConstraintViolation<MedicalCentre>> constraintViolations = validator.validate(medicalCentre);
 
-            if (constraintViolations.isEmpty()) {
-                MedicalCentre medicalCentreToUpdate = retrieveMedicalCentreById(medicalCentre.getMedicalCentreId());
+                if (constraintViolations.isEmpty()) {
+                    MedicalCentre medicalCentreToUpdate = retrieveMedicalCentreById(medicalCentre.getMedicalCentreId());
 
-                medicalCentreToUpdate.setName(medicalCentre.getName());
-                medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
-                medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
+                    medicalCentreToUpdate.setName(medicalCentre.getName());
+                    medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
+                    medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
 
-                Address medicalCentreAddress = medicalCentreToUpdate.getAddress();
-                if (medicalCentreAddress.getStreetName() != null) {
-                    medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
-                }
-                if (medicalCentreAddress.getUnitNumber() != null) {
-                    medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
-                }
-                if (medicalCentreAddress.getBuildingName() != null) {
-                    medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
-                }
-                if (medicalCentreAddress.getCountry() != null) {
-                    medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
-                }
-                if (medicalCentreAddress.getPostal() != null) {
-                    medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
-                }
+                    Address medicalCentreAddress = medicalCentreToUpdate.getAddress();
+                    if (medicalCentreAddress.getStreetName() != null) {
+                        medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+                    }
+                    if (medicalCentreAddress.getUnitNumber() != null) {
+                        medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
+                    }
+                    if (medicalCentreAddress.getBuildingName() != null) {
+                        medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
+                    }
+                    if (medicalCentreAddress.getCountry() != null) {
+                        medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
+                    }
+                    if (medicalCentreAddress.getPostal() != null) {
+                        medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+                    }
 
-                List<OperatingHours> ohs = medicalCentre.getOperatingHours();
-                List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
-                for (int i = 0; i < ohsToUpdate.size(); i++) {
-                    ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
-                    ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
+                    List<OperatingHours> ohs = medicalCentre.getOperatingHours();
+                    List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
+                    // Can look to combine these 2 loops, for sake of easy understanding, I have left them separate
+                    for (OperatingHours oh : ohs) {
+                        Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
+                        if (!constraintViolationsOperatingHours.isEmpty()) {
+                            throw new UpdateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
+                        }
+                    }
+                    for (int i = 0; i < ohsToUpdate.size(); i++) {
+                        ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
+                        ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
+                    }
+                } else {
+                    throw new UpdateMedicalCentreException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }
-
             } else {
-                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                throw new UpdateMedicalCentreException("Medical Centre information not found");
             }
-        } else {
-            throw new MedicalCentreNotFoundException("Medical Centre ID is not provided to update!");
+        } catch (UpdateMedicalCentreException ex) {
+            throw new UpdateMedicalCentreException(errorMessage + ex.getMessage());
+        } catch (MedicalCentreNotFoundException ex) {
+            throw new UpdateMedicalCentreException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new UpdateMedicalCentreException(generalUnexpectedErrorMessage + "updating medical centre");
         }
     }
 
     @Override
-    public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException {
-        MedicalCentre medicalCentreToRemove = retrieveMedicalCentreById(medicalCentreId);
+    public void deleteMedicalCentre(Long medicalCentreId) throws DeleteMedicalCentreException {
+        try {
+            MedicalCentre medicalCentreToRemove = retrieveMedicalCentreById(medicalCentreId);
 
-        for (OperatingHours ohs : medicalCentreToRemove.getOperatingHours()) {
-            em.remove(ohs);
+            for (OperatingHours ohs : medicalCentreToRemove.getOperatingHours()) {
+                em.remove(ohs);
+            }
+
+            em.remove(medicalCentreToRemove);
+        } catch (MedicalCentreNotFoundException ex) {
+            throw new DeleteMedicalCentreException("Failed to delete Medical Centre: " + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new DeleteMedicalCentreException(generalUnexpectedErrorMessage + "deleting medical centre");
         }
-
-        em.remove(medicalCentreToRemove);
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<MedicalCentre>> constraintViolations) {
-        String msg = "Input data validation error!:";
+        String msg = "";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+            msg += constraintViolation.getMessage() + "\n";
         }
+
+        msg = msg.substring(0, msg.length() - 1);
+
+        return msg;
+    }
+
+    private String prepareOperatingHoursInputDataValidationErrorsMessage(Set<ConstraintViolation<OperatingHours>> constraintViolations) {
+        String msg = "";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += constraintViolation.getMessage() + "\n";
+        }
+
+        msg = msg.substring(0, msg.length() - 1);
 
         return msg;
     }
