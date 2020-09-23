@@ -7,6 +7,7 @@ package entity;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,9 +41,9 @@ public class Serviceman implements Serializable {
     private String name;
 
     @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email address must be provided")
-    @Size(min = 9, max = 64, message = "Proper formatted email address must be between 9 to 64")
-    @Email(message = "Email must be properly formatted")
+    @NotNull(message = "Email must be provided")
+    @Size(max = 64, message = "Proper formatted Email must be provided")
+    @Email(message = "Proper formatted Email must be provided")
     private String email;
 
     @Column(nullable = false, unique = true, length = 8)
@@ -69,11 +70,11 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Password must be provided")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
-
+    
+    @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
-    @Size(min = 8, message = "Address must be at least of length 8")
-    private String address;
+    private Address address;
 
     @Column(nullable = false)
     @NotNull
@@ -86,23 +87,11 @@ public class Serviceman implements Serializable {
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
+        
+        this.address = new Address();
     }
 
-    public Serviceman(Serviceman another) {
-        this.servicemanId = another.servicemanId;
-        this.name = another.name;
-        this.email = another.email;
-        this.phoneNumber = another.phoneNumber;
-        this.rod = another.rod;
-        this.gender = another.gender;
-        this.bloodType = another.bloodType;
-        this.password = another.password;
-        this.address = another.address;
-        this.isActivated = another.isActivated;
-        this.salt = another.salt;
-    }
-
-    public Serviceman(String name, String email, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, String address) {
+    public Serviceman(String name, String email, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
         this.email = email;
@@ -182,11 +171,11 @@ public class Serviceman implements Serializable {
     }
 
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 

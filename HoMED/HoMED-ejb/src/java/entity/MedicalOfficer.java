@@ -19,12 +19,12 @@ public class MedicalOfficer extends Employee implements Serializable {
     public MedicalOfficer() {
     }
 
-    public MedicalOfficer(String name, String password, String email, String address, String phoneNumber, GenderEnum gender) {
+    public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.MEDICAL_OFFICER;
     }
 
-    public MedicalOfficer(String name, String email, String address, String phoneNumber, GenderEnum gender) {
+    public MedicalOfficer(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.MEDICAL_OFFICER;
     }

@@ -65,7 +65,9 @@
 
                             <p:column headerText="Action" width="5%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
-                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" actionListener="#{servicemanAccountManagementManagedBean.doViewServiceman(serviceman)}" process="@this" oncomplete="PF('dialogManageServiceman').show()" />
+                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" actionListener="#{servicemanAccountManagementManagedBean.doViewServiceman(serviceman)}" process="@this" oncomplete="PF('dialogManageServiceman').show()">
+                                    <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman"/>
+                                </p:commandButton>
                             </p:column>
 
                         </p:dataTable>

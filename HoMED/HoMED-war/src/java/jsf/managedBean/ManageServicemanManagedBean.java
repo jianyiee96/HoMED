@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-war
- */
 package jsf.managedBean;
 
 import ejb.session.stateless.ServicemanSessionBeanLocal;
@@ -26,7 +22,6 @@ public class ManageServicemanManagedBean implements Serializable {
     @EJB(name = "ServicemanSessionBeanLocal")
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
-    private Serviceman originalServicemanToView;
     private Serviceman servicemanToView;
 
     private Boolean isAdminView;
@@ -64,7 +59,6 @@ public class ManageServicemanManagedBean implements Serializable {
             servicemanSessionBeanLocal.updateServiceman(servicemanToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated serviceman!", null));
             this.isEditMode = false;
-            this.originalServicemanToView = new Serviceman(servicemanToView);
         } catch (UpdateServicemanException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
@@ -74,7 +68,6 @@ public class ManageServicemanManagedBean implements Serializable {
         try {
             // isActivated is changed
             this.servicemanToView.setIsActivated(false);
-            this.originalServicemanToView = new Serviceman(servicemanToView);
 
             servicemanSessionBeanLocal.resetServicemanPasswordByAdmin(servicemanToView);
 
@@ -98,7 +91,6 @@ public class ManageServicemanManagedBean implements Serializable {
 
     public void doCancel() {
         this.isEditMode = false;
-        this.servicemanToView = new Serviceman(originalServicemanToView);
     }
 
     public Serviceman getServicemanToView() {
@@ -106,7 +98,6 @@ public class ManageServicemanManagedBean implements Serializable {
     }
 
     public void setServicemanToView(Serviceman servicemanToView) {
-        this.originalServicemanToView = new Serviceman(servicemanToView);
         this.servicemanToView = servicemanToView;
     }
 

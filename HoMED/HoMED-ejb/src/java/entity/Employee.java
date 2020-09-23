@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
 
 import java.io.Serializable;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -20,10 +16,6 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 import util.security.CryptographicHelper;
 
-/**
- *
- * @author User
- */
 @Entity
 public class Employee implements Serializable {
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
@@ -33,30 +25,16 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long employeeId;
 
-    @Column(columnDefinition = "CHAR(64) NOT NULL")
-    @NotNull(message = "Password must be between length 8 to 64")
-    @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
-    protected String password;
-
-    @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
-    @Email(message = "Proper formatted email with length no more than 64 must be provided")
-    private String email;
-
     @Column(nullable = false, length = 128)
-    @NotNull(message = "Name must be between length 2 to 128")
+    @NotNull(message = "Name must be provided")
     @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     protected String name;
 
-    @Column(nullable = false)
-    @NotNull
-    private Boolean isActivated;
-
-    @Column(nullable = false, length = 128)
-    @NotNull(message = "Address must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "Address must be between length 2 to 128")
-    protected String address;
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Email must be provided")
+    @Size(max = 64, message = "Proper formatted Email must be provided")
+    @Email(message = "Proper formatted Email must be provided")
+    private String email;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
@@ -68,22 +46,38 @@ public class Employee implements Serializable {
     @NotNull(message = "Gender must be provided")
     protected GenderEnum gender;
 
-    @Column(columnDefinition = "CHAR(32) NOT NULL")
+    @Column(columnDefinition = "CHAR(64) NOT NULL")
+    @NotNull(message = "Password must be between length 8 to 64")
+    @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
+    protected String password;
+
+    @Embedded
+    @Column(nullable = false)
+    @NotNull(message = "Address must be provided")
+    private Address address;
+
+    @Column(nullable = false)
     @NotNull
-    protected String salt;
+    private Boolean isActivated;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
 
+    @Column(columnDefinition = "CHAR(32) NOT NULL")
+    @NotNull
+    protected String salt;
+
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
+        
+        this.address = new Address();
     }
 
-    public Employee(String name, String password, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String password, String email, Address address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.password = password;
@@ -95,27 +89,13 @@ public class Employee implements Serializable {
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String email, Address address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.gender = genderEnum;
-    }
-
-    // Cloning of Employee
-    public Employee(Employee another) {
-        this.employeeId = another.employeeId;
-        this.isActivated = another.isActivated;
-        this.salt = another.salt;
-        this.name = another.name;
-        this.email = another.email;
-        this.address = another.address;
-        this.phoneNumber = another.phoneNumber;
-        this.gender = another.gender;
-        this.password = another.password;
-        this.role = another.role;
     }
 
     public Long getEmployeeId() {
@@ -162,11 +142,11 @@ public class Employee implements Serializable {
         this.isActivated = isActivated;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 

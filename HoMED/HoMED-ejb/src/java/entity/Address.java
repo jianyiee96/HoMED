@@ -12,20 +12,22 @@ import javax.validation.constraints.Size;
 @Embeddable
 public class Address implements Serializable {
 
-    @NotNull(message = "Please provide street name for the address")
-    @Size(min = 6, message = "Street name must be at least of length 6")
+    @NotNull(message = "Street Name must be provided")
+    @Size(min = 6, message = "Street Name must be at least of length 6")
     private String streetName;
     private String unitNumber;
     private String buildingName;
     private String country;
-    @NotNull(message = "Please provide a valid postal code")
-    @Size(min = 6, max = 6, message = "Please provide a valid postal code")
+    @NotNull(message = "Postal Code must be provided")
+    @Size(min = 6, max = 6, message = "Postal Code must be of length 6")
     private String postal;
 
     public Address() {
     }
 
     public Address(String streetName, String unitNumber, String buildingName, String country, String postal) {
+        this();
+        
         this.streetName = streetName;
         this.unitNumber = unitNumber;
         this.buildingName = buildingName;
@@ -92,7 +94,7 @@ public class Address implements Serializable {
         if (postal != null && !postal.trim().equals("")) {
             str += " " + postal;
         }
-        
+
         return str;
     }
 
