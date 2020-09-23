@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
+import util.exceptions.CreateServicemanException;
 import util.exceptions.DeleteServicemanException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.UpdateServicemanException;
@@ -24,9 +25,12 @@ public class ManageServicemanManagedBean implements Serializable {
 
     private Serviceman servicemanToView;
 
+    private Boolean isManageState;
+    private Boolean isCreateState;
+
     private Boolean isAdminView;
     private Boolean isEditMode;
-    private Boolean isDeleted;
+    private Boolean isHideAdminPanel;
 
     public ManageServicemanManagedBean() {
         this.servicemanToView = new Serviceman();
@@ -35,6 +39,8 @@ public class ManageServicemanManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         init();
+        this.isManageState = false;
+        this.isCreateState = false;
         this.isAdminView = false;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
@@ -46,12 +52,33 @@ public class ManageServicemanManagedBean implements Serializable {
     }
 
     public void init() {
-        this.isEditMode = false;
-        this.isDeleted = false;
+        this.isHideAdminPanel = false;
     }
 
-    public void doEdit() {
+    public void initCreate() {
+        init();
+        this.servicemanToView = new Serviceman();
+        this.isManageState = false;
+        this.isCreateState = true;
         this.isEditMode = true;
+    }
+
+    public void initManage() {
+        init();
+        this.isManageState = true;
+        this.isCreateState = false;
+        this.isEditMode = false;
+    }
+
+    public void doCreate() {
+        try {
+            servicemanSessionBeanLocal.createServiceman(servicemanToView);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created serviceman! Please inform serviceman that OTP has been sent to his/her email.", null));
+            this.isHideAdminPanel = true;
+            this.isEditMode = false;
+        } catch (CreateServicemanException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
     }
 
     public void doSave() {
@@ -66,7 +93,6 @@ public class ManageServicemanManagedBean implements Serializable {
 
     public void doResetPassword() {
         try {
-            // isActivated is changed
             this.servicemanToView.setIsActivated(false);
 
             servicemanSessionBeanLocal.resetServicemanPasswordByAdmin(servicemanToView);
@@ -81,16 +107,11 @@ public class ManageServicemanManagedBean implements Serializable {
         try {
             servicemanSessionBeanLocal.deleteServiceman(this.servicemanToView.getServicemanId());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted serviceman!", null));
-
-            this.isDeleted = true;
+            this.isHideAdminPanel = true;
             this.isEditMode = false;
         } catch (DeleteServicemanException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
-    }
-
-    public void doCancel() {
-        this.isEditMode = false;
     }
 
     public Serviceman getServicemanToView() {
@@ -117,12 +138,27 @@ public class ManageServicemanManagedBean implements Serializable {
         this.isEditMode = isEditMode;
     }
 
-    public Boolean getIsDeleted() {
-        return isDeleted;
+    public Boolean getIsHideAdminPanel() {
+        return isHideAdminPanel;
     }
 
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setIsHideAdminPanel(Boolean isHideAdminPanel) {
+        this.isHideAdminPanel = isHideAdminPanel;
     }
 
+    public Boolean getIsManageState() {
+        return isManageState;
+    }
+
+    public void setIsManageState(Boolean isManageState) {
+        this.isManageState = isManageState;
+    }
+
+    public Boolean getIsCreateState() {
+        return isCreateState;
+    }
+
+    public void setIsCreateState(Boolean isCreateState) {
+        this.isCreateState = isCreateState;
+    }
 }

@@ -13,52 +13,96 @@
 
     <cc:implementation>
         <h:form id="formManageServiceman">
-            <p:dialog id="dialogManageServiceman" widgetVar="dialogManageServiceman" header="Serviceman Details" showEffect="fade"
-                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
-                <p:outputPanel id="panelManageServiceman">
+            <p:dialog id="dialogManageServiceman" widgetVar="dialogManageServiceman" header="#{manageServicemanManagedBean.isCreateState ? 'Create Serviceman' : 'Serviceman Details'}" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      minWidth="500" width="700">
+                <p:outputPanel id="panelManageServiceman" rendered="#{not empty manageServicemanManagedBean.servicemanToView}">
                     <div class="p-grid">
-                        <div class="p-col-12 p-grid p-justify-center">
-                            <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
+                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView and manageServicemanManagedBean.isManageState}">
+                            <div class="p-col-12 p-grid p-justify-center">
                                 <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}" />
-                            </ui:fragment>
-                        </div>
+                            </div>
+                        </ui:fragment>
 
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
                                 <h5>Personal Particulars</h5>
                                 <div class="p-field">
+                                    <i class="pi pi-user p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-name" value="Name"/>
-                                    <p:inputText disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-name" value="#{manageServicemanManagedBean.servicemanToView.name}" />
+                                    <p:inputText id="view-name" value="#{manageServicemanManagedBean.servicemanToView.name}" disabled="#{not manageServicemanManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-name" />
                                 </div>
 
                                 <div class="p-field">
-                                    <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-email"  value="#{manageServicemanManagedBean.servicemanToView.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
-
-                                <div class="p-field">
+                                    <i class="fa fa-venus-mars p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-gender" value="Gender"/>
-                                    <p:selectOneMenu disabled="#{not manageServicemanManagedBean.isEditMode}" id="view-gender" value="#{manageServicemanManagedBean.servicemanToView.gender}">
-                                        <f:selectItems value="#{servicemanAccountManagementManagedBean.genders}"/>
+                                    <p:selectOneMenu id="view-gender" value="#{manageServicemanManagedBean.servicemanToView.gender}" disabled="#{not manageServicemanManagedBean.isEditMode}" >
+                                        <f:selectItems value="#{servicemanAccountManagementManagedBean.getGenders()}"/>
                                     </p:selectOneMenu>
+                                    <p:message class="error-message" for="view-gender" />
                                 </div> 
                             </div>
                         </div>
 
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
-                                <h5>Contact Details</h5>
+                                <h5>Contact Details</h5> 
                                 <div class="p-field">
+                                    <i class="fa fa-phone p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
-                                    <p:inputText id="view-phoneNumber" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.phoneNumber}" />
+                                    <p:inputText id="view-phoneNumber" value="#{manageServicemanManagedBean.servicemanToView.phoneNumber}" disabled="#{not manageServicemanManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-phoneNumber" />
                                 </div>
 
                                 <div class="p-field">
-                                    <p:outputLabel for="view-address" value="Address"/>
-                                    <p:inputText id="view-address" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.address}" />
+                                    <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
+                                    <p:outputLabel for="view-email" value="Email Address"/>
+                                    <p:inputText id="view-email" value="#{manageServicemanManagedBean.servicemanToView.email}" disabled="#{not manageServicemanManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-email" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h5>Address Details</h5>
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="pi pi-directions-alt p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-street-name" value="Street Name"/>
+                                        <p:inputText id="view-street-name" value="#{manageServicemanManagedBean.servicemanToView.address.streetName}" disabled="#{not manageServicemanManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-street-name" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-unit-number" value="Unit Number"/>
+                                        <p:inputText id="view-unit-number" value="#{manageServicemanManagedBean.servicemanToView.address.unitNumber}" disabled="#{not manageServicemanManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-unit-number" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-building-o p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-building-name" value="Building Name"/>
+                                        <p:inputText id="view-building-name" value="#{manageServicemanManagedBean.servicemanToView.address.buildingName}" disabled="#{not manageServicemanManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-building-name" />
+                                    </div>
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-globe p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-country" value="Country"/>
+                                        <p:selectOneMenu id="view-country" value="#{manageServicemanManagedBean.servicemanToView.address.country}" disabled="#{not manageServicemanManagedBean.isEditMode}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
+                                        <p:message class="error-message" for="view-country" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-map-marker p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-postal-code" value="Postal Code"/>
+                                        <p:inputText id="view-postal-code" value="#{manageServicemanManagedBean.servicemanToView.address.postal}" disabled="#{not manageServicemanManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-postal-code" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -66,47 +110,60 @@
                         <div class="p-col-12">
                             <div class="card ui-fluid">
                                 <h5>Other Information</h5>
-                                <div class="p-grid">
-                                    <div class="p-col-6 p-field">
-                                        <p:outputLabel for="manage-bloodtype" value="Blood Type" />
-                                        <p:selectOneMenu id="manage-bloodtype" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.bloodType}">
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-tint p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-bloodtype" value="Blood Type" />
+                                        <p:selectOneMenu id="view-bloodtype" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.bloodType}">
                                             <f:selectItems value="#{servicemanAccountManagementManagedBean.bloodTypes}" var="bloodType" itemLabel="#{bloodType.bloodTypeString}" />
                                         </p:selectOneMenu>
+                                        <p:message class="error-message" for="view-bloodtype" />
                                     </div>
-                                    <div class="p-col-6 p-field">
-                                        <p:outputLabel for="manage-rod" value="ROD" />
-                                        <p:datePicker id="manage-rod" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.rod}" pattern="dd/MM/yyyy" />
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-calendar p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-rod" value="ROD" />
+                                        <p:datePicker id="view-rod" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.rod}" pattern="dd/MM/yyyy" />
+                                        <p:message class="error-message" for="view-rod" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="p-col-12">
-                            <p:messages closable="true">
+                            <p:messages globalOnly="true" class="error-message" closable="true">
                                 <p:autoUpdate/>
                             </p:messages>
                         </div>
-                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView and not manageServicemanManagedBean.isDeleted}">
+
+                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView and not manageServicemanManagedBean.isHideAdminPanel}">
                             <div class="p-col-12">
                                 <p:toolbar>
                                     <f:facet name="left">
                                         <h5>Admin Rights</h5>
                                     </f:facet>
                                     <f:facet name="right">
-                                        <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
-                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doEdit}" update="panelManageServiceman" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2"/>
+                                        <ui:fragment rendered ="#{manageServicemanManagedBean.isCreateState}">
+                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doCreate}" update="panelManageServiceman" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                         </ui:fragment>
-                                        <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode}">
-                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doSave}" update="panelManageServiceman" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
-                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doResetPassword}" update="panelManageServiceman" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
-                                                <p:confirm header="Confirmation" message="Are you sure you want to reset this serviceman's password?" icon="pi pi-exclamation-triangle" />
-                                            </p:commandButton>
-                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doDelete}" update="panelManageServiceman" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
-                                                <p:confirm header="Confirmation" message="Are you sure you want to delete this serviceman? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
-                                            </p:commandButton>
-                                            <p:commandButton actionListener="#{manageServicemanManagedBean.doCancel}" update="panelManageServiceman" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
-                                                <p:resetInput target="panelManageServiceman"/>
-                                            </p:commandButton>
+                                        <ui:fragment rendered ="#{manageServicemanManagedBean.isManageState}">
+                                            <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
+                                                <p:commandButton update="panelManageServiceman" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
+                                                    <f:setPropertyActionListener target="#{manageServicemanManagedBean.isEditMode}" value="true"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode}">
+                                                <p:commandButton actionListener="#{manageServicemanManagedBean.doSave}" update="panelManageServiceman" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                                <p:commandButton actionListener="#{manageServicemanManagedBean.doResetPassword}" update="panelManageServiceman" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to reset this sericeman's password?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton actionListener="#{manageServicemanManagedBean.doDelete}" update="panelManageServiceman" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this serivceman? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton update="panelManageServiceman" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                    <p:resetInput target="panelManageServiceman"/>
+                                                    <f:setPropertyActionListener target="#{manageServicemanManagedBean.isEditMode}" value="false"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
                                         </ui:fragment>
                                     </f:facet>
                                 </p:toolbar>
@@ -121,7 +178,5 @@
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
         </h:form>
-
-
     </cc:implementation>
 </html>
