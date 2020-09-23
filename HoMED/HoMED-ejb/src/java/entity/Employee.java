@@ -14,8 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.EmployeeRoleEnum;
@@ -35,11 +33,6 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long employeeId;
 
-    @Column(nullable = false, unique = true, length = 9)
-    @NotNull(message = "NRIC must be of length 9")
-    @Size(min = 9, max = 9, message = "NRIC must be of length 9")
-    protected String nric;
-
     @Column(columnDefinition = "CHAR(64) NOT NULL")
     @NotNull(message = "Password must be between length 8 to 64")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
@@ -53,7 +46,7 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, length = 128)
     @NotNull(message = "Name must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "First Name must be between length 2 to 128")
+    @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     protected String name;
 
     @Column(nullable = false)
@@ -90,10 +83,9 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String nric, String password, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String password, String email, String address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
-        this.nric = nric;
         this.password = password;
         this.email = email;
         this.address = address;
@@ -103,10 +95,9 @@ public class Employee implements Serializable {
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String nric, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String email, String address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
-        this.nric = nric;
         this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -119,7 +110,6 @@ public class Employee implements Serializable {
         this.isActivated = another.isActivated;
         this.salt = another.salt;
         this.name = another.name;
-        this.nric = another.nric;
         this.email = another.email;
         this.address = another.address;
         this.phoneNumber = another.phoneNumber;
@@ -134,14 +124,6 @@ public class Employee implements Serializable {
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
-    }
-
-    public String getNric() {
-        return nric;
-    }
-
-    public void setNric(String nric) {
-        this.nric = nric;
     }
 
     public String getPassword() {

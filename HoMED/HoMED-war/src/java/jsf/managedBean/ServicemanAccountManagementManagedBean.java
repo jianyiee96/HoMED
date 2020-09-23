@@ -21,11 +21,7 @@ import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.InputDataValidationException;
-import util.exceptions.ServicemanEmailExistException;
-import util.exceptions.ServicemanNricExistException;
-import util.exceptions.UnknownPersistenceException;
+import util.exceptions.CreateServicemanException;
 
 @Named(value = "servicemanAccountManagementManagedBean")
 @ViewScoped
@@ -54,7 +50,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
         PrimeFaces.current().ajax().update("formAllServicemen:dataTableServicemen");
     }
-    
+
     public void doViewServiceman(Serviceman serviceman) {
         this.manageServicemanManagedBean.setServicemanToView(serviceman);
         this.manageServicemanManagedBean.init();
@@ -67,14 +63,12 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void createServiceman() {
         try {
-            servicemanSessionBeanLocal.createNewServiceman(servicemanToCreate);
+            servicemanSessionBeanLocal.createServiceman(servicemanToCreate);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created serviceman! Please inform serviceman that OTP has been sent to his/her email.", null));
             this.isEditableCreateServiceman = false;
             this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
-        } catch (ServicemanNricExistException | ServicemanEmailExistException | InputDataValidationException | UnknownPersistenceException | DuplicateEntryExistsException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while creating serviceman: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (CreateServicemanException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 

@@ -10,11 +10,7 @@
 
     <ui:define name="content">
 
-        <style type="text/css">
-            .error-message {
-                margin: 0.5rem 0rem 0rem 0rem !important;
-            }
-        </style>
+        <h:outputStylesheet name="crud-tables.css" library="css" />
 
         <ezcomp:manageServiceman id="ccManageServiceman">
             <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
@@ -28,7 +24,9 @@
 
                         <div class="buttonbar">
                             <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{servicemanAccountManagementManagedBean.doCreateServiceman}"
-                                             update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()" />
+                                             update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()">
+                                <p:resetInput target="formCreateServiceman" />
+                            </p:commandButton>
                         </div>
 
                         <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"  var="serviceman" value="#{servicemanAccountManagementManagedBean.servicemen}" sortBy="#{serviceman.servicemanId}"
@@ -45,12 +43,8 @@
                                 </div>
                             </f:facet>
 
-                            <p:column headerText="ID" width="5%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
+                            <p:column headerText="ID" width="3%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.servicemanId}" />
-                            </p:column>
-
-                            <p:column headerText="NRIC" width="5%" sortBy="#{serviceman.nric}" filterBy="#{serviceman.nric}" filterMatchMode="contains">
-                                <h:outputText value="#{serviceman.nric}" />
                             </p:column>
 
                             <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
@@ -69,7 +63,7 @@
                                 <h:outputText value="#{serviceman.phoneNumber}" />
                             </p:column>
 
-                            <p:column headerText="Action" width="3%">
+                            <p:column headerText="Action" width="5%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
                                                  update="ccManageServiceman:formManageServiceman:panelManageServiceman" actionListener="#{servicemanAccountManagementManagedBean.doViewServiceman(serviceman)}" process="@this" oncomplete="PF('dialogManageServiceman').show()" />
                             </p:column>
@@ -93,9 +87,13 @@
                                     <p:outputLabel for="create-name" value="Name" />
                                     <p:inputText id="create-name" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.name}" />
                                 </div>
+
                                 <div class="p-field">
-                                    <p:outputLabel for="create-nric" value="NRIC"/>
-                                    <p:inputText id="create-nric" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.nric}" />
+                                    <p:outputLabel for="create-email" value="Email Address"/>
+                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
+                                        <f:validateRegex
+                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
                                 </div>
 
                                 <div class="p-field">
@@ -113,16 +111,9 @@
                                 <div class="p-field">
                                     <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="create-phoneNumber"  disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.phoneNumber}" />
-                                        
+
                                 </div>
 
-                                <div class="p-field">
-                                    <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
                                 <div class="p-field">
                                     <p:outputLabel for="create-address" value="Address"/>
                                     <p:inputText id="create-address" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.address}" />
@@ -175,6 +166,5 @@
             </p:confirmDialog>
         </h:form>
 
-        <h:outputStylesheet name="crud-tables.css" library="css" />
     </ui:define>
 </ui:composition>

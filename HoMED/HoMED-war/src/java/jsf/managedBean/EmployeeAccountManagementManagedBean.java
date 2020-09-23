@@ -18,9 +18,7 @@ import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.InputDataValidationException;
-import util.exceptions.UnknownPersistenceException;
+import util.exceptions.CreateEmployeeException;
 
 @Named(value = "employeeAccountManagementManagedBean")
 @ViewScoped
@@ -30,7 +28,7 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     @Inject
-    private ViewEmployeeManagedBean viewEmployeeManagedBean;
+    private ManageEmployeeManagedBean manageEmployeeManagedBean;
 
     private List<Employee> employees;
 
@@ -54,8 +52,8 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
     }
 
     public void doViewEmployee(Employee employee) {
-        this.viewEmployeeManagedBean.setEmployeeToView(employee);
-        this.viewEmployeeManagedBean.init();
+        this.manageEmployeeManagedBean.setEmployeeToView(employee);
+        this.manageEmployeeManagedBean.init();
     }
 
     public void doCreateEmployee() {
@@ -69,10 +67,8 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created Employee! Please inform employee that OTP has been sent to their email.", null));
             this.isEditableCreateEmployee = false;
             this.employees = employeeSessionBeanLocal.retrieveAllEmployees();
-        } catch (DuplicateEntryExistsException | InputDataValidationException | UnknownPersistenceException ex) {
+        } catch (CreateEmployeeException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
         }
     }
 
@@ -84,12 +80,12 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
         this.employees = employees;
     }
 
-    public ViewEmployeeManagedBean getViewEmployeeManagedBean() {
-        return viewEmployeeManagedBean;
+    public ManageEmployeeManagedBean getManageEmployeeManagedBean() {
+        return manageEmployeeManagedBean;
     }
 
-    public void setViewEmployeeManagedBean(ViewEmployeeManagedBean viewEmployeeManagedBean) {
-        this.viewEmployeeManagedBean = viewEmployeeManagedBean;
+    public void setManageEmployeeManagedBean(ManageEmployeeManagedBean manageEmployeeManagedBean) {
+        this.manageEmployeeManagedBean = manageEmployeeManagedBean;
     }
 
     public Employee getEmployeeToCreate() {

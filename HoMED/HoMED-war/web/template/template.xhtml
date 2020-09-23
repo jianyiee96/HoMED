@@ -26,7 +26,13 @@
 
 
         <ezcomp:sessionTimeout/>
-      
+        <h:form id="formTemplateGrowl">
+            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkIfActivatedUponLogin()}"/>
+            <p:growl id="growlTemplate" for="formTemplateGrowl"  sticky="true" showDetail="true">
+                <p:autoUpdate/>
+            </p:growl>
+        </h:form>
+
         <div class="layout-wrapper #{themeCustomiser.menuMode} layout-menu-#{themeCustomiser.menuColor} layout-topbar-#{themeCustomiser.topbarColor}">
             <ui:include src="./topbar.xhtml"></ui:include>
             <ui:include src="./menu.xhtml"></ui:include>
@@ -54,7 +60,8 @@
                 </f:facet>
             </p:ajaxStatus>
         </div>
-
+        
+        <h:outputStylesheet name="default.css" library="css" />
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="roma-layout" />
         <h:outputStylesheet name="icons.css" library="css" />

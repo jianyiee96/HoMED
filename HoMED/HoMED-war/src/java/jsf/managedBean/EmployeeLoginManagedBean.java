@@ -24,13 +24,13 @@ import util.helper.ThemeCustomiser;
 @ViewScoped
 public class EmployeeLoginManagedBean implements Serializable {
 
-    private String nric;
+    private String email;
     private String password;
     private Employee currentEmployee;
     private String activatePassword;
     private String activateRePassword;
-    private String forgetPasswordNric;
     private String forgetPasswordEmail;
+    private String forgetPasswordPhoneNumber;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -48,7 +48,7 @@ public class EmployeeLoginManagedBean implements Serializable {
     public void login() throws IOException {
 
         try {
-            currentEmployee = employeeSessionBeanLocal.employeeLogin(nric, password);
+            currentEmployee = employeeSessionBeanLocal.employeeLogin(email, password);
             if (currentEmployee.getIsActivated()) {
                 FacesContext.getCurrentInstance().getExternalContext().getSession(true);
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
@@ -57,10 +57,10 @@ public class EmployeeLoginManagedBean implements Serializable {
 
                 FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
             } else {
-                PrimeFaces.current().executeScript("PF('dlg').show()");
+                PrimeFaces.current().executeScript("PF('dlgActivatePassword').show()");
             }
         } catch (EmployeeInvalidLoginCredentialException ex) {
-            FacesContext.getCurrentInstance().addMessage("loginForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("formLogin", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
 
     }
@@ -75,45 +75,41 @@ public class EmployeeLoginManagedBean implements Serializable {
     }
 
     public void activateAccount() throws IOException {
-        if (currentEmployee.getIsActivated()) {
-            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account has already been activated!", null));
-        } else if (!activatePassword.equals(activateRePassword)) {
-            FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed! Passwords do not match.", null));
-        } else {
-            try {
-                currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getNric(), activatePassword, activateRePassword);
-                FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
+        try {
+            currentEmployee = employeeSessionBeanLocal.activateEmployee(currentEmployee.getEmail(), activatePassword, activateRePassword);
+            FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
 
-                setRoleTheme(currentEmployee.getRole());
+            setRoleTheme(currentEmployee.getRole());
 
-                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
-                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
-            } catch (ActivateEmployeeException ex) {
-                FacesContext.getCurrentInstance().addMessage("dialogForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Activation Failed " + ex.getMessage(), null));
-            }
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("activatedAccount", true);
+            FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+        } catch (ActivateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage("formActivatePassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
-    public void openForgotPasswordForm() {
-        this.forgetPasswordNric = "";
-        this.forgetPasswordEmail = "";
+    public void checkIfActivatedUponLogin() {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        if (flash.get("activatedAccount") != null) {
+            FacesContext.getCurrentInstance().addMessage("formTemplateGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully Activated Account!", "Password has been successfully changed"));
+        }
     }
 
     public void sendOtp() {
         try {
-            employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordNric, forgetPasswordEmail);
-            PrimeFaces.current().executeScript("PF('forgotDlg').hide()");
-            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
+            employeeSessionBeanLocal.resetEmployeePassword(forgetPasswordEmail, forgetPasswordPhoneNumber);
+            PrimeFaces.current().executeScript("PF('dlgForgetPassword').hide()");
+            FacesContext.getCurrentInstance().addMessage("formInactivity", new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset password!", "Do check your email for the new OTP"));
         } catch (ResetEmployeePasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage("forgotPasswordForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage("formForgetPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
     public void checkInactivity() {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         if (flash.get("inactiveSession") != null) {
-            FacesContext.getCurrentInstance().addMessage("inactivityForm", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
+            FacesContext.getCurrentInstance().addMessage("formInactivity", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Expired", "You have been logged out due to inactivity"));
         }
     }
 
@@ -130,12 +126,12 @@ public class EmployeeLoginManagedBean implements Serializable {
         }
     }
 
-    public String getNric() {
-        return nric;
+    public String getEmail() {
+        return email;
     }
 
-    public void setNric(String nric) {
-        this.nric = nric;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -162,20 +158,20 @@ public class EmployeeLoginManagedBean implements Serializable {
         this.activateRePassword = activateRePassword;
     }
 
-    public String getForgetPasswordNric() {
-        return forgetPasswordNric;
-    }
-
-    public void setForgetPasswordNric(String forgetPasswordNric) {
-        this.forgetPasswordNric = forgetPasswordNric;
-    }
-
     public String getForgetPasswordEmail() {
         return forgetPasswordEmail;
     }
 
     public void setForgetPasswordEmail(String forgetPasswordEmail) {
         this.forgetPasswordEmail = forgetPasswordEmail;
+    }
+
+    public String getForgetPasswordPhoneNumber() {
+        return forgetPasswordPhoneNumber;
+    }
+
+    public void setForgetPasswordPhoneNumber(String forgetPasswordPhoneNumber) {
+        this.forgetPasswordPhoneNumber = forgetPasswordPhoneNumber;
     }
 
 }

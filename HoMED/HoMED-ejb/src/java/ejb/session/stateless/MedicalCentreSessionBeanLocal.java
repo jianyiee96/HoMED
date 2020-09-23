@@ -8,14 +8,15 @@ import entity.MedicalCentre;
 import entity.OperatingHours;
 import java.util.List;
 import javax.ejb.Local;
-import util.exceptions.InputDataValidationException;
+import util.exceptions.CreateMedicalCentreException;
+import util.exceptions.DeleteMedicalCentreException;
 import util.exceptions.MedicalCentreNotFoundException;
-import util.exceptions.UnknownPersistenceException;
+import util.exceptions.UpdateMedicalCentreException;
 
 @Local
 public interface MedicalCentreSessionBeanLocal {
 
-    public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws InputDataValidationException, UnknownPersistenceException;
+    public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws CreateMedicalCentreException;
 
     public Long createNewOperatingHours(OperatingHours newOperatingHours);
 
@@ -23,8 +24,8 @@ public interface MedicalCentreSessionBeanLocal {
 
     public MedicalCentre retrieveMedicalCentreById(Long medicalCentreId) throws MedicalCentreNotFoundException;
 
-    public void updateMedicalCentre(MedicalCentre medicalCentre) throws MedicalCentreNotFoundException, InputDataValidationException;
+    public void updateMedicalCentre(MedicalCentre medicalCentre) throws UpdateMedicalCentreException;
 
-    public void deleteMedicalCentre(Long medicalCentreId) throws MedicalCentreNotFoundException;
-    
+    public void deleteMedicalCentre(Long medicalCentreId) throws DeleteMedicalCentreException;
+
 }
