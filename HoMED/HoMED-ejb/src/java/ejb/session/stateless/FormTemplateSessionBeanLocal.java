@@ -26,6 +26,8 @@ public interface FormTemplateSessionBeanLocal {
     public boolean archiveFormTemplate(Long id);
 
     public boolean deleteFormTemplate(Long id);
+    
+    public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic);
 
     public FormTemplate retrieveFormTemplate(Long id);
     

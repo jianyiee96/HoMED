@@ -164,6 +164,19 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             return false;
         }
     }
+    
+    @Override
+    public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic) {
+        FormTemplate formTemplate = retrieveFormTemplate(id);
+
+        if (formTemplate.isIsPublic() != newIsPublic) {
+            formTemplate.setIsPublic(newIsPublic);
+            em.flush();
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     public FormTemplate retrieveFormTemplate(Long id) {

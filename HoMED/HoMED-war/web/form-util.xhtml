@@ -10,6 +10,7 @@
 
     <ui:define name="content">
 
+        <h:outputStylesheet name="crud-tables.css" library="css" />
 
         <style type="text/css">
             .ui-chips {
@@ -104,7 +105,7 @@
 
                     <p:growl id="growl" globalOnly="true" showDetail="true" sticky="true" />  
                     <ui:fragment rendered="#{formUtilityManagedBean.selectedForm != null}">
-
+                        <!--                        <div class="crud-table">-->
                         <div class="card">
 
                             <div>
@@ -114,14 +115,31 @@
                                 <p:commandButton rendered="#{not formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right">
                                     <p:confirm header="Clone Template" message="Any changed on the form editor will be saved before cloning. Proceed to clone?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
+
+
+                                <p:outputLabel class="p-mx-2 " value="Public "/>
+                                <p:selectBooleanCheckbox  value="#{formUtilityManagedBean.newFormIsPublic}">
+                                    <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
+                                </p:selectBooleanCheckbox>
+                                
+
                                 <p:commandButton rendered="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right" />
+
+
+
                             </div>
 
                             <p:dataList value="#{formUtilityManagedBean.selectedFormFieldWrappers}" rendered="#{formUtilityManagedBean.selectedForm != null}" type="definition" var="fieldWrapper">
+
                                 <f:facet name="header">
+
+
                                     <p:inplace disabled="#{formUtilityManagedBean.fieldsDisabled}" id="templateName" editor="true">
                                         <p:inputText value="#{formUtilityManagedBean.newFormName}" required="true" label="text" />
                                     </p:inplace>
+
+
+
                                 </f:facet>
 
                                 <div class="card" style="margin-bottom: 5px">
@@ -177,6 +195,7 @@
 
                             </p:dataList>
                         </div>
+                        <!--</div>-->
                         <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" value="Add Field" style="width: 100%" rendered="#{formUtilityManagedBean.selectedForm != null}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}"/>
 
                     </ui:fragment>

@@ -25,6 +25,7 @@ import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import jsf.classes.FormFieldWrapper;
+import org.primefaces.PrimeFaces;
 import util.enumeration.FormStatusEnum;
 import util.enumeration.InputTypeEnum;
 
@@ -46,6 +47,8 @@ public class FormUtilityManagedBean implements Serializable {
     private String createFormName;
 
     private String newFormName;
+
+    private boolean newFormIsPublic;
 
     private boolean fieldsDisabled;
 
@@ -267,9 +270,25 @@ public class FormUtilityManagedBean implements Serializable {
         this.fieldsDisabled = fieldsDisabled;
     }
 
+    public boolean isNewFormIsPublic() {
+        return newFormIsPublic;
+    }
+
+    public void setNewFormIsPublic(boolean newFormIsPublic) {
+        this.newFormIsPublic = newFormIsPublic;
+    }
+
+    public void updateFormPrivacy() {
+        formTemplateSessionBeanLocal.updateFormTemplatePrivacy(selectedForm.getFormTemplateId(), newFormIsPublic);
+        selectedForm.setIsPublic(newFormIsPublic);
+        formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
+
+    }
+
     public void setSelectedForm(FormTemplate selectedForm) {
         this.selectedForm = formTemplateSessionBeanLocal.retrieveFormTemplate(selectedForm.getFormTemplateId());
         this.newFormName = selectedForm.getFormTemplateName();
+        this.newFormIsPublic = selectedForm.isIsPublic();
         this.selectedFormFieldWrappers = new ArrayList<>();
 
         for (FormField ff : this.selectedForm.getFormFields()) {
@@ -367,9 +386,9 @@ public class FormUtilityManagedBean implements Serializable {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         return dateFormat.format(date);
     }
-    
+
     public String renderPrivacy(boolean privacy) {
-        if(privacy) {
+        if (privacy) {
             return "public";
         } else {
             return "private";
