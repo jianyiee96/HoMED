@@ -23,8 +23,9 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{servicemanAccountManagementManagedBean.doCreateServiceman}"
-                                             update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()">
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
+                                             update="formCreateServiceman" process="@this" immediate="true" 
+                                             actionListener="#{servicemanAccountManagementManagedBean.doCreateServiceman}" oncomplete="PF('dialogCreateServiceman').show()">
                                 <p:resetInput target="formCreateServiceman" />
                             </p:commandButton>
                         </div>
