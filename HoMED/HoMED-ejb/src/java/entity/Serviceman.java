@@ -41,9 +41,9 @@ public class Serviceman implements Serializable {
     private String name;
 
     @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email address must be provided")
-    @Size(min = 9, max = 64, message = "Proper formatted email address must be between 9 to 64")
-    @Email(message = "Email must be properly formatted")
+    @NotNull(message = "Email must be provided")
+    @Size(max = 64, message = "Proper formatted Email must be provided")
+    @Email(message = "Proper formatted Email must be provided")
     private String email;
 
     @Column(nullable = false, unique = true, length = 8)

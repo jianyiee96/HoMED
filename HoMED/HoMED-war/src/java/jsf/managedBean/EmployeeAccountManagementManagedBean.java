@@ -42,7 +42,7 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
     public void postConstruct() {
 
         employees = employeeSessionBeanLocal.retrieveAllEmployees();
-
+        this.employeeToCreate = new Employee();
     }
 
     public void dialogActionListener() {
@@ -57,7 +57,7 @@ public class EmployeeAccountManagementManagedBean implements Serializable {
     }
 
     public void doCreateEmployee() {
-        this.employeeToCreate = new Employee();
+
         this.isEditableCreateEmployee = true;
     }
 

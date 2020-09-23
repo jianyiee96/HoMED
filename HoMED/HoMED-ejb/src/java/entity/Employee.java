@@ -25,30 +25,16 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long employeeId;
 
-    @Column(columnDefinition = "CHAR(64) NOT NULL")
-    @NotNull(message = "Password must be between length 8 to 64")
-    @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
-    protected String password;
-
-    @Column(nullable = false, unique = true, length = 64)
-    @NotNull(message = "Proper formatted email with length no more than 64 must be provided")
-    @Size(min = 2, max = 64, message = "Proper formatted email with length no more than 64 must be provided")
-    @Email(message = "Proper formatted email with length no more than 64 must be provided")
-    private String email;
-
     @Column(nullable = false, length = 128)
-    @NotNull(message = "Name must be between length 2 to 128")
+    @NotNull(message = "Name must be provided")
     @Size(min = 2, max = 128, message = "Name must be between length 2 to 128")
     protected String name;
 
-    @Column(nullable = false)
-    @NotNull
-    private Boolean isActivated;
-
-    @Embedded
-    @Column(nullable = false)
-    @NotNull(message = "Address must be provided")
-    private Address address;
+    @Column(nullable = false, unique = true, length = 64)
+    @NotNull(message = "Email must be provided")
+    @Size(max = 64, message = "Proper formatted Email must be provided")
+    @Email(message = "Proper formatted Email must be provided")
+    private String email;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
@@ -60,19 +46,35 @@ public class Employee implements Serializable {
     @NotNull(message = "Gender must be provided")
     protected GenderEnum gender;
 
-    @Column(columnDefinition = "CHAR(32) NOT NULL")
+    @Column(columnDefinition = "CHAR(64) NOT NULL")
+    @NotNull(message = "Password must be between length 8 to 64")
+    @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
+    protected String password;
+
+    @Embedded
+    @Column(nullable = false)
+    @NotNull(message = "Address must be provided")
+    private Address address;
+
+    @Column(nullable = false)
     @NotNull
-    protected String salt;
+    private Boolean isActivated;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
 
+    @Column(columnDefinition = "CHAR(32) NOT NULL")
+    @NotNull
+    protected String salt;
+
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
     public Employee() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
+        
+        this.address = new Address();
     }
 
     public Employee(String name, String password, String email, Address address, String phoneNumber, GenderEnum genderEnum) {

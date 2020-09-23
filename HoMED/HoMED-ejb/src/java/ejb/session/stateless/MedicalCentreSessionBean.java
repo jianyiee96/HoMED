@@ -46,12 +46,11 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
 
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
-                    if (constraintViolationsOperatingHours.isEmpty()) {
+                    if (oh.getClosingHours() != null && oh.getOpeningHours() != null && oh.getClosingHours().isBefore(oh.getOpeningHours())) {
+                        throw new CreateMedicalCentreException("Opening Hours must be before Closing Hours");
+                    } else {
                         em.persist(oh);
                         em.flush();
-                    } else {
-                        throw new CreateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
                     }
                 }
 
@@ -157,11 +156,10 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
                     List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
-                    // Can look to combine these 2 loops, for sake of easy understanding, I have left them separate
+
                     for (OperatingHours oh : ohs) {
-                        Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
-                        if (!constraintViolationsOperatingHours.isEmpty()) {
-                            throw new UpdateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
+                        if (oh.getClosingHours() != null && oh.getOpeningHours() != null && oh.getClosingHours().isBefore(oh.getOpeningHours())) {
+                            throw new UpdateMedicalCentreException("Opening Hours must be before Closing Hours");
                         }
                     }
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
@@ -214,15 +212,4 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         return msg;
     }
 
-    private String prepareOperatingHoursInputDataValidationErrorsMessage(Set<ConstraintViolation<OperatingHours>> constraintViolations) {
-        String msg = "";
-
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += constraintViolation.getMessage() + "\n";
-        }
-
-        msg = msg.substring(0, msg.length() - 1);
-
-        return msg;
-    }
 }

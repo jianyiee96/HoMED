@@ -83,7 +83,8 @@
         </h:form>
         <h:form id="formCreateEmployee">
             <p:dialog id="dialogCreateEmployee" widgetVar="dialogCreateEmployee" header="Create Employee" showEffect="fade"
-                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
+                      responsive="true" draggable="false" modal="true" fitViewport="true"
+                      minWidth="500" width="700">
                 <p:outputPanel id="panelCreateEmployee" rendered="#{not empty employeeAccountManagementManagedBean.employeeToCreate}">
                     <div class="p-grid">
                         <div class="p-col-12 p-grid p-justify-center">
@@ -95,15 +96,19 @@
                             <div class="card ui-fluid">
                                 <h5>Personal Particulars</h5>
                                 <div class="p-field">
+                                    <i class="pi pi-user p-mr-2"/>
                                     <p:outputLabel for="create-name" value="Name"/>
-                                    <p:inputText id="create-name" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.name}" />
+                                    <p:inputText id="create-name" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.name}"/>
+                                    <p:message class="error-message" for="create-name" />
                                 </div>
 
                                 <div class="p-field">
+                                    <i class="fa fa-venus-mars p-mr-2"/>
                                     <p:outputLabel for="create-gender" value="Gender"/>
                                     <p:selectOneMenu id="create-gender" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.gender}">
                                         <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
                                     </p:selectOneMenu>
+                                    <p:message class="error-message" for="create-gender" />
                                 </div> 
                             </div>
                         </div>
@@ -112,31 +117,65 @@
                             <div class="card ui-fluid">
                                 <h5>Contact Details</h5>
                                 <div class="p-field">
+                                    <i class="fa fa-phone p-mr-2"/>
                                     <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="create-phoneNumber" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.phoneNumber}" />
-
+                                    <p:message class="error-message" for="create-phoneNumber" />
                                 </div>
 
                                 <div class="p-field">
+                                    <i class="fa fa-envelope-o p-mr-2"/>
                                     <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"  />
-                                    </p:inputText>
+                                    <p:inputText id="create-email" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"  validatorMessage="Please ensure that email format is correct!" value="#{employeeAccountManagementManagedBean.employeeToCreate.email}"/>
+                                    <p:message class="error-message" for="create-email" />
                                 </div>
                             </div>
                         </div>
 
                         <div class="p-col-12">
                             <div class="card ui-fluid">
-                                <div class="p-field">
-                                    <p:outputLabel for="create-address" value="Address"/>
-                                    <p:inputText id="create-address" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.streetName}" />
+                                <h5>Address Details</h5>
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2"/>
+                                        <p:outputLabel for="create-street-name" value="Street Name"/>
+                                        <p:inputText id="create-street-name" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.streetName}" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"/>
+                                        <p:message class="error-message" for="create-street-name" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2"/>
+                                        <p:outputLabel for="create-unit-number" value="Unit Number"/>
+                                        <p:inputText id="create-unit-number" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.unitNumber}" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"/>
+                                        <p:message class="error-message" for="create-unit-number" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2"/>
+                                        <p:outputLabel for="create-building-name" value="Building Name"/>
+                                        <p:inputText id="create-building-name" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.buildingName}" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"/>
+                                        <p:message class="error-message" for="create-building-name" />
+                                    </div>
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2"/>
+                                        <p:outputLabel for="create-country" value="Country"/>
+                                        <p:selectOneMenu id="create-country" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.country}" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
+                                        <p:message class="error-message" for="create-country" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2"/>
+                                        <p:outputLabel for="create-postal-code" value="Postal Code"/>
+                                        <p:inputText id="create-postal-code" value="#{employeeAccountManagementManagedBean.employeeToCreate.address.postal}" disabled="#{not employeeAccountManagementManagedBean.isEditableCreateEmployee}"/>
+                                        <p:message class="error-message" for="create-postal-code" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="p-col-12">
-                            <p:messages closable="true">
+                            <p:messages class="error-message" closable="true">
                                 <p:autoUpdate/>
                             </p:messages>
                         </div>
@@ -147,15 +186,15 @@
                                         <h5>Admin Rights</h5>
                                     </f:facet>
                                     <f:facet name="right">
-                                        <p:commandButton actionListener="#{employeeAccountManagementManagedBean.createEmployee}" update="panelCreateEmployee formAllEmployees" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                        <p:commandButton actionListener="#{employeeAccountManagementManagedBean.createEmployee}" oncomplete="PF('dialogCreateEmployee').show()" update="formCreateEmployee formAllEmployees" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                     </f:facet>
                                 </p:toolbar>
                             </div>
                         </ui:fragment>
                     </div>
                 </p:outputPanel>
-
             </p:dialog>
+
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
