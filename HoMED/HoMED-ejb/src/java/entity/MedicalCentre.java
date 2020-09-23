@@ -38,7 +38,7 @@ public class MedicalCentre implements Serializable {
 
     @Embedded
     @Column(nullable = false)
-    @NotNull
+    @NotNull(message = "Address must be provided")
     private Address address;
 
     @OneToMany

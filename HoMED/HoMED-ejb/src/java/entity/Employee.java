@@ -2,6 +2,7 @@ package entity;
 
 import java.io.Serializable;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -44,10 +45,10 @@ public class Employee implements Serializable {
     @NotNull
     private Boolean isActivated;
 
-    @Column(nullable = false, length = 128)
-    @NotNull(message = "Address must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "Address must be between length 2 to 128")
-    protected String address;
+    @Embedded
+    @Column(nullable = false)
+    @NotNull(message = "Address must be provided")
+    private Address address;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
@@ -74,7 +75,7 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
     }
 
-    public Employee(String name, String password, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String password, String email, Address address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.password = password;
@@ -86,7 +87,7 @@ public class Employee implements Serializable {
     }
 
     // Constructor to be used for OTP accounts
-    public Employee(String name, String email, String address, String phoneNumber, GenderEnum genderEnum) {
+    public Employee(String name, String email, Address address, String phoneNumber, GenderEnum genderEnum) {
         this();
         this.name = name;
         this.email = email;
@@ -139,11 +140,11 @@ public class Employee implements Serializable {
         this.isActivated = isActivated;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 

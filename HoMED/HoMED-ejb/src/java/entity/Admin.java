@@ -19,12 +19,12 @@ public class Admin extends Employee implements Serializable {
     public Admin() {
     }
 
-    public Admin(String name, String password, String email, String address, String phoneNumber, GenderEnum gender) {
+    public Admin(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.ADMIN;
     }
 
-    public Admin(String name, String email, String address, String phoneNumber, GenderEnum gender) {
+    public Admin(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.ADMIN;
     }

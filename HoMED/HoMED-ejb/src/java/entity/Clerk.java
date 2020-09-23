@@ -19,12 +19,12 @@ public class Clerk extends Employee implements Serializable {
     public Clerk() {
     }
 
-    public Clerk(String name, String password, String email, String address, String phoneNumber, GenderEnum gender) {
+    public Clerk(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.CLERK;
     }
 
-    public Clerk(String name, String email, String address, String phoneNumber, GenderEnum gender) {
+    public Clerk(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
         this.role = EmployeeRoleEnum.CLERK;
     }
