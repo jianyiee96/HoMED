@@ -69,7 +69,9 @@
 
                             <p:column headerText="Action" width="3%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
-                                                 update="ccManageEmployee:formManageEmployee:panelManageEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogManageEmployee').show()" />
+                                                 update="ccManageEmployee:formManageEmployee:panelManageEmployee" actionListener="#{employeeAccountManagementManagedBean.doViewEmployee(employee)}" process="@this" oncomplete="PF('dialogManageEmployee').show()">
+                                    <p:resetInput target="ccManageEmployee:formManageEmployee:panelManageEmployee"/>
+                                </p:commandButton>
                             </p:column>
 
                         </p:dataTable>

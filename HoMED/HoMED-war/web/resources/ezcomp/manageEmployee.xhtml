@@ -58,7 +58,7 @@
                                     <p:outputLabel for="view-name" value="Name"/>
                                     <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" />
                                 </div>
-                                
+
                                 <div class="p-field">
                                     <p:outputLabel for="view-email" value="Email Address"/>
                                     <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}">
@@ -84,7 +84,7 @@
                                     <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
                                     <p:inputText id="view-phoneNumber" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" />
                                 </div>
-                                
+
                                 <div class="p-field">
                                     <p:outputLabel for="view-address" value="Address"/>
                                     <p:inputText id="view-address" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address}" />
@@ -114,7 +114,9 @@
                                             <p:commandButton actionListener="#{manageEmployeeManagedBean.doDelete}" update="panelManageEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
                                                 <p:confirm header="Confirmation" message="Are you sure you want to delete this employee? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doCancel}" update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2"/>
+                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doCancel}" update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                <p:resetInput target="panelManageEmployee"/>
+                                            </p:commandButton>
                                         </ui:fragment>
                                     </f:facet>
                                 </p:toolbar>

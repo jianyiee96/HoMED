@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
 
 import java.io.Serializable;
@@ -20,10 +15,6 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 import util.security.CryptographicHelper;
 
-/**
- *
- * @author User
- */
 @Entity
 public class Employee implements Serializable {
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
@@ -102,20 +93,6 @@ public class Employee implements Serializable {
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.gender = genderEnum;
-    }
-
-    // Cloning of Employee
-    public Employee(Employee another) {
-        this.employeeId = another.employeeId;
-        this.isActivated = another.isActivated;
-        this.salt = another.salt;
-        this.name = another.name;
-        this.email = another.email;
-        this.address = another.address;
-        this.phoneNumber = another.phoneNumber;
-        this.gender = another.gender;
-        this.password = another.password;
-        this.role = another.role;
     }
 
     public Long getEmployeeId() {

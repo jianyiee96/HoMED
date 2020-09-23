@@ -23,7 +23,6 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     private Employee currentEmployee;
 
-    private Employee originalEmployeeToView;
     private Employee employeeToView;
 
     private Boolean isAdminView;
@@ -61,7 +60,6 @@ public class ManageEmployeeManagedBean implements Serializable {
             employeeSessionBean.updateEmployee(employeeToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
-            this.originalEmployeeToView = new Employee(employeeToView);
         } catch (UpdateEmployeeException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
@@ -71,7 +69,6 @@ public class ManageEmployeeManagedBean implements Serializable {
         try {
             // isActivated is changed
             this.employeeToView.setIsActivated(false);
-            this.originalEmployeeToView = new Employee(this.employeeToView);
 
             employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
 
@@ -98,7 +95,6 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     public void doCancel() {
         this.isEditMode = false;
-        this.employeeToView = new Employee(originalEmployeeToView);
     }
 
     public Employee getEmployeeToView() {
@@ -106,7 +102,6 @@ public class ManageEmployeeManagedBean implements Serializable {
     }
 
     public void setEmployeeToView(Employee employeeToView) {
-        this.originalEmployeeToView = new Employee(employeeToView);
         this.employeeToView = employeeToView;
     }
 
