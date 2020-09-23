@@ -64,15 +64,21 @@
                             <p:column  headerText="Status" sortBy="#{formTemplate.formStatus}">
                                 <span class="form-status-badge status-#{formTemplate.formStatus.text.toLowerCase()}">#{formTemplate.formStatus.text}</span>
                             </p:column>
+                            <p:column  headerText="Privacy" sortBy="#{formTemplate.isPublic}">
+                                <span class="form-status-badge privacy-#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}">#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}</span>
+                            </p:column>
 
                             <p:column exportable="false">
 
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
                                     <f:attribute name="formToView" value="#{formTemplate}" />
                                 </p:commandButton> 
-                                <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                <p:commandButton rendered="#{formTemplate.formStatus != 'ARCHIVED'}" disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
                                     <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Publish Template" message="You will no longer be able to edit the template. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                <p:commandButton rendered="#{formTemplate.formStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
                                 </p:commandButton> 
                                 <p:commandButton disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
                                     <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
@@ -102,9 +108,13 @@
                         <div class="card">
 
                             <div>
-                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.saveFormFields()}" value="Save" icon="pi pi-save" style="margin: 2px" />
-                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" style="margin: 2px" />
-                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" immediate="true" update="editorForm" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" style="margin: 2px" />
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mx-2 p-mb-2" />
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" immediate="true" update="editorForm" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
+                                <p:commandButton rendered="#{not formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right">
+                                    <p:confirm header="Clone Template" message="Any changed on the form editor will be saved before cloning. Proceed to clone?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton rendered="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right" />
                             </div>
 
                             <p:dataList value="#{formUtilityManagedBean.selectedFormFieldWrappers}" rendered="#{formUtilityManagedBean.selectedForm != null}" type="definition" var="fieldWrapper">
@@ -143,7 +153,7 @@
                                                 </h:panelGrid>
                                                 <h:panelGrid columns="1" cellpadding="5">
 
-                                                    <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" title="Delete" value="Remove Field">
+                                                    <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
                                                         <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
                                                     </p:commandButton>
 
@@ -153,11 +163,11 @@
 
                                         </div>
                                         <div class="p-col-1" style="float: right; text-align: right">
-                                            <p:commandButton style="height: 50%; margin: 1px; float: right" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" icon="fa fa-arrow-up">
+                                            <p:commandButton style="height: 50%" class="p-mb-2" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" icon="fa fa-arrow-up">
                                                 <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
                                             </p:commandButton>
 
-                                            <p:commandButton style="height: 50%; margin: 1px; float: right" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" icon="fa fa-arrow-down">
+                                            <p:commandButton style="height: 50%" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" icon="fa fa-arrow-down">
                                                 <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
                                             </p:commandButton>
 

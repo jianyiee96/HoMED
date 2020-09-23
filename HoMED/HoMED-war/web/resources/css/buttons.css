@@ -28,6 +28,17 @@
     color: #C63737;
 }
 
+.privacy-public {
+    background: #ECCFFF;
+    color: #694382;
+}
+
+.privacy-private {
+    background: #FFD8B2;
+    color: #805B36;
+}
+
+
 .button-margin {
     margin: 2px;
 }

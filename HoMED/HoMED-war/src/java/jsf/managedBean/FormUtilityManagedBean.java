@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +27,6 @@ import javax.faces.view.ViewScoped;
 import jsf.classes.FormFieldWrapper;
 import util.enumeration.FormStatusEnum;
 import util.enumeration.InputTypeEnum;
-import util.exceptions.InputDataValidationException;
-import util.exceptions.UnknownPersistenceException;
-import util.security.CryptographicHelper;
 
 @Named(value = "formUtilityManagedBean")
 @ViewScoped
@@ -79,7 +75,7 @@ public class FormUtilityManagedBean implements Serializable {
                 formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
             }
 
-        } catch (InputDataValidationException | UnknownPersistenceException ex) {
+        } catch (Exception ex) { //Create form template exception TODO: Add a crete form exception
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to create form template!", "Please check the supplied form template name."));
 
         }
@@ -97,6 +93,8 @@ public class FormUtilityManagedBean implements Serializable {
                     setSelectedForm(ft);
                 }
             }
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to publish form template!", "Please ensure that the form template has at least 1 form field."));
         }
 
     }
@@ -129,7 +127,11 @@ public class FormUtilityManagedBean implements Serializable {
         }
     }
 
-    public void saveFormFields() {
+    public void invokeSaveFormFields() {
+        saveFormFields();
+    }
+
+    public boolean saveFormFields() {
 
         boolean emptyTitle = false;
         boolean emptyOptions = false;
@@ -173,8 +175,13 @@ public class FormUtilityManagedBean implements Serializable {
             formTemplateSessionBeanLocal.saveFormTemplate(selectedForm);
 
             formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
+            System.out.println("saved form template: ");
+            System.out.println(selectedForm.getFormTemplateId());
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully saved form template!", "Database has been updated."));
+            return true;
+        } else {
+            return false;
         }
 
     }
@@ -187,6 +194,29 @@ public class FormUtilityManagedBean implements Serializable {
                 break;
             }
         }
+    }
+
+    public void cloneCurrentForm(boolean save) {
+        boolean success = true;
+        if (save) {
+            success = saveFormFields();
+            if (!success) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Unable to Clone!", "We are unable to save your form."));
+            }
+        }
+
+        if (success) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Clone", "Form template is cloned!"));
+            formTemplateSessionBeanLocal.cloneFormTemplate(this.selectedForm.getFormTemplateId());
+            // Reload
+            formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
+
+            if (formTemplates.size() > 0) {
+                FormTemplate newFormTemplate = formTemplates.get(formTemplates.size() - 1);
+                setSelectedForm(newFormTemplate);
+            }
+        }
+
     }
 
     public List<FormTemplate> getFormTemplates() {
@@ -245,8 +275,8 @@ public class FormUtilityManagedBean implements Serializable {
         for (FormField ff : this.selectedForm.getFormFields()) {
             this.selectedFormFieldWrappers.add(new FormFieldWrapper(ff));
         }
-        
-        Collections.sort(selectedFormFieldWrappers); 
+
+        Collections.sort(selectedFormFieldWrappers);
 
         if (this.selectedForm.getFormStatus() == FormStatusEnum.DRAFT) {
             this.fieldsDisabled = false;
@@ -333,11 +363,19 @@ public class FormUtilityManagedBean implements Serializable {
 
     }
 
-    public String renderDate(Date date){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
+    public String renderDate(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         return dateFormat.format(date);
     }
     
+    public String renderPrivacy(boolean privacy) {
+        if(privacy) {
+            return "public";
+        } else {
+            return "private";
+        }
+    }
+
     public InputTypeEnum[] getInputTypes() {
         return InputTypeEnum.values();
     }

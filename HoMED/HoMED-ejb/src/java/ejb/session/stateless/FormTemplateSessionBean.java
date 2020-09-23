@@ -4,11 +4,13 @@
  */
 package ejb.session.stateless;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -21,8 +23,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.FormStatusEnum;
-import util.exceptions.InputDataValidationException;
-import util.exceptions.UnknownPersistenceException;
 
 @Stateless
 public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
@@ -39,7 +39,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     }
 
     @Override
-    public Long createFormTemplate(FormTemplate formTemplate) throws InputDataValidationException, UnknownPersistenceException {
+    public Long createFormTemplate(FormTemplate formTemplate) {
         try {
             Set<ConstraintViolation<FormTemplate>> constraintViolations = validator.validate(formTemplate);
 
@@ -49,11 +49,54 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
                 return formTemplate.getFormTemplateId();
             } else {
-                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                System.out.println("Error Error");
+                return null;
+
             }
-        } catch (PersistenceException ex) {
-            throw new UnknownPersistenceException(ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("Error Error");
+            return null;
         }
+    }
+
+    @Override
+    public void cloneFormTemplate(Long formTemplateId) {
+
+        FormTemplate ft = retrieveFormTemplate(formTemplateId);
+
+        FormTemplate newFT = new FormTemplate(ft.getFormTemplateName() + " Cloned");
+
+        List<FormField> newFFs = new ArrayList<>();
+
+        for (FormField ff : ft.getFormFields()) {
+
+            FormField newFF = new FormField();
+
+            List<FormFieldOption> newFFOs = new ArrayList<>();
+
+            for (FormFieldOption ffo : ff.getFormFieldOptions()) {
+
+                FormFieldOption newFFO = new FormFieldOption(ffo.getFormFieldOptionValue());
+                em.persist(newFFO);
+                newFFOs.add(newFFO);
+
+            }
+
+            newFF.setFormFieldOptions(newFFOs);
+            newFF.setInputType(ff.getInputType());
+            newFF.setIsRequired(ff.isIsRequired());
+            newFF.setIsServicemanEditable(ff.isIsServicemanEditable());
+            newFF.setPosition(ff.getPosition());
+            newFF.setTitle(ff.getTitle());
+            em.persist(newFF);
+            newFFs.add(newFF);
+        }
+
+        newFT.setFormFields(newFFs);
+
+        em.persist(newFT);
+        em.flush();
+
     }
 
     @Override
@@ -66,7 +109,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         }
         ft.setFormFields(new ArrayList<>());
         em.flush();
-        
+
 
         ft.setFormStatus(formTemplate.getFormStatus());
         ft.setFormTemplateName(formTemplate.getFormTemplateName());
@@ -87,7 +130,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean publishFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
+        if (formTemplate.getFormStatus() == FormStatusEnum.ARCHIVED || formTemplate.getFormStatus() == FormStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
             formTemplate.setFormStatus(FormStatusEnum.PUBLISHED);
             em.flush();
             return true;

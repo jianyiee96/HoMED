@@ -46,6 +46,10 @@ public class FormTemplate implements Serializable {
     @NotNull
     private FormStatusEnum formStatus;
     
+    @Column(nullable = false)
+    @NotNull
+    private boolean isPublic;
+    
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormField> formFields;
     
@@ -53,6 +57,7 @@ public class FormTemplate implements Serializable {
         this.dateCreated = new Date();
         this.formFields = new ArrayList<>();
         this.formStatus = FormStatusEnum.DRAFT;
+        this.isPublic = false;
     }
 
     public FormTemplate(String formTemplateName) {
@@ -92,6 +97,14 @@ public class FormTemplate implements Serializable {
         this.formStatus = formStatus;
     }
 
+    public boolean isIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+    
     public List<FormField> getFormFields() {
         return formFields;
     }
