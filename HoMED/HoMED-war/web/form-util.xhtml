@@ -122,12 +122,12 @@
                                                 <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
 
                                                     <p:outputLabel value="Question: " />
-                                                    
+
                                                     <p:inputText style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.title}"/>
 
                                                     <p:outputLabel value="Input Type: " />
                                                     <p:selectOneMenu style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
-                                                        <f:selectItems value="#{formUtilityManagedBean.inputTypes}" />
+                                                        <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
                                                         <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
                                                     </p:selectOneMenu>
 
