@@ -12,16 +12,17 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
+        <h:outputStylesheet name="default.css" library="css" />
         <title>HoMED Employee Login</title>
     </h:head>
 
     <h:body styleClass="login-body">
-        <h:form id="inactivityForm">
-            <p:growl id="inactivityGrowl" sticky="true" showDetail="true" />
-            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkInactivity()}"/>
+        <h:form id="formInactivity">
+            <p:growl id="growlInactivity" for="formInactivity" sticky="true" showDetail="true" />
+            <f:event type="preRenderComponent" listener="#{employeeLoginManagedBean.checkInactivity}"/>
         </h:form>
-        <h:form id="loginForm">
-            <p:outputPanel id="grid">
+        <h:form id="formLogin">
+            <p:outputPanel>
                 <div class="card login-panel ui-fluid">
                     <div class="login-panel-content">
 
@@ -34,55 +35,43 @@
                             </div>
 
                             <div class="p-col-12 username-container">
-
                                 <h:panelGroup>
-                                    <label>NRIC/FIN</label>
-                                    <div class="login-input">
-                                        <span class="ui-input-icon-left">
-                                            <i class="pi pi-user"></i>
-                                            <p:inputText label="NRIC/FIN" id="nric" value="#{employeeLoginManagedBean.nric}" 
-                                                         validatorMessage="Please provide a valid NRIC/FIN"
-                                                         required="true" requiredMessage="NRIC is required" maxlength="32" 
-                                                         style="padding-left: 2rem" >
-                                                <f:validateLength minimum="9"/>
-                                            </p:inputText>
-                                        </span>
-                                        <p:message for="nric" />
-                                    </div>
+                                    <p:outputLabel value="Email" for="email"/>
+                                    <span class="ui-input-icon-left">
+                                        <i class="pi pi-user"/>
+                                        <p:inputText id="email" value="#{employeeLoginManagedBean.currentEmployee.email}"
+                                                     style="padding-left: 2rem" />
+                                    </span>
+                                    <p:message class="error-message" for="email"/>
                                 </h:panelGroup>
-
                             </div>
 
                             <div class="p-col-12 password-container">
-                                <h:panelGroup id="passwordPanel">
-                                    <h:outputLabel id="passwordLabel">Password / OTP</h:outputLabel>
-                                    <div class="login-input">
-                                        <span class="ui-input-icon-left">
-                                            <i class="pi pi-lock"></i>
-                                            <p:password id="password" label="Password" value="#{employeeLoginManagedBean.password}"
-                                                        validatorMessage="Please provide a valid Password"
-                                                        required="true" requiredMessage="Password is required" maxlength="32" 
-                                                        style="padding-left: 2rem" >
-                                                <f:validateLength minimum="8" />
-                                            </p:password>
-                                        </span>
-                                        <p:message for="password" />
-                                    </div>
+                                <h:panelGroup>
+                                    <p:outputLabel value="Password / OTP" for="password"/>
+                                    <span class="ui-input-icon-left">
+                                        <i class="pi pi-lock"/>
+                                        <p:password id="password" value="#{employeeLoginManagedBean.password}"
+                                                    style="padding-left: 2rem" />
+                                    </span>
+                                    <p:message class="error-message" for="password"/>
                                 </h:panelGroup>
                             </div>
 
                             <div class="p-col-12 forgetpassword-container">
-                                <p:commandLink update="forgotPasswordForm" actionListener="#{employeeLoginManagedBean.openForgotPasswordForm}" oncomplete="PF('forgotDlg').show()">
-                                    Forgot Password
+                                <p:commandLink value="Forgot Password" update="formForgetPassword" oncomplete="PF('dlgForgetPassword').show()" process="@this" >
+                                    <p:resetInput target="formForgetPassword" />
                                 </p:commandLink>
-                            </div>
-                            
-                            <div class="p-col-12">
-                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="loginForm dialogForm" icon="pi pi-user" />
                             </div>
 
                             <div class="p-col-12">
-                                <p:messages id="messages" for="loginForm" closable="true">
+                                <p:commandButton type="submit" value="Login" action="#{employeeLoginManagedBean.login}" update="formLogin formActivatePassword" icon="pi pi-user" >
+                                    <p:resetInput target="formActivatePassword" />
+                                </p:commandButton>
+                            </div>
+
+                            <div class="p-col-12">
+                                <p:messages id="messages" for="formLogin" closable="true">
                                     <p:autoUpdate/>
                                 </p:messages>
                             </div>
@@ -92,137 +81,93 @@
             </p:outputPanel>
         </h:form>
 
-        <h:form id="dialogForm">
-            <p:dialog header="Account Activation" widgetVar="dlg" id="dlg" modal="true" responsive="true" width="350" showEffect="fade" draggable="false" hideEffect="fade">
-                <p:outputPanel id="actPanel">
+        <h:form id="formActivatePassword">
+            <p:dialog header="Account Activation" widgetVar="dlgActivatePassword" id="dlgActivatePassword" modal="true" responsive="true" width="300" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false" >
+                <p:outputPanel id="panelActivatePassword">
                     <div class="ui-fluid">
-                        <div class="login-panel-content">
-                            <div class="p-grid">
-                                <div class="p-col-12 password-container">
+                        <div class="p-field">
+                            <h:panelGroup>
+                                <p:outputLabel value="Enter New Password" for="activatePassword"/>
+                                <span class="ui-input-icon-left">
+                                    <i class="pi pi-lock"/>
+                                    <p:password id="activatePassword" value="#{employeeLoginManagedBean.activatePassword}"
+                                                style="padding-left: 2rem" />
+                                </span>
+                                <p:message class="error-message" for="activatePassword"/>
+                            </h:panelGroup>
+                        </div>
+                        <div class="p-field">
+                            <h:panelGroup>
+                                <p:outputLabel value="Re-Enter New Password" for="activateRePassword"/>
+                                <span class="ui-input-icon-left">
+                                    <i class="pi pi-lock"/>
+                                    <p:password id="activateRePassword" value="#{employeeLoginManagedBean.activateRePassword}"
+                                                style="padding-left: 2rem" />
+                                </span>
+                                <p:message class="error-message" for="activateRePassword"/>
+                            </h:panelGroup>
+                        </div>
 
-                                    <h:panelGroup id="actPasswordPanel">
-                                        <label style="margin:.5em 0 .5em 0; display: block">Enter New Password</label>
-                                        <div class="login-input">
-                                            <span class="ui-input-icon-left">
-                                                <i class="pi pi-lock"></i>
-                                                <p:password id="actPassword" label="actPassword" value="#{employeeLoginManagedBean.activatePassword}"
-                                                            validatorMessage="Please provide a valid Password"
-                                                            required="true" requiredMessage="Password is required" maxlength="32" 
-                                                            style="padding-left: 2rem" >
-                                                    <f:validateLength minimum="8" />
-                                                </p:password>
-                                            </span>
-                                            <p:message id="messagePassword" for="actPassword"/>
-                                        </div>
-                                    </h:panelGroup>
+                        <div class="p-field">
+                            <p:messages id="messages" for="formActivatePassword" closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
 
-                                </div>
-
-                                <div class="p-col-12 password-container">
-
-                                    <h:panelGroup id="actRePasswordPanel">
-                                        <label style="margin:.5em 0 .5em 0; display: block">Re-Enter New Password</label>
-                                        <div class="login-input">
-                                            <span class="ui-input-icon-left">
-                                                <i class="pi pi-lock"></i>
-                                                <p:password id="actRePassword" label="actRePassword" value="#{employeeLoginManagedBean.activateRePassword}"
-                                                            validatorMessage="Please provide a valid Password"
-                                                            required="true" requiredMessage="Password Confirmation is required" maxlength="32" 
-                                                            style="padding-left: 2rem" >
-                                                    <f:validateLength minimum="8" />
-                                                </p:password>
-                                            </span>
-                                            <p:message id="messageRePassword" for="actRePassword"/>
-                                        </div>
-                                    </h:panelGroup>
-
-                                </div>
-
-                                <div class="p-col-12">
-                                    <p:messages id="messages" for="dialogForm" closable="true">
-                                        <p:autoUpdate/>
-                                    </p:messages>
-                                </div>
-
-                                <div class="p-col-12">
-                                    <div class="p-grid p-justify-center">
-                                        <div class="p-col-8">
-                                            <p:commandButton type="submit" value="Activate Account" actionListener="#{employeeLoginManagedBean.activateAccount}"
-                                                             update="actPanel" icon="fa fa-key"/>
-                                        </div>
-                                    </div>
+                        <div class="p-field">
+                            <div class="p-grid p-justify-center">
+                                <div class="p-col-8">
+                                    <p:commandButton value="Activate Account" type="submit" icon="fa fa-key"
+                                                     actionListener="#{employeeLoginManagedBean.activateAccount}"
+                                                     update="panelActivatePassword"/>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </p:outputPanel>
             </p:dialog>
         </h:form>
 
-        <h:form id="forgotPasswordForm">
-            <p:dialog header="Forgot Password" widgetVar="forgotDlg" id="forgotDlg" modal="true" responsive="true" width="350" showEffect="fade" hideEffect="fade">
-                <p:outputPanel id="forgotPanel">
+        <h:form id="formForgetPassword">
+            <p:dialog header="Forgot Password" widgetVar="dlgForgetPassword" id="dlgForgetPassword" modal="true" responsive="true" width="300" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false">
+                <p:outputPanel id="panelForgetPassword">
                     <div class="ui-fluid">
-                        <div class="login-panel-content">
-                            <div class="p-grid">
-                                <div class="p-col-12 password-container">
+                        <div class="p-field">
+                            <h:panelGroup>
+                                <p:outputLabel value="Enter your Email" for="forgetPasswordEmail"/>
+                                <span class="ui-input-icon-left">
+                                    <i class="pi pi-user"/>
+                                    <p:inputText id="forgetPasswordEmail" value="#{employeeLoginManagedBean.currentEmployee.email}"
+                                                 style="padding-left: 2rem" />
+                                </span>
+                                <p:message class="error-message" for="forgetPasswordEmail"/>
+                            </h:panelGroup>
+                        </div>
+                        <div class="p-field">
+                            <h:panelGroup>
+                                <p:outputLabel value="Enter your Phone Number" for="forgetPasswordPhoneNumber"/>
+                                <span class="ui-input-icon-left">
+                                    <i class="fa fa-phone"/>
+                                    <p:inputText id="forgetPasswordPhoneNumber" value="#{employeeLoginManagedBean.currentEmployee.phoneNumber}"
+                                                 style="padding-left: 2rem" />
+                                </span>
+                                <p:message class="error-message" for="forgetPasswordPhoneNumber"/>
+                            </h:panelGroup>
+                        </div>
 
-                                    <h:panelGroup id="forgotPasswordNricPanel">
-                                        <label style="margin:.5em 0 .5em 0; display: block">Enter your NRIC/FIN</label>
-                                        <div class="login-input">
-                                            <span class="ui-input-icon-left">
-                                                <i class="pi pi-user"></i>
-                                                <p:inputText label="NRIC/FIN" id="forgetPasswordNric" value="#{employeeLoginManagedBean.forgetPasswordNric}" 
-                                                             validatorMessage="Please provide a valid NRIC/FIN"
-                                                             required="true" requiredMessage="NRIC is required" maxlength="32" 
-                                                             style="padding-left: 2rem" >
-                                                    <f:validateLength minimum="9"/>
-                                                </p:inputText>
-                                            </span>
-                                            <p:message id="messageForgetPasswordNric" for="forgetPasswordNric"/>
-                                        </div>
-                                    </h:panelGroup>
+                        <div class="p-field">
+                            <p:messages id="messages" for="formForgetPassword" closable="true">
+                                <p:autoUpdate/>
+                            </p:messages>
+                        </div>
 
-                                </div>
-
-                                <div class="p-col-12 password-container">
-
-                                    <h:panelGroup id="forgotPasswordEmailPanel">
-                                        <label style="margin:.5em 0 .5em 0; display: block">Enter your Email</label>
-                                        <div class="login-input">
-                                            <span class="ui-input-icon-left">
-                                                <i class="pi pi-user"></i>
-                                                <p:inputText label="Email" id="forgetPasswordEmail" value="#{employeeLoginManagedBean.forgetPasswordEmail}" 
-                                                             validatorMessage="Please provide a valid Email"
-                                                             required="true" requiredMessage="Email is required" maxlength="40" 
-                                                             style="padding-left: 2rem" >
-                                                    <f:validateRegex
-                                                        pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                                </p:inputText>
-                                            </span>
-                                            <p:message id="messageForgetPasswordEmail" for="forgetPasswordEmail"/>
-                                        </div>
-                                    </h:panelGroup>
-
-                                </div>
-
-                                <div class="p-col-12">
-                                    <p:messages id="messages" for="forgotPasswordForm" closable="true">
-                                        <p:autoUpdate/>
-                                    </p:messages>
-                                </div>
-
-                                <div class="p-col-12">
-                                    <div class="p-grid p-justify-center">
-                                        <div class="p-col-8">
-                                            <p:commandButton type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp()}"
-                                                             update="forgotPanel inactivityForm" icon="fa fa-send-o"/>
-                                        </div>
-                                    </div>
+                        <div class="p-field">
+                            <div class="p-grid p-justify-center">
+                                <div class="p-col-8">
+                                    <p:commandButton type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp}"
+                                                     update="panelForgetPassword" icon="pi pi-key"/>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </p:outputPanel>

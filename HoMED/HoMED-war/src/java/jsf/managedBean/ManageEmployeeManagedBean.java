@@ -10,35 +10,38 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
+import util.exceptions.CreateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
 
-@Named(value = "viewEmployeeManagedBean")
+@Named(value = "manageEmployeeManagedBean")
 @ViewScoped
-public class ViewEmployeeManagedBean implements Serializable {
+public class ManageEmployeeManagedBean implements Serializable {
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBean;
 
     private Employee currentEmployee;
 
-    private Employee originalEmployeeToView;
     private Employee employeeToView;
+
+    private Boolean isManageState;
+    private Boolean isCreateState;
 
     private Boolean isAdminView;
     private Boolean isEditMode;
-    private Boolean isDeleted;
+    private Boolean isHideAdminPanel;
 
-    public ViewEmployeeManagedBean() {
+    public ManageEmployeeManagedBean() {
         this.employeeToView = new Employee();
     }
 
     @PostConstruct
     public void postConstruct() {
         init();
+        this.isManageState = false;
+        this.isCreateState = false;
         this.isAdminView = false;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
@@ -49,13 +52,34 @@ public class ViewEmployeeManagedBean implements Serializable {
         }
     }
 
-    public void init() {
-        this.isEditMode = false;
-        this.isDeleted = false;
+    private void init() {
+        this.isHideAdminPanel = false;
     }
 
-    public void doEdit() {
+    public void initCreate() {
+        init();
+        this.employeeToView = new Employee();
+        this.isManageState = false;
+        this.isCreateState = true;
         this.isEditMode = true;
+    }
+
+    public void initManage() {
+        init();
+        this.isManageState = true;
+        this.isCreateState = false;
+        this.isEditMode = false;
+    }
+
+    public void doCreate() {
+        try {
+            employeeSessionBean.createEmployee(employeeToView);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created Employee! Please inform employee that OTP has been sent to their email.", null));
+            this.isHideAdminPanel = true;
+            this.isEditMode = false;
+        } catch (CreateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
     }
 
     public void doSave() {
@@ -63,25 +87,20 @@ public class ViewEmployeeManagedBean implements Serializable {
             employeeSessionBean.updateEmployee(employeeToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
-            this.originalEmployeeToView = new Employee(employeeToView);
-        } catch (EmployeeNotFoundException | UpdateEmployeeException | DuplicateEntryExistsException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the employee: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (UpdateEmployeeException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
     public void doResetPassword() {
         try {
-            // isActivated is changed
             this.employeeToView.setIsActivated(false);
-            this.originalEmployeeToView = new Employee(this.employeeToView);
+
             employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
+
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset employee's password! Please inform employee that OTP has been sent to their email.", null));
         } catch (ResetEmployeePasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while resetting employee password: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -92,19 +111,12 @@ public class ViewEmployeeManagedBean implements Serializable {
             try {
                 employeeSessionBean.deleteEmployee(this.employeeToView.getEmployeeId());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted employee!", null));
-                this.isDeleted = true;
+                this.isHideAdminPanel = true;
                 this.isEditMode = false;
-            } catch (DeleteEmployeeException | EmployeeNotFoundException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while deleting the employee: " + ex.getMessage(), null));
-            } catch (Exception ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            } catch (DeleteEmployeeException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
             }
         }
-    }
-
-    public void doCancel() {
-        this.isEditMode = false;
-        this.employeeToView = new Employee(originalEmployeeToView);
     }
 
     public Employee getEmployeeToView() {
@@ -112,7 +124,6 @@ public class ViewEmployeeManagedBean implements Serializable {
     }
 
     public void setEmployeeToView(Employee employeeToView) {
-        this.originalEmployeeToView = new Employee(employeeToView);
         this.employeeToView = employeeToView;
     }
 
@@ -132,12 +143,28 @@ public class ViewEmployeeManagedBean implements Serializable {
         this.isEditMode = isEditMode;
     }
 
-    public Boolean getIsDeleted() {
-        return isDeleted;
+    public Boolean getIsHideAdminPanel() {
+        return isHideAdminPanel;
     }
 
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setIsHideAdminPanel(Boolean isHideAdminPanel) {
+        this.isHideAdminPanel = isHideAdminPanel;
+    }
+
+    public Boolean getIsManageState() {
+        return isManageState;
+    }
+
+    public void setIsManageState(Boolean isManageState) {
+        this.isManageState = isManageState;
+    }
+
+    public Boolean getIsCreateState() {
+        return isCreateState;
+    }
+
+    public void setIsCreateState(Boolean isCreateState) {
+        this.isCreateState = isCreateState;
     }
 
 }

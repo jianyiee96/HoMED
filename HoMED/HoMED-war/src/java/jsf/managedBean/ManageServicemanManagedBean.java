@@ -1,9 +1,4 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-war
- */
 package jsf.managedBean;
-
 
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
@@ -17,10 +12,7 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.DeleteServicemanException;
-import util.exceptions.DuplicateEntryExistsException;
-import util.exceptions.InputDataValidationException;
 import util.exceptions.ResetServicemanPasswordException;
-import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
 
 @Named(value = "manageServicemanManagedBean")
@@ -30,7 +22,6 @@ public class ManageServicemanManagedBean implements Serializable {
     @EJB(name = "ServicemanSessionBeanLocal")
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
-    private Serviceman originalServicemanToView;
     private Serviceman servicemanToView;
 
     private Boolean isAdminView;
@@ -68,11 +59,8 @@ public class ManageServicemanManagedBean implements Serializable {
             servicemanSessionBeanLocal.updateServiceman(servicemanToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated serviceman!", null));
             this.isEditMode = false;
-            this.originalServicemanToView = new Serviceman(servicemanToView);
-        } catch (ServicemanNotFoundException | UpdateServicemanException | InputDataValidationException | DuplicateEntryExistsException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while updating the serviceman: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (UpdateServicemanException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -80,15 +68,12 @@ public class ManageServicemanManagedBean implements Serializable {
         try {
             // isActivated is changed
             this.servicemanToView.setIsActivated(false);
-            this.originalServicemanToView = new Serviceman(servicemanToView);
 
             servicemanSessionBeanLocal.resetServicemanPasswordByAdmin(servicemanToView);
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset serviceman's password! Please inform serviceman that OTP has been sent to their email.", null));
         } catch (ResetServicemanPasswordException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while resetting serviceman password: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
@@ -99,16 +84,13 @@ public class ManageServicemanManagedBean implements Serializable {
 
             this.isDeleted = true;
             this.isEditMode = false;
-        } catch (DeleteServicemanException | ServicemanNotFoundException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An error has occurred while deleting the serviceman: " + ex.getMessage(), null));
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An unexpected error has occurred: " + ex.getMessage(), null));
+        } catch (DeleteServicemanException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
 
     public void doCancel() {
         this.isEditMode = false;
-        this.servicemanToView = new Serviceman(originalServicemanToView);
     }
 
     public Serviceman getServicemanToView() {
