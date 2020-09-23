@@ -32,14 +32,13 @@ public class FormField implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formFieldId;
 
-    @Column(nullable = false)
-    @NotNull
-    private String title;
+    @Column (nullable = true) //Validation to be done when saving a form
+    private String question;
     
     @Column(nullable = false)
     @NotNull
     @Min(1)
-    private int position;
+    private Integer position;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,11 +47,11 @@ public class FormField implements Serializable {
     
     @Column(nullable = false)
     @NotNull
-    private boolean isRequired;
+    private Boolean isRequired;
     
     @Column(nullable = false)
     @NotNull
-    private boolean isServicemanEditable;
+    private Boolean isServicemanEditable;
     
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormFieldOption> formFieldOptions;
@@ -71,19 +70,19 @@ public class FormField implements Serializable {
         this.formFieldId = formFieldId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(Integer position) {
         this.position = position;
     }
 
@@ -95,19 +94,19 @@ public class FormField implements Serializable {
         this.inputType = inputType;
     }
 
-    public boolean isIsRequired() {
+    public Boolean getIsRequired() {
         return isRequired;
     }
 
-    public void setIsRequired(boolean isRequired) {
+    public void setIsRequired(Boolean isRequired) {
         this.isRequired = isRequired;
     }
 
-    public boolean isIsServicemanEditable() {
+    public Boolean getIsServicemanEditable() {
         return isServicemanEditable;
     }
 
-    public void setIsServicemanEditable(boolean isServicemanEditable) {
+    public void setIsServicemanEditable(Boolean isServicemanEditable) {
         this.isServicemanEditable = isServicemanEditable;
     }
 

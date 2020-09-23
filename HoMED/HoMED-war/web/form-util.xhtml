@@ -113,19 +113,27 @@
                                 <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
                                 <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" immediate="true" update="editorForm" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
                                 <p:commandButton rendered="#{not formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right">
-                                    <p:confirm header="Clone Template" message="Any changed on the form editor will be saved before cloning. Proceed to clone?" icon="pi pi-exclamation-triangle" />
+                                    <p:confirm header="Clone Template" message="Any current changes on the form editor will be saved before cloning. Proceed to clone?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
 
 
-                                <p:outputLabel class="p-mx-2 " value="Public "/>
+                                <p:outputLabel class="p-mx-2" value="Public: "/>
                                 <p:selectBooleanCheckbox  value="#{formUtilityManagedBean.newFormIsPublic}">
                                     <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
                                 </p:selectBooleanCheckbox>
-                                
+
 
                                 <p:commandButton rendered="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right" />
 
 
+
+                            </div>
+                            <div>
+                                <h:panelGrid style="margin-left:5px; font-weight: bold; color: graytext" rendered="#{formUtilityManagedBean.selectedForm.datePublished != null}" columns="2">
+                                    <p:outputLabel value="Published since: "></p:outputLabel>
+                                    <p:outputLabel value="#{formUtilityManagedBean.renderDate(formUtilityManagedBean.selectedForm.datePublished)}"></p:outputLabel>
+
+                                </h:panelGrid>
 
                             </div>
 
@@ -137,8 +145,13 @@
                                     <p:inplace disabled="#{formUtilityManagedBean.fieldsDisabled}" id="templateName" editor="true">
                                         <p:inputText value="#{formUtilityManagedBean.newFormName}" required="true" label="text" />
                                     </p:inplace>
+                                    <div style="margin-top: 5px">
+                                        <ui:repeat value="#{formUtilityManagedBean.selectedFormFieldWrappers}" var="consultations">
+                                            <span class="form-status-badge status-#{formUtilityManagedBean.selectedForm.formStatus.text.toLowerCase()}">#{consultations.formField.question}</span>
 
-
+                                        </ui:repeat>
+                                     
+                                    </div>
 
                                 </f:facet>
 
@@ -151,10 +164,10 @@
 
                                                     <p:outputLabel value="Question: " />
 
-                                                    <p:inputText style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.title}"/>
+                                                    <p:inputText style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.question}"/>
 
                                                     <p:outputLabel value="Input Type: " />
-                                                    <p:selectOneMenu style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
+                                                    <p:selectOneMenu style="width: 100%" immediate="true" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
                                                         <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
                                                         <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
                                                     </p:selectOneMenu>

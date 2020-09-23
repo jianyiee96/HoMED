@@ -7,16 +7,13 @@ package ejb.session.stateless;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -64,7 +61,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         FormTemplate ft = retrieveFormTemplate(formTemplateId);
 
-        FormTemplate newFT = new FormTemplate(ft.getFormTemplateName() + " Cloned");
+        FormTemplate newFT = new FormTemplate(ft.getFormTemplateName() + " - Cloned");
 
         List<FormField> newFFs = new ArrayList<>();
 
@@ -84,10 +81,10 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
             newFF.setFormFieldOptions(newFFOs);
             newFF.setInputType(ff.getInputType());
-            newFF.setIsRequired(ff.isIsRequired());
-            newFF.setIsServicemanEditable(ff.isIsServicemanEditable());
+            newFF.setIsRequired(ff.getIsRequired());
+            newFF.setIsServicemanEditable(ff.getIsServicemanEditable());
             newFF.setPosition(ff.getPosition());
-            newFF.setTitle(ff.getTitle());
+            newFF.setQuestion(ff.getQuestion());
             em.persist(newFF);
             newFFs.add(newFF);
         }
@@ -132,6 +129,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         if (formTemplate.getFormStatus() == FormStatusEnum.ARCHIVED || formTemplate.getFormStatus() == FormStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
             formTemplate.setFormStatus(FormStatusEnum.PUBLISHED);
+            formTemplate.setDatePublished(new Date());
             em.flush();
             return true;
         } else {
@@ -169,7 +167,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.isIsPublic() != newIsPublic) {
+        if (formTemplate.getIsPublic() != newIsPublic) {
             formTemplate.setIsPublic(newIsPublic);
             em.flush();
             return true;

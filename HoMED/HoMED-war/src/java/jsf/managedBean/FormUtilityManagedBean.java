@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -25,7 +24,6 @@ import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import jsf.classes.FormFieldWrapper;
-import org.primefaces.PrimeFaces;
 import util.enumeration.FormStatusEnum;
 import util.enumeration.InputTypeEnum;
 
@@ -40,20 +38,17 @@ public class FormUtilityManagedBean implements Serializable {
 
     private FormTemplate selectedForm;
 
-    private List<FormFieldWrapper> selectedFormFieldWrappers = new ArrayList<>();
-
-    private List<InputTypeEnum> inputTypes = new ArrayList<>();
+    private List<FormFieldWrapper> selectedFormFieldWrappers;
 
     private String createFormName;
 
     private String newFormName;
 
-    private boolean newFormIsPublic;
+    private Boolean newFormIsPublic;
 
-    private boolean fieldsDisabled;
+    private Boolean fieldsDisabled;
 
     public FormUtilityManagedBean() {
-        inputTypes = Arrays.asList(InputTypeEnum.class.getEnumConstants());
     }
 
     @PostConstruct
@@ -136,35 +131,35 @@ public class FormUtilityManagedBean implements Serializable {
 
     public boolean saveFormFields() {
 
-        boolean emptyTitle = false;
-        boolean emptyOptions = false;
-        boolean duplicateTitle = false;
-        HashSet<String> titleSet = new HashSet<>();
+        HashSet<String> questionSet = new HashSet<>();
 
         List<FormField> newFormFields = new ArrayList<>();
         int index = 1;
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
-
-            if (ffw.getFormField().getTitle().equals("")) {
+            System.out.println(ffw.getFormField().getQuestion());
+            if (ffw.getFormField().getQuestion() == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Empty question detected!"));
-                emptyTitle = true;
-                break;
-            } else if (titleSet.contains(ffw.getFormField().getTitle())) {
+                return false;
+
+            } else if (questionSet.contains(ffw.getFormField().getQuestion())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Duplicate question detected!"));
-                duplicateTitle = true;
-                break;
+                return false;
+
             } else if (ffw.getHasInputOption() && ffw.getFormFieldOptions().isEmpty()) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Please ensure there is at least one option for applicable fields!"));
-                emptyOptions = true;
-                break;
+                return false;
+
             } else {
-                titleSet.add(ffw.getFormField().getTitle());
+                questionSet.add(ffw.getFormField().getQuestion());
             }
 
             FormField ff = ffw.getFormField();
             List<FormFieldOption> formFieldOptions = new ArrayList<>();
-            for (String fieldOption : ffw.getFormFieldOptions()) {
-                formFieldOptions.add(new FormFieldOption(fieldOption));
+
+            if (ffw.getHasInputOption()) {
+                for (String fieldOption : ffw.getFormFieldOptions()) {
+                    formFieldOptions.add(new FormFieldOption(fieldOption));
+                }
             }
             ff.setFormFieldOptions(formFieldOptions);
             ff.setPosition(index);
@@ -172,20 +167,13 @@ public class FormUtilityManagedBean implements Serializable {
             index++;
         }
 
-        if (!emptyTitle && !emptyOptions && !duplicateTitle) {
-            selectedForm.setFormFields(newFormFields);
-            selectedForm.setFormTemplateName(this.newFormName);
-            formTemplateSessionBeanLocal.saveFormTemplate(selectedForm);
+        selectedForm.setFormFields(newFormFields);
+        selectedForm.setFormTemplateName(this.newFormName);
+        formTemplateSessionBeanLocal.saveFormTemplate(selectedForm);
+        formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
 
-            formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
-            System.out.println("saved form template: ");
-            System.out.println(selectedForm.getFormTemplateId());
-
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully saved form template!", "Database has been updated."));
-            return true;
-        } else {
-            return false;
-        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully saved form template!", "Database has been updated."));
+        return true;
 
     }
 
@@ -222,6 +210,10 @@ public class FormUtilityManagedBean implements Serializable {
 
     }
 
+    public InputTypeEnum[] getInputTypes() {
+        return InputTypeEnum.values();
+    }
+
     public List<FormTemplate> getFormTemplates() {
         return formTemplates;
     }
@@ -242,10 +234,6 @@ public class FormUtilityManagedBean implements Serializable {
         this.selectedFormFieldWrappers = selectedFormFieldWrappers;
     }
 
-    public void setInputTypes(List<InputTypeEnum> inputTypes) {
-        this.inputTypes = inputTypes;
-    }
-
     public String getCreateFormName() {
         return createFormName;
     }
@@ -262,19 +250,19 @@ public class FormUtilityManagedBean implements Serializable {
         this.newFormName = newFormName;
     }
 
-    public boolean isFieldsDisabled() {
+    public Boolean getFieldsDisabled() {
         return fieldsDisabled;
     }
 
-    public void setFieldsDisabled(boolean fieldsDisabled) {
+    public void setFieldsDisabled(Boolean fieldsDisabled) {
         this.fieldsDisabled = fieldsDisabled;
     }
 
-    public boolean isNewFormIsPublic() {
+    public Boolean getNewFormIsPublic() {
         return newFormIsPublic;
     }
 
-    public void setNewFormIsPublic(boolean newFormIsPublic) {
+    public void setNewFormIsPublic(Boolean newFormIsPublic) {
         this.newFormIsPublic = newFormIsPublic;
     }
 
@@ -288,7 +276,7 @@ public class FormUtilityManagedBean implements Serializable {
     public void setSelectedForm(FormTemplate selectedForm) {
         this.selectedForm = formTemplateSessionBeanLocal.retrieveFormTemplate(selectedForm.getFormTemplateId());
         this.newFormName = selectedForm.getFormTemplateName();
-        this.newFormIsPublic = selectedForm.isIsPublic();
+        this.newFormIsPublic = selectedForm.getIsPublic();
         this.selectedFormFieldWrappers = new ArrayList<>();
 
         for (FormField ff : this.selectedForm.getFormFields()) {
@@ -317,8 +305,6 @@ public class FormUtilityManagedBean implements Serializable {
 
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
             if (!ffw.getFormFieldCode().equals(fieldToDelete)) {
-                System.out.println(ffw.getFormField().getTitle());
-                System.out.println(ffw.getFormFieldCode());
 
                 remainingFormFieldWrappers.add(ffw);
             }
@@ -395,7 +381,4 @@ public class FormUtilityManagedBean implements Serializable {
         }
     }
 
-    public InputTypeEnum[] getInputTypes() {
-        return InputTypeEnum.values();
-    }
 }

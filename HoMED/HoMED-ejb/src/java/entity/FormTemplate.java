@@ -41,6 +41,10 @@ public class FormTemplate implements Serializable {
     @NotNull
     private Date dateCreated;
     
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = true)
+    private Date datePublished;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
@@ -48,7 +52,7 @@ public class FormTemplate implements Serializable {
     
     @Column(nullable = false)
     @NotNull
-    private boolean isPublic;
+    private Boolean isPublic;
     
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormField> formFields;
@@ -89,6 +93,14 @@ public class FormTemplate implements Serializable {
         this.dateCreated = dateCreated;
     }
 
+    public Date getDatePublished() {
+        return datePublished;
+    }
+
+    public void setDatePublished(Date datePublished) {
+        this.datePublished = datePublished;
+    }
+    
     public FormStatusEnum getFormStatus() {
         return formStatus;
     }
@@ -97,11 +109,11 @@ public class FormTemplate implements Serializable {
         this.formStatus = formStatus;
     }
 
-    public boolean isIsPublic() {
+    public Boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setIsPublic(boolean isPublic) {
+    public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
     }
     
