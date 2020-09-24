@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-war
- */
 package jsf.managedBean;
 
 import ejb.session.stateless.ServicemanSessionBeanLocal;
@@ -34,10 +30,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     private ManageServicemanManagedBean manageServicemanManagedBean;
 
     private List<Serviceman> servicemen;
-
-    private Serviceman servicemanToCreate;
-    private Boolean isEditableCreateServiceman;
-
+    
     public ServicemanAccountManagementManagedBean() {
     }
 
@@ -49,27 +42,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void dialogActionListener() {
         this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
         PrimeFaces.current().ajax().update("formAllServicemen:dataTableServicemen");
-    }
-
-    public void doViewServiceman(Serviceman serviceman) {
-        this.manageServicemanManagedBean.setServicemanToView(serviceman);
-        this.manageServicemanManagedBean.init();
-    }
-
-    public void doCreateServiceman() {
-        this.servicemanToCreate = new Serviceman();
-        this.isEditableCreateServiceman = true;
-    }
-
-    public void createServiceman() {
-        try {
-            servicemanSessionBeanLocal.createServiceman(servicemanToCreate);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created serviceman! Please inform serviceman that OTP has been sent to his/her email.", null));
-            this.isEditableCreateServiceman = false;
-            this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
-        } catch (CreateServicemanException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
-        }
     }
 
     public List<Serviceman> getServicemen() {
@@ -93,14 +65,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         return dateFormat.format(date);
     }
 
-    public Serviceman getServicemanToCreate() {
-        return servicemanToCreate;
-    }
-
-    public void setServicemanToCreate(Serviceman servicemanToCreate) {
-        this.servicemanToCreate = servicemanToCreate;
-    }
-
     public GenderEnum[] getGenders() {
         return GenderEnum.values();
     }
@@ -108,13 +72,5 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public BloodTypeEnum[] getBloodTypes() {
         return BloodTypeEnum.values();
     }
-
-    public Boolean getIsEditableCreateServiceman() {
-        return isEditableCreateServiceman;
-    }
-
-    public void setIsEditableCreateServiceman(Boolean isEditableCreateServiceman) {
-        this.isEditableCreateServiceman = isEditableCreateServiceman;
-    }
-
+    
 }
