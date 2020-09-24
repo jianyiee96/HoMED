@@ -4,7 +4,9 @@
  */
 package jsf.managedBean;
 
+import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
+import entity.ConsultationPurpose;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
@@ -35,9 +37,14 @@ public class FormUtilityManagedBean implements Serializable {
     @EJB
     private FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
 
+    @EJB
+    private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
+
     private List<FormTemplate> formTemplates;
 
     private FormTemplate selectedForm;
+
+    private List<ConsultationPurpose> selectedFormConsultationPurpose;
 
     private List<FormFieldWrapper> selectedFormFieldWrappers;
 
@@ -57,6 +64,7 @@ public class FormUtilityManagedBean implements Serializable {
 
         formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
         selectedFormFieldWrappers = new ArrayList<>();
+        selectedFormConsultationPurpose = new ArrayList<>();
     }
 
     public void selectForm(ActionEvent event) {
@@ -108,6 +116,24 @@ public class FormUtilityManagedBean implements Serializable {
                     setSelectedForm(ft);
                 }
             }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted form template!", "Database has been updated."));
+
+        }
+    }
+
+    public void restoreForm(ActionEvent event) {
+
+        Long id = (Long) event.getComponent().getAttributes().get("formIdToRestore");
+        boolean success = formTemplateSessionBeanLocal.restoreFormTemplate(id);
+        if (success) {
+            postConstruct();
+            for (FormTemplate ft : formTemplates) {
+                if (ft.getFormTemplateId() == id) {
+                    setSelectedForm(ft);
+                }
+            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully restored form template!", "Database has been updated."));
+
         }
     }
 
@@ -136,7 +162,6 @@ public class FormUtilityManagedBean implements Serializable {
         List<FormField> newFormFields = new ArrayList<>();
         int index = 1;
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
-            System.out.println(ffw.getFormField().getQuestion());
             if (ffw.getFormField().getQuestion() == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Empty question detected!"));
                 return false;
@@ -290,6 +315,17 @@ public class FormUtilityManagedBean implements Serializable {
         } else {
             this.fieldsDisabled = true;
         }
+
+        this.selectedFormConsultationPurpose = consultationPurposeSessionBeanLocal.retrieveAllFormTemplateLinkedConsultationPurposes(this.selectedForm.getFormTemplateId());
+
+    }
+
+    public List<ConsultationPurpose> getSelectedFormConsultationPurpose() {
+        return selectedFormConsultationPurpose;
+    }
+
+    public void setSelectedFormConsultationPurpose(List<ConsultationPurpose> selectedFormConsultationPurpose) {
+        this.selectedFormConsultationPurpose = selectedFormConsultationPurpose;
     }
 
     public void addCurrentFormFieldWrapper() {

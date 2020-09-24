@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.ConsultationPurpose;
+import entity.FormTemplate;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -62,6 +63,30 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
     }
 
     @Override
+    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates) {
+
+        ConsultationPurpose cp = retrieveConsultationPurpose(id);
+
+        List<FormTemplate> currentFormTemplates = cp.getFormTemplates();
+
+        for (FormTemplate ftLink : formTemplates) {
+            em.merge(ftLink);
+        }
+
+        // Unlink All
+        for (FormTemplate ftUnlink : currentFormTemplates) {
+            ftUnlink.getConsultationPurposes().remove(cp);
+        }
+
+        // Link 
+        cp.setFormTemplates(formTemplates);
+        for (FormTemplate ftLink : formTemplates) {
+            ftLink.getConsultationPurposes().add(cp);
+        }
+
+    }
+
+    @Override
     public ConsultationPurpose retrieveConsultationPurpose(Long id) {
         ConsultationPurpose consultationPurpose = em.find(ConsultationPurpose.class, id);
         return consultationPurpose;
@@ -70,9 +95,40 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
     @Override
     public List<ConsultationPurpose> retrieveAllConsultationPurposes() {
         Query query = em.createQuery("SELECT c FROM ConsultationPurpose c");
-        return query.getResultList();
+        List<ConsultationPurpose> cps = query.getResultList();
+        for (ConsultationPurpose cp : cps) {
+            cp.getFormTemplates().size();
+        }
+        return cps;
     }
 
+    @Override
+    public List<ConsultationPurpose> retrieveAllFormTemplateLinkedConsultationPurposes(Long id) {
+        Query query = em.createQuery("SELECT distinct c FROM ConsultationPurpose c JOIN c.formTemplates ft WHERE ft.formTemplateId = :id");
+        query.setParameter("id", id);
+        List<ConsultationPurpose> cps = query.getResultList();
+        for (ConsultationPurpose cp : cps) {
+            cp.getFormTemplates().size();
+        }
+        return cps;
+    }
+
+    @Override
+    public void deleteConsultationPurpose(Long id) {
+        
+        ConsultationPurpose cp = retrieveConsultationPurpose(id);
+
+        List<FormTemplate> currentFormTemplates = cp.getFormTemplates();
+
+        // Unlink All
+        for (FormTemplate ftUnlink : currentFormTemplates) {
+            ftUnlink.getConsultationPurposes().remove(cp);
+        }
+        
+        em.remove(cp);
+        
+    }
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<ConsultationPurpose>> constraintViolations) {
         String msg = "";
 

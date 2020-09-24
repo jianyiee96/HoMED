@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.ConsultationPurpose;
+import entity.FormTemplate;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.CreateConsultationPurposeException;
@@ -21,4 +22,10 @@ public interface ConsultationPurposeSessionBeanLocal {
     public ConsultationPurpose retrieveConsultationPurpose(Long id);
     
     public List<ConsultationPurpose> retrieveAllConsultationPurposes();
+    
+    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates);
+    
+    public List<ConsultationPurpose> retrieveAllFormTemplateLinkedConsultationPurposes(Long id);
+    
+    public void deleteConsultationPurpose(Long id);
 }

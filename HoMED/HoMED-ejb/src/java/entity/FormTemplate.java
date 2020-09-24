@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,8 +34,8 @@ public class FormTemplate implements Serializable {
     private Long formTemplateId;
 
     @Column(nullable = false, length = 128)
-    @NotNull(message = "Form Name must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "Form Name must be between length 2 to 128")
+    @NotNull(message = "Form Name must be between length 1 to 128")
+    @Size(min = 1, max = 128, message = "Form Name must be between length 1 to 128")
     private String formTemplateName;
     
     @Temporal(TemporalType.TIMESTAMP)
@@ -58,12 +59,13 @@ public class FormTemplate implements Serializable {
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormField> formFields;
 
-    @ManyToMany(mappedBy = "formTemplates")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "formTemplates")
     private List<ConsultationPurpose> consultationPurposes;
     
     public FormTemplate() {
         this.dateCreated = new Date();
         this.formFields = new ArrayList<>();
+        this.consultationPurposes = new ArrayList<>();
         this.formStatus = FormStatusEnum.DRAFT;
         this.isPublic = false;
     }
@@ -159,7 +161,7 @@ public class FormTemplate implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.FormTemplate[ id=" + formTemplateId + " ]";
+        return formTemplateName+ " [" + formTemplateId + "]";
     }
     
 }

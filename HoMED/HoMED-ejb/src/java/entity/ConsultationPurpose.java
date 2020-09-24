@@ -29,8 +29,8 @@ public class ConsultationPurpose implements Serializable {
     private Long consultationPurposeId;
 
     @Column(nullable = false, unique = true, length = 128)
-    @NotNull(message = "Form Name must be between length 2 to 128")
-    @Size(min = 2, max = 128, message = "Form Name must be between length 2 to 128")
+    @NotNull(message = "Consultation Purpose Name must be between length 1 to 128")
+    @Size(min = 1, max = 128, message = "Consultation Purpose Name must be between length 1 to 128")
     private String consultationPurposeName;
 
     @ManyToMany

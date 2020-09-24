@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.ConsultationPurpose;
 import entity.FormField;
 import entity.FormFieldOption;
 import entity.FormTemplate;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,6 +27,9 @@ import util.exceptions.CreateFormTemplateException;
 
 @Stateless
 public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
+
+    @EJB
+    private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -152,6 +157,12 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         if (formTemplate.getFormStatus() == FormStatusEnum.PUBLISHED) {
             formTemplate.setFormStatus(FormStatusEnum.ARCHIVED);
+
+            List<ConsultationPurpose> cpUnlink = consultationPurposeSessionBeanLocal.retrieveAllFormTemplateLinkedConsultationPurposes(id);
+            for (ConsultationPurpose cp : cpUnlink) {
+                cp.getFormTemplates().remove(formTemplate);
+            }
+            formTemplate.setConsultationPurposes(new ArrayList<>());
             em.flush();
             return true;
         } else {
@@ -165,6 +176,19 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         if (formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
             formTemplate.setFormStatus(FormStatusEnum.DELETED);
+            em.flush();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean restoreFormTemplate(Long id) {
+        FormTemplate formTemplate = retrieveFormTemplate(id);
+
+        if (formTemplate.getFormStatus() == FormStatusEnum.DELETED) {
+            formTemplate.setFormStatus(FormStatusEnum.DRAFT);
             em.flush();
             return true;
         } else {
@@ -194,7 +218,20 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public List<FormTemplate> retrieveAllFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f");
+        List<FormTemplate> fts = query.getResultList();
+        for (FormTemplate ft : fts) {
+            ft.getConsultationPurposes().size();
+        }
+        return fts;
+    }
+
+    @Override
+    public List<FormTemplate> retrieveAllPublishedFormTemplates() {
+        Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formStatus = :publish ");
+        query.setParameter("publish", FormStatusEnum.PUBLISHED);
+
         return query.getResultList();
+
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<FormTemplate>> constraintViolations) {
