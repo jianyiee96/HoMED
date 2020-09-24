@@ -20,11 +20,6 @@
             <div class="p-grid crud-table">
                 <div class="p-col-12">
                     <div class="card">
-                        <h:form enctype="multipart/form-data">        
-                            <p:fileUpload value="#{servicemanAccountManagementManagedBean.csvFile}" mode="simple" skinSimple="true" />
-                            <p:commandButton value="Submit" ajax="false" action="#{servicemanAccountManagementManagedBean.uploadCsv}" />
-                        </h:form>
-
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
@@ -32,6 +27,11 @@
                                              update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()">
                                 <p:resetInput target="formCreateServiceman" />
                             </p:commandButton>
+
+                            <h:form enctype="multipart/form-data">        
+                                <p:fileUpload value="#{servicemanAccountManagementManagedBean.csvFile}" mode="simple" skinSimple="true" process="@form" />
+                                <p:commandButton value="Submit" ajax="false" action="#{servicemanAccountManagementManagedBean.uploadCsv}" process="@form" update="@form" />
+                            </h:form>
                         </div>
 
                         <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"  var="serviceman" value="#{servicemanAccountManagementManagedBean.servicemen}" sortBy="#{serviceman.servicemanId}"
