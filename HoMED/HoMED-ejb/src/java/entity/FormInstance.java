@@ -38,7 +38,7 @@ public class FormInstance implements Serializable {
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
-    private FormTemplate formTemplate;
+    private FormTemplate formTemplateMapping;
     
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormInstanceValue> formInstanceValues;
@@ -52,11 +52,6 @@ public class FormInstance implements Serializable {
         this.formInstanceValues = new ArrayList<>();
     }
     
-    public FormInstance(Serviceman serviceman, FormTemplate formTemplate) {
-        this.serviceman = serviceman;
-        this.formTemplate = formTemplate;
-    }
-
     public FormInstanceStatusEnum getFormInstanceStatusEnum() {
         return formInstanceStatusEnum;
     }
@@ -65,12 +60,12 @@ public class FormInstance implements Serializable {
         this.formInstanceStatusEnum = formInstanceStatusEnum;
     }
 
-    public FormTemplate getFormTemplate() {
-        return formTemplate;
+    public FormTemplate getFormTemplateMapping() {
+        return formTemplateMapping;
     }
 
-    public void setFormTemplate(FormTemplate formTemplate) {
-        this.formTemplate = formTemplate;
+    public void setFormTemplateMapping(FormTemplate formTemplateMapping) {
+        this.formTemplateMapping = formTemplateMapping;
     }
 
     public List<FormInstanceValue> getFormInstanceValues() {

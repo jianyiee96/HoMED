@@ -144,6 +144,15 @@ public class FormTemplate implements Serializable {
         this.consultationPurposes = consultationPurposes;
     }
 
+    public List<FormInstance> getFormInstances() {
+        return formInstances;
+    }
+
+    public void setFormInstances(List<FormInstance> formInstances) {
+        this.formInstances = formInstances;
+    }
+    
+
     @Override
     public int hashCode() {
         int hash = 0;

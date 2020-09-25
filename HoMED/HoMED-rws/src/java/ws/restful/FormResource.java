@@ -14,10 +14,13 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.GenerateFormInstanceException;
+import ws.datamodel.CreateFormInstanceReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.RetrieveAllFormTemplatesRsp;
 import ws.datamodel.ServicemanLoginRsp;
@@ -52,8 +55,6 @@ public class FormResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveAllFormTemplates() {
 
-        System.out.println("GET FORM TEMPLATE API CAllED!");
-
         try {
             List<FormTemplate> formTemplates = formTemplateSessionBeanLocal.retrieveAllPublishedFormTemplates();
             for(FormTemplate ft : formTemplates) {
@@ -66,5 +67,27 @@ public class FormResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
 
+    }
+    
+    @Path("createFormInstance")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createFormInstance(CreateFormInstanceReq createFormInstanceReq) {
+        
+        try {
+
+            formInstanceSessionBeanLocal.generateFormInstance(createFormInstanceReq.getServicemanId(), createFormInstanceReq.getFormTemplateId());
+            
+            return Response.status(Response.Status.OK).build();
+
+        } catch (GenerateFormInstanceException ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
     }
 }

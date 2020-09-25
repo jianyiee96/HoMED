@@ -24,38 +24,36 @@ public class FormInstanceValue implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formInstanceValueId;
     
-//    Should the value be String? 
     @Column
-    private String value;
+    private String inputValue;
     
     @OneToOne(optional = false)
-    private FormField formField;
+    private FormField formFieldMapping;
     
     public FormInstanceValue(){
+        this.inputValue = "";
     }
     
-    public FormInstanceValue(String value, FormField formField) {
-        this.value = value;
-        this.formField = formField;
+    public FormInstanceValue(FormField formField) {
+        this();
+        this.formFieldMapping = formField;
     }
 
-    public String getValue() {
-        return value;
+    public String getInputValue() {
+        return inputValue;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setInputValue(String inputValue) {
+        this.inputValue = inputValue;
     }
 
-    public FormField getFormField() {
-        return formField;
+    public FormField getFormFieldMapping() {
+        return formFieldMapping;
     }
 
-    public void setFormField(FormField formField) {
-        this.formField = formField;
+    public void setFormFieldMapping(FormField formFieldMapping) {
+        this.formFieldMapping = formFieldMapping;
     }
-
-    
     
     public Long getFormInstanceValueId() {
         return formInstanceValueId;

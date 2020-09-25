@@ -32,25 +32,23 @@ public class FormField implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formFieldId;
 
-    @Column (nullable = true) //Validation to be done when saving a form
+    @Column(nullable = true) //Validation to be done when saving a form
     private String question;
     
     @Column(nullable = false)
-    @NotNull
-    @Min(1)
+    @NotNull(message = "Position must not be null")
     private Integer position;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @NotNull
+    @Column
     private InputTypeEnum inputType;
     
     @Column(nullable = false)
-    @NotNull
+    @NotNull(message = "isRequired must not be null")
     private Boolean isRequired;
     
     @Column(nullable = false)
-    @NotNull
+    @NotNull(message = "isServicemanEditable must not be null")
     private Boolean isServicemanEditable;
     
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -58,6 +56,8 @@ public class FormField implements Serializable {
     
 
     public FormField() {
+        this.isRequired = false;
+        this.isServicemanEditable = false;
         this.formFieldOptions = new ArrayList<>();
         this.position = 1;
     }

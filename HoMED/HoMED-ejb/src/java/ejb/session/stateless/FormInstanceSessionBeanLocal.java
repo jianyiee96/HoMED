@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import javax.ejb.Local;
+import util.exceptions.GenerateFormInstanceException;
 
 /**
  *
@@ -12,5 +13,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface FormInstanceSessionBeanLocal {
+    
+    public Long generateFormInstance(Long servicemanId, Long formTemplateId) throws GenerateFormInstanceException;
     
 }
