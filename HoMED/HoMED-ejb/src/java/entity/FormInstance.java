@@ -68,6 +68,48 @@ public class FormInstance implements Serializable {
         this.formTemplate = formTemplate;
     }
 
+    public Boolean getIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
+    public FormInstanceStatusEnum getFormInstanceStatusEnum() {
+        return formInstanceStatusEnum;
+    }
+
+    public void setFormInstanceStatusEnum(FormInstanceStatusEnum formInstanceStatusEnum) {
+        this.formInstanceStatusEnum = formInstanceStatusEnum;
+    }
+
+    public FormTemplate getFormTemplate() {
+        return formTemplate;
+    }
+
+    public void setFormTemplate(FormTemplate formTemplate) {
+        this.formTemplate = formTemplate;
+    }
+
+    public List<FormInstanceValue> getFormInstanceValues() {
+        return formInstanceValues;
+    }
+
+    public void setFormInstanceValues(List<FormInstanceValue> formInstanceValues) {
+        this.formInstanceValues = formInstanceValues;
+    }
+
+    public Serviceman getServiceman() {
+        return serviceman;
+    }
+
+    public void setServiceman(Serviceman serviceman) {
+        this.serviceman = serviceman;
+    }
+
+    
+    
     public Long getFormInstanceId() {
         return formInstanceId;
     }
