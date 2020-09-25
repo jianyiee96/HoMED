@@ -233,7 +233,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
     @Override
     public List<FormTemplate> retrieveAllPublishedFormTemplates() {
-        Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formStatus = :publish ");
+        Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formTemplateStatus = :publish ");
         query.setParameter("publish", FormTemplateStatusEnum.PUBLISHED);
 
         return query.getResultList();

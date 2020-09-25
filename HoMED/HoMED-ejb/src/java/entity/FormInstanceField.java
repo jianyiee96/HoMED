@@ -7,12 +7,14 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 /**
  *
@@ -25,17 +27,18 @@ public class FormInstanceField implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formInstanceFieldId;
-    
-    @OneToMany
+
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormInstanceFieldValue> formInstanceFieldValues;
-    
-    @OneToOne(optional = false)
+
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private FormField formFieldMapping;
-    
-    public FormInstanceField(){
+
+    public FormInstanceField() {
         this.formInstanceFieldValues = new ArrayList<>();
     }
-    
+
     public FormInstanceField(FormField formField) {
         this();
         this.formFieldMapping = formField;
@@ -48,7 +51,7 @@ public class FormInstanceField implements Serializable {
     public void setFormFieldMapping(FormField formFieldMapping) {
         this.formFieldMapping = formFieldMapping;
     }
-    
+
     public Long getFormInstanceFieldId() {
         return formInstanceFieldId;
     }
@@ -89,5 +92,5 @@ public class FormInstanceField implements Serializable {
     public String toString() {
         return "entity.FormInstanceValue[ id=" + formInstanceFieldId + " ]";
     }
-    
+
 }
