@@ -25,14 +25,38 @@ public class FormInstanceValue implements Serializable {
     private Long formInstanceValueId;
     
 //    Should the value be String? 
-//    @Column
-//    private String value;
+    @Column
+    private String value;
     
     @OneToOne(optional = false)
     private FormField formField;
     
+    public FormInstanceValue(){
+    }
     
+    public FormInstanceValue(String value, FormField formField) {
+        this.value = value;
+        this.formField = formField;
+    }
 
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public FormField getFormField() {
+        return formField;
+    }
+
+    public void setFormField(FormField formField) {
+        this.formField = formField;
+    }
+
+    
+    
     public Long getFormInstanceValueId() {
         return formInstanceValueId;
     }
