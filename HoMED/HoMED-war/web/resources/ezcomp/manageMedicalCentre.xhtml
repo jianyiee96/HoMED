@@ -94,9 +94,9 @@
 
                                             <h:panelGroup id="manage-group-1">
                                                 <h5>
-                                                    <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
+                                                    <p:selectBooleanButton class="boolean-button" onLabel="Open" offLabel="Close" onIcon="pi pi-check" offIcon="pi pi-times"
                                                                            disabled="#{not manageMedicalCentreManagedBean.isEditMode}"
-                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}">
+                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen}">
                                                         <p:ajax update="manage-group-1" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                 </h5>
@@ -105,8 +105,8 @@
                                                     <div class="p-field p-col">
                                                         <p:outputLabel for="manage-opening">Opening Hours</p:outputLabel>
                                                         <p:datePicker id="manage-opening" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).openingHours}" 
-                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
-                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen}"
+                                                                      required="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen}"
                                                                       requiredMessage="Opening hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
                                                         <p:message class="error-message" for="manage-opening" />
                                                     </div>
@@ -114,8 +114,8 @@
                                                     <div class="p-field p-col">
                                                         <p:outputLabel for="manage-closing">Closing Hours</p:outputLabel>
                                                         <p:datePicker id="manage-closing" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).closingHours}" 
-                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
-                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen}"
+                                                                      required="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen}"
                                                                       requiredMessage="Closing hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
                                                         <p:message class="error-message" for="manage-closing" />
                                                     </div>
@@ -128,9 +128,9 @@
 
                                             <h:panelGroup id="manage-group-2">
                                                 <h5>
-                                                    <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
-                                                                           disabled="#{not manageMedicalCentreManagedBean.isEditMode}" 
-                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}">
+                                                    <p:selectBooleanButton class="boolean-button" onLabel="Open" offLabel="Close" onIcon="pi pi-check" offIcon="pi pi-times"
+                                                                           disabled="#{not manageMedicalCentreManagedBean.isEditMode}"
+                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen}">
                                                         <p:ajax update="manage-group-2" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                 </h5>
@@ -139,8 +139,8 @@
                                                     <div class="p-field p-col">
                                                         <p:outputLabel for="manage-alt-opening">Opening Hours</p:outputLabel>
                                                         <p:datePicker id="manage-alt-opening" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).openingHours}" 
-                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
-                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen}"
+                                                                      required="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen}"
                                                                       requiredMessage="Opening hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
                                                         <p:message class="error-message" for="manage-alt-opening" />
                                                     </div>
@@ -148,8 +148,8 @@
                                                     <div class="p-field p-col">
                                                         <p:outputLabel for="manage-alt-closing">Closing Hours</p:outputLabel>
                                                         <p:datePicker id="manage-alt-closing" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).closingHours}" 
-                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
-                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen}"
+                                                                      required="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen}"
                                                                       requiredMessage="Closing hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
                                                         <p:message class="error-message" for="manage-alt-closing" />
                                                     </div>

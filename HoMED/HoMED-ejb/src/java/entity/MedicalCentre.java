@@ -48,14 +48,14 @@ public class MedicalCentre implements Serializable {
         this.address = new Address();
         this.operatingHours = new ArrayList<>(8);
 
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.FALSE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.TRUE, null, null));
-        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.TRUE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.FALSE, null, null));
+        operatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.FALSE, null, null));
     }
 
     public MedicalCentre(String name, String phone, Address address, List<OperatingHours> operatingHours) {

@@ -121,7 +121,7 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
 
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
-                        ohsToUpdate.get(i).setIsClose(ohs.get(i).getIsClose());
+                        ohsToUpdate.get(i).setIsOpen(ohs.get(i).getIsOpen());
                         ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
                         ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
                     }
@@ -168,7 +168,7 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     private OperatingHours isOperatingHoursValid(List<OperatingHours> operatingHours) {
         // To check if the operating hours provided are valid.
         for (OperatingHours oh : operatingHours) {
-            if (!oh.getIsClose() && !oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+            if (oh.getIsOpen() && !oh.getClosingHours().isAfter(oh.getOpeningHours())) {
                 return oh;
             }
         }
