@@ -23,10 +23,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.UpdateFormInstanceException;
 import ws.datamodel.CreateFormInstanceReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.RetrieveAllFormTemplatesRsp;
 import ws.datamodel.RetrieveAllServicemanFormInstancesRsp;
+import ws.datamodel.UpdateFormInstanceReq;
 
 /**
  * REST Web Service
@@ -115,6 +117,29 @@ public class FormResource {
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
+    }
+    
+    @Path("updateFormInstanceFieldValues")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateFormInstanceFieldValues(UpdateFormInstanceReq updateFormInstanceReq) {
+        
+        try {
+
+            formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
+
+            return Response.status(Response.Status.OK).build();
+
+        } catch (UpdateFormInstanceException ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
+        
     }
 
     @Path("deleteFormInstance")

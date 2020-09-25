@@ -26,6 +26,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.FormTemplateStatusEnum;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.UpdateFormInstanceException;
 
 /**
  *
@@ -115,7 +116,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
                 fif.setFormInstanceFieldValues(new ArrayList<>());
             }
             formInstance.setFormInstanceFields(new ArrayList<>());
-            
+
             formInstance.getServiceman().getFormInstances().remove(formInstance);
 
             formInstance.getFormTemplateMapping().getFormInstances().remove(formInstance);
@@ -133,17 +134,64 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             throw new DeleteFormInstanceException(generalUnexpectedErrorMessage + "generate Form Instance");
         }
     }
-    
+
+    @Override
+    public void updateFormInstanceFieldValues(FormInstance formInstance) throws UpdateFormInstanceException {
+        String errorMessage = "Failed to update Form Instance Field Values: ";
+
+        try {
+
+            FormInstance fiPersisted = retrieveFormInstance(formInstance.getFormInstanceId());
+
+            if (formInstance == null) {
+                throw new UpdateFormInstanceException("Please supply an existing formInstanceId");
+            }
+
+            for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
+                
+                for (FormInstanceField fifPersisted : fiPersisted.getFormInstanceFields()) {
+                    
+                    if(fif.getFormInstanceFieldId().equals(fifPersisted.getFormInstanceFieldId())) {
+                        
+                        List<FormInstanceFieldValue> newFifvs = new ArrayList<>();
+                        
+                        for(FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+                            
+                            FormInstanceFieldValue newFifv = new FormInstanceFieldValue(fifv.getInputValue());
+                            em.persist(newFifv);
+                            newFifvs.add(newFifv);
+                            
+                        }
+                        
+                        fifPersisted.setFormInstanceFieldValues(newFifvs);
+                        
+                    }
+                    
+                }
+                
+            }
+
+        } catch (UpdateFormInstanceException ex) {
+            throw new UpdateFormInstanceException(errorMessage + ex.getMessage());
+        } catch (PersistenceException ex) {
+            throw new UpdateFormInstanceException(generalUnexpectedErrorMessage + "update Form Instance Field Values [Persistence Exception]");
+        } catch (Exception ex) {
+            System.out.println(ex.getClass());
+            ex.printStackTrace();
+            throw new UpdateFormInstanceException(generalUnexpectedErrorMessage + "update Form Instance Field Values");
+        }
+    }
+
     @Override
     public List<FormInstance> retrieveServicemanFormInstances(Long servicemanId) {
-        
+
         Query query = em.createQuery("SELECT f FROM FormInstance f WHERE f.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
 
         return query.getResultList();
-        
+
     }
-    
+
     @Override
     public FormInstance retrieveFormInstance(Long id) {
         FormInstance formInstance = em.find(FormInstance.class, id);
