@@ -97,7 +97,7 @@
                                                     <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
                                                                            disabled="#{not manageMedicalCentreManagedBean.isEditMode}"
                                                                            value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}">
-                                                        <p:ajax update="manage-group-1" />
+                                                        <p:ajax update="manage-group-1" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                 </h5>
 
@@ -131,7 +131,7 @@
                                                     <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
                                                                            disabled="#{not manageMedicalCentreManagedBean.isEditMode}" 
                                                                            value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}">
-                                                        <p:ajax update="manage-group-2" />
+                                                        <p:ajax update="manage-group-2" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                 </h5>
 

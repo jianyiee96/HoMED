@@ -43,24 +43,33 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
             if (constraintViolations.isEmpty()) {
 
-                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    if (oh.getIsClose()) {
-                        em.persist(oh);
-                        em.flush();
-                    } else {
-                        if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
-                            if (oh.getClosingHours().isAfter(oh.getOpeningHours())) {
-                                em.persist(oh);
-                                em.flush();
-                            } else {
-                                throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
-                            }
-                        } else {
-                            throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
-                        }
-                    }
+                OperatingHours operatingHours = isOperatingHoursValid(newMedicalCentre.getOperatingHours());
+                if (operatingHours != null) {
+                    throw new CreateMedicalCentreException("[" + operatingHours.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
                 }
 
+                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
+                    em.persist(oh);
+                    em.flush();
+                }
+
+//                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
+//                    if (oh.getIsClose()) {
+//                        em.persist(oh);
+//                        em.flush();
+//                    } else {
+//                        if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
+//                            if (oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+//                                em.persist(oh);
+//                                em.flush();
+//                            } else {
+//                                throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
+//                            }
+//                        } else {
+//                            throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
+//                        }
+//                    }
+//                }
                 trimAddress(newMedicalCentre.getAddress());
 
                 em.persist(newMedicalCentre);
@@ -120,22 +129,14 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
                     trimAddress(medicalCentreToUpdate.getAddress());
 
-                    // To check if the operating hours provided are valid.
-                    for (OperatingHours oh : medicalCentre.getOperatingHours()) {
-                        if (!oh.getIsClose()) {
-                            if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
-                                if (!oh.getClosingHours().isAfter(oh.getOpeningHours())) {
-                                    throw new UpdateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
-                                }
-                            } else {
-                                throw new UpdateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
-                            }
-                        }
+                    OperatingHours operatingHours = isOperatingHoursValid(medicalCentre.getOperatingHours());
+                    if (operatingHours != null) {
+                        throw new UpdateMedicalCentreException("[" + operatingHours.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
                     }
 
                     List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
-                    
+
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
                         ohsToUpdate.get(i).setIsClose(ohs.get(i).getIsClose());
                         ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
@@ -179,6 +180,17 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         }
 
         return medicalCentreAddress;
+    }
+
+    private OperatingHours isOperatingHoursValid(List<OperatingHours> operatingHours) {
+        // To check if the operating hours provided are valid.
+        for (OperatingHours oh : operatingHours) {
+            if (!oh.getIsClose() && !oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+                return oh;
+            }
+        }
+
+        return null;
     }
 
     @Override
