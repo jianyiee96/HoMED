@@ -20,6 +20,18 @@
             .ui-chips-container {
                 width: 100%;
             }
+            
+            .form-name {
+                font-size: 25px;
+            }
+            
+            .form-name  .ui-inputtext {
+                font-size:20px;
+            }
+            
+            .form-name .ui-inplace-save {
+                margin-right: 3px;
+            }
         </style>
 
         <div class="p-grid">
@@ -56,7 +68,7 @@
                             <f:facet id="dataViewListHeader" name="header">
                                 <span style="font-weight: bold">FORM TEMPLATES</span>
                             </f:facet>
-                            <p:column width="30" headerText="Id" sortBy="#{formTemplate.formTemplateId}">
+                            <p:column width="35" headerText="Id" sortBy="#{formTemplate.formTemplateId}">
                                 <h:outputText value="#{formTemplate.formTemplateId}" />
                             </p:column>
                             <p:column headerText="Name" sortBy="#{formTemplate.formTemplateName}">
@@ -128,7 +140,7 @@
 
 
                                 <p:outputLabel class="p-mx-2" value="Public: "/>
-                                <p:selectBooleanCheckbox  value="#{formUtilityManagedBean.newFormIsPublic}">
+                                <p:selectBooleanCheckbox  disabled="#{formUtilityManagedBean.fieldsDisabled}" value="#{formUtilityManagedBean.newFormIsPublic}">
                                     <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
                                 </p:selectBooleanCheckbox>
 
@@ -152,8 +164,8 @@
                                 <f:facet name="header">
 
 
-                                    <p:inplace disabled="#{formUtilityManagedBean.fieldsDisabled}" id="templateName" editor="true">
-                                        <p:inputText value="#{formUtilityManagedBean.newFormName}" required="true" label="text" />
+                                    <p:inplace disabled="#{formUtilityManagedBean.fieldsDisabled}" id="templateName" editor="true" styleClass="form-name">
+                                        <p:inputText value="#{formUtilityManagedBean.newFormName}" required="true" label="text" styleClass="form-name"/>
                                     </p:inplace>
                                     <div style="margin-top: 5px">
                                         <ui:repeat value="#{formUtilityManagedBean.selectedFormConsultationPurpose}" var="consultations">
