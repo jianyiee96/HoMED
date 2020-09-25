@@ -58,7 +58,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             if (serviceman == null || formTemplate == null) {
                 throw new GenerateFormInstanceException("Please supply an existing servicemanId or formTemplateId");
-            } else if (formTemplate.getFormStatus() != FormTemplateStatusEnum.PUBLISHED) {
+            } else if (formTemplate.getFormTemplateStatus() != FormTemplateStatusEnum.PUBLISHED) {
                 throw new GenerateFormInstanceException("Supplied Form Template is not of Published status");
             } 
             

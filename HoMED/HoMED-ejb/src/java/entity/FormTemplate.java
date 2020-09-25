@@ -50,7 +50,7 @@ public class FormTemplate implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
-    private FormTemplateStatusEnum formStatus;
+    private FormTemplateStatusEnum formTemplateStatus;
     
     @Column(nullable = false)
     @NotNull
@@ -70,7 +70,7 @@ public class FormTemplate implements Serializable {
         this.dateCreated = new Date();
         this.formFields = new ArrayList<>();
         this.consultationPurposes = new ArrayList<>();
-        this.formStatus = FormTemplateStatusEnum.DRAFT;
+        this.formTemplateStatus = FormTemplateStatusEnum.DRAFT;
         this.isPublic = false;
         this.formInstances = new ArrayList<>();
     }
@@ -112,12 +112,12 @@ public class FormTemplate implements Serializable {
         this.datePublished = datePublished;
     }
     
-    public FormTemplateStatusEnum getFormStatus() {
-        return formStatus;
+    public FormTemplateStatusEnum getFormTemplateStatus() {
+        return formTemplateStatus;
     }
 
-    public void setFormStatus(FormTemplateStatusEnum formStatus) {
-        this.formStatus = formStatus;
+    public void setFormTemplateStatus(FormTemplateStatusEnum formTemplateStatus) {
+        this.formTemplateStatus = formTemplateStatus;
     }
 
     public Boolean getIsPublic() {

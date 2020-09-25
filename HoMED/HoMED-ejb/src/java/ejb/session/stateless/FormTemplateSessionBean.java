@@ -124,7 +124,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             ft.setFormFields(new ArrayList<>());
             em.flush();
 
-            ft.setFormStatus(formTemplate.getFormStatus());
+            ft.setFormTemplateStatus(formTemplate.getFormTemplateStatus());
             ft.setFormTemplateName(formTemplate.getFormTemplateName());
             ft.setFormFields(formTemplate.getFormFields());
 
@@ -147,8 +147,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean publishFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.ARCHIVED || formTemplate.getFormStatus() == FormTemplateStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
-            formTemplate.setFormStatus(FormTemplateStatusEnum.PUBLISHED);
+        if (formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.ARCHIVED || formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
+            formTemplate.setFormTemplateStatus(FormTemplateStatusEnum.PUBLISHED);
             formTemplate.setDatePublished(new Date());
             em.flush();
             return true;
@@ -161,8 +161,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean archiveFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.PUBLISHED) {
-            formTemplate.setFormStatus(FormTemplateStatusEnum.ARCHIVED);
+        if (formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.PUBLISHED) {
+            formTemplate.setFormTemplateStatus(FormTemplateStatusEnum.ARCHIVED);
 
             List<ConsultationPurpose> cpUnlink = consultationPurposeSessionBeanLocal.retrieveAllFormTemplateLinkedConsultationPurposes(id);
             for (ConsultationPurpose cp : cpUnlink) {
@@ -180,8 +180,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean deleteFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.DRAFT) {
-            formTemplate.setFormStatus(FormTemplateStatusEnum.DELETED);
+        if (formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {
+            formTemplate.setFormTemplateStatus(FormTemplateStatusEnum.DELETED);
             em.flush();
             return true;
         } else {
@@ -193,8 +193,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean restoreFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.DELETED) {
-            formTemplate.setFormStatus(FormTemplateStatusEnum.DRAFT);
+        if (formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.DELETED) {
+            formTemplate.setFormTemplateStatus(FormTemplateStatusEnum.DRAFT);
             em.flush();
             return true;
         } else {

@@ -77,8 +77,8 @@
                             <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
                                 <h:outputText value="#{formUtilityManagedBean.renderDate(formTemplate.dateCreated)}" />
                             </p:column>
-                            <p:column width="100" headerText="Status" sortBy="#{formTemplate.formStatus}">
-                                <span class="form-status-badge status-#{formTemplate.formStatus.text.toLowerCase()}">#{formTemplate.formStatus.text}</span>
+                            <p:column width="100" headerText="Status" sortBy="#{formTemplate.formTemplateStatus}">
+                                <span class="form-status-badge status-#{formTemplate.formTemplateStatus.text.toLowerCase()}">#{formTemplate.formTemplateStatus.text}</span>
                             </p:column>
                             <p:column width="100" headerText="Privacy" sortBy="#{formTemplate.isPublic}">
                                 <span class="form-status-badge privacy-#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}">#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}</span>
@@ -89,26 +89,26 @@
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
                                     <f:attribute name="formToView" value="#{formTemplate}" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formStatus != 'ARCHIVED'}" disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'ARCHIVED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
                                     <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Publish Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
                                     <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Publish Template" escape="false" message="Republish an archived form template?" icon="pi pi-exclamation-triangle" />
 
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formStatus != 'DELETED'}" disabled="#{formTemplate.formStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'DELETED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
                                     <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Delete Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formStatus == 'DELETED'}" class="rounded-button help-button-" style="margin: 3px" update="@form editorForm formAllTemplates" icon="fa fa-rotate-left"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button help-button-" style="margin: 3px" update="@form editorForm formAllTemplates" icon="fa fa-rotate-left"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
                                     <f:attribute name="formIdToRestore" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Restore Template" escape="false" message="Form Template will be restored to Draft status. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
                                 
                                 
-                                <p:commandButton disabled="#{formTemplate.formStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
+                                <p:commandButton disabled="#{formTemplate.formTemplateStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
                                     <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Archive Template" escape="false" message="Users will no longer be able to use this Form Template.&lt;br/&gt;Any linkage to Consultation Purposes will be removed too.&lt;br/&gt;Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>

@@ -310,7 +310,7 @@ public class FormUtilityManagedBean implements Serializable {
 
         Collections.sort(selectedFormFieldWrappers);
 
-        if (this.selectedForm.getFormStatus() == FormTemplateStatusEnum.DRAFT) {
+        if (this.selectedForm.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {
             this.fieldsDisabled = false;
         } else {
             this.fieldsDisabled = true;
