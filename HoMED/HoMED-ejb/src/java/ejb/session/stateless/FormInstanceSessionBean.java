@@ -6,7 +6,7 @@ package ejb.session.stateless;
 
 import entity.FormField;
 import entity.FormInstance;
-import entity.FormInstanceValue;
+import entity.FormInstanceField;
 import entity.FormTemplate;
 import entity.Serviceman;
 import java.util.Set;
@@ -72,10 +72,10 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             
             for(FormField ff : formTemplate.getFormFields()) {
                 
-                FormInstanceValue fiv = new FormInstanceValue();
-                fiv.setFormFieldMapping(ff);
-                em.persist(fiv);
-                formInstance.getFormInstanceValues().add(fiv);
+                FormInstanceField fif = new FormInstanceField();
+                fif.setFormFieldMapping(ff);
+                em.persist(fif);
+                formInstance.getFormInstanceFields().add(fif);
                 
             }
             
