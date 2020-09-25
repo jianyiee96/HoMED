@@ -114,27 +114,33 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public void saveFormTemplate(FormTemplate formTemplate) {
 
-        FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
+        try {
 
-        for (FormField oldFF : ft.getFormFields()) {
-            oldFF.setFormFieldOptions(new ArrayList<>());
-        }
-        ft.setFormFields(new ArrayList<>());
-        em.flush();
+            FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
 
-        ft.setFormStatus(formTemplate.getFormStatus());
-        ft.setFormTemplateName(formTemplate.getFormTemplateName());
-        ft.setFormFields(formTemplate.getFormFields());
-
-        for (FormField ff : ft.getFormFields()) {
-            for (FormFieldOption ffo : ff.getFormFieldOptions()) {
-                em.persist(ffo);
+            for (FormField oldFF : ft.getFormFields()) {
+                oldFF.setFormFieldOptions(new ArrayList<>());
             }
-            em.persist(ff);
+            ft.setFormFields(new ArrayList<>());
+            em.flush();
+
+            ft.setFormStatus(formTemplate.getFormStatus());
+            ft.setFormTemplateName(formTemplate.getFormTemplateName());
+            ft.setFormFields(formTemplate.getFormFields());
+
+            for (FormField ff : ft.getFormFields()) {
+                for (FormFieldOption ffo : ff.getFormFieldOptions()) {
+                    em.persist(ffo);
+                }
+                em.persist(ff);
+            }
+
+            em.merge(ft);
+            em.flush();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
 
-        em.merge(ft);
-        em.flush();
     }
 
     @Override

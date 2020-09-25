@@ -18,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotNull;
 import util.enumeration.FormInstanceStatusEnum;
 
 /**
@@ -32,18 +31,9 @@ public class FormInstance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formInstanceId;
-    
-//    @Column(nullable = false)
-//    @NotNull
-//    private Boolean isApproved;
-    
-    @Column(nullable = false)
-    @NotNull
-    private Boolean isLocked;
-    
+        
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @NotNull(message = "Form Instance Status must be provided")
+    @Column
     private FormInstanceStatusEnum formInstanceStatusEnum;
     
     @ManyToOne(optional = false)
@@ -58,7 +48,6 @@ public class FormInstance implements Serializable {
     private Serviceman serviceman;
     
     public FormInstance() {
-        this.isLocked = false;
         this.formInstanceStatusEnum = FormInstanceStatusEnum.DRAFT;
         this.formInstanceValues = new ArrayList<>();
     }
@@ -66,14 +55,6 @@ public class FormInstance implements Serializable {
     public FormInstance(Serviceman serviceman, FormTemplate formTemplate) {
         this.serviceman = serviceman;
         this.formTemplate = formTemplate;
-    }
-
-    public Boolean getIsLocked() {
-        return isLocked;
-    }
-
-    public void setIsLocked(Boolean isLocked) {
-        this.isLocked = isLocked;
     }
 
     public FormInstanceStatusEnum getFormInstanceStatusEnum() {
