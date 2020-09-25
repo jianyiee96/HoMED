@@ -191,9 +191,8 @@
                                                 <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doDelete}" update="panelManageMedicalCentre" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
                                                     <p:confirm header="Confirmation" message="Are you sure you want to delete this medical centre? Actions cannot be reverted!" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
-                                                <p:commandButton update="panelManageMedicalCentre" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doReset}" update="panelManageMedicalCentre" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
                                                     <p:resetInput target="panelManageMedicalCentre" />
-                                                    <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.isEditMode}" value="false"/>
                                                 </p:commandButton>
                                             </ui:fragment>
                                         </ui:fragment>

@@ -88,16 +88,10 @@ public class DataInitializationSessionBean {
 
     private void initializeMedicalCentres() throws CreateMedicalCentreException {
         MedicalCentre newMedicalCentre = new MedicalCentre();
-
-        String medicalCentreName = "HOME TEAM ACADEMY MEDICAL CENTRE";
-        newMedicalCentre.setName(medicalCentreName);
-
-        String medicalCentrePhone = "64653921";
-        newMedicalCentre.setPhone(medicalCentrePhone);
-
+        newMedicalCentre.setName("HOME TEAM ACADEMY MEDICAL CENTRE");
+        newMedicalCentre.setPhone("64653921");
         // Street Name, Unit Number, Building Name, Country, Postal Code
-        Address medicalCentreAddress = new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928");
-        newMedicalCentre.setAddress(medicalCentreAddress);
+        newMedicalCentre.setAddress(new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", null, "Singapore", "698928"));
 
         List<OperatingHours> medicalCentreOperatingHours = new ArrayList<>();
         medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.FALSE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
@@ -110,7 +104,6 @@ public class DataInitializationSessionBean {
         medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.TRUE, null, null));
 
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
-
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
     }
 }

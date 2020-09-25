@@ -53,23 +53,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     em.flush();
                 }
 
-//                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-//                    if (oh.getIsClose()) {
-//                        em.persist(oh);
-//                        em.flush();
-//                    } else {
-//                        if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
-//                            if (oh.getClosingHours().isAfter(oh.getOpeningHours())) {
-//                                em.persist(oh);
-//                                em.flush();
-//                            } else {
-//                                throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
-//                            }
-//                        } else {
-//                            throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
-//                        }
-//                    }
-//                }
                 trimAddress(newMedicalCentre.getAddress());
 
                 em.persist(newMedicalCentre);

@@ -13,6 +13,7 @@ import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.CreateMedicalCentreException;
 import util.exceptions.DeleteMedicalCentreException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UpdateMedicalCentreException;
 
 @Named(value = "manageMedicalCentreManagedBean")
@@ -100,7 +101,16 @@ public class ManageMedicalCentreManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
-    
+
+    public void doReset() {
+        try {
+            medicalCentreToView = medicalCentreSessionBeanLocal.retrieveMedicalCentreById(medicalCentreToView.getMedicalCentreId());
+            this.isEditMode = false;
+        } catch (MedicalCentreNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
+    }
+
     public MedicalCentre getMedicalCentreToView() {
         return medicalCentreToView;
     }
