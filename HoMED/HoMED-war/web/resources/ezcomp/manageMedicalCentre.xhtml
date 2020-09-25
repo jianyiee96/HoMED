@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <cc:interface>
+        <cc:clientBehavior name="dialogCloseEvent" targets="formManageMedicalCentre:dialogManageMedicalCentre" event="close" /> 
+    </cc:interface>
+
+    <cc:implementation>
+
+        <h:form id="formManageMedicalCentre">
+            <p:dialog id="dialogManageMedicalCentre" widgetVar="dialogManageMedicalCentre" header="#{manageMedicalCentreManagedBean.isCreateState ? 'Create Medical Centre' : 'Medical Centre Details'}" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      minWidth="500" width="900">
+                <p:outputPanel id="panelManageMedicalCentre" rendered="#{not empty manageMedicalCentreManagedBean.medicalCentreToView}">
+                    <div class="p-grid">
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h4>BASIC INFORMATION</h4>
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="pi pi-home p-mr-2 p-ml-2" />
+                                        <p:outputLabel for="manage-name">Name</p:outputLabel>
+                                        <p:inputText id="manage-name" value="#{manageMedicalCentreManagedBean.medicalCentreToView.name}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}" />
+                                        <p:message class="error-message" for="manage-name" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-phone p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-phone">Telephone Number</p:outputLabel>
+                                        <p:inputText id="manage-phone" value="#{manageMedicalCentreManagedBean.medicalCentreToView.phone}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}" />
+                                        <p:message class="error-message" for="manage-phone" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h5>CENTRE ADDRESS</h5>
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="pi pi-directions-alt p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-street-name" value="Street Name"/>
+                                        <p:inputText id="manage-street-name" value="#{manageMedicalCentreManagedBean.medicalCentreToView.address.streetName}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="manage-street-name" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-unit-number" value="Unit Number"/>
+                                        <p:inputText id="manage-unit-number" value="#{manageMedicalCentreManagedBean.medicalCentreToView.address.unitNumber}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="manage-unit-number" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-building-o p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-building-name" value="Building Name"/>
+                                        <p:inputText id="manage-building-name" value="#{manageMedicalCentreManagedBean.medicalCentreToView.address.buildingName}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="manage-building-name" />
+                                    </div>
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-globe p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-country" value="Country"/>
+                                        <p:selectOneMenu id="manage-country" value="#{manageMedicalCentreManagedBean.medicalCentreToView.address.country}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
+                                        <p:message class="error-message" for="manage-country" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-map-marker p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="manage-postal-code" value="Postal Code"/>
+                                        <p:inputText id="manage-postal-code" value="#{manageMedicalCentreManagedBean.medicalCentreToView.address.postal}" disabled="#{not manageMedicalCentreManagedBean.isEditMode}" />
+                                        <p:message class="error-message" for="manage-postal-code" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-12">
+                            <div class="card ui-fluid">
+                                <h4>OPERATING HOURS</h4>
+
+                                <div class="p-formgrid p-grid">
+                                    <p:repeat value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours}" var="operatingHours" step="2" varStatus="status">
+                                        <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                            <h5>#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).dayOfWeek}</h5>
+
+                                            <h:panelGroup id="manage-group-1">
+                                                <h5>
+                                                    <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
+                                                                           disabled="#{not manageMedicalCentreManagedBean.isEditMode}"
+                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}">
+                                                        <p:ajax update="manage-group-1" />
+                                                    </p:selectBooleanButton>
+                                                </h5>
+
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-opening" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).openingHours}" 
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      requiredMessage="Opening hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
+                                                        <p:message class="error-message" for="manage-opening" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-closing" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).closingHours}" 
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isClose}"
+                                                                      requiredMessage="Closing hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
+                                                        <p:message class="error-message" for="manage-closing" />
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+
+                                        <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                            <h5>#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).dayOfWeek}</h5>
+
+                                            <h:panelGroup id="manage-group-2">
+                                                <h5>
+                                                    <p:selectBooleanButton class="boolean-button" onLabel="Close" offLabel="Open" onIcon="pi pi-check" offIcon="pi pi-times"
+                                                                           disabled="#{not manageMedicalCentreManagedBean.isEditMode}" 
+                                                                           value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}">
+                                                        <p:ajax update="manage-group-2" />
+                                                    </p:selectBooleanButton>
+                                                </h5>
+
+                                                <div class="p-formgrid p-grid">
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-alt-opening">Opening Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-alt-opening" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).openingHours}" 
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      requiredMessage="Opening hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
+                                                        <p:message class="error-message" for="manage-alt-opening" />
+                                                    </div>
+
+                                                    <div class="p-field p-col">
+                                                        <p:outputLabel for="manage-alt-closing">Closing Hours</p:outputLabel>
+                                                        <p:datePicker id="manage-alt-closing" value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).closingHours}" 
+                                                                      disabled="#{not manageMedicalCentreManagedBean.isEditMode or manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      required="#{not manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isClose}"
+                                                                      requiredMessage="Closing hours is required" timeOnly="true" pattern="HH:mm" hourFormat="24" stepMinute="1" />
+                                                        <p:message class="error-message" for="manage-alt-closing" />
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </p:repeat>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="p-col-12">
+                            <p:messages globalOnly="true" class="error-message" closable="true">
+                                <p:autoUpdate />
+                            </p:messages>
+                        </div>
+
+                        <ui:fragment rendered="#{manageMedicalCentreManagedBean.isAdminView and not manageMedicalCentreManagedBean.isHideAdminPanel}">
+                            <div class="p-col-12">
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <h5>Admin Rights</h5>
+                                    </f:facet>
+                                    <f:facet name="right">
+                                        <ui:fragment rendered ="#{manageMedicalCentreManagedBean.isCreateState}">
+                                            <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doCreate}" update="panelManageMedicalCentre" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                        </ui:fragment>
+
+                                        <ui:fragment rendered ="#{manageMedicalCentreManagedBean.isManageState}">
+                                            <ui:fragment rendered="#{not manageMedicalCentreManagedBean.isEditMode}">
+                                                <p:commandButton update="panelManageMedicalCentre" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
+                                                    <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.isEditMode}" value="true"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
+
+                                            <ui:fragment rendered="#{manageMedicalCentreManagedBean.isEditMode}">
+                                                <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doSave}" update="panelManageMedicalCentre" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                                <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doDelete}" update="panelManageMedicalCentre" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this medical centre? Actions cannot be reverted!" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton update="panelManageMedicalCentre" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                    <p:resetInput target="panelManageMedicalCentre" />
+                                                    <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.isEditMode}" value="false"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
+                                        </ui:fragment>
+                                    </f:facet>
+                                </p:toolbar>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+
+    </cc:implementation>
+</html>
