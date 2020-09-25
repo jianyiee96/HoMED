@@ -30,12 +30,10 @@ public class OperatingHours implements Serializable {
     private DayOfWeekEnum dayOfWeek;
 
     @Column(nullable = false)
+    @NotNull(message = "Operating status must be provided")
     private Boolean isClose;
 
-    @Column(nullable = true)
     private LocalTime openingHours;
-
-    @Column(nullable = true)
     private LocalTime closingHours;
 
     public OperatingHours() {

@@ -18,8 +18,6 @@ public interface MedicalCentreSessionBeanLocal {
 
     public Long createNewMedicalCentre(MedicalCentre newMedicalCentre) throws CreateMedicalCentreException;
 
-    public Long createNewOperatingHours(OperatingHours newOperatingHours);
-
     public List<MedicalCentre> retrieveAllMedicalCentres();
 
     public MedicalCentre retrieveMedicalCentreById(Long medicalCentreId) throws MedicalCentreNotFoundException;

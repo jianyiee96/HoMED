@@ -6,8 +6,6 @@ import entity.OperatingHours;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -46,30 +44,24 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
 
                 for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    if (oh.getClosingHours() != null && oh.getOpeningHours() != null && oh.getClosingHours().isBefore(oh.getOpeningHours())) {
-                        throw new CreateMedicalCentreException("Opening Hours must be before Closing Hours");
-                    } else {
+                    if (oh.getIsClose()) {
                         em.persist(oh);
                         em.flush();
+                    } else {
+                        if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
+                            if (oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+                                em.persist(oh);
+                                em.flush();
+                            } else {
+                                throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
+                            }
+                        } else {
+                            throw new CreateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
+                        }
                     }
                 }
 
-                Address medicalCentreAddress = newMedicalCentre.getAddress();
-                if (medicalCentreAddress.getStreetName() != null) {
-                    medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
-                }
-                if (medicalCentreAddress.getUnitNumber() != null) {
-                    medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
-                }
-                if (medicalCentreAddress.getBuildingName() != null) {
-                    medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
-                }
-                if (medicalCentreAddress.getCountry() != null) {
-                    medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
-                }
-                if (medicalCentreAddress.getPostal() != null) {
-                    medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
-                }
+                trimAddress(newMedicalCentre.getAddress());
 
                 em.persist(newMedicalCentre);
                 em.flush();
@@ -87,16 +79,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             ex.printStackTrace();
             throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre");
         }
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public Long createNewOperatingHours(OperatingHours newOperatingHours) {
-
-        em.persist(newOperatingHours);
-        em.flush();
-
-        return newOperatingHours.getOperatingHoursId();
     }
 
     @Override
@@ -136,33 +118,26 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     medicalCentreToUpdate.setName(medicalCentre.getName());
                     medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
                     medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
+                    trimAddress(medicalCentreToUpdate.getAddress());
 
-                    Address medicalCentreAddress = medicalCentreToUpdate.getAddress();
-                    if (medicalCentreAddress.getStreetName() != null) {
-                        medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
-                    }
-                    if (medicalCentreAddress.getUnitNumber() != null) {
-                        medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
-                    }
-                    if (medicalCentreAddress.getBuildingName() != null) {
-                        medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
-                    }
-                    if (medicalCentreAddress.getCountry() != null) {
-                        medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
-                    }
-                    if (medicalCentreAddress.getPostal() != null) {
-                        medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+                    // To check if the operating hours provided are valid.
+                    for (OperatingHours oh : medicalCentre.getOperatingHours()) {
+                        if (!oh.getIsClose()) {
+                            if (oh.getOpeningHours() != null && oh.getClosingHours() != null) {
+                                if (!oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+                                    throw new UpdateMedicalCentreException("[" + oh.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
+                                }
+                            } else {
+                                throw new UpdateMedicalCentreException("[" + oh.getDayOfWeek() + "] Operating Hours is required");
+                            }
+                        }
                     }
 
                     List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
-
-                    for (OperatingHours oh : ohs) {
-                        if (oh.getClosingHours() != null && oh.getOpeningHours() != null && oh.getClosingHours().isBefore(oh.getOpeningHours())) {
-                            throw new UpdateMedicalCentreException("Opening Hours must be before Closing Hours");
-                        }
-                    }
+                    
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
+                        ohsToUpdate.get(i).setIsClose(ohs.get(i).getIsClose());
                         ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
                         ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
                     }
@@ -180,6 +155,30 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             ex.printStackTrace();
             throw new UpdateMedicalCentreException(generalUnexpectedErrorMessage + "updating medical centre");
         }
+    }
+
+    private Address trimAddress(Address medicalCentreAddress) {
+        if (medicalCentreAddress.getStreetName() != null) {
+            medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+        }
+
+        if (medicalCentreAddress.getUnitNumber() != null) {
+            medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
+        }
+
+        if (medicalCentreAddress.getBuildingName() != null) {
+            medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
+        }
+
+        if (medicalCentreAddress.getCountry() != null) {
+            medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
+        }
+
+        if (medicalCentreAddress.getPostal() != null) {
+            medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+        }
+
+        return medicalCentreAddress;
     }
 
     @Override

@@ -28,7 +28,7 @@ public class MedicalCentre implements Serializable {
 
     @Column(nullable = false)
     @NotNull(message = "Please provide a name for the medical centre")
-    @Size(min = 8, message = "Medical centre name must be at least of length 8")
+    @Size(min = 2, max = 256, message = "Name must be between length 2 to 256")
     private String name;
 
     @Column(nullable = false)
@@ -60,7 +60,7 @@ public class MedicalCentre implements Serializable {
 
     public MedicalCentre(String name, String phone, Address address, List<OperatingHours> operatingHours) {
         this();
-        
+
         this.name = name;
         this.phone = phone;
         this.address = address;
