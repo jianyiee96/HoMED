@@ -26,7 +26,7 @@ import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import jsf.classes.FormFieldWrapper;
-import util.enumeration.FormStatusEnum;
+import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
 import util.exceptions.CreateFormTemplateException;
 
@@ -310,7 +310,7 @@ public class FormUtilityManagedBean implements Serializable {
 
         Collections.sort(selectedFormFieldWrappers);
 
-        if (this.selectedForm.getFormStatus() == FormStatusEnum.DRAFT) {
+        if (this.selectedForm.getFormStatus() == FormTemplateStatusEnum.DRAFT) {
             this.fieldsDisabled = false;
         } else {
             this.fieldsDisabled = true;

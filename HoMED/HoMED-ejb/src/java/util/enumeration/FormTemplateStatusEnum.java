@@ -4,7 +4,7 @@
  */
 package util.enumeration;
 
-public enum FormStatusEnum {
+public enum FormTemplateStatusEnum {
     DRAFT("Draft"),
     PUBLISHED("Published"),
     DELETED("Deleted"),
@@ -12,7 +12,7 @@ public enum FormStatusEnum {
     
     private String text;
 
-    private FormStatusEnum(String text) {
+    private FormTemplateStatusEnum(String text) {
         this.text = text;
     }
     

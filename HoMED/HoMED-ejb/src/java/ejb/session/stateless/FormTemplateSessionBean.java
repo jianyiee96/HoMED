@@ -22,7 +22,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.enumeration.FormStatusEnum;
+import util.enumeration.FormTemplateStatusEnum;
 import util.exceptions.CreateFormTemplateException;
 
 @Stateless
@@ -141,8 +141,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean publishFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormStatusEnum.ARCHIVED || formTemplate.getFormStatus() == FormStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
-            formTemplate.setFormStatus(FormStatusEnum.PUBLISHED);
+        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.ARCHIVED || formTemplate.getFormStatus() == FormTemplateStatusEnum.DRAFT && formTemplate.getFormFields().size() > 0) {
+            formTemplate.setFormStatus(FormTemplateStatusEnum.PUBLISHED);
             formTemplate.setDatePublished(new Date());
             em.flush();
             return true;
@@ -155,8 +155,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean archiveFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormStatusEnum.PUBLISHED) {
-            formTemplate.setFormStatus(FormStatusEnum.ARCHIVED);
+        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.PUBLISHED) {
+            formTemplate.setFormStatus(FormTemplateStatusEnum.ARCHIVED);
 
             List<ConsultationPurpose> cpUnlink = consultationPurposeSessionBeanLocal.retrieveAllFormTemplateLinkedConsultationPurposes(id);
             for (ConsultationPurpose cp : cpUnlink) {
@@ -174,8 +174,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean deleteFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormStatusEnum.DRAFT) {
-            formTemplate.setFormStatus(FormStatusEnum.DELETED);
+        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.DRAFT) {
+            formTemplate.setFormStatus(FormTemplateStatusEnum.DELETED);
             em.flush();
             return true;
         } else {
@@ -187,8 +187,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public boolean restoreFormTemplate(Long id) {
         FormTemplate formTemplate = retrieveFormTemplate(id);
 
-        if (formTemplate.getFormStatus() == FormStatusEnum.DELETED) {
-            formTemplate.setFormStatus(FormStatusEnum.DRAFT);
+        if (formTemplate.getFormStatus() == FormTemplateStatusEnum.DELETED) {
+            formTemplate.setFormStatus(FormTemplateStatusEnum.DRAFT);
             em.flush();
             return true;
         } else {
@@ -228,7 +228,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public List<FormTemplate> retrieveAllPublishedFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formStatus = :publish ");
-        query.setParameter("publish", FormStatusEnum.PUBLISHED);
+        query.setParameter("publish", FormTemplateStatusEnum.PUBLISHED);
 
         return query.getResultList();
 

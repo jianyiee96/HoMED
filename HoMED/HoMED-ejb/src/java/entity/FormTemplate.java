@@ -23,7 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import util.enumeration.FormStatusEnum;
+import util.enumeration.FormTemplateStatusEnum;
 
 @Entity
 public class FormTemplate implements Serializable {
@@ -50,7 +50,7 @@ public class FormTemplate implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
-    private FormStatusEnum formStatus;
+    private FormTemplateStatusEnum formStatus;
     
     @Column(nullable = false)
     @NotNull
@@ -62,12 +62,17 @@ public class FormTemplate implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "formTemplates")
     private List<ConsultationPurpose> consultationPurposes;
     
+    //Cannot delete FormTemplate when there is FormInstance
+    @OneToMany
+    private List<FormInstance> formInstances;
+    
     public FormTemplate() {
         this.dateCreated = new Date();
         this.formFields = new ArrayList<>();
         this.consultationPurposes = new ArrayList<>();
-        this.formStatus = FormStatusEnum.DRAFT;
+        this.formStatus = FormTemplateStatusEnum.DRAFT;
         this.isPublic = false;
+        this.formInstances = new ArrayList<>();
     }
 
     public FormTemplate(String formTemplateName) {
@@ -107,11 +112,11 @@ public class FormTemplate implements Serializable {
         this.datePublished = datePublished;
     }
     
-    public FormStatusEnum getFormStatus() {
+    public FormTemplateStatusEnum getFormStatus() {
         return formStatus;
     }
 
-    public void setFormStatus(FormStatusEnum formStatus) {
+    public void setFormStatus(FormTemplateStatusEnum formStatus) {
         this.formStatus = formStatus;
     }
 
