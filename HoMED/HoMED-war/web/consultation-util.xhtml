@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Consultation Purpose Utility</ui:define>
+
+
+    <ui:define name="content">
+
+        <div class="p-grid">
+
+            <div class="p-col-12 p-md-12 p-lg-6">
+
+                <h:form id="formAllConsultationPurposes">
+
+                    <p:growl id="growl" globalOnly="true" showDetail="true" />
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog>    
+
+
+                    <div class="card">
+                        <h1>Consultation Purpose Utility Tool</h1>
+
+
+                        <div style="margin: 6px; float: right"  class="p-field">
+
+                            <p:inputText size="30" id="newConsultationPurposeField" value="#{consultationPurposeUtilityManagedBean.createConsultationPurposeName}" placeholder="New Consultation Purpose" >
+                                <p:ajax event="keyup" update="create"/>
+                            </p:inputText>
+                            <p:commandButton id="create" icon="pi pi-plus" update="formAllConsultationPurposes" action="#{consultationPurposeUtilityManagedBean.createConsultationPurpose()}" disabled="#{consultationPurposeUtilityManagedBean.createConsultationPurposeName == null || consultationPurposeUtilityManagedBean.createConsultationPurposeName == ''}" >
+                                <p:confirm header="Create Form Template" message="Confirm create consultation purpose named [#{consultationPurposeUtilityManagedBean.createConsultationPurposeName}]?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+
+                        </div>
+
+                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="consultationPurpose" value="#{consultationPurposeUtilityManagedBean.consultationPurposes}"
+                                     rowKey="#{consultationPurpose.consultationPurposeId}" scrollable="true" scrollHeight="600"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">CONSULTATION PURPOSES</span>
+                            </f:facet>
+                            <p:column width="35" headerText="Id" sortBy="#{consultationPurpose.consultationPurposeId}">
+                                <h:outputText value="#{consultationPurpose.consultationPurposeId}" />
+
+                            </p:column>
+                            <p:column headerText="Name" sortBy="#{consultationPurpose.consultationPurposeName}">
+                                <h:outputText value="#{consultationPurpose.consultationPurposeName}" />
+                            </p:column>
+
+                            <p:column style="text-align: center" exportable="false">
+
+                                <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes"  icon="pi pi-search" title="View" actionListener="#{consultationPurposeUtilityManagedBean.selectConsultationPurpose}">
+                                    <f:attribute name="consultationPurposeToView" value="#{consultationPurpose}" />
+                                </p:commandButton> 
+
+                                <p:commandButton class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-trash"  title="Delete" actionListener="#{consultationPurposeUtilityManagedBean.deleteConsultationPurpose}">
+                                    <f:attribute name="consultationPurposeIdToDelete" value="#{consultationPurpose.consultationPurposeId}" />
+                                    <p:confirm header="Delete Consultation Purpose" escape="false" message="Any linkage of Form Templates to [#{consultationPurpose.consultationPurposeName}] will be removed. &lt;br/&gt;Do you want to proceed?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                            </p:column>
+                        </p:dataTable>    
+                    </div>
+
+
+                </h:form>
+            </div>
+
+            <div class="p-col-12 p-md-12 p-lg-6">
+
+                <h:form id="editorForm" >
+                    <p:growl id="growl" globalOnly="true" showDetail="true" sticky="true" />  
+                    <ui:fragment rendered="#{consultationPurposeUtilityManagedBean.selectedConsultationPurpose != null}">
+                        <div class="card">
+
+
+                            <h3>#{consultationPurposeUtilityManagedBean.selectedConsultationPurpose.consultationPurposeName}</h3>
+
+                            <p:pickList id="pickList" value="#{consultationPurposeUtilityManagedBean.dualListFormTemplates}" converter="formTemplateConverter" var="ft" itemLabel="#{ft}" itemValue="#{ft}"
+                                        effect="fade" responsive="true">
+                                <f:facet name="sourceCaption">Form Templates that are not linked</f:facet>
+                                <f:facet name="targetCaption">Linked Form Templates</f:facet>
+                                <p:ajax event="transfer" listener="#{consultationPurposeUtilityManagedBean.onTransfer}" update="editorForm" />
+                            </p:pickList>
+                        </div>
+                    </ui:fragment>
+                </h:form>
+
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

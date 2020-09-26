@@ -6,6 +6,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
@@ -70,6 +72,9 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Password must be provided")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
+    
+    @OneToMany
+    private List<FormInstance> formInstances;
     
     @Embedded
     @Column(nullable = false)
@@ -195,6 +200,14 @@ public class Serviceman implements Serializable {
         this.isActivated = isActivated;
     }
 
+    public List<FormInstance> getFormInstances() {
+        return formInstances;
+    }
+
+    public void setFormInstances(List<FormInstance> formInstances) {
+        this.formInstances = formInstances;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
