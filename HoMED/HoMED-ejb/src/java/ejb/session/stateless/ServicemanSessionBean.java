@@ -210,7 +210,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ActivateServicemanException(errorMessage + "Unable to find account details!");
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new ActivateServicemanException(generalUnexpectedErrorMessage + "activating employee account");
+            throw new ActivateServicemanException(generalUnexpectedErrorMessage + "activating serviceman account");
         }
     }
 
@@ -311,10 +311,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 && ex.getCause().getCause().getClass().getSimpleName().equals("SQLIntegrityConstraintViolationException")) {
 
             if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
-                result += "Employee with same email address already exists\n";
+                result += "Serivceman with same email address already exists\n";
             }
             if (ex.getCause().getCause().getMessage().contains("PHONE")) {
-                result += "Employee with same phone number already exists\n";
+                result += "Serivceman with same phone number already exists\n";
             }
         } else {
             ex.printStackTrace();

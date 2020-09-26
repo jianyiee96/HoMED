@@ -15,10 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import util.enumeration.DayOfWeekEnum;
-import util.validators.OpeningHours;
 
 @Entity
-@OpeningHours(message = "Opening hour has to be before closing hour!")
 public class OperatingHours implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,20 +30,18 @@ public class OperatingHours implements Serializable {
     private DayOfWeekEnum dayOfWeek;
 
     @Column(nullable = false)
-    private Boolean isClose;
+    @NotNull(message = "Operating status must be provided")
+    private Boolean isOpen;
 
-    @Column(nullable = true)
     private LocalTime openingHours;
-
-    @Column(nullable = true)
     private LocalTime closingHours;
 
     public OperatingHours() {
     }
 
-    public OperatingHours(DayOfWeekEnum dayOfWeek, Boolean isClose, LocalTime openingHours, LocalTime closingHours) {
+    public OperatingHours(DayOfWeekEnum dayOfWeek, Boolean isOpen, LocalTime openingHours, LocalTime closingHours) {
         this.dayOfWeek = dayOfWeek;
-        this.isClose = isClose;
+        this.isOpen = isOpen;
         this.openingHours = openingHours;
         this.closingHours = closingHours;
     }
@@ -66,14 +62,14 @@ public class OperatingHours implements Serializable {
         this.dayOfWeek = dayOfWeek;
     }
 
-    public Boolean getIsClose() {
-        return isClose;
+    public Boolean getIsOpen() {
+        return isOpen;
     }
 
-    public void setIsClose(Boolean isClose) {
-        this.isClose = isClose;
+    public void setIsOpen(Boolean isOpen) {
+        this.isOpen = isOpen;
 
-        if (isClose) {
+        if (!isOpen) {
             this.openingHours = null;
             this.closingHours = null;
         }

@@ -41,38 +41,41 @@
 
 
         <h:form id="formManageEmployee">
-            <p:dialog id="dialogManageEmployee" widgetVar="dialogManageEmployee" header="Employee Details" showEffect="fade"
-                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
-                <p:outputPanel id="panelManageEmployee">
+            <p:dialog id="dialogManageEmployee" widgetVar="dialogManageEmployee" header="#{manageEmployeeManagedBean.isCreateState ? 'Create Employee' : 'Employee Details'}" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      minWidth="500" width="700">
+                <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">
                         <div class="p-col-12 p-grid p-justify-center">
-                            <span class="role-badge role-#{manageEmployeeManagedBean.employeeToView.role}">#{manageEmployeeManagedBean.employeeToView.role.stringVal}</span>
-                            <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView}">
-                                <i style="margin-left: 5px; font-size:25px" class="fa #{manageEmployeeManagedBean.employeeToView.isActivated?'fa-unlock':'fa-lock'}"/>
+                            <ui:fragment rendered="#{manageEmployeeManagedBean.isManageState}">
+                                <span class="role-badge role-#{manageEmployeeManagedBean.employeeToView.role}">#{manageEmployeeManagedBean.employeeToView.role.stringVal}</span>
+                                <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView}">
+                                    <i style="margin-left: 5px; font-size:25px" class="fa #{manageEmployeeManagedBean.employeeToView.isActivated?'fa-unlock':'fa-lock'}"/>
+                                </ui:fragment>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{manageEmployeeManagedBean.isCreateState}">
+                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}">
+                                    <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                                </p:selectOneMenu>
                             </ui:fragment>
                         </div>
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
                                 <h5>Personal Particulars</h5>
                                 <div class="p-field">
+                                    <i class="pi pi-user p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-name" value="Name"/>
-                                    <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" />
+                                    <p:inputText id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-name" />
                                 </div>
 
                                 <div class="p-field">
-                                    <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
-
-
-                                <div class="p-field">
+                                    <i class="fa fa-venus-mars p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-gender" value="Gender"/>
-                                    <p:selectOneMenu disabled="#{not manageEmployeeManagedBean.isEditMode}" id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}">
+                                    <p:selectOneMenu id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}" disabled="#{not manageEmployeeManagedBean.isEditMode}" >
                                         <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
                                     </p:selectOneMenu>
+                                    <p:message class="error-message" for="view-gender" />
                                 </div> 
                             </div>
                         </div>
@@ -81,42 +84,100 @@
                             <div class="card ui-fluid">
                                 <h5>Contact Details</h5>
                                 <div class="p-field">
+                                    <i class="fa fa-phone p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
-                                    <p:inputText id="view-phoneNumber" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" />
+                                    <p:inputText id="view-phoneNumber" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-phoneNumber" />
                                 </div>
 
                                 <div class="p-field">
-                                    <p:outputLabel for="view-address" value="Address"/>
-                                    <p:inputText id="view-address" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address}" />
+                                    <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
+                                    <p:outputLabel for="view-email" value="Email Address"/>
+                                    <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:message class="error-message" for="view-email" />
                                 </div>
                             </div>
                         </div>
+
                         <div class="p-col-12">
-                            <p:messages closable="true">
+                            <div class="card ui-fluid">
+                                <h5>Address Details</h5>
+                                <div class="p-formgrid p-grid">
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="pi pi-directions-alt p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-street-name" value="Street Name"/>
+                                        <p:inputText id="view-street-name" value="#{manageEmployeeManagedBean.employeeToView.address.streetName}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-street-name" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-street-view p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-unit-number" value="Unit Number"/>
+                                        <p:inputText id="view-unit-number" value="#{manageEmployeeManagedBean.employeeToView.address.unitNumber}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-unit-number" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                        <i class="fa fa-building-o p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-building-name" value="Building Name"/>
+                                        <p:inputText id="view-building-name" value="#{manageEmployeeManagedBean.employeeToView.address.buildingName}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-building-name" />
+                                    </div>
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-globe p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-country" value="Country"/>
+                                        <p:selectOneMenu id="view-country" value="#{manageEmployeeManagedBean.employeeToView.address.country}" disabled="#{not manageEmployeeManagedBean.isEditMode}">
+                                            <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
+                                        </p:selectOneMenu>
+                                        <p:message class="error-message" for="view-country" />
+                                    </div>
+
+                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                        <i class="fa fa-map-marker p-mr-2 p-ml-2"/>
+                                        <p:outputLabel for="view-postal-code" value="Postal Code"/>
+                                        <p:inputText id="view-postal-code" value="#{manageEmployeeManagedBean.employeeToView.address.postal}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:message class="error-message" for="view-postal-code" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-col-12">
+                            <p:messages globalOnly="true" class="error-message" closable="true">
                                 <p:autoUpdate/>
                             </p:messages>
                         </div>
-                        <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView and not manageEmployeeManagedBean.isDeleted}">
+
+                        <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView and not manageEmployeeManagedBean.isHideAdminPanel}">
                             <div class="p-col-12">
                                 <p:toolbar>
                                     <f:facet name="left">
                                         <h5>Admin Rights</h5>
                                     </f:facet>
                                     <f:facet name="right">
-                                        <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode}">
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doEdit}" update="panelManageEmployee" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2"/>
+                                        <ui:fragment rendered ="#{manageEmployeeManagedBean.isCreateState}">
+                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doCreate}" update="panelManageEmployee" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                         </ui:fragment>
-                                        <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode}">
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doSave}" update="panelManageEmployee" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doResetPassword}" update="panelManageEmployee" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
-                                                <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
-                                            </p:commandButton>
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doDelete}" update="panelManageEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
-                                                <p:confirm header="Confirmation" message="Are you sure you want to delete this employee? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
-                                            </p:commandButton>
-                                            <p:commandButton actionListener="#{manageEmployeeManagedBean.doCancel}" update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
-                                                <p:resetInput target="panelManageEmployee"/>
-                                            </p:commandButton>
+                                        <ui:fragment rendered ="#{manageEmployeeManagedBean.isManageState}">
+                                            <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode}">
+                                                <p:commandButton update="panelManageEmployee" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
+                                                    <f:setPropertyActionListener target="#{manageEmployeeManagedBean.isEditMode}" value="true"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode}">
+                                                <p:commandButton actionListener="#{manageEmployeeManagedBean.doSave}" update="panelManageEmployee" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
+                                                <p:commandButton actionListener="#{manageEmployeeManagedBean.doResetPassword}" update="panelManageEmployee" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton actionListener="#{manageEmployeeManagedBean.doDelete}" update="panelManageEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this employee? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                    <p:resetInput target="panelManageEmployee"/>
+                                                    <f:setPropertyActionListener target="#{manageEmployeeManagedBean.isEditMode}" value="false"/>
+                                                </p:commandButton>
+                                            </ui:fragment>
                                         </ui:fragment>
                                     </f:facet>
                                 </p:toolbar>
@@ -124,8 +185,8 @@
                         </ui:fragment>
                     </div>
                 </p:outputPanel>
-
             </p:dialog>
+
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />

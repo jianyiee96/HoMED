@@ -23,9 +23,10 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" style="margin-right: .5rem" title="Create" actionListener="#{servicemanAccountManagementManagedBean.doCreateServiceman}"
-                                             update="formCreateServiceman" process="@this" immediate="true" oncomplete="PF('dialogCreateServiceman').show()">
-                                <p:resetInput target="formCreateServiceman" />
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
+                                             update="ccManageServiceman:formManageServiceman" process="@this" immediate="true" 
+                                             actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initCreate}" oncomplete="PF('dialogManageServiceman').show()">
+                                <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman" />
                             </p:commandButton>
 
                             <h:form enctype="multipart/form-data">        
@@ -68,10 +69,12 @@
                                 <h:outputText value="#{serviceman.phoneNumber}" />
                             </p:column>
 
-                            <p:column headerText="Action" width="5%">
-                                <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
-                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" actionListener="#{servicemanAccountManagementManagedBean.doViewServiceman(serviceman)}" process="@this" oncomplete="PF('dialogManageServiceman').show()">
+                            <p:column headerText="Action" width="3%">
+                                <p:commandButton icon="pi pi-search" styleClass="info-button rounded-button p-mr-2 p-mb-2" title="View"
+                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" process="@this" 
+                                                 actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initManage()}" oncomplete="PF('dialogManageServiceman').show()">
                                     <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman"/>
+                                    <f:setPropertyActionListener target="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.servicemanToView}" value="#{serviceman}"/>
                                 </p:commandButton>
                             </p:column>
 
@@ -80,97 +83,6 @@
                     </div>
                 </div>
             </div>
-        </h:form>
-
-        <h:form id="formCreateServiceman">
-            <p:dialog id="dialogCreateServiceman" widgetVar="dialogCreateServiceman" header="Create Serviceman" showEffect="fade"
-                      responsive="true" draggable="false" modal="true" minWidth="200" width="500" minHeight="500" fitViewport="true">
-                <p:outputPanel id="panelCreateServiceman" rendered="#{not empty servicemanAccountManagementManagedBean.servicemanToCreate}">
-                    <div class="p-grid">
-                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
-                            <div class="card ui-fluid">
-                                <h5>Personal Particulars</h5>
-                                <div class="p-field">
-                                    <p:outputLabel for="create-name" value="Name" />
-                                    <p:inputText id="create-name" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.name}" />
-                                </div>
-
-                                <div class="p-field">
-                                    <p:outputLabel for="create-email" value="Email Address"/>
-                                    <p:inputText id="create-email" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.email}">
-                                        <f:validateRegex
-                                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
-                                    </p:inputText>
-                                </div>
-
-                                <div class="p-field">
-                                    <p:outputLabel for="create-gender" value="Gender"/>
-                                    <p:selectOneMenu id="create-gender" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.gender}">
-                                        <f:selectItems value="#{servicemanAccountManagementManagedBean.genders}"/>
-                                    </p:selectOneMenu>
-                                </div> 
-                            </div>
-                        </div>
-
-                        <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
-                            <div class="card ui-fluid">
-                                <h5>Contact Details</h5>
-                                <div class="p-field">
-                                    <p:outputLabel for="create-phoneNumber" value="Phone Number"/>
-                                    <p:inputText id="create-phoneNumber"  disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.phoneNumber}" />
-
-                                </div>
-
-                                <div class="p-field">
-                                    <p:outputLabel for="create-address" value="Address"/>
-                                    <p:inputText id="create-address" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.address}" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-col-12">
-                            <div class="card ui-fluid">
-                                <h5>Other Information</h5>
-                                <div class="p-grid">
-                                    <div class="p-col-6 p-field">
-                                        <p:outputLabel for="create-bloodtype" value="Blood Type" />
-                                        <p:selectOneMenu id="create-bloodtype" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.bloodType}">
-                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.bloodTypes}" var="bloodType" itemLabel="#{bloodType.bloodTypeString}" />
-                                        </p:selectOneMenu>
-                                    </div>
-                                    <div class="p-col-6 p-field">
-                                        <p:outputLabel for="create-rod" value="ROD" />
-                                        <p:datePicker id="create-rod" disabled="#{not servicemanAccountManagementManagedBean.isEditableCreateServiceman}" value="#{servicemanAccountManagementManagedBean.servicemanToCreate.rod}" pattern="dd/MM/yyyy" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-col-12">
-                            <p:messages closable="true">
-                                <p:autoUpdate/>
-                            </p:messages>
-                        </div>
-                        <ui:fragment rendered="#{servicemanAccountManagementManagedBean.isEditableCreateServiceman}">
-                            <div class="p-col-12">
-                                <p:toolbar>
-                                    <f:facet name="left">
-                                        <h5>Admin Rights</h5>
-                                    </f:facet>
-                                    <f:facet name="right">
-                                        <p:commandButton actionListener="#{servicemanAccountManagementManagedBean.createServiceman}" update="panelCreateServiceman formAllServicemen" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
-                                    </f:facet>
-                                </p:toolbar>
-                            </div>
-                        </ui:fragment>
-                    </div>
-                </p:outputPanel>
-
-            </p:dialog>
-            <p:confirmDialog global="true">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-            </p:confirmDialog>
         </h:form>
 
     </ui:define>

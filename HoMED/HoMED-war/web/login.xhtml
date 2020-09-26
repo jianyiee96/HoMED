@@ -39,10 +39,8 @@
                                     <p:outputLabel value="Email" for="email"/>
                                     <span class="ui-input-icon-left">
                                         <i class="pi pi-user"/>
-                                        <p:inputText id="email" value="#{employeeLoginManagedBean.email}"
-                                                     style="padding-left: 2rem" >
-                                            <f:validator validatorId="emailValidator"/>
-                                        </p:inputText>
+                                        <p:inputText id="email" value="#{employeeLoginManagedBean.currentEmployee.email}"
+                                                     style="padding-left: 2rem" />
                                     </span>
                                     <p:message class="error-message" for="email"/>
                                 </h:panelGroup>
@@ -50,13 +48,11 @@
 
                             <div class="p-col-12 password-container">
                                 <h:panelGroup>
-                                    <h:outputLabel value="Password / OTP" for="password"/>
+                                    <p:outputLabel value="Password / OTP" for="password"/>
                                     <span class="ui-input-icon-left">
                                         <i class="pi pi-lock"/>
                                         <p:password id="password" value="#{employeeLoginManagedBean.password}"
-                                                    style="padding-left: 2rem" >
-                                            <f:validator validatorId="passwordValidator"/>
-                                        </p:password>
+                                                    style="padding-left: 2rem" />
                                     </span>
                                     <p:message class="error-message" for="password"/>
                                 </h:panelGroup>
@@ -86,18 +82,18 @@
         </h:form>
 
         <h:form id="formActivatePassword">
-            <p:dialog header="Account Activation" widgetVar="dlgActivatePassword" id="dlgActivatePassword" modal="true" responsive="true" width="300" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false" >
-                <p:outputPanel id="panelActivatePassword">
-                    <div class="ui-fluid">
+            <p:dialog header="Account Activation" widgetVar="dlgActivatePassword" id="dlgActivatePassword"
+                      width="450" modal="true" responsive="true" showEffect="fade" hideEffect="fade"
+                      fitViewport="true" draggable="false">
+                <div class="card ui-fluid">
+                    <p:outputPanel id="panelActivatePassword">
                         <div class="p-field">
                             <h:panelGroup>
                                 <p:outputLabel value="Enter New Password" for="activatePassword"/>
                                 <span class="ui-input-icon-left">
                                     <i class="pi pi-lock"/>
                                     <p:password id="activatePassword" value="#{employeeLoginManagedBean.activatePassword}"
-                                                style="padding-left: 2rem">
-                                        <f:validator validatorId="passwordValidator"/>
-                                    </p:password>
+                                                style="padding-left: 2rem" />
                                 </span>
                                 <p:message class="error-message" for="activatePassword"/>
                             </h:panelGroup>
@@ -108,9 +104,7 @@
                                 <span class="ui-input-icon-left">
                                     <i class="pi pi-lock"/>
                                     <p:password id="activateRePassword" value="#{employeeLoginManagedBean.activateRePassword}"
-                                                style="padding-left: 2rem">
-                                        <f:validator validatorId="passwordValidator"/>
-                                    </p:password>
+                                                style="padding-left: 2rem" />
                                 </span>
                                 <p:message class="error-message" for="activateRePassword"/>
                             </h:panelGroup>
@@ -124,31 +118,31 @@
 
                         <div class="p-field">
                             <div class="p-grid p-justify-center">
-                                <div class="p-col-8">
+                                <div class="p-col-10">
                                     <p:commandButton value="Activate Account" type="submit" icon="fa fa-key"
                                                      actionListener="#{employeeLoginManagedBean.activateAccount}"
                                                      update="panelActivatePassword"/>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </p:outputPanel>
+                    </p:outputPanel>
+                </div>
             </p:dialog>
         </h:form>
 
         <h:form id="formForgetPassword">
-            <p:dialog header="Forgot Password" widgetVar="dlgForgetPassword" id="dlgForgetPassword" modal="true" responsive="true" width="300" showEffect="fade" hideEffect="fade" fitViewport="true" draggable="false">
-                <p:outputPanel id="panelForgetPassword">
-                    <div class="ui-fluid">
+            <p:dialog header="Forgot Password" widgetVar="dlgForgetPassword" id="dlgForgetPassword"
+                      width="450" modal="true" responsive="true" showEffect="fade" hideEffect="fade"
+                      fitViewport="true" draggable="false">
+                <div class="card ui-fluid">
+                    <p:outputPanel id="panelForgetPassword">
                         <div class="p-field">
                             <h:panelGroup>
                                 <p:outputLabel value="Enter your Email" for="forgetPasswordEmail"/>
                                 <span class="ui-input-icon-left">
                                     <i class="pi pi-user"/>
-                                    <p:inputText id="forgetPasswordEmail" value="#{employeeLoginManagedBean.forgetPasswordEmail}"
-                                                 style="padding-left: 2rem" >
-                                        <f:validator validatorId="emailValidator"/>
-                                    </p:inputText>
+                                    <p:inputText id="forgetPasswordEmail" value="#{employeeLoginManagedBean.currentEmployee.email}"
+                                                 style="padding-left: 2rem" />
                                 </span>
                                 <p:message class="error-message" for="forgetPasswordEmail"/>
                             </h:panelGroup>
@@ -158,10 +152,8 @@
                                 <p:outputLabel value="Enter your Phone Number" for="forgetPasswordPhoneNumber"/>
                                 <span class="ui-input-icon-left">
                                     <i class="fa fa-phone"/>
-                                    <p:inputText id="forgetPasswordPhoneNumber" value="#{employeeLoginManagedBean.forgetPasswordPhoneNumber}"
-                                                 style="padding-left: 2rem" >
-                                        <f:validator validatorId="phoneNumberValidator"/>
-                                    </p:inputText>
+                                    <p:inputText id="forgetPasswordPhoneNumber" value="#{employeeLoginManagedBean.currentEmployee.phoneNumber}"
+                                                 style="padding-left: 2rem" />
                                 </span>
                                 <p:message class="error-message" for="forgetPasswordPhoneNumber"/>
                             </h:panelGroup>
@@ -175,14 +167,14 @@
 
                         <div class="p-field">
                             <div class="p-grid p-justify-center">
-                                <div class="p-col-8">
+                                <div class="p-col-10">
                                     <p:commandButton type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp}"
                                                      update="panelForgetPassword" icon="pi pi-key"/>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </p:outputPanel>
+                    </p:outputPanel>
+                </div>
             </p:dialog>
         </h:form>
 

@@ -6,8 +6,6 @@ import entity.OperatingHours;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -45,32 +43,17 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
 
             if (constraintViolations.isEmpty()) {
 
-                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
-                    Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
-                    if (constraintViolationsOperatingHours.isEmpty()) {
-                        em.persist(oh);
-                        em.flush();
-                    } else {
-                        throw new CreateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
-                    }
+                OperatingHours operatingHours = isOperatingHoursValid(newMedicalCentre.getOperatingHours());
+                if (operatingHours != null) {
+                    throw new CreateMedicalCentreException("[" + operatingHours.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
                 }
 
-                Address medicalCentreAddress = newMedicalCentre.getAddress();
-                if (medicalCentreAddress.getStreetName() != null) {
-                    medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+                for (OperatingHours oh : newMedicalCentre.getOperatingHours()) {
+                    em.persist(oh);
+                    em.flush();
                 }
-                if (medicalCentreAddress.getUnitNumber() != null) {
-                    medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
-                }
-                if (medicalCentreAddress.getBuildingName() != null) {
-                    medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
-                }
-                if (medicalCentreAddress.getCountry() != null) {
-                    medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
-                }
-                if (medicalCentreAddress.getPostal() != null) {
-                    medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
-                }
+
+                trimAddress(newMedicalCentre.getAddress());
 
                 em.persist(newMedicalCentre);
                 em.flush();
@@ -88,16 +71,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             ex.printStackTrace();
             throw new CreateMedicalCentreException(generalUnexpectedErrorMessage + "creating Medical Centre");
         }
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public Long createNewOperatingHours(OperatingHours newOperatingHours) {
-
-        em.persist(newOperatingHours);
-        em.flush();
-
-        return newOperatingHours.getOperatingHoursId();
     }
 
     @Override
@@ -137,34 +110,18 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
                     medicalCentreToUpdate.setName(medicalCentre.getName());
                     medicalCentreToUpdate.setPhone(medicalCentre.getPhone());
                     medicalCentreToUpdate.setAddress(medicalCentre.getAddress());
+                    trimAddress(medicalCentreToUpdate.getAddress());
 
-                    Address medicalCentreAddress = medicalCentreToUpdate.getAddress();
-                    if (medicalCentreAddress.getStreetName() != null) {
-                        medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
-                    }
-                    if (medicalCentreAddress.getUnitNumber() != null) {
-                        medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
-                    }
-                    if (medicalCentreAddress.getBuildingName() != null) {
-                        medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
-                    }
-                    if (medicalCentreAddress.getCountry() != null) {
-                        medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
-                    }
-                    if (medicalCentreAddress.getPostal() != null) {
-                        medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+                    OperatingHours operatingHours = isOperatingHoursValid(medicalCentre.getOperatingHours());
+                    if (operatingHours != null) {
+                        throw new UpdateMedicalCentreException("[" + operatingHours.getDayOfWeek() + "] Opening Hours must be before Closing Hours");
                     }
 
                     List<OperatingHours> ohs = medicalCentre.getOperatingHours();
                     List<OperatingHours> ohsToUpdate = medicalCentreToUpdate.getOperatingHours();
-                    // Can look to combine these 2 loops, for sake of easy understanding, I have left them separate
-                    for (OperatingHours oh : ohs) {
-                        Set<ConstraintViolation<OperatingHours>> constraintViolationsOperatingHours = validator.validate(oh);
-                        if (!constraintViolationsOperatingHours.isEmpty()) {
-                            throw new UpdateMedicalCentreException(prepareOperatingHoursInputDataValidationErrorsMessage(constraintViolationsOperatingHours));
-                        }
-                    }
+
                     for (int i = 0; i < ohsToUpdate.size(); i++) {
+                        ohsToUpdate.get(i).setIsOpen(ohs.get(i).getIsOpen());
                         ohsToUpdate.get(i).setOpeningHours(ohs.get(i).getOpeningHours());
                         ohsToUpdate.get(i).setClosingHours(ohs.get(i).getClosingHours());
                     }
@@ -182,6 +139,41 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
             ex.printStackTrace();
             throw new UpdateMedicalCentreException(generalUnexpectedErrorMessage + "updating medical centre");
         }
+    }
+
+    private Address trimAddress(Address medicalCentreAddress) {
+        if (medicalCentreAddress.getStreetName() != null) {
+            medicalCentreAddress.setStreetName(medicalCentreAddress.getStreetName().trim());
+        }
+
+        if (medicalCentreAddress.getUnitNumber() != null) {
+            medicalCentreAddress.setUnitNumber(medicalCentreAddress.getUnitNumber().trim());
+        }
+
+        if (medicalCentreAddress.getBuildingName() != null) {
+            medicalCentreAddress.setBuildingName(medicalCentreAddress.getBuildingName().trim());
+        }
+
+        if (medicalCentreAddress.getCountry() != null) {
+            medicalCentreAddress.setCountry(medicalCentreAddress.getCountry().trim());
+        }
+
+        if (medicalCentreAddress.getPostal() != null) {
+            medicalCentreAddress.setPostal(medicalCentreAddress.getPostal().trim());
+        }
+
+        return medicalCentreAddress;
+    }
+
+    private OperatingHours isOperatingHoursValid(List<OperatingHours> operatingHours) {
+        // To check if the operating hours provided are valid.
+        for (OperatingHours oh : operatingHours) {
+            if (oh.getIsOpen() && !oh.getClosingHours().isAfter(oh.getOpeningHours())) {
+                return oh;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -214,15 +206,4 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         return msg;
     }
 
-    private String prepareOperatingHoursInputDataValidationErrorsMessage(Set<ConstraintViolation<OperatingHours>> constraintViolations) {
-        String msg = "";
-
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            msg += constraintViolation.getMessage() + "\n";
-        }
-
-        msg = msg.substring(0, msg.length() - 1);
-
-        return msg;
-    }
 }
