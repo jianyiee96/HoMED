@@ -23,17 +23,34 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
-                                             update="ccManageServiceman:formManageServiceman" process="@this" immediate="true" 
-                                             actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initCreate}" oncomplete="PF('dialogManageServiceman').show()">
+                            <p:splitButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
+                                           update="ccManageServiceman:formManageServiceman" process="@this" immediate="true" 
+                                           actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initCreate}" oncomplete="PF('dialogManageServiceman').show()">
                                 <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman" />
-                            </p:commandButton>
 
-                            <h:form enctype="multipart/form-data">        
-                                <p:fileUpload value="#{servicemanAccountManagementManagedBean.csvFile}" mode="simple" skinSimple="true" process="@form" />
-                                <p:commandButton value="Submit" ajax="false" action="#{servicemanAccountManagementManagedBean.uploadCsv}" process="@form" update="@form" />
-                            </h:form>
+                                <p:menuitem value="Bulk Import" icon="pi pi-upload" title="Import" update="formBulkImportServicemen" process="@this"
+                                            oncomplete="PF('dialogBulkImportServicemen').show()" />
+                            </p:splitButton>
                         </div>
+
+                        <h:form id="formBulkImportServicemen" enctype="multipart/form-data">
+                            <p:dialog id="dialogBulkImportServicemen" widgetVar="dialogBulkImportServicemen" header="Bulk Import Servicemen" showEffect="fade"
+                                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                                      minWidth="500" width="700" height="700">
+                                <p:outputPanel id="panelBulkImportServicemen">
+                                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true"
+                                                  listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
+
+                                    <ui:fragment>
+                                        <p:separator />
+
+                                        <div class="p-grid">
+
+                                        </div>
+                                    </ui:fragment>
+                                </p:outputPanel>
+                            </p:dialog>
+                        </h:form>
 
                         <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"  var="serviceman" value="#{servicemanAccountManagementManagedBean.servicemen}" sortBy="#{serviceman.servicemanId}"
                                      styleClass="crud-management-table" rowKey="#{serviceman.servicemanId}" paginator="true" rows="10" paginatorPosition="bottom">

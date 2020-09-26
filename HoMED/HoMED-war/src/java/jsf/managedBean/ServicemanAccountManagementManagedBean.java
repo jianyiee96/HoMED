@@ -5,6 +5,7 @@ import entity.Serviceman;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import javax.faces.view.ViewScoped;
 import org.primefaces.model.file.UploadedFile;
 import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
 
@@ -31,7 +33,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     private List<Serviceman> servicemen;
 
-    private UploadedFile csvFile;
+    private List<Serviceman> importedServicemen;
 
     public ServicemanAccountManagementManagedBean() {
     }
@@ -39,6 +41,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
+        importedServicemen = new ArrayList<>();
     }
 
     public void dialogActionListener() {
@@ -46,15 +49,17 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         PrimeFaces.current().ajax().update("formAllServicemen:dataTableServicemen");
     }
 
-    public void uploadCsv() {
+    public void handleFileUpload(FileUploadEvent event) {
+        FacesMessage msg = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+
+    public void uploadCsv(FileUploadEvent event) {
         System.out.println("Uploading...");
-//        System.out.println(csvFile);
+        UploadedFile csv = event.getFile();
 
-        if (csvFile != null) {
-            System.out.println("Uploaded file --> " + csvFile.getFileName() + " Size --> " + csvFile.getSize() + " ContentType --> " + csvFile.getContentType());
-
-            FacesMessage message = new FacesMessage("Successful", csvFile.getFileName() + " is uploaded.");
-            FacesContext.getCurrentInstance().addMessage("growl", message);
+        if (csv != null) {
+            System.out.println("Uploaded file --> " + csv.getFileName() + " Size --> " + csv.getSize() + " ContentType --> " + csv.getContentType());
         }
     }
 
@@ -64,6 +69,14 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void setServicemen(List<Serviceman> servicemen) {
         this.servicemen = servicemen;
+    }
+
+    public List<Serviceman> getImportedServicemen() {
+        return importedServicemen;
+    }
+
+    public void setImportedServicemen(List<Serviceman> importedServicemen) {
+        this.importedServicemen = importedServicemen;
     }
 
     public ManageServicemanManagedBean getManageServicemanManagedBean() {
@@ -77,16 +90,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public String renderDate(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(date);
-    }
-
-    public UploadedFile getCsvFile() {
-        System.out.println("getting CSV File");
-        return csvFile;
-    }
-
-    public void setCsvFile(UploadedFile csvFile) {
-        System.out.println("Setting csv file");
-        this.csvFile = csvFile;
     }
 
     public GenderEnum[] getGenders() {
