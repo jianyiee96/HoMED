@@ -11,6 +11,7 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
+            <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/icons/favicon.ico']}"/>
         </f:facet>
         <h:outputStylesheet name="default.css" library="css" />
         <title>HoMED Employee Login</title>
@@ -61,6 +62,8 @@
                             <div class="p-col-12 forgetpassword-container">
                                 <p:commandLink value="Forgot Password" update="formForgetPassword" oncomplete="PF('dlgForgetPassword').show()" process="@this" >
                                     <p:resetInput target="formForgetPassword" />
+                                    <f:setPropertyActionListener target="#{employeeLoginManagedBean.currentEmployee.email}" value=""/>
+                                    <f:setPropertyActionListener target="#{employeeLoginManagedBean.currentEmployee.phoneNumber}" value=""/>
                                 </p:commandLink>
                             </div>
 
@@ -168,14 +171,29 @@
                         <div class="p-field">
                             <div class="p-grid p-justify-center">
                                 <div class="p-col-10">
-                                    <p:commandButton type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp}"
-                                                     update="panelForgetPassword" icon="pi pi-key"/>
+                                    <p:commandButton id="resetPassword" type="submit" value="Reset Password" actionListener="#{employeeLoginManagedBean.sendOtp}"
+                                                     update="panelForgetPassword formInactivity:growlInactivity" icon="pi pi-key">
+                                    </p:commandButton>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="p-field">
+                            <div class="p-grid p-justify-center">
+                                <p:ajaxStatus>
+                                    <f:facet name="start">
+                                        <div class="p-field p-mt-4">
+                                            <div class="p-grid p-justify-center">
+                                                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"/>
+                                            </div>
+                                        </div>
+                                    </f:facet>
+                                </p:ajaxStatus>
                             </div>
                         </div>
                     </p:outputPanel>
                 </div>
             </p:dialog>
+            <p:blockUI block="dlgForgetPassword" trigger="resetPassword" />
         </h:form>
 
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />

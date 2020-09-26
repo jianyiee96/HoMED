@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.DayOfWeekEnum;
 
@@ -34,6 +35,7 @@ public class MedicalCentre implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Please provide a telephone number for the medical centre")
     @Size(min = 8, max = 8, message = "Telephone number must be of length 8")
+    @Pattern(regexp = "^[89]\\d{7}", message = "Proper formmated Phone Number must be provided")
     private String phone;
 
     @Embedded

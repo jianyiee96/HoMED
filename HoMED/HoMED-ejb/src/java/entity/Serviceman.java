@@ -20,6 +20,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
@@ -51,6 +52,7 @@ public class Serviceman implements Serializable {
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
     @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
+    @Pattern(regexp = "^[89]\\d{7}", message = "Proper formmated Phone Number must be provided")
     private String phoneNumber;
 
     @Temporal(TemporalType.TIMESTAMP)
