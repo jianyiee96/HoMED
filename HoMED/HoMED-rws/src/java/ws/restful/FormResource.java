@@ -86,8 +86,7 @@ public class FormResource {
             for (FormInstance fi : formInstances) {
                 fi.setServiceman(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
-                fi.getFormTemplateMapping().setConsultationPurposes(null);
-                
+                fi.getFormTemplateMapping().setConsultationPurposes(null); 
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanFormInstancesRsp(formInstances)).build();
         } catch (Exception ex) {
