@@ -38,7 +38,7 @@
                                       draggable="false" modal="true" responsive="true" fitViewport="true"
                                       minWidth="500" width="700" height="700">
                                 <p:outputPanel id="panelBulkImportServicemen">
-                                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true"
+                                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="formAllServicemen:growl-message"
                                                   listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
 
                                     <ui:fragment>
@@ -48,6 +48,12 @@
 
                                         </div>
                                     </ui:fragment>
+
+                                    <div class="p-col-12">
+                                        <p:messages globalOnly="true" class="error-message" closable="true">
+                                            <p:autoUpdate/>
+                                        </p:messages>
+                                    </div>
                                 </p:outputPanel>
                             </p:dialog>
                         </h:form>
