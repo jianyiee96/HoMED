@@ -36,19 +36,124 @@
                         <h:form id="formBulkImportServicemen" enctype="multipart/form-data">
                             <p:dialog id="dialogBulkImportServicemen" widgetVar="dialogBulkImportServicemen" header="Bulk Import Servicemen" showEffect="fade"
                                       draggable="false" modal="true" responsive="true" fitViewport="true"
-                                      minWidth="500" width="700" height="700">
+                                      minWidth="500" width="1100" height="700">
                                 <p:outputPanel id="panelBulkImportServicemen">
-                                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="formAllServicemen:growl-message"
+                                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="formAllServicemen:growl-message panelGroupBulkImportServicemen"
                                                   listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
 
-                                    <ui:fragment>
-                                        <p:separator />
+                                    <p:separator />
 
-                                        <div class="p-grid">
+                                    <h:panelGroup id='panelGroupBulkImportServicemen'>
+                                        <ui:fragment rendered='#{servicemanAccountManagementManagedBean.isUploaded}'>
+                                            <div class="p-grid">
+                                                <div class="p-col-12">
+                                                    <div class="card ui-fluid">
+                                                        <div class="p-formgrid p-grid">
+                                                            <p:repeat value="#{servicemanAccountManagementManagedBean.servicemanWrappers}" var="servicemanWrapper" >
+                                                                <div class="p-field p-col-12 p-md-6 p-sm-6">
+                                                                    <h5>New Servicemen</h5>
+                                                                    <div class="card ui-fluid">
+                                                                        <!-- New Name -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-name">Name</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-name" value="#{servicemanWrapper.newServiceman.name}" />
+                                                                            </div>
+                                                                        </div>
 
-                                        </div>
-                                    </ui:fragment>
-                                    
+                                                                        <!-- New Gender -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-gender">Gender</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-gender" value="#{servicemanWrapper.newServiceman.gender}" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- New Phone Number -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-phone">Phone</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-phone" value="#{servicemanWrapper.newServiceman.phoneNumber}" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- New Email -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-email">Email</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-email" value="#{servicemanWrapper.newServiceman.email}" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- New Address -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-address">Address</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-address" value="#{servicemanWrapper.newServiceman.address}" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- New Blood Type -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-blood-type">Blood Type</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-blood-type" value="#{servicemanWrapper.newServiceman.bloodType}" />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- New ROD -->
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col-3">
+                                                                                <p:outputLabel for="new-serviceman-rod">ROD</p:outputLabel>
+                                                                            </div>
+                                                                            <div class="p-field p-col-9">
+                                                                                <h:outputText id="new-serviceman-rod" value="#{servicemanAccountManagementManagedBean.renderDate(servicemanWrapper.newServiceman.rod)}" />
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="p-field p-col-12 p-md-6 p-sm-6">
+                                                                    <h5>Existing Servicemen</h5>
+                                                                    <div class="card ui-fluid">
+                                                                        <div class="p-formgrid p-grid">
+                                                                            <div class="p-field p-col">
+<!--                                                                                <p:outputLabel for="existing-serviceman-name">Name</p:outputLabel>
+                                                                                <p:inplace id="existing-serviceman-name" editor="true">
+                                                                                    <p:inputText value="#{servicemanWrapper.newServiceman.name}" />
+                                                                                </p:inplace>
+
+                                                                                <p:outputLabel for="existing-serviceman-gender">Gender</p:outputLabel>
+                                                                                <p:inplace id="existing-serviceman-gender" editor="true" >
+                                                                                    <p:inputText value="#{servicemanWrapper.newServiceman.gender}" />
+                                                                                </p:inplace>-->
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </p:repeat>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </ui:fragment>
+                                    </h:panelGroup>
+
+
                                 </p:outputPanel>
                             </p:dialog>
                         </h:form>

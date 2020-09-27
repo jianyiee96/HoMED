@@ -40,6 +40,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     private List<Serviceman> servicemen;
 
     private List<ServicemanWrapper> servicemanWrappers;
+    private Boolean isUploaded;
 
     public ServicemanAccountManagementManagedBean() {
         this.servicemanWrappers = new ArrayList<>();
@@ -100,10 +101,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                         newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
                     } else {
                         servicemanWrapper.getErrorMessages().add(1, "Incorrect gender input (" + gender + "). Please change it to MALE/FEMALE.");
-//                        facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
-//                        facesMessage.setSummary("Bulk Import");
-//                        facesMessage.setDetail("[Line " + idx + " - " + name + "] has incorrect gender input (" + gender + ")! Please modify it to MALE/FEMALE.");
-//                        facesContext.addMessage("growl-message", facesMessage);
                     }
 
                     // Phone
@@ -128,6 +125,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     }
                 }
 
+                this.isUploaded = Boolean.TRUE;
             } catch (IOException ex) {
                 ex.printStackTrace();
                 printUnexpectedErrorMessage();
@@ -182,6 +180,14 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public BloodTypeEnum[] getBloodTypes() {
         return BloodTypeEnum.values();
+    }
+
+    public Boolean getIsUploaded() {
+        return isUploaded;
+    }
+
+    public void setIsUploaded(Boolean isUploaded) {
+        this.isUploaded = isUploaded;
     }
 
 }
