@@ -1,9 +1,9 @@
 package jsf.managedBean;
 
 import ejb.session.stateless.ServicemanSessionBeanLocal;
+import entity.Address;
 import entity.Serviceman;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.model.file.UploadedFile;
 import javax.inject.Inject;
+import jsf.classes.ServicemanWrapper;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import util.enumeration.BloodTypeEnum;
@@ -38,15 +39,15 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     private List<Serviceman> servicemen;
 
-    private List<Serviceman> importedServicemen;
+    private List<ServicemanWrapper> servicemanWrappers;
 
     public ServicemanAccountManagementManagedBean() {
+        this.servicemanWrappers = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
         servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
-        importedServicemen = new ArrayList<>();
     }
 
     public void dialogActionListener() {
@@ -57,8 +58,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void uploadCsv(FileUploadEvent event) {
         System.out.println("Uploading...");
         UploadedFile csv = event.getFile();
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        FacesMessage facesMessage = new FacesMessage();
 
         if (csv != null) {
             System.out.println("Uploaded file --> " + csv.getFileName() + " Size --> " + csv.getSize() + " ContentType --> " + csv.getContentType());
@@ -87,32 +86,65 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                             + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
                             + "); Blood Type = " + bloodType + "; ROD = " + rod);
 
+                    ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
+                    this.servicemanWrappers.add(servicemanWrapper);
+
                     Serviceman newServiceman = new Serviceman();
+                    servicemanWrapper.setNewServiceman(newServiceman);
+
+                    // Name
                     newServiceman.setName(name);
 
+                    // Gender
                     if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
-
+                        newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
                     } else {
-                        facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
-                        facesMessage.setSummary("Bulk Import");
-                        facesMessage.setDetail("[Line " + idx + " - " + name + "] has incorrect gender input (" + gender +")! Please modify it to MALE/FEMALE.");
-                        facesContext.addMessage("growl-message", facesMessage);
+                        servicemanWrapper.getErrorMessages().add(1, "Incorrect gender input (" + gender + "). Please change it to MALE/FEMALE.");
+//                        facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
+//                        facesMessage.setSummary("Bulk Import");
+//                        facesMessage.setDetail("[Line " + idx + " - " + name + "] has incorrect gender input (" + gender + ")! Please modify it to MALE/FEMALE.");
+//                        facesContext.addMessage("growl-message", facesMessage);
+                    }
+
+                    // Phone
+                    newServiceman.setPhoneNumber(phone);
+                    // Email
+                    newServiceman.setEmail(email);
+                    // Address
+                    Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
+                    // Blood Type
+                    BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOfLabel(bloodType);
+                    if (bloodTypeEnum != null) {
+                        newServiceman.setBloodType(bloodTypeEnum);
+                    } else {
+                        servicemanWrapper.getErrorMessages().add(9, "Incorrect blood type input (" + bloodType + "). Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+                    }
+                    // ROD
+                    try {
+                        Date rodDate = new Date(rod);
+                        newServiceman.setRod(rodDate);
+                    } catch (IllegalArgumentException ex) {
+                        servicemanWrapper.getErrorMessages().add(9, "Incorrect ROD date input (" + rod + "). Please change it to \"YYYY/MM/DD\".");
                     }
                 }
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
-                facesMessage.setSummary("Bulk Import");
-                facesMessage.setDetail("An unexpected error has occurred while creating servicemen in bulk. Please contact IT admins for assistance!");
-                facesContext.addMessage("growl-message", facesMessage);
+                printUnexpectedErrorMessage();
             }
         } else {
-            facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
-            facesMessage.setSummary("Bulk Import");
-            facesMessage.setDetail("An unexpected error has occurred while creating servicemen in bulk. Please contact IT admins for assistance!");
-            facesContext.addMessage("growl-message", facesMessage);
+            printUnexpectedErrorMessage();
         }
+    }
+
+    private void printUnexpectedErrorMessage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        FacesMessage facesMessage = new FacesMessage();
+
+        facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
+        facesMessage.setSummary("Bulk Import");
+        facesMessage.setDetail("An unexpected error has occurred while creating servicemen in bulk. Please contact IT admins for assistance!");
+        facesContext.addMessage("growl-message", facesMessage);
     }
 
     public List<Serviceman> getServicemen() {
@@ -123,12 +155,12 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         this.servicemen = servicemen;
     }
 
-    public List<Serviceman> getImportedServicemen() {
-        return importedServicemen;
+    public List<ServicemanWrapper> getServicemanWrappers() {
+        return servicemanWrappers;
     }
 
-    public void setImportedServicemen(List<Serviceman> importedServicemen) {
-        this.importedServicemen = importedServicemen;
+    public void setServicemanWrappers(List<ServicemanWrapper> servicemanWrappers) {
+        this.servicemanWrappers = servicemanWrappers;
     }
 
     public ManageServicemanManagedBean getManageServicemanManagedBean() {
