@@ -147,6 +147,17 @@
                             <p:messages globalOnly="true" class="error-message" closable="true">
                                 <p:autoUpdate/>
                             </p:messages>
+                            <div class="p-grid p-justify-center">
+                                <p:ajaxStatus>
+                                    <f:facet name="start">
+                                        <div class="p-field">
+                                            <div class="p-grid p-justify-center">
+                                                <i class="pi pi-spin pi-spinner p-mt-4" style="font-size: 2rem"/>
+                                            </div>
+                                        </div>
+                                    </f:facet>
+                                </p:ajaxStatus>
+                            </div>
                         </div>
 
                         <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView and not manageEmployeeManagedBean.isHideAdminPanel}">
@@ -167,7 +178,7 @@
                                             </ui:fragment>
                                             <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode}">
                                                 <p:commandButton actionListener="#{manageEmployeeManagedBean.doSave}" update="panelManageEmployee" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
-                                                <p:commandButton actionListener="#{manageEmployeeManagedBean.doResetPassword}" update="panelManageEmployee" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
+                                                <p:commandButton id="resetPassword" actionListener="#{manageEmployeeManagedBean.doResetPassword}" update="panelManageEmployee" type="submit" title="Reset Password" icon="fa fa-key" styleClass="help-button p-mr-2">
                                                     <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                                 <p:commandButton actionListener="#{manageEmployeeManagedBean.doDelete}" update="panelManageEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
