@@ -6,7 +6,7 @@ package ws.restful;
 
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
-import entity.DeleteFormInstanceException;
+import util.exceptions.DeleteFormInstanceException;
 import entity.FormInstance;
 import entity.FormInstanceField;
 import entity.FormTemplate;
