@@ -2,7 +2,7 @@
  * Project Title: Home Team Medical Board
  * Project Application: HoMED-ejb
  */
-package entity;
+package util.exceptions;
 
 /**
  *
