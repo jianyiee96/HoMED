@@ -62,7 +62,7 @@ public class ServicemanResource {
             
             try {
                 Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getEmail(), servicemanLoginReq.getPassword());
-
+                serviceman.setFormInstances(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
             } catch (ServicemanInvalidLoginCredentialException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
@@ -149,7 +149,7 @@ public class ServicemanResource {
 
             try {
                 Serviceman updatedServiceman = servicemanSessionBeanLocal.updateServiceman(servicemanUpdateReq.getServiceman());
-
+                updatedServiceman.setFormInstances(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanUpdateRsp(updatedServiceman)).build();
             } catch (UpdateServicemanException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());

@@ -1,0 +1,243 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">E-Form Utility</ui:define>
+
+
+    <ui:define name="content">
+
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .ui-chips {
+                width: 100%;
+            }
+
+            .ui-chips-container {
+                width: 100%;
+            }
+            
+            .form-name {
+                font-size: 25px;
+            }
+            
+            .form-name  .ui-inputtext {
+                font-size:20px;
+            }
+            
+            .form-name .ui-inplace-save {
+                margin-right: 3px;
+            }
+        </style>
+
+        <div class="p-grid">
+
+            <div class="p-col-12 p-md-12 p-lg-6">
+
+                <h:form id="formAllTemplates">
+                    <p:growl id="growl" globalOnly="true" showDetail="true" />
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog>     
+
+                    <div class="card">
+                        <h1>E-Form Utility Tool</h1>
+
+
+                        <div style="margin: 6px; float: right"  class="p-field">
+
+                            <p:inputText id="newFormField" value="#{formUtilityManagedBean.createFormName}" placeholder="New Form Name" >
+                                <p:ajax event="keyup" update="create"/>
+                            </p:inputText>
+                            <p:commandButton id="create" icon="pi pi-plus" update="formAllTemplates" action="#{formUtilityManagedBean.createForm()}" disabled="#{formUtilityManagedBean.createFormName == null || formUtilityManagedBean.createFormName == ''}" >
+                                <p:confirm header="Create Form Template" message="Confirm create form template named [#{formUtilityManagedBean.createFormName}]?" icon="pi pi-exclamation-triangle" />
+
+                            </p:commandButton>
+
+                        </div>
+
+                        <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="formTemplate" value="#{formUtilityManagedBean.formTemplates}"
+                                     rowKey="#{formTemplate.formTemplateId}"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                            <f:facet id="dataViewListHeader" name="header">
+                                <span style="font-weight: bold">FORM TEMPLATES</span>
+                            </f:facet>
+                            <p:column width="35" headerText="Id" sortBy="#{formTemplate.formTemplateId}">
+                                <h:outputText value="#{formTemplate.formTemplateId}" />
+                            </p:column>
+                            <p:column headerText="Name" sortBy="#{formTemplate.formTemplateName}">
+                                <h:outputText value="#{formTemplate.formTemplateName}" />
+                            </p:column>
+                            <p:column headerText="Creation Date" sortBy="#{formTemplate.dateCreated}">
+                                <h:outputText value="#{formUtilityManagedBean.renderDate(formTemplate.dateCreated)}" />
+                            </p:column>
+                            <p:column width="100" headerText="Status" sortBy="#{formTemplate.formTemplateStatus}">
+                                <span class="form-status-badge status-#{formTemplate.formTemplateStatus.text.toLowerCase()}">#{formTemplate.formTemplateStatus.text}</span>
+                            </p:column>
+                            <p:column width="100" headerText="Privacy" sortBy="#{formTemplate.isPublic}">
+                                <span class="form-status-badge privacy-#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}">#{formUtilityManagedBean.renderPrivacy(formTemplate.isPublic)}</span>
+                            </p:column>
+
+                            <p:column style="text-align: center" exportable="false">
+
+                                <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
+                                    <f:attribute name="formToView" value="#{formTemplate}" />
+                                </p:commandButton> 
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'ARCHIVED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Publish Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-pencil" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
+                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Publish Template" escape="false" message="Republish an archived form template?" icon="pi pi-exclamation-triangle" />
+
+                                </p:commandButton> 
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'DELETED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
+                                    <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Delete Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button help-button-" style="margin: 3px" update="@form editorForm formAllTemplates" icon="fa fa-rotate-left"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
+                                    <f:attribute name="formIdToRestore" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Restore Template" escape="false" message="Form Template will be restored to Draft status. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton> 
+                                
+                                
+                                <p:commandButton disabled="#{formTemplate.formTemplateStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
+                                    <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
+                                    <p:confirm header="Archive Template" escape="false" message="Users will no longer be able to use this Form Template.&lt;br/&gt;Any linkage to Consultation Purposes will be removed too.&lt;br/&gt;Do you want to proceed?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+
+
+                            </p:column>
+                        </p:dataTable>
+
+                    </div>
+
+                </h:form>
+            </div>
+
+            <div class="p-col-12 p-md-12 p-lg-6">
+
+                <h:form id="editorForm" >
+
+                    <p:growl id="growl" globalOnly="true" showDetail="true" sticky="true" />  
+                    <ui:fragment rendered="#{formUtilityManagedBean.selectedForm != null}">
+                        <div class="card">
+
+                            <div>
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mx-2 p-mb-2" />
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
+                                <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" immediate="true" update="editorForm" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
+                                <p:commandButton rendered="#{not formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right">
+                                    <p:confirm header="Clone Template" escape="false" message="Any current changes on the form editor will be saved before cloning.&lt;br/&gt;Proceed to clone?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+
+
+                                <p:outputLabel class="p-mx-2" value="Public: "/>
+                                <p:selectBooleanCheckbox  disabled="#{formUtilityManagedBean.fieldsDisabled}" value="#{formUtilityManagedBean.newFormIsPublic}">
+                                    <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
+                                </p:selectBooleanCheckbox>
+
+
+                                <p:commandButton rendered="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-copy" class="p-mx-2 p-mb-2" style="float: right" />
+
+
+
+                            </div>
+                            <div>
+                                <h:panelGrid style="margin-left:5px; font-weight: bold; color: graytext" rendered="#{formUtilityManagedBean.selectedForm.datePublished != null}" columns="2">
+                                    <p:outputLabel value="Published since: "></p:outputLabel>
+                                    <p:outputLabel value="#{formUtilityManagedBean.renderDate(formUtilityManagedBean.selectedForm.datePublished)}"></p:outputLabel>
+
+                                </h:panelGrid>
+
+                            </div>
+
+                            <p:dataList value="#{formUtilityManagedBean.selectedFormFieldWrappers}" rendered="#{formUtilityManagedBean.selectedForm != null}" type="definition" var="fieldWrapper">
+
+                                <f:facet name="header">
+
+
+                                    <p:inplace disabled="#{formUtilityManagedBean.fieldsDisabled}" id="templateName" editor="true" styleClass="form-name">
+                                        <p:inputText value="#{formUtilityManagedBean.newFormName}" required="true" label="text" styleClass="form-name"/>
+                                    </p:inplace>
+                                    <div style="margin-top: 5px">
+                                        <ui:repeat value="#{formUtilityManagedBean.selectedFormConsultationPurpose}" var="consultations">
+                                            <span class="form-status-badge consultation-badge">#{consultations.consultationPurposeName}</span>
+                                        </ui:repeat>
+
+                                    </div>
+
+                                </f:facet>
+
+                                <div class="card" style="margin-bottom: 5px">
+                                    <div class="p-grid">
+                                        <div class="p-col-11 p-md-11 p-lg-11">
+                                            <div style="max-width: 380px">
+
+                                                <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+
+                                                    <p:outputLabel value="Question: " />
+
+                                                    <p:inputText style="width: 100%" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="float-input" value="#{fieldWrapper.formField.question}"/>
+
+                                                    <p:outputLabel value="Input Type: " />
+                                                    <p:selectOneMenu style="width: 100%" immediate="true" disabled="#{formUtilityManagedBean.fieldsDisabled}" id="inputType" value="#{fieldWrapper.formField.inputType}">
+                                                        <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
+                                                        <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
+                                                    </p:selectOneMenu>
+
+                                                    <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
+                                                    <p:chips disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
+
+                                                    <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
+                                                    <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
+
+                                                    <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
+                                                    <p:toggleSwitch disabled="#{formUtilityManagedBean.fieldsDisabled}" rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
+
+                                                </h:panelGrid>
+                                                <h:panelGrid columns="1" cellpadding="5">
+
+                                                    <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
+                                                        <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
+                                                    </p:commandButton>
+
+                                                </h:panelGrid>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="p-col-1" style="float: right; text-align: right">
+                                            <p:commandButton style="height: 50%" class="p-mb-2" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" icon="fa fa-arrow-up">
+                                                <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                            </p:commandButton>
+
+                                            <p:commandButton style="height: 50%" disabled="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" icon="fa fa-arrow-down">
+                                                <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                            </p:commandButton>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </p:dataList>
+                        </div>
+                        <p:commandButton disabled="#{formUtilityManagedBean.fieldsDisabled}" value="Add Field" style="width: 100%" rendered="#{formUtilityManagedBean.selectedForm != null}" update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}"/>
+
+                    </ui:fragment>
+                </h:form>
+
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
@@ -39,6 +40,7 @@ public class Employee implements Serializable {
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
     @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
+    @Pattern(regexp = "^[89]\\d{7}", message = "Proper formmated Phone Number must be provided")
     protected String phoneNumber;
 
     @Enumerated(EnumType.STRING)
@@ -73,7 +75,7 @@ public class Employee implements Serializable {
     public Employee() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
-        
+
         this.address = new Address();
     }
 

@@ -12,7 +12,7 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
             <meta name="apple-mobile-web-app-capable" content="yes" />
-            <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/roma-layout/images/favicon.ico" />
+            <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/icons/favicon.ico']}"/>
         </f:facet>
         <title>
             <ui:insert name="title">HoMED</ui:insert>
@@ -23,6 +23,7 @@
     </h:head>
 
     <h:body styleClass="#{themeCustomiser.inputStyle}">
+
 
         <ezcomp:sessionTimeout/>
         <h:form id="formTemplateGrowl">
@@ -64,6 +65,7 @@
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="roma-layout" />
         <h:outputStylesheet name="icons.css" library="css" />
+        <h:outputStylesheet name="buttons.css" library="css" />
 
         <h:outputStylesheet name="css/nanoscroller.css" library="roma-layout" />
 

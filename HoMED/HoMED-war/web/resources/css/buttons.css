@@ -1,14 +1,3 @@
-.custom-icon {
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    display: inline-block;
-    -webkit-font-smoothing: antialiased;
-}
-
 .form-status-badge {
     border-radius: 2px;
     padding: .25em .5rem;
@@ -39,12 +28,22 @@
     color: #C63737;
 }
 
+.consultation-badge {
+    background: #406E7E;
+    color: #FFFFFF;
+}
+
+.privacy-public {
+    background: #ECCFFF;
+    color: #694382;
+}
+
+.privacy-private {
+    background: #FFD8B2;
+    color: #805B36;
+}
+
+
 .button-margin {
     margin: 2px;
 }
-
-/*.medicalCentre-icon {
-    width: 14px;
-    height: 14px;
-    background-image: url("#{resource['images/icons/medicalCentre_icon.svg']}") !important;
-}*/
