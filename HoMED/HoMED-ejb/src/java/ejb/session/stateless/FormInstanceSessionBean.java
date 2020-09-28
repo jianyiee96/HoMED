@@ -195,7 +195,6 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     @Override
     public FormInstance retrieveFormInstance(Long id) {
         FormInstance formInstance = em.find(FormInstance.class, id);
-//        formInstance.getFormInstanceFields().sort((x, y) -> x.getFormFieldMapping().getPosition() - y.getFormFieldMapping().getPosition());
         return formInstance;
     }
 

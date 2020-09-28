@@ -115,7 +115,8 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public void saveFormTemplate(FormTemplate formTemplate) {
 
         try {
-
+            formTemplate.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
+            
             FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
 
             for (FormField oldFF : ft.getFormFields()) {
@@ -218,7 +219,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public FormTemplate retrieveFormTemplate(Long id) {
         FormTemplate formTemplate = em.find(FormTemplate.class, id);
-        formTemplate.getFormFields().sort((x,y) -> x.getPosition() - y.getPosition());
+        formTemplate.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
         return formTemplate;
     }
 
