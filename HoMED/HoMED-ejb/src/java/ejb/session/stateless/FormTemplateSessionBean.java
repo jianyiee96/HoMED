@@ -218,6 +218,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public FormTemplate retrieveFormTemplate(Long id) {
         FormTemplate formTemplate = em.find(FormTemplate.class, id);
+        formTemplate.getFormFields().sort((x,y) -> x.getPosition() - y.getPosition());
         return formTemplate;
     }
 
