@@ -109,6 +109,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     newServiceman.setEmail(email);
                     // Address
                     Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
+                    newServiceman.setAddress(address);
                     // Blood Type
                     BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOfLabel(bloodType);
                     if (bloodTypeEnum != null) {
