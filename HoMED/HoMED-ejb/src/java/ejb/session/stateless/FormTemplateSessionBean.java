@@ -238,9 +238,11 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public List<FormTemplate> retrieveAllPublishedFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formTemplateStatus = :publish ");
         query.setParameter("publish", FormTemplateStatusEnum.PUBLISHED);
-
-        return query.getResultList();
-
+        List<FormTemplate> fts = query.getResultList();
+        for (FormTemplate ft : fts) {
+            ft.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
+        }
+        return fts;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<FormTemplate>> constraintViolations) {
