@@ -9,13 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServicemanWrapper {
-    
+
     private Serviceman existingServiceman;
     private Serviceman newServiceman;
     private List<String> errorMessages;
 
     public ServicemanWrapper() {
-        this.errorMessages = new ArrayList<>(11);
+        this.errorMessages = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            this.errorMessages.add(null);
+        }
     }
 
     public Serviceman getExistingServiceman() {
@@ -41,7 +44,5 @@ public class ServicemanWrapper {
     public void setErrorMessages(List<String> errorMessages) {
         this.errorMessages = errorMessages;
     }
-    
-    
-    
+
 }

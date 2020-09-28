@@ -57,6 +57,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void uploadCsv(FileUploadEvent event) {
+        this.servicemanWrappers = new ArrayList<>();
         System.out.println("Uploading...");
         UploadedFile csv = event.getFile();
 
@@ -71,59 +72,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 Integer idx = 1;
                 while (reader.ready() && (line = reader.readLine()) != null) {
                     String[] serviceman = line.split(",");
-                    String name = serviceman[0];
-                    String gender = serviceman[1];
-                    String phone = serviceman[2];
-                    String email = serviceman[3];
-                    String streetName = serviceman[4];
-                    String unitNumber = serviceman[5];
-                    String buildingName = serviceman[6];
-                    String country = serviceman[7];
-                    String postalCode = serviceman[8];
-                    String bloodType = serviceman[9];
-                    String rod = serviceman[10];
-
-                    System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
-                            + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
-                            + "); Blood Type = " + bloodType + "; ROD = " + rod);
-
-                    ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
-                    this.servicemanWrappers.add(servicemanWrapper);
-
-                    Serviceman newServiceman = new Serviceman();
-                    servicemanWrapper.setNewServiceman(newServiceman);
-
-                    // Name
-                    newServiceman.setName(name);
-
-                    // Gender
-                    if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
-                        newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
-                    } else {
-                        servicemanWrapper.getErrorMessages().add(1, "Incorrect gender input (" + gender + "). Please change it to MALE/FEMALE.");
-                    }
-
-                    // Phone
-                    newServiceman.setPhoneNumber(phone);
-                    // Email
-                    newServiceman.setEmail(email);
-                    // Address
-                    Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
-                    newServiceman.setAddress(address);
-                    // Blood Type
-                    BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOfLabel(bloodType);
-                    if (bloodTypeEnum != null) {
-                        newServiceman.setBloodType(bloodTypeEnum);
-                    } else {
-                        servicemanWrapper.getErrorMessages().add(9, "Incorrect blood type input (" + bloodType + "). Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
-                    }
-                    // ROD
-                    try {
-                        Date rodDate = new Date(rod);
-                        newServiceman.setRod(rodDate);
-                    } catch (IllegalArgumentException ex) {
-                        servicemanWrapper.getErrorMessages().add(9, "Incorrect ROD date input (" + rod + "). Please change it to \"YYYY/MM/DD\".");
-                    }
+                    validateServiceman(serviceman);
                 }
 
                 this.isUploaded = Boolean.TRUE;
@@ -133,6 +82,66 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             }
         } else {
             printUnexpectedErrorMessage();
+        }
+    }
+
+    private void validateServiceman(String[] serviceman) {
+        String name = serviceman[0];
+        String gender = serviceman[1];
+        String phone = serviceman[2];
+        String email = serviceman[3];
+        String streetName = serviceman[4];
+        String unitNumber = serviceman[5];
+        String buildingName = serviceman[6];
+        String country = serviceman[7];
+        String postalCode = serviceman[8];
+        String bloodType = serviceman[9];
+        String rod = serviceman[10];
+
+        System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
+                + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
+                + "); Blood Type = " + bloodType + "; ROD = " + rod);
+
+        ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
+        this.servicemanWrappers.add(servicemanWrapper);
+
+        Serviceman newServiceman = new Serviceman();
+        servicemanWrapper.setNewServiceman(newServiceman);
+
+        // Name
+        if (name != null && name.length() >= 2 && name.length() <= 128) {
+            newServiceman.setName(name);
+        } else {
+            servicemanWrapper.getErrorMessages().add(0, "Incorrect name format [" + name + "]. Name must be between length 2 to 128.");
+        }
+
+        // Gender
+        if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
+            newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
+        } else {
+            servicemanWrapper.getErrorMessages().add(1, "Incorrect gender format [" + gender + "]. Please change it to MALE/FEMALE.");
+        }
+
+        // Phone
+        newServiceman.setPhoneNumber(phone);
+        // Email
+        newServiceman.setEmail(email);
+        // Address
+        Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
+        newServiceman.setAddress(address);
+        // Blood Type
+        BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOfLabel(bloodType);
+        if (bloodTypeEnum != null) {
+            newServiceman.setBloodType(bloodTypeEnum);
+        } else {
+            servicemanWrapper.getErrorMessages().add(9, "Incorrect blood type input (" + bloodType + "). Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+        }
+        // ROD
+        try {
+            Date rodDate = new Date(rod);
+            newServiceman.setRod(rodDate);
+        } catch (IllegalArgumentException ex) {
+            servicemanWrapper.getErrorMessages().add(9, "Incorrect ROD date input (" + rod + "). Please change it to \"YYYY/MM/DD\".");
         }
     }
 

@@ -18,6 +18,12 @@
             .boolean-button {
                 width: 20% !important;
             }
+            .error-label {
+                background-color: rgb(255, 220, 224);
+            }
+            .error-output-message {
+                background-color: rgb(255, 238, 240);
+            }
         </style>
 
         <ezcomp:manageServiceman id="ccManageServiceman">
@@ -82,21 +88,23 @@
                                                                     <div class="card ui-fluid">
                                                                         <!-- New Name -->
                                                                         <div class="p-formgrid p-grid">
-                                                                            <div class="p-field p-col-3">
+                                                                            <div class="p-field p-col-3 #{servicemanWrapper.errorMessages.get(0) ne null ? 'error-label' : null}">
                                                                                 <p:outputLabel class="label" for="new-serviceman-name">Name</p:outputLabel>
                                                                             </div>
-                                                                            <div class="p-field p-col-9">
-                                                                                <h:outputText id="new-serviceman-name" value="#{servicemanWrapper.newServiceman.name}" />
+                                                                            <div class="p-field p-col-9 #{servicemanWrapper.errorMessages.get(0) ne null ? 'error-output-message' : null}" >
+                                                                                <h:outputText id="new-serviceman-name" rendered="#{servicemanWrapper.errorMessages.get(0) eq null}" value="#{servicemanWrapper.newServiceman.name}" />
+                                                                                <h:outputText id="new-serviceman-name-error" rendered="#{servicemanWrapper.errorMessages.get(0) ne null}" value="#{servicemanWrapper.errorMessages.get(0)}" />
                                                                             </div>
                                                                         </div>
 
                                                                         <!-- New Gender -->
                                                                         <div class="p-formgrid p-grid">
-                                                                            <div class="p-field p-col-3">
+                                                                            <div class="p-field p-col-3 #{servicemanWrapper.errorMessages.get(1) ne null ? 'error-label' : null}">
                                                                                 <p:outputLabel class="label" for="new-serviceman-gender">Gender</p:outputLabel>
                                                                             </div>
-                                                                            <div class="p-field p-col-9">
+                                                                            <div class="p-field p-col-9 #{servicemanWrapper.errorMessages.get(1) ne null ? 'error-output-message' : null}">
                                                                                 <h:outputText id="new-serviceman-gender" value="#{servicemanWrapper.newServiceman.gender}" />
+                                                                                <h:outputText id="new-serviceman-gender-error" rendered="#{servicemanWrapper.errorMessages.get(1) ne null}" value="#{servicemanWrapper.errorMessages.get(1)}" />
                                                                             </div>
                                                                         </div>
 
