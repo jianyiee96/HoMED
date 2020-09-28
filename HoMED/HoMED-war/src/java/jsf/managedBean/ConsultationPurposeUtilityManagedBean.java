@@ -21,6 +21,7 @@ import javax.faces.view.ViewScoped;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import util.exceptions.CreateConsultationPurposeException;
+import util.exceptions.RelinkFormTemplatesException;
 
 @Named(value = "consultationPurposeUtilityManagedBean")
 @ViewScoped
@@ -119,7 +120,11 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
     }
 
     public void onTransfer(TransferEvent event) {
-        consultationPurposeSessionBeanLocal.relinkFormTemplates(selectedConsultationPurpose.getConsultationPurposeId(), dualListFormTemplates.getTarget());
+        try {
+            consultationPurposeSessionBeanLocal.relinkFormTemplates(selectedConsultationPurpose.getConsultationPurposeId(), dualListFormTemplates.getTarget());
+        } catch (RelinkFormTemplatesException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to link form Templates", ex.getMessage()));
+        }
     }
 
     public String getCreateConsultationPurposeName() {
