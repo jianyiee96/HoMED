@@ -26,6 +26,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.exceptions.ServicemanNotFoundException;
 
 @Named(value = "servicemanAccountManagementManagedBean")
 @ViewScoped
@@ -72,7 +73,12 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 Integer idx = 1;
                 while (reader.ready() && (line = reader.readLine()) != null) {
                     String[] serviceman = line.split(",");
-                    validateServiceman(serviceman);
+
+                    ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
+                    this.servicemanWrappers.add(servicemanWrapper);
+
+                    validateServiceman(serviceman, servicemanWrapper);
+                    verifyExistingServiceman(serviceman, servicemanWrapper);
                 }
 
                 this.isUploaded = Boolean.TRUE;
@@ -85,7 +91,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
     }
 
-    private void validateServiceman(String[] serviceman) {
+    private void validateServiceman(String[] serviceman, ServicemanWrapper servicemanWrapper) {
         String name = serviceman[0];
         String gender = serviceman[1];
         String phone = serviceman[2];
@@ -101,9 +107,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
                 + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
                 + "); Blood Type = " + bloodType + "; ROD = " + rod);
-
-        ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
-        this.servicemanWrappers.add(servicemanWrapper);
 
         Serviceman newServiceman = new Serviceman();
         servicemanWrapper.setNewServiceman(newServiceman);
@@ -123,9 +126,19 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
 
         // Phone
-        newServiceman.setPhoneNumber(phone);
+        if (phone.length() == 8) {
+            newServiceman.setPhoneNumber(phone);
+        } else {
+            servicemanWrapper.getErrorMessages().add(2, "Incorrect phone number format [" + phone + "]. Phone Number must be of length 8");
+        }
+
         // Email
-        newServiceman.setEmail(email);
+        if (email.length() <= 64) {
+            newServiceman.setEmail(email);
+        } else {
+            servicemanWrapper.getErrorMessages().add(2, "Incorrect email format [" + email + "]. Proper formatted Email must be provided");
+        }
+
         // Address
         Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
         newServiceman.setAddress(address);
@@ -142,6 +155,16 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             newServiceman.setRod(rodDate);
         } catch (IllegalArgumentException ex) {
             servicemanWrapper.getErrorMessages().add(9, "Incorrect ROD date input (" + rod + "). Please change it to \"YYYY/MM/DD\".");
+        }
+    }
+
+    private void verifyExistingServiceman(String[] serviceman, ServicemanWrapper servicemanWrapper) {
+        String email = serviceman[3];
+
+        try {
+            servicemanWrapper.setExistingServiceman(servicemanSessionBeanLocal.retrieveServicemanByEmail(email));
+        } catch (ServicemanNotFoundException ex) {
+            servicemanWrapper.setExistingServiceman(null);
         }
     }
 
