@@ -116,7 +116,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         try {
             formTemplate.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
-            
+
             FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
 
             for (FormField oldFF : ft.getFormFields()) {
@@ -229,6 +229,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         List<FormTemplate> fts = query.getResultList();
         for (FormTemplate ft : fts) {
             ft.getConsultationPurposes().size();
+            ft.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
         }
         return fts;
     }
