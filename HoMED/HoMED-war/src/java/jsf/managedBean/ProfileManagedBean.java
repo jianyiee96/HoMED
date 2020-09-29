@@ -115,7 +115,6 @@ public class ProfileManagedBean implements Serializable {
     }
 
     public void setIsEditContact(Boolean isEditContact) {
-        System.out.println(isEditContact);
         this.isEditContact = isEditContact;
     }
 

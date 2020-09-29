@@ -47,3 +47,15 @@
 .button-margin {
     margin: 2px;
 }
+
+.tooltip-btn {
+    background-color: transparent;
+    color: #25A4D4;
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 6.5px 10px;
+    font-size: 12px;
+}
+.tooltip-btn:hover {
+    background: rgba(37,164,212,0.04);
+}

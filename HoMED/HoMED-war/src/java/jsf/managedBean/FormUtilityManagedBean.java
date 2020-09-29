@@ -25,7 +25,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import jsf.classes.FormFieldWrapper;
+import org.primefaces.PrimeFaces;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
 import util.exceptions.CreateFormTemplateException;
@@ -39,6 +41,9 @@ public class FormUtilityManagedBean implements Serializable {
 
     @EJB
     private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
+
+    @Inject
+    private FormTemplatePreviewManagedBean formTemplatePreviewManagedBean;
 
     private List<FormTemplate> formTemplates;
 
@@ -55,6 +60,8 @@ public class FormUtilityManagedBean implements Serializable {
     private Boolean newFormIsPublic;
 
     private Boolean fieldsDisabled;
+
+    private FormTemplate formToPublish;
 
     public FormUtilityManagedBean() {
     }
@@ -88,14 +95,13 @@ public class FormUtilityManagedBean implements Serializable {
 
     }
 
-    public void publishForm(ActionEvent event) {
+    public void publishForm() {
 
-        Long id = (Long) event.getComponent().getAttributes().get("formIdToPublish");
-        boolean success = formTemplateSessionBeanLocal.publishFormTemplate(id);
+        boolean success = formTemplateSessionBeanLocal.publishFormTemplate(formToPublish.getFormTemplateId());
         if (success) {
             postConstruct();
             for (FormTemplate ft : formTemplates) {
-                if (ft.getFormTemplateId() == id) {
+                if (ft.getFormTemplateId() == formToPublish.getFormTemplateId()) {
                     setSelectedForm(ft);
                 }
             }
@@ -233,6 +239,21 @@ public class FormUtilityManagedBean implements Serializable {
             }
         }
 
+    }
+
+    public void previewCurrentForm() {
+        boolean success = saveFormFields();
+
+        if (success) {
+            this.formTemplatePreviewManagedBean.setFormTemplateToView(selectedForm);
+            PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
+        }
+
+    }
+
+    public void previewPublishForm() {
+        this.formTemplatePreviewManagedBean.setFormTemplateToView(formToPublish);
+        PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
     }
 
     public InputTypeEnum[] getInputTypes() {
@@ -419,15 +440,30 @@ public class FormUtilityManagedBean implements Serializable {
 
     public String renderList(List<String> list) {
         String s = "";
-        for(int i = 0; i < list.size() ; i++){
-            if(i != list.size()-1) {
-                s = s+=list.get(i)+", ";
+        for (int i = 0; i < list.size(); i++) {
+            if (i != list.size() - 1) {
+                s = s += list.get(i) + ", ";
             } else {
-                s = s+=list.get(i);
+                s = s += list.get(i);
             }
         }
         return s;
     }
-    
-    
+
+    public FormTemplatePreviewManagedBean getFormTemplatePreviewManagedBean() {
+        return formTemplatePreviewManagedBean;
+    }
+
+    public void setFormTemplatePreviewManagedBean(FormTemplatePreviewManagedBean formTemplatePreviewManagedBean) {
+        this.formTemplatePreviewManagedBean = formTemplatePreviewManagedBean;
+    }
+
+    public FormTemplate getFormToPublish() {
+        return formToPublish;
+    }
+
+    public void setFormToPublish(FormTemplate formToPublish) {
+        this.formToPublish = formToPublish;
+    }
+
 }

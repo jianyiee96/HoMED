@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="template/template.xhtml">
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
 
     <ui:define name="title">E-Form Utility</ui:define>
 
@@ -37,13 +38,25 @@
         <div class="p-grid">
 
             <div class="p-col-12 p-md-12 p-lg-6">
+                <h:form id="formPublishPreview">
+                    <p:confirmDialog id="dlgPublishPreview" widgetVar="dlgPublishPreview" global="false" closable="false"
+                                     message="You will no longer be able to edit the Form Template. Are you sure?" header="Publish Template" >
+                        <p:commandButton value="Preview" type="submit" styleClass="ui-confirmdialog-yes" icon="pi pi-search-plus" 
+                                         actionListener="#{formUtilityManagedBean.previewPublishForm()}" update="ccFormTemplatePreview:formTemplatePreview"/>
+                        <p:commandButton value="Yes" oncomplete="PF('dlgPublishPreview').hide()" type="submit" styleClass="ui-confirmdialog-yes" icon="pi pi-check"
+                                         actionListener="#{formUtilityManagedBean.publishForm()}" update="editorForm formAllTemplates"/>
+                        <p:commandButton value="No" onclick="PF('dlgPublishPreview').hide();" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog>
+                </h:form>
+
 
                 <h:form id="formAllTemplates">
                     <p:growl id="growl" globalOnly="true" showDetail="true" />
                     <p:confirmDialog global="true">
                         <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                    </p:confirmDialog>     
+                    </p:confirmDialog>
+
 
                     <div class="card">
                         <h1>E-Form Utility Tool</h1>
@@ -89,26 +102,23 @@
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
                                     <f:attribute name="formToView" value="#{formTemplate}" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'ARCHIVED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
-                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
-                                    <p:confirm header="Publish Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'ARCHIVED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" onclick="PF('dlgPublishPreview').show()">
+                                    <f:setPropertyActionListener target="#{formUtilityManagedBean.formToPublish}" value="#{formTemplate}"/>
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" actionListener="#{formUtilityManagedBean.publishForm}">
-                                    <f:attribute name="formIdToPublish" value="#{formTemplate.formTemplateId}" />
-                                    <p:confirm header="Publish Template" escape="false" message="Republish an archived form template?" icon="pi pi-exclamation-triangle" />
-
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" onclick="PF('dlgPublishPreview').show()">
+                                    <f:setPropertyActionListener target="#{formUtilityManagedBean.formToPublish}" value="#{formTemplate}"/>
                                 </p:commandButton> 
                                 <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'DELETED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
                                     <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Delete Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button help-button-" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-undo"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button help-button" style="margin: 3px" update="editorForm formAllTemplates" icon="pi pi-undo"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
                                     <f:attribute name="formIdToRestore" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Restore Template" escape="false" message="Form Template will be restored to Draft status. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
 
 
-                                <p:commandButton disabled="#{formTemplate.formTemplateStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
+                                <p:commandButton disabled="#{formTemplate.formTemplateStatus != 'PUBLISHED'}" class="rounded-button help-button" style="margin: 3px" update="editorForm formAllTemplates" icon="pi pi-folder" title="Archive" actionListener="#{formUtilityManagedBean.archiveForm}">
                                     <f:attribute name="formIdToArchive" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Archive Template" escape="false" message="Users will no longer be able to use this Form Template.&lt;br/&gt;Any linkage to Consultation Purposes will be removed too.&lt;br/&gt;Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
@@ -121,12 +131,11 @@
 
                 </h:form>
             </div>
-
+            <ezcomp:formTemplatePreview id="ccFormTemplatePreview" />
             <div class="p-col-12 p-md-12 p-lg-6">
 
                 <h:form id="editorForm" >
 
-                    <p:growl id="growl" globalOnly="true" showDetail="true" sticky="true" />  
 
                     <ui:fragment rendered="#{formUtilityManagedBean.selectedForm == null}">
                         <div class="card">
@@ -139,7 +148,7 @@
 
                     <ui:fragment rendered="#{formUtilityManagedBean.selectedForm != null}">
 
-
+                        <!--WHEN FORM IS OTHER STATUS !DRAFT-->
                         <ui:fragment rendered="#{formUtilityManagedBean.fieldsDisabled}">
 
                             <div class="card">
@@ -159,8 +168,15 @@
 
 
                                     <div class="p-col-4"> 
-                                        <p:commandButton rendered="#{formUtilityManagedBean.fieldsDisabled}" update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right"/>
+                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right"/>
+                                        <p:commandButton type="submit" process="@this" update="ccFormTemplatePreview:formTemplatePreview"
+                                                         value="Preview" icon="pi pi-search-plus" style="float:right" class="p-mr-2"
+                                                         oncomplete="PF('dlgFormTemplatePreview').show()">
+                                            <f:setPropertyActionListener target="#{formUtilityManagedBean.formTemplatePreviewManagedBean.formTemplateToView}" value="#{formUtilityManagedBean.selectedForm}"/>
+                                        </p:commandButton>
                                     </div>
+
+
 
 
                                 </div>
@@ -231,7 +247,7 @@
 
                         </ui:fragment>
 
-
+                        <!--WHEN FORM IS IN DRAFT-->
                         <ui:fragment rendered="#{not formUtilityManagedBean.fieldsDisabled}">
 
                             <div class="card">
@@ -241,7 +257,7 @@
                                         <h:panelGrid columns="5">
                                             <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mx-2 p-mb-2" />
                                             <p:commandButton update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
-                                            <p:commandButton immediate="true" update="editorForm" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
+                                            <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
                                             <p:outputLabel class="p-mx-2" value="Public: "/>
                                             <p:selectBooleanCheckbox value="#{formUtilityManagedBean.newFormIsPublic}">
                                                 <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
@@ -254,6 +270,10 @@
                                     <div class="p-col-4">
                                         <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-clone" class="p-mx-2 p-mb-2" style="float: right">
                                             <p:confirm header="Clone Template" escape="false" message="Any current changes on the form editor will be saved before cloning.&lt;br/&gt;Proceed to clone?" icon="pi pi-exclamation-triangle" />
+                                        </p:commandButton>
+                                        <p:commandButton type="submit" update="editorForm formAllTemplates ccFormTemplatePreview:formTemplatePreview" actionListener="#{formUtilityManagedBean.previewCurrentForm()}"
+                                                         value="Preview" icon="pi pi-search-plus" style="float:right" class="p-mr-2">
+                                            <p:confirm header="Preview Form" escape="false" message="Any current changes on the form editor will be saved before previewing.&lt;br/&gt;Proceed to save and preview?" icon="pi pi-exclamation-triangle" />
                                         </p:commandButton>
                                     </div>
                                 </div>

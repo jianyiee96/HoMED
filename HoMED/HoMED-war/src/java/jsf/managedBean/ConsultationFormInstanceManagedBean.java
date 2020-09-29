@@ -26,6 +26,10 @@ public class ConsultationFormInstanceManagedBean implements Serializable {
         this.formInstanceToView = formInstanceSessionBeanLocal.retrieveFormInstance(1l);
     }
 
+    public void init() {
+
+    }
+
     public FormInstance getFormInstanceToView() {
         return formInstanceToView;
     }
