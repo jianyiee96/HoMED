@@ -163,8 +163,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                 if (errorMsg.contains("Name")) {
 
-                    validationErrorMessages.remove(0);
                     String curr = validationErrorMessages.get(0);
+                    validationErrorMessages.remove(0);
                     if (curr != null) {
                         validationErrorMessages.add(0, (curr + "\nIncorrect name format [" + name + "]. " + errorMsg));
                     } else {
@@ -178,8 +178,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                 } else if (errorMsg.contains("Phone")) {
 
-                    validationErrorMessages.remove(2);
                     String curr = validationErrorMessages.get(2);
+                    validationErrorMessages.remove(2);
                     if (curr != null) {
                         validationErrorMessages.add(2, (curr + "\nIncorrect phone number format [" + phone + "]. " + errorMsg));
                     } else {
@@ -188,13 +188,14 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                 } else if (errorMsg.contains("Email")) {
 
-                    validationErrorMessages.remove(3);
                     String curr = validationErrorMessages.get(3);
+                    validationErrorMessages.remove(3);
                     if (curr != null) {
                         validationErrorMessages.add(3, (curr + "\nIncorrect email format [" + email + "]. " + errorMsg));
                     } else {
                         validationErrorMessages.add(3, "Incorrect email format [" + email + "]. " + errorMsg);
                     }
+                    System.out.println("3: " + validationErrorMessages.get(3));
                                         
                 } else if (errorMsg.contains("Blood type")) {
                     

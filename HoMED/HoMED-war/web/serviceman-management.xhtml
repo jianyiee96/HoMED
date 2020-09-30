@@ -74,17 +74,26 @@
                                                         <div class="card ui-fluid">
                                                             <div class="p-formgrid p-grid">
                                                                 <div class="p-field p-col-12 p-md-12 p-sm-12">
-                                                                    <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) ne null}">
-                                                                        <h3>Serviceman Email: #{servicemanWrapper.errorMessages.get(3)}</h3>
-                                                                    </ui:fragment>
+                                                                    
+                                                                    <div class="p-formgrid p-grid">
+                                                                        <div class="p-field p-col-2 #{servicemanWrapper.errorMessages.get(3) ne null ? 'error-label' : null}"><h5>Serviceman Email</h5></div>
+                                                                        <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) ne null}">
+                                                                            <div class="p-field p-col-10 error-output-message">
+                                                                                <h5>#{servicemanWrapper.errorMessages.get(3)}</h5>
+                                                                            </div>
+                                                                        </ui:fragment>
+                                                                        <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
+                                                                            <div class="p-field p-col-10">
+                                                                                <h5>#{servicemanWrapper.newServiceman.email}</h5>
+                                                                            </div>
+                                                                        </ui:fragment>
+                                                                    </div>
 
                                                                     <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
-                                                                        <h3>Serviceman Email: #{servicemanWrapper.newServiceman.email}</h3>
-
                                                                         <div class="card ui-fluid">
                                                                             <div class="p-formgrid p-grid">
-                                                                                <div class="p-field p-col-6"><h4>Existing Serviceman</h4></div>
-                                                                                <div class="p-field p-col-6"><h5>New Serviceman</h5></div>
+                                                                                <div class="p-field p-col-6"><p:outputLabel class="label">Existing Serviceman</p:outputLabel></div>
+                                                                                <div class="p-field p-col-6"><p:outputLabel class="label">New Serviceman</p:outputLabel></div>
                                                                             </div>
 
                                                                             <!-- Name -->
