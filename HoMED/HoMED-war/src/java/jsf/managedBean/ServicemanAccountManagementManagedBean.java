@@ -9,10 +9,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -21,6 +24,10 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.model.file.UploadedFile;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import jsf.classes.ServicemanWrapper;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
@@ -40,10 +47,18 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     private List<Serviceman> servicemen;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    private final List<String> dateFormats;
     private List<ServicemanWrapper> servicemanWrappers;
     private Boolean isUploaded;
 
     public ServicemanAccountManagementManagedBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+
+        this.dateFormats = Arrays.asList("d-M-yy", "d/M/yy");
         this.servicemanWrappers = new ArrayList<>();
     }
 
@@ -104,57 +119,77 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         String bloodType = serviceman[9];
         String rod = serviceman[10];
 
+        System.out.println("======================================================================");
         System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
                 + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
                 + "); Blood Type = " + bloodType + "; ROD = " + rod);
+        System.out.println("======================================================================");
 
         Serviceman newServiceman = new Serviceman();
+        Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
+        
+        newServiceman.setName(name);
+        newServiceman.setEmail(email);
+        newServiceman.setPhoneNumber(phone);
+        newServiceman.setAddress(address);
+        
         servicemanWrapper.setNewServiceman(newServiceman);
-
-        // Name
-        if (name != null && name.length() >= 2 && name.length() <= 128) {
-            newServiceman.setName(name);
-        } else {
-            servicemanWrapper.getErrorMessages().add(0, "Incorrect name format [" + name + "]. Name must be between length 2 to 128.");
-        }
-
+        
         // Gender
         if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
             newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
-        } else {
-            servicemanWrapper.getErrorMessages().add(1, "Incorrect gender format [" + gender + "]. Please change it to MALE/FEMALE.");
         }
-
-        // Phone
-        if (phone.length() == 8) {
-            newServiceman.setPhoneNumber(phone);
-        } else {
-            servicemanWrapper.getErrorMessages().add(2, "Incorrect phone number format [" + phone + "]. Phone Number must be of length 8");
-        }
-
-        // Email
-        if (email.length() <= 64) {
-            newServiceman.setEmail(email);
-        } else {
-            servicemanWrapper.getErrorMessages().add(2, "Incorrect email format [" + email + "]. Proper formatted Email must be provided");
-        }
-
-        // Address
-        Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
-        newServiceman.setAddress(address);
         // Blood Type
-        BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOfLabel(bloodType);
-        if (bloodTypeEnum != null) {
-            newServiceman.setBloodType(bloodTypeEnum);
-        } else {
-            servicemanWrapper.getErrorMessages().add(9, "Incorrect blood type input (" + bloodType + "). Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+        if (BloodTypeEnum.valueOfLabel(bloodType) != null) {
+            newServiceman.setBloodType(BloodTypeEnum.valueOfLabel(bloodType));
         }
         // ROD
-        try {
-            Date rodDate = new Date(rod);
-            newServiceman.setRod(rodDate);
-        } catch (IllegalArgumentException ex) {
-            servicemanWrapper.getErrorMessages().add(9, "Incorrect ROD date input (" + rod + "). Please change it to \"YYYY/MM/DD\".");
+        for (String df : dateFormats) {
+            try {
+                newServiceman.setRod(new SimpleDateFormat(df).parse(rod));
+                break;
+            } catch (ParseException e) {
+            }
+        }
+
+        List<String> validationErrorMessages = servicemanWrapper.getErrorMessages();
+
+        Set<ConstraintViolation<Object>> servicemanConstraintViolations = validator.validate(newServiceman);
+        if (!servicemanConstraintViolations.isEmpty()) {
+            System.out.println("----- Serviceman -----");
+
+            for (String errorMsg : prepareInputDataValidationErrorsMessage(servicemanConstraintViolations)) {
+                System.out.println(errorMsg);
+
+                if (errorMsg.contains("Name")) {
+                    validationErrorMessages.add(0, "Incorrect name format [" + name + "]. " + errorMsg);
+                } else if (errorMsg.contains("Gender")) {
+                    validationErrorMessages.add(1, "Incorrect gender format [" + gender + "]. Please change it to MALE/FEMALE.");
+                } else if (errorMsg.contains("Phone")) {
+                    validationErrorMessages.add(2, "Incorrect phone format [" + phone + "]. " + errorMsg);
+                } else if (errorMsg.contains("Email")) {
+                    validationErrorMessages.add(3, "Incorrect email format [" + email + "]. " + errorMsg);
+                } else if (errorMsg.contains("Blood type")) {
+                    validationErrorMessages.add(9, "Incorrect blood type format [" + bloodType + "]. Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+                } else if (errorMsg.contains("ROD")) {
+                    validationErrorMessages.add(10, "Incorrect ROD date format [" + rod + "]. Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
+                }
+            }
+        }
+
+        Set<ConstraintViolation<Object>> addressConstraintViolations = validator.validate(address);
+        if (!addressConstraintViolations.isEmpty()) {
+            System.out.println("----- Address -----");
+
+            for (String errorMsg : prepareInputDataValidationErrorsMessage(addressConstraintViolations)) {
+                System.out.println(errorMsg);
+                
+                if (errorMsg.contains("Street Name")) {
+                    validationErrorMessages.add(4, "Incorrect street name format [" + streetName + "]. " + errorMsg);
+                } else if (errorMsg.contains("Postal Code")) {
+                    validationErrorMessages.add(8, "Incorrect postal code format [" + postalCode + "]. " + errorMsg);
+                }
+            }
         }
     }
 
@@ -221,6 +256,20 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void setIsUploaded(Boolean isUploaded) {
         this.isUploaded = isUploaded;
+    }
+
+    private List<String> prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Object>> constraintViolations) {
+        List<String> msgs = new ArrayList<>();
+//        String msg = "";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msgs.add(constraintViolation.getMessage());
+//            msg += constraintViolation.getMessage() + "\n";
+        }
+
+//        msg = msg.substring(0, msg.length() - 1);
+        return msgs;
+//        return msg;
     }
 
 }
