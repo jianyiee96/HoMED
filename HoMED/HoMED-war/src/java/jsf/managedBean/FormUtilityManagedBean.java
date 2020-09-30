@@ -115,7 +115,6 @@ public class FormUtilityManagedBean implements Serializable {
 
     public void doPublishForm(FormTemplate formTemplate) {
         formToPublish = formTemplate;
-        System.out.println("entered - " + formToPublish.getFormTemplateStatus());
         if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.ARCHIVED) {
             this.publishFormString = "Republish an archived form template?";
         } else if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {

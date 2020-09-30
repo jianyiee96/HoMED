@@ -8,6 +8,14 @@
 
 }
 
+.operating-hours-badge {
+    border-radius: 2px;
+    padding: .7rem 1.2rem;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .3px;
+}
+
 .status-published {
     background: #C8E6C9;
     color: #256029;

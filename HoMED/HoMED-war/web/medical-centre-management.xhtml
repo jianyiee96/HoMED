@@ -65,7 +65,7 @@
                                 <h:outputText value="#{medicalCentre.address}" />
                             </p:column>
 
-                            <p:column headerText="Action" width="5%">
+                            <p:column headerText="Action" width="7%">
                                 <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
                                                  update="ccManageMedicalCentre:formManageMedicalCentre" process="@this" 
                                                  actionListener="#{manageMedicalCentreManagedBean.initManage}" oncomplete="PF('dialogManageMedicalCentre').show()">
