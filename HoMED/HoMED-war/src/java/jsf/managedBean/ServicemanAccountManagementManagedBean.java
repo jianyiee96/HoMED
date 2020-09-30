@@ -127,14 +127,14 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         Serviceman newServiceman = new Serviceman();
         Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
-        
+
         newServiceman.setName(name);
         newServiceman.setEmail(email);
         newServiceman.setPhoneNumber(phone);
         newServiceman.setAddress(address);
-        
+
         servicemanWrapper.setNewServiceman(newServiceman);
-        
+
         // Gender
         if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
             newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
@@ -162,17 +162,50 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 System.out.println(errorMsg);
 
                 if (errorMsg.contains("Name")) {
-                    validationErrorMessages.add(0, "Incorrect name format [" + name + "]. " + errorMsg);
+
+                    validationErrorMessages.remove(0);
+                    String curr = validationErrorMessages.get(0);
+                    if (curr != null) {
+                        validationErrorMessages.add(0, (curr + "\nIncorrect name format [" + name + "]. " + errorMsg));
+                    } else {
+                        validationErrorMessages.add(0, "Incorrect name format [" + name + "]. " + errorMsg);
+                    }
+
                 } else if (errorMsg.contains("Gender")) {
+
+                    validationErrorMessages.remove(1);
                     validationErrorMessages.add(1, "Incorrect gender format [" + gender + "]. Please change it to MALE/FEMALE.");
+
                 } else if (errorMsg.contains("Phone")) {
-                    validationErrorMessages.add(2, "Incorrect phone format [" + phone + "]. " + errorMsg);
+
+                    validationErrorMessages.remove(2);
+                    String curr = validationErrorMessages.get(2);
+                    if (curr != null) {
+                        validationErrorMessages.add(2, (curr + "\nIncorrect phone number format [" + phone + "]. " + errorMsg));
+                    } else {
+                        validationErrorMessages.add(2, "Incorrect phone number format [" + phone + "]. " + errorMsg);
+                    }
+
                 } else if (errorMsg.contains("Email")) {
-                    validationErrorMessages.add(3, "Incorrect email format [" + email + "]. " + errorMsg);
+
+                    validationErrorMessages.remove(3);
+                    String curr = validationErrorMessages.get(3);
+                    if (curr != null) {
+                        validationErrorMessages.add(3, (curr + "\nIncorrect email format [" + email + "]. " + errorMsg));
+                    } else {
+                        validationErrorMessages.add(3, "Incorrect email format [" + email + "]. " + errorMsg);
+                    }
+                                        
                 } else if (errorMsg.contains("Blood type")) {
+                    
+                    validationErrorMessages.remove(9);
                     validationErrorMessages.add(9, "Incorrect blood type format [" + bloodType + "]. Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+                    
                 } else if (errorMsg.contains("ROD")) {
+                    
+                    validationErrorMessages.remove(10);
                     validationErrorMessages.add(10, "Incorrect ROD date format [" + rod + "]. Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
+                    
                 }
             }
         }
@@ -183,7 +216,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
             for (String errorMsg : prepareInputDataValidationErrorsMessage(addressConstraintViolations)) {
                 System.out.println(errorMsg);
-                
+
                 if (errorMsg.contains("Street Name")) {
                     validationErrorMessages.add(4, "Incorrect street name format [" + streetName + "]. " + errorMsg);
                 } else if (errorMsg.contains("Postal Code")) {

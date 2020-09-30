@@ -45,14 +45,14 @@ public class Serviceman implements Serializable {
 
     @Column(nullable = false, unique = true, length = 64)
     @NotNull(message = "Email must be provided")
-    @Size(max = 64, message = "Proper formatted Email must be provided")
+    @Size(max = 64, message = "Email must be of length less than 64")
     @Email(message = "Proper formatted Email must be provided")
     private String email;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
     @Size(min = 8, max = 8, message = "Phone Number must be of length 8")
-    @Pattern(regexp = "^[89]\\d{7}", message = "Proper formmated Phone Number must be provided")
+    @Pattern(regexp = "^[89]\\d{7}", message = "Proper formatted Phone Number must be provided")
     private String phoneNumber;
 
     @Temporal(TemporalType.TIMESTAMP)
