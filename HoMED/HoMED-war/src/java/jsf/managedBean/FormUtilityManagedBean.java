@@ -63,6 +63,8 @@ public class FormUtilityManagedBean implements Serializable {
 
     private FormTemplate formToPublish;
 
+    private String publishFormString;
+
     public FormUtilityManagedBean() {
     }
 
@@ -109,6 +111,26 @@ public class FormUtilityManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to publish form template!", "Please ensure that the form template has at least 1 form field."));
         }
 
+    }
+
+    public void doPublishForm(FormTemplate formTemplate) {
+        formToPublish = formTemplate;
+        System.out.println("entered - " + formToPublish.getFormTemplateStatus());
+        if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.ARCHIVED) {
+            this.publishFormString = "Republish an archived form template?";
+        } else if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {
+            if (selectedForm != null && formToPublish.getFormTemplateId().equals(selectedForm.getFormTemplateId())) {
+                this.publishFormString = "This form is currently opened in the form editor. Any current changes on the form editor will be saved before publishing. Proceed?";
+            } else {
+                this.publishFormString = "You will no longer be able to edit the Form Template. Are you sure?";
+            }
+        }
+
+    }
+
+    public void previewPublishForm() {
+        this.formTemplatePreviewManagedBean.setFormTemplateToView(formToPublish);
+        PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
     }
 
     public void deleteForm(ActionEvent event) {
@@ -249,11 +271,6 @@ public class FormUtilityManagedBean implements Serializable {
             PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
         }
 
-    }
-
-    public void previewPublishForm() {
-        this.formTemplatePreviewManagedBean.setFormTemplateToView(formToPublish);
-        PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
     }
 
     public InputTypeEnum[] getInputTypes() {
@@ -464,6 +481,14 @@ public class FormUtilityManagedBean implements Serializable {
 
     public void setFormToPublish(FormTemplate formToPublish) {
         this.formToPublish = formToPublish;
+    }
+
+    public String getPublishFormString() {
+        return publishFormString;
+    }
+
+    public void setPublishFormString(String publishFormString) {
+        this.publishFormString = publishFormString;
     }
 
 }

@@ -40,7 +40,11 @@
             <div class="p-col-12 p-md-12 p-lg-6">
                 <h:form id="formPublishPreview">
                     <p:confirmDialog id="dlgPublishPreview" widgetVar="dlgPublishPreview" global="false" closable="false"
-                                     message="You will no longer be able to edit the Form Template. Are you sure?" header="Publish Template" >
+                                     header="Publish Template" >
+
+                        <f:facet name="message">
+                            #{formUtilityManagedBean.publishFormString}
+                        </f:facet>
                         <p:commandButton value="Preview" type="submit" styleClass="ui-confirmdialog-yes" icon="pi pi-search-plus" 
                                          actionListener="#{formUtilityManagedBean.previewPublishForm()}" update="ccFormTemplatePreview:formTemplatePreview"/>
                         <p:commandButton value="Yes" oncomplete="PF('dlgPublishPreview').hide()" type="submit" styleClass="ui-confirmdialog-yes" icon="pi pi-check"
@@ -102,11 +106,10 @@
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllTemplates"  icon="pi pi-search" title="View" actionListener="#{formUtilityManagedBean.selectForm}">
                                     <f:attribute name="formToView" value="#{formTemplate}" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'ARCHIVED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" onclick="PF('dlgPublishPreview').show()">
-                                    <f:setPropertyActionListener target="#{formUtilityManagedBean.formToPublish}" value="#{formTemplate}"/>
-                                </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'ARCHIVED'}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-upload" title="Publish" onclick="PF('dlgPublishPreview').show()">
-                                    <f:setPropertyActionListener target="#{formUtilityManagedBean.formToPublish}" value="#{formTemplate}"/>
+                                <p:commandButton disabled="#{formTemplate.formTemplateStatus == 'PUBLISHED' or formTemplate.formTemplateStatus == 'DELETED'}" title="Publish" 
+                                                 class="rounded-button success-button" style="margin: 3px" icon="pi pi-upload"
+                                                 actionListener="#{formUtilityManagedBean.doPublishForm(formTemplate)}" oncomplete="PF('dlgPublishPreview').show()"
+                                                 update="editorForm formAllTemplates formPublishPreview" >
                                 </p:commandButton> 
                                 <p:commandButton rendered="#{formTemplate.formTemplateStatus != 'DELETED'}" disabled="#{formTemplate.formTemplateStatus != 'DRAFT'}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllTemplates" icon="pi pi-trash"  title="Delete" actionListener="#{formUtilityManagedBean.deleteForm}">
                                     <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
