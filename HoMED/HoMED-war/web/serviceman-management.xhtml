@@ -88,7 +88,7 @@
                                                                             </div>
 
                                                                             <div class="p-col-2" style="text-align: right;">
-                                                                                <p:selectBooleanCheckbox disabled="#{not servicemanWrapper.isValid}" />
+                                                                                <p:selectBooleanCheckbox disabled="#{not servicemanWrapper.isValid}" value="#{servicemanWrapper.isSelected}" />
                                                                                 <p:outputLabel value="Import" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
                                                                             </div>
                                                                         </ui:fragment>
@@ -97,8 +97,8 @@
                                                                     <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
                                                                         <div class="card ui-fluid">
                                                                             <div class="p-formgrid p-grid">
-                                                                                <div class="p-field p-col-6" style="background-color: #90A4AE"><p:outputLabel class="label">Existing Serviceman</p:outputLabel></div>
-                                                                                <div class="p-field p-col-6" style="background-color: #84bfdd"><p:outputLabel class="label">New Serviceman</p:outputLabel></div>
+                                                                                <div class="p-field p-col-6" style="background-color: rgb(146, 164, 175)"><p:outputLabel class="label">Existing Serviceman</p:outputLabel></div>
+                                                                                <div class="p-field p-col-6" style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">New Serviceman</p:outputLabel></div>
                                                                             </div>
 
                                                                             <!-- Name -->
@@ -342,6 +342,27 @@
                                                         </div>
 
                                                     </p:repeat>
+
+                                                    <div class="card ui-fluid">
+                                                        <div class="p-formgrid p-grid">
+                                                            <div class="p-field p-col">
+                                                                <h:form>
+                                                                    <p:commandButton icon="pi pi-upload" label="p-mr-2 p-mb-2" value="Import" title="Import"
+                                                                                     update="@form" process="@this"
+                                                                                     actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" />
+
+                                                                </h:form>
+                                                                <!--
+                                                                
+                                                                
+                                                                                                                                <p:commandButton icon="pi pi-search" styleClass="info-button rounded-button p-mr-2 p-mb-2" title="View"
+                                                                                                                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" process="@this" 
+                                                                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initManage()}" oncomplete="PF('dialogManageServiceman').show()">
+                                                                                                                                </p:commandButton>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
 

@@ -93,7 +93,15 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     this.servicemanWrappers.add(servicemanWrapper);
 
                     validateServiceman(serviceman, servicemanWrapper);
-                    verifyExistingServiceman(serviceman, servicemanWrapper);
+//                    verifyExistingServiceman(serviceman, servicemanWrapper);
+
+                    String email = serviceman[3];
+                    try {
+                        servicemanWrapper.setExistingServiceman(servicemanSessionBeanLocal.retrieveServicemanByEmail(email));
+                    } catch (ServicemanNotFoundException ex) {
+                        servicemanWrapper.setExistingServiceman(null);
+                    }
+
                 }
 
                 this.isUploaded = Boolean.TRUE;
@@ -211,13 +219,17 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
     }
 
-    private void verifyExistingServiceman(String[] serviceman, ServicemanWrapper servicemanWrapper) {
-        String email = serviceman[3];
-
-        try {
-            servicemanWrapper.setExistingServiceman(servicemanSessionBeanLocal.retrieveServicemanByEmail(email));
-        } catch (ServicemanNotFoundException ex) {
-            servicemanWrapper.setExistingServiceman(null);
+    public void importSelectedServicemen() {
+        System.out.println("hello");
+        for (ServicemanWrapper sw : servicemanWrappers) {
+            System.out.println("          Email: " + sw.getNewServiceman().getEmail());
+            System.out.println("Selected Status: " + sw.getIsSelected());
+            if (sw.getIsSelected()) {
+                System.out.println("=======================================================================");
+                System.out.println("==================== Selected Serviceman to Import ====================");
+                System.out.println("=======================================================================");
+                System.out.println("Selected Email: " + sw.getNewServiceman().getEmail());
+            }
         }
     }
 

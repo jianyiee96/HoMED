@@ -63,6 +63,7 @@ public class ServicemanWrapper {
 
     public void setIsSelected(Boolean isSelected) {
         this.isSelected = isSelected;
+        System.out.println("Setting..." + isSelected);
     }
 
 }
