@@ -40,7 +40,7 @@
             <div class="p-col-12 p-md-12 p-lg-6">
                 <h:form id="formPublishPreview">
                     <p:confirmDialog id="dlgPublishPreview" widgetVar="dlgPublishPreview" global="false" closable="false"
-                                     header="Publish Template" >
+                                     header="Publish Template" width="400">
 
                         <f:facet name="message">
                             #{formUtilityManagedBean.publishFormString}
@@ -115,7 +115,7 @@
                                     <f:attribute name="formIdToDelete" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Delete Template" escape="false" message="You will no longer be able to edit the Form Template. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
-                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button help-button" style="margin: 3px" update="editorForm formAllTemplates" icon="pi pi-undo"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
+                                <p:commandButton rendered="#{formTemplate.formTemplateStatus == 'DELETED'}" class="rounded-button danger-button" style="margin: 3px" update="editorForm formAllTemplates" icon="pi pi-undo"  title="Restore" actionListener="#{formUtilityManagedBean.restoreForm}">
                                     <f:attribute name="formIdToRestore" value="#{formTemplate.formTemplateId}" />
                                     <p:confirm header="Restore Template" escape="false" message="Form Template will be restored to Draft status. &lt;br/&gt;Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
@@ -171,7 +171,7 @@
 
 
                                     <div class="p-col-4"> 
-                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right"/>
+                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right" class="p-mr-2 p-mb-2"/>
                                         <p:commandButton type="submit" process="@this" update="ccFormTemplatePreview:formTemplatePreview"
                                                          value="Preview" icon="pi pi-search-plus" style="float:right" class="p-mr-2"
                                                          oncomplete="PF('dlgFormTemplatePreview').show()">
