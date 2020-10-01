@@ -33,6 +33,14 @@
             .modified-output-message-existing-serviceman {
                 background-color: rgb(241, 248, 255);
             }
+            .p-field.p-grid .p-col-fixed, .p-formgrid.p-grid .p-col-fixed, .p-field.p-grid .p-col, .p-formgrid.p-grid .p-col, .p-formgroup .p-grid .p-col-1, .p-formgrid.p-grid .p-col-1, .p-field.p-grid .p-col-2, .p-formgrid.p-grid .p-col-2, .p-field.p-grid .p-col-3, .p-formgrid.p-grid .p-col-3, .p-field.p-grid .p-col-4, .p-formgroup.p-grid .p-col-4, .p-field.p-grid .p-col-5, .p-formgrid.p-grid .p-col-5, .p-field.p-grid .p-col-6, .p-formgrid.p-grid .p-col-6, .p-formgroup .p-grid .p-col-7, .p-formgrid.p-grid .p-col-7, .p-field.p-grid .p-col-8, .p-formgrid.p-grid .p-col-8, .p-formgroup .p-grid .p-col-9, .p-formgrid.p-grid .p-col-9, .p-field.p-grid .p-col-10, .p-formgrid.p-grid .p-col-10, .p-field.p-grid .p-col-11, .p-formgroup.p-grid .p-col-11, .p-field.p-grid .p-col-12, .p-formgrid.p-grid .p-col-12 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            .p-field {
+                margin-top: 0.15rem;
+                margin-bottom: 0.15rem;
+            }
         </style>
 
         <ezcomp:manageServiceman id="ccManageServiceman">
@@ -95,7 +103,7 @@
                                                                     </div>
 
                                                                     <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
-                                                                        <div class="card ui-fluid">
+                                                                        <div class="card ui-fluid" style="padding-top: 0 !important; padding-bottom: 0 !important;">
                                                                             <div class="p-formgrid p-grid">
                                                                                 <div class="p-field p-col-6" style="background-color: rgb(146, 164, 175)"><p:outputLabel class="label">Existing Serviceman</p:outputLabel></div>
                                                                                 <div class="p-field p-col-6" style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">New Serviceman</p:outputLabel></div>
@@ -197,7 +205,7 @@
                                                                                        ? 'modified-label-existing-serviceman' : null}">
                                                                                     <p:outputLabel class="label">Address</p:outputLabel>
                                                                                 </div>
-                                                                                <div class="p-field p-col-5">
+                                                                                <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
                                                                                     <div class="p-formgrid p-grid">
                                                                                         <div class="p-field p-col-12
                                                                                              #{servicemanWrapper.existingServiceman ne null 
@@ -243,7 +251,7 @@
                                                                                        or servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-label-new-serviceman' : null}">
                                                                                     <p:outputLabel class="label">Address</p:outputLabel>
                                                                                 </div>
-                                                                                <div class="p-field p-col-5">
+                                                                                <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
                                                                                     <div class="p-formgrid p-grid">
                                                                                         <div class="p-field p-col-12
                                                                                              #{servicemanWrapper.errorMessages.get(4) ne null ? 'error-output-message' : null}
