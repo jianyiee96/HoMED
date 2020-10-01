@@ -123,7 +123,7 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
         try {
             consultationPurposeSessionBeanLocal.relinkFormTemplates(selectedConsultationPurpose.getConsultationPurposeId(), dualListFormTemplates.getTarget());
         } catch (RelinkFormTemplatesException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to link form Templates", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to link form templates", ex.getMessage()));
         }
     }
 
