@@ -454,18 +454,6 @@ public class FormUtilityManagedBean implements Serializable {
         }
     }
 
-    public String renderList(List<String> list) {
-        String s = "";
-        for (int i = 0; i < list.size(); i++) {
-            if (i != list.size() - 1) {
-                s = s += list.get(i) + ", ";
-            } else {
-                s = s += list.get(i);
-            }
-        }
-        return s;
-    }
-
     public FormTemplatePreviewManagedBean getFormTemplatePreviewManagedBean() {
         return formTemplatePreviewManagedBean;
     }
