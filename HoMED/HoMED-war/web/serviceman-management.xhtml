@@ -11,6 +11,7 @@
     <ui:define name="content">
 
         <h:outputStylesheet name="crud-tables.css" library="css" />
+
         <style type="text/css">
             .label {
                 font-weight: bold;
@@ -133,29 +134,59 @@
                                                 <div class="p-field p-col-12 p-md-12 p-sm-12">
 
                                                     <div class="p-formgrid p-grid">
+                                                        <div class="p-field p-col" style="text-align: center;">
+                                                            <!-- Validity of Imported Servicemen -->
+                                                            <ui:fragment rendered="#{servicemanWrapper.isValid}" >
+                                                                <span class="form-status-badge status-valid">VALID</span>
+                                                            </ui:fragment>
+                                                            <ui:fragment rendered="#{not servicemanWrapper.isValid}" >
+                                                                <span class="form-status-badge status-invalid">INVALID</span>
+                                                            </ui:fragment>
+
+                                                            <!-- Existence of Imported Servicemen -->
+                                                            <ui:fragment rendered="#{servicemanWrapper.existingServiceman eq null}" >
+                                                                <span class="form-status-badge status-create">CREATE</span>
+                                                            </ui:fragment>
+                                                            <ui:fragment rendered="#{servicemanWrapper.existingServiceman ne null}" >
+                                                                <span class="form-status-badge status-update">UPDATE</span>
+                                                            </ui:fragment>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="p-formgrid p-grid">
                                                         <div class="p-field p-col-2 #{servicemanWrapper.errorMessages.get(3) ne null ? 'error-label' : null}"><h5>Serviceman Email</h5></div>
                                                         <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) ne null}">
                                                             <div class="p-field p-col-10 error-output-message">
                                                                 <h5>#{servicemanWrapper.errorMessages.get(3)}</h5>
                                                             </div>
                                                         </ui:fragment>
-                                                        
+
                                                         <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
                                                             <div class="p-field p-col-8">
                                                                 <h5>#{servicemanWrapper.newServiceman.email}</h5>
                                                             </div>
 
                                                             <div class="p-col-2" style="text-align: right;">
-                                                                #{servicemanWrapper.isSelected}
-                                                                <p:selectBooleanCheckbox disabled="#{not servicemanWrapper.isValid}" value="#{servicemanWrapper.isSelected}">
-                                                                    <p:ajax update="formBulkImportServicemen:panelGroupBulkImportServicemen" />
-                                                                </p:selectBooleanCheckbox>
-                                                                <p:outputLabel value="Import" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+
+                                                                <ui:fragment rendered="#{servicemanWrapper.isValid}" >
+                                                                    <p:selectBooleanCheckbox value="#{servicemanWrapper.isSelected}">
+                                                                        <p:ajax update="formBulkImportServicemen:panelGroupBulkImportServicemen" process="@this" />
+                                                                    </p:selectBooleanCheckbox>
+                                                                    <p:outputLabel value="IMPORT" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+                                                                </ui:fragment>
+
+                                                                <ui:fragment rendered="#{not servicemanWrapper.isValid}">
+                                                                    <p:selectBooleanCheckbox value="#{servicemanWrapper.isDismissed}">
+                                                                        <p:ajax update="formBulkImportServicemen:panelGroupBulkImportServicemen" process="@this" />
+                                                                    </p:selectBooleanCheckbox>
+                                                                    <p:outputLabel value="DISMISS" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+                                                                </ui:fragment>
+
                                                             </div>
                                                         </ui:fragment>
                                                     </div>
 
-                                                    <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
+                                                    <h:panelGroup id="panelGroupServicemanDetails" rendered="#{servicemanWrapper.errorMessages.get(3) eq null and not servicemanWrapper.isSelected and not servicemanWrapper.isDismissed}">
                                                         <div class="card ui-fluid" style="padding-top: 0 !important; padding-bottom: 0 !important;">
                                                             <div class="p-formgrid p-grid">
                                                                 <div class="p-field p-col-6" style="background-color: rgb(146, 164, 175)"><p:outputLabel class="label">Existing Serviceman</p:outputLabel></div>
@@ -454,7 +485,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </ui:fragment>
+                                                    </h:panelGroup>
+
 
                                                 </div>
                                             </div>

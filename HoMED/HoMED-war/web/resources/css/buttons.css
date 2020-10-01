@@ -16,24 +16,28 @@
     letter-spacing: .3px;
 }
 
-.status-published {
+.status-published, .status-valid {
     background: #C8E6C9;
     color: #256029;
 }
 
-.status-draft {
+.status-draft, .status-create {
     background: #B3E5FC;
     color: #23547B;
 }
 
-.status-archived {
+.status-archived, .status-update {
     background: #FEEDAF;
     color: #8A5340;
 }
 
-.status-deleted {
+.status-deleted, .status-invalid {
     background: #FFCDD2;
     color: #C63737;
+}
+
+.status-valid, .status-invalid, .status-create, .status-update {
+    font-size: 18px;
 }
 
 .consultation-badge {
