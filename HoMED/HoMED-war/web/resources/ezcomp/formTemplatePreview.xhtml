@@ -46,8 +46,8 @@
                                     </ui:fragment>
                                     <ui:fragment rendered="#{formField.inputType != 'HEADER'}">
                                         <div class="p-col-12 ui-fluid">
-                                            <p:outputLabel value="#{formField.question}" indicateRequired="#{formField.isRequired}"
-                                                           style="font-size: 20px"/>
+                                            <p:outputLabel value="#{formField.question}" indicateRequired="false"
+                                                           style="font-size: 20px"/><h:outputText value="#{formField.isRequired ? ' *' : ''}" style="font-size: 20px; color: red;" />
                                         </div>
                                         <ui:fragment rendered="#{formField.inputType == 'TEXT' or formField.inputType == 'FILE_UPLOAD' or formField.inputType == 'IMAGE_UPLOAD'}">
                                             <div class="p-col-12 ui-fluid">
