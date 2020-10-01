@@ -110,7 +110,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     } catch (ServicemanNotFoundException ex) {
                         servicemanWrapper.setExistingServiceman(null);
                     }
-
                 }
 
                 this.isUploaded = Boolean.TRUE;
