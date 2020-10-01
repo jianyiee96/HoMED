@@ -27,6 +27,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
+import util.enumeration.InputTypeEnum;
 import util.exceptions.ArchiveFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.SubmitFormInstanceException;
@@ -114,6 +115,8 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             if (formInstance == null) {
                 throw new DeleteFormInstanceException("Please supply an existing formInstanceId");
+            } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+                throw new DeleteFormInstanceException("Unable to delete submitted form instances");
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
@@ -194,6 +197,35 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             throw new SubmitFormInstanceException("Invalid Form Instance status: Status of form instance must be DRAFT");
         } else if (formInstance == null) {
             throw new SubmitFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        // server-side validation
+        String validationMessage = "Form Instance Validation Error:";
+        boolean validationSuccess = true;
+
+        for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
+
+            if (fif.getFormFieldMapping().getIsServicemanEditable()
+                    && fif.getFormFieldMapping().getIsRequired()
+                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER) { // not header, is required, is editabl -> must have content
+                boolean hasContent = false;
+                for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+                    if (fifv.getInputValue() != null && !fifv.getInputValue().equals("")) {
+                        hasContent = true;
+                    }
+                }
+
+                if (!hasContent) {
+                    validationMessage = validationMessage + "\nQuestion: " + fif.getFormFieldMapping().getQuestion() + " is required";
+                    validationSuccess = false;
+                }
+
+            }
+
+        }
+
+        if (!validationSuccess) {
+            throw new SubmitFormInstanceException(validationMessage);
         }
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
