@@ -53,6 +53,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     private final List<String> dateFormats;
     private List<ServicemanWrapper> servicemanWrappers;
     private Boolean isUploaded;
+    
+    private Boolean test;
 
     public ServicemanAccountManagementManagedBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -303,6 +305,21 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 //        msg = msg.substring(0, msg.length() - 1);
         return msgs;
 //        return msg;
+    }
+
+    public Boolean getTest() {
+        System.out.println("getting test");
+        return test;
+    }
+
+    public void setTest(Boolean test) {
+        System.out.println("setting test");
+        this.test = test;
+    }
+    
+    public void listener() {
+        System.out.println("Toggle");
+        
     }
 
 }

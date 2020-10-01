@@ -109,6 +109,10 @@
                                                                                 <div class="p-field p-col-6" style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">New Serviceman</p:outputLabel></div>
                                                                             </div>
 
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-12"  style="background-color: #11a9df"><p:outputLabel class="label">Personal</p:outputLabel></div>
+                                                                            </div>
+
                                                                             <!-- Name -->
                                                                             <div class="p-formgrid p-grid">                                                                                
                                                                                 <div class="p-field p-col-1 
@@ -193,98 +197,246 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <!-- Address -->
-                                                                            <div class="p-formgrid p-grid nested-grid">
-                                                                                <div class="p-field p-col-1 
-                                                                                     #{servicemanWrapper.existingServiceman ne null
-                                                                                       and (servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName
-                                                                                       or servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber
-                                                                                       or servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName
-                                                                                       or servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country
-                                                                                       or servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal)
-                                                                                       ? 'modified-label-existing-serviceman' : null}">
-                                                                                    <p:outputLabel class="label">Address</p:outputLabel>
-                                                                                </div>
-                                                                                <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
-                                                                                    <div class="p-formgrid p-grid">
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.existingServiceman ne null 
-                                                                                               and servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName 
-                                                                                               ? 'modified-output-message-existing-serviceman' : null}">
-                                                                                            <h:outputText value="#{servicemanWrapper.existingServiceman.address.streetName}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.existingServiceman ne null 
-                                                                                               and servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber 
-                                                                                               ? 'modified-output-message-existing-serviceman' : null}">
-                                                                                            <h:outputText value="#{servicemanWrapper.existingServiceman.address.unitNumber}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.existingServiceman ne null 
-                                                                                               and servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName 
-                                                                                               ? 'modified-output-message-existing-serviceman' : null}">
-                                                                                            <h:outputText value="#{servicemanWrapper.existingServiceman.address.buildingName}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.existingServiceman ne null 
-                                                                                               and servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country 
-                                                                                               ? 'modified-output-message-existing-serviceman' : null}">
-                                                                                            <h:outputText value="#{servicemanWrapper.existingServiceman.address.country}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.existingServiceman ne null 
-                                                                                               and servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal
-                                                                                               ? 'modified-output-message-existing-serviceman' : null}">
-                                                                                            <h:outputText value="#{servicemanWrapper.existingServiceman.address.postal}" />
-                                                                                        </div>
-                                                                                    </div>
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-12"  style="background-color: #11a9df"><p:outputLabel class="label">Address</p:outputLabel></div>
+                                                                            </div>
+
+                                                                            <!-- Street Name -->
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-label-existing-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Street Name</p:outputLabel>
                                                                                 </div>
 
-                                                                                <div class="p-field p-col-1 
-                                                                                     #{servicemanWrapper.errorMessages.get(4) ne null or servicemanWrapper.errorMessages.get(5) ne null 
-                                                                                       or servicemanWrapper.errorMessages.get(6) ne null or servicemanWrapper.errorMessages.get(7) ne null 
-                                                                                       or servicemanWrapper.errorMessages.get(8) ne null ? 'error-label' : null}
-                                                                                     #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName
-                                                                                       or servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber
-                                                                                       or servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName
-                                                                                       or servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country
-                                                                                       or servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-label-new-serviceman' : null}">
-                                                                                    <p:outputLabel class="label">Address</p:outputLabel>
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-output-message-existing-serviceman' : null}">
+                                                                                    <h:outputText value="#{servicemanWrapper.existingServiceman.address.streetName}" />
                                                                                 </div>
-                                                                                <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
-                                                                                    <div class="p-formgrid p-grid">
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.errorMessages.get(4) ne null ? 'error-output-message' : null}
-                                                                                             #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-output-message-new-serviceman' : null}">
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) eq null}" value="#{servicemanWrapper.newServiceman.address.streetName}" />
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) ne null}" value="#{servicemanWrapper.errorMessages.get(4)}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.errorMessages.get(5) ne null ? 'error-output-message' : null}
-                                                                                             #{servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-output-message-new-serviceman' : null}">
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) eq null}" value="#{servicemanWrapper.newServiceman.address.unitNumber}" />
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) ne null}" value="#{servicemanWrapper.errorMessages.get(5)}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.errorMessages.get(6) ne null ? 'error-output-message' : null}
-                                                                                             #{servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-output-message-new-serviceman' : null}">
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) eq null}" value="#{servicemanWrapper.newServiceman.address.buildingName}" />
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) ne null}" value="#{servicemanWrapper.errorMessages.get(6)}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.errorMessages.get(7) ne null ? 'error-output-message' : null}
-                                                                                             #{servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-output-message-new-serviceman' : null}">
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) eq null}" value="#{servicemanWrapper.newServiceman.address.country}" />
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) ne null}" value="#{servicemanWrapper.errorMessages.get(7)}" />
-                                                                                        </div>
-                                                                                        <div class="p-field p-col-12
-                                                                                             #{servicemanWrapper.errorMessages.get(8) ne null ? 'error-output-message' : null}
-                                                                                             #{servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-output-message-new-serviceman' : null}">
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) eq null}" value="#{servicemanWrapper.newServiceman.address.postal}" />
-                                                                                            <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) ne null}" value="#{servicemanWrapper.errorMessages.get(8)}" />
-                                                                                        </div>
-                                                                                    </div>
+
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.errorMessages.get(4) ne null ? 'error-label' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-label-new-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Street Name</p:outputLabel>
                                                                                 </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.errorMessages.get(4) ne null ? 'error-output-message' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-output-message-new-serviceman' : null}">
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) eq null}" value="#{servicemanWrapper.newServiceman.address.streetName}" />
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) ne null}" value="#{servicemanWrapper.errorMessages.get(4)}" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Unit Number -->
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-label-existing-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Unit Number</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-output-message-existing-serviceman' : null}">
+                                                                                    <h:outputText value="#{servicemanWrapper.existingServiceman.address.unitNumber}" />
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.errorMessages.get(5) ne null ? 'error-label' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-label-new-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Unit Number</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.errorMessages.get(5) ne null ? 'error-output-message' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-output-message-new-serviceman' : null}">
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) eq null}" value="#{servicemanWrapper.newServiceman.address.unitNumber}" />
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) ne null}" value="#{servicemanWrapper.errorMessages.get(5)}" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Building Name -->
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-label-existing-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Building Name</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-output-message-existing-serviceman' : null}">
+                                                                                    <h:outputText value="#{servicemanWrapper.existingServiceman.address.buildingName}" />
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.errorMessages.get(6) ne null ? 'error-label' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-label-new-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Building Name</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.errorMessages.get(6) ne null ? 'error-output-message' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-output-message-new-serviceman' : null}">
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) eq null}" value="#{servicemanWrapper.newServiceman.address.buildingName}" />
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) ne null}" value="#{servicemanWrapper.errorMessages.get(6)}" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Country -->
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-label-existing-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Country</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-output-message-existing-serviceman' : null}">
+                                                                                    <h:outputText value="#{servicemanWrapper.existingServiceman.address.country}" />
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.errorMessages.get(7) ne null ? 'error-label' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-label-new-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Country</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.errorMessages.get(7) ne null ? 'error-output-message' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-output-message-new-serviceman' : null}">
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) eq null}" value="#{servicemanWrapper.newServiceman.address.country}" />
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) ne null}" value="#{servicemanWrapper.errorMessages.get(6)}" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Postal Code -->
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-label-existing-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Postal Code</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.existingServiceman ne null 
+                                                                                       and servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-output-message-existing-serviceman' : null}">
+                                                                                    <h:outputText value="#{servicemanWrapper.existingServiceman.address.postal}" />
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-1
+                                                                                     #{servicemanWrapper.errorMessages.get(8) ne null ? 'error-label' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-label-new-serviceman' : null}">
+                                                                                    <p:outputLabel class="label">Postal Code</p:outputLabel>
+                                                                                </div>
+
+                                                                                <div class="p-field p-col-5
+                                                                                     #{servicemanWrapper.errorMessages.get(8) ne null ? 'error-output-message' : null}
+                                                                                     #{servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-output-message-new-serviceman' : null}">
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) eq null}" value="#{servicemanWrapper.newServiceman.address.postal}" />
+                                                                                    <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) ne null}" value="#{servicemanWrapper.errorMessages.get(8)}" />
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Address -->
+                                                                            <!--                                                                            <div class="p-formgrid p-grid nested-grid">
+                                                                                                                                                            <div class="p-field p-col-1 
+                                                                            #{servicemanWrapper.existingServiceman ne null
+                                                                              and (servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName
+                                                                              or servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber
+                                                                              or servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName
+                                                                              or servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country
+                                                                              or servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal)
+                                                                              ? 'modified-label-existing-serviceman' : null}">
+                                                                           <p:outputLabel class="label">Address</p:outputLabel>
+                                                                       </div>
+                                                                       <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
+                                                                           <div class="p-formgrid p-grid">
+                                                                               <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.existingServiceman ne null 
+                                                                              and servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName 
+                                                                              ? 'modified-output-message-existing-serviceman' : null}">
+                                                                           <h:outputText value="#{servicemanWrapper.existingServiceman.address.streetName}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.existingServiceman ne null 
+                                                                              and servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber 
+                                                                              ? 'modified-output-message-existing-serviceman' : null}">
+                                                                           <h:outputText value="#{servicemanWrapper.existingServiceman.address.unitNumber}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.existingServiceman ne null 
+                                                                              and servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName 
+                                                                              ? 'modified-output-message-existing-serviceman' : null}">
+                                                                           <h:outputText value="#{servicemanWrapper.existingServiceman.address.buildingName}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.existingServiceman ne null 
+                                                                              and servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country 
+                                                                              ? 'modified-output-message-existing-serviceman' : null}">
+                                                                           <h:outputText value="#{servicemanWrapper.existingServiceman.address.country}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.existingServiceman ne null 
+                                                                              and servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal
+                                                                              ? 'modified-output-message-existing-serviceman' : null}">
+                                                                           <h:outputText value="#{servicemanWrapper.existingServiceman.address.postal}" />
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+
+                                                               <div class="p-field p-col-1 
+                                                                            #{servicemanWrapper.errorMessages.get(4) ne null or servicemanWrapper.errorMessages.get(5) ne null 
+                                                                              or servicemanWrapper.errorMessages.get(6) ne null or servicemanWrapper.errorMessages.get(7) ne null 
+                                                                              or servicemanWrapper.errorMessages.get(8) ne null ? 'error-label' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName
+                                                                              or servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber
+                                                                              or servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName
+                                                                              or servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country
+                                                                              or servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-label-new-serviceman' : null}">
+                                                                           <p:outputLabel class="label">Address</p:outputLabel>
+                                                                       </div>
+                                                                       <div class="p-field p-col-5" style="padding-top: 0; padding-bottom: 0;">
+                                                                           <div class="p-formgrid p-grid">
+                                                                               <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.errorMessages.get(4) ne null ? 'error-output-message' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.streetName ne servicemanWrapper.newServiceman.address.streetName ? 'modified-output-message-new-serviceman' : null}">
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) eq null}" value="#{servicemanWrapper.newServiceman.address.streetName}" />
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(4) ne null}" value="#{servicemanWrapper.errorMessages.get(4)}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.errorMessages.get(5) ne null ? 'error-output-message' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.unitNumber ne servicemanWrapper.newServiceman.address.unitNumber ? 'modified-output-message-new-serviceman' : null}">
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) eq null}" value="#{servicemanWrapper.newServiceman.address.unitNumber}" />
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(5) ne null}" value="#{servicemanWrapper.errorMessages.get(5)}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.errorMessages.get(6) ne null ? 'error-output-message' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.buildingName ne servicemanWrapper.newServiceman.address.buildingName ? 'modified-output-message-new-serviceman' : null}">
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) eq null}" value="#{servicemanWrapper.newServiceman.address.buildingName}" />
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(6) ne null}" value="#{servicemanWrapper.errorMessages.get(6)}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.errorMessages.get(7) ne null ? 'error-output-message' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.country ne servicemanWrapper.newServiceman.address.country ? 'modified-output-message-new-serviceman' : null}">
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) eq null}" value="#{servicemanWrapper.newServiceman.address.country}" />
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(7) ne null}" value="#{servicemanWrapper.errorMessages.get(7)}" />
+                                                                       </div>
+                                                                       <div class="p-field p-col-12
+                                                                            #{servicemanWrapper.errorMessages.get(8) ne null ? 'error-output-message' : null}
+                                                                            #{servicemanWrapper.existingServiceman.address.postal ne servicemanWrapper.newServiceman.address.postal ? 'modified-output-message-new-serviceman' : null}">
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) eq null}" value="#{servicemanWrapper.newServiceman.address.postal}" />
+                                                                           <h:outputText rendered="#{servicemanWrapper.errorMessages.get(8) ne null}" value="#{servicemanWrapper.errorMessages.get(8)}" />
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </div>-->
+
+                                                                            <div class="p-formgrid p-grid">
+                                                                                <div class="p-field p-col-12"  style="background-color: #11a9df"><p:outputLabel class="label">Others</p:outputLabel></div>
                                                                             </div>
 
                                                                             <!-- Blood Type -->
@@ -354,19 +506,10 @@
                                                     <div class="card ui-fluid">
                                                         <div class="p-formgrid p-grid">
                                                             <div class="p-field p-col">
-                                                                <h:form>
-                                                                    <p:commandButton icon="pi pi-upload" label="p-mr-2 p-mb-2" value="Import" title="Import"
-                                                                                     update="@form" process="@this"
-                                                                                     actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" />
 
-                                                                </h:form>
-                                                                <!--
-                                                                
-                                                                
-                                                                                                                                <p:commandButton icon="pi pi-search" styleClass="info-button rounded-button p-mr-2 p-mb-2" title="View"
-                                                                                                                                                 update="ccManageServiceman:formManageServiceman:panelManageServiceman" process="@this" 
-                                                                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.manageServicemanManagedBean.initManage()}" oncomplete="PF('dialogManageServiceman').show()">
-                                                                                                                                </p:commandButton>-->
+                                                                <p:commandButton icon="pi pi-upload" label="p-mr-2 p-mb-2" value="Import" title="Import"
+                                                                                 update="@form" process="@this"
+                                                                                 actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -376,7 +519,6 @@
 
                                         </ui:fragment>
                                     </h:panelGroup>
-
 
                                 </p:outputPanel>
                             </p:dialog>
