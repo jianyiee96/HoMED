@@ -29,6 +29,10 @@ public class SessionTimeoutManagedBean implements Serializable {
         this.isCountdownState = true;
         this.countdownRemainingSeconds = 60;
     }
+    
+    public void stopCountdown() {
+        this.isCountdownState = false;
+    }
 
     public void decrease() throws IOException {
         this.countdownRemainingSeconds -= 1;

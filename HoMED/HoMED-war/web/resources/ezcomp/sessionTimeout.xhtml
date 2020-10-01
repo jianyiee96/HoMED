@@ -27,7 +27,7 @@
                         <div class="p-col-12" style="text-align: center">
                             <div class="p-grid  p-justify-even">
                                 <p:commandButton value="Sign Out" type="submit" actionListener="#{sessionTimeoutManagedBean.employeeLoginManagedBean.logout}" icon="fa fa-sign-out" styleClass="ui-confirmdialog-yes" />
-                                <p:commandButton value="Extend" type="submit" update="formSessionTimeout" oncomplete="PF('dlgCountdown').hide()" icon="fa fa-sign-in" styleClass="ui-confirmdialog-no"/>
+                                <p:commandButton value="Extend" type="submit" actionListener="#{sessionTimeoutManagedBean.stopCountdown()}" update="formSessionTimeout" oncomplete="PF('dlgCountdown').hide()" icon="fa fa-sign-in" styleClass="ui-confirmdialog-no"/>
                             </div>
                         </div>
                     </div>
