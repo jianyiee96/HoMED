@@ -115,6 +115,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public void saveFormTemplate(FormTemplate formTemplate) {
 
         try {
+            formTemplate.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
 
             FormTemplate ft = retrieveFormTemplate(formTemplate.getFormTemplateId());
 
@@ -126,15 +127,19 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
             ft.setFormTemplateStatus(formTemplate.getFormTemplateStatus());
             ft.setFormTemplateName(formTemplate.getFormTemplateName());
-            ft.setFormFields(formTemplate.getFormFields());
 
-            for (FormField ff : ft.getFormFields()) {
+            List<FormField> ffs = formTemplate.getFormFields();
+
+            for (FormField ff : ffs) {
                 for (FormFieldOption ffo : ff.getFormFieldOptions()) {
                     em.persist(ffo);
+                    em.flush();
                 }
                 em.persist(ff);
+                em.flush();
             }
 
+            ft.setFormFields(ffs);
             em.merge(ft);
             em.flush();
         } catch (Exception ex) {
@@ -218,6 +223,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     @Override
     public FormTemplate retrieveFormTemplate(Long id) {
         FormTemplate formTemplate = em.find(FormTemplate.class, id);
+        formTemplate.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
         return formTemplate;
     }
 
@@ -227,6 +233,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         List<FormTemplate> fts = query.getResultList();
         for (FormTemplate ft : fts) {
             ft.getConsultationPurposes().size();
+            ft.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
         }
         return fts;
     }
@@ -235,9 +242,11 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
     public List<FormTemplate> retrieveAllPublishedFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formTemplateStatus = :publish ");
         query.setParameter("publish", FormTemplateStatusEnum.PUBLISHED);
-
-        return query.getResultList();
-
+        List<FormTemplate> fts = query.getResultList();
+        for (FormTemplate ft : fts) {
+            ft.getFormFields().sort((x, y) -> x.getPosition() - y.getPosition());
+        }
+        return fts;
     }
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<FormTemplate>> constraintViolations) {

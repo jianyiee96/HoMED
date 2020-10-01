@@ -33,26 +33,25 @@ public class FormField implements Serializable {
 
     @Column(nullable = true) //Validation to be done when saving a form
     private String question;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Position must not be null")
     private Integer position;
-    
+
     @Enumerated(EnumType.STRING)
     @Column
     private InputTypeEnum inputType;
-    
+
     @Column(nullable = false)
     @NotNull(message = "isRequired must not be null")
     private Boolean isRequired;
-    
+
     @Column(nullable = false)
     @NotNull(message = "isServicemanEditable must not be null")
     private Boolean isServicemanEditable;
-    
+
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormFieldOption> formFieldOptions;
-    
 
     public FormField() {
         this.isRequired = false;
@@ -60,7 +59,20 @@ public class FormField implements Serializable {
         this.formFieldOptions = new ArrayList<>();
         this.position = 1;
     }
-    
+
+    public FormField(String question, Integer position, InputTypeEnum inputType, Boolean isRequired, Boolean isServicemanEditable, List<FormFieldOption> formFieldOptions) {
+        this.question = question;
+        this.position = position;
+        this.inputType = inputType;
+        this.isRequired = isRequired;
+        this.isServicemanEditable = isServicemanEditable;
+        if (formFieldOptions == null) {
+            this.formFieldOptions = new ArrayList<>();
+        } else {
+            this.formFieldOptions = formFieldOptions;
+        }
+    }
+
     public Long getFormFieldId() {
         return formFieldId;
     }
@@ -116,7 +128,7 @@ public class FormField implements Serializable {
     public void setFormFieldOptions(List<FormFieldOption> formFieldOptions) {
         this.formFieldOptions = formFieldOptions;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -141,5 +153,5 @@ public class FormField implements Serializable {
     public String toString() {
         return "entity.FormField[ id=" + formFieldId + " ]";
     }
-    
+
 }

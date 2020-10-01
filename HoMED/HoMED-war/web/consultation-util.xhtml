@@ -39,7 +39,7 @@
                         </div>
 
                         <p:dataTable widgetVar="allFormsDT" id="allFormsDT" var="consultationPurpose" value="#{consultationPurposeUtilityManagedBean.consultationPurposes}"
-                                     rowKey="#{consultationPurpose.consultationPurposeId}" scrollable="true" scrollHeight="600"
+                                     rowKey="#{consultationPurpose.consultationPurposeId}" sortBy="#{consultationPurpose.consultationPurposeId}" scrollable="true" scrollHeight="600"
                                      styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
 
                             <f:facet id="dataViewListHeader" name="header">

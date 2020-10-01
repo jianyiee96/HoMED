@@ -4,7 +4,7 @@
  */
 package ejb.session.stateless;
 
-import entity.DeleteFormInstanceException;
+import util.exceptions.DeleteFormInstanceException;
 import entity.FormInstance;
 import java.util.List;
 import javax.ejb.Local;
