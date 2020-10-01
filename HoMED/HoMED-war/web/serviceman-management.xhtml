@@ -52,7 +52,7 @@
             <div class="p-grid crud-table">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+                        <p:growl id="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
                             <p:splitButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
@@ -121,7 +121,7 @@
                 <p:outputPanel id="panelBulkImportServicemen">
                     <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="panelGroupBulkImportServicemen"
                                   listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
-
+                    
                     <p:separator />
 
                     <h:panelGroup id='panelGroupBulkImportServicemen'>
@@ -170,7 +170,8 @@
 
                                                                 <ui:fragment rendered="#{servicemanWrapper.isValid}" >
                                                                     <p:selectBooleanCheckbox value="#{servicemanWrapper.isSelected}">
-                                                                        <p:ajax update="formBulkImportServicemen:panelGroupBulkImportServicemen" process="@this" />
+                                                                        <p:ajax update="formBulkImportServicemen:panelGroupBulkImportServicemen" process="@this"
+                                                                                listener="#{servicemanAccountManagementManagedBean.selectServicemanToImport(servicemanWrapper)}" />
                                                                     </p:selectBooleanCheckbox>
                                                                     <p:outputLabel value="IMPORT" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
                                                                 </ui:fragment>
@@ -494,15 +495,16 @@
 
                                     </p:repeat>
 
-                                    <div class="card ui-fluid">
+                                    <div class="ui-fluid">
                                         <div class="p-formgrid p-grid">
-                                            <div class="p-field p-col">
-
-                                                <p:commandButton icon="pi pi-upload" label="p-mr-2 p-mb-2" value="Import" title="Import" process="@this"
-                                                                 actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" />
+                                            <div class="p-field p-col-2 p-offset-5">
+                                                <p:commandButton style="font-size: 18px;" icon="pi pi-upload" disabled="#{servicemanAccountManagementManagedBean.servicemenToCreate.size() eq 0 and servicemanAccountManagementManagedBean.servicemenToUpdate.size() eq 0}" 
+                                                                 value="Import" title="Import" process="@this" update="formAllServicemen" actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}">
+                                                    <p:confirm header="Bulk Import" escape="false" message="Selected servicemen will be imported to the system. Do you want to proceed?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>                                   
 
                                 </div>
                             </div>
@@ -510,6 +512,8 @@
                     </h:panelGroup>
                 </p:outputPanel>
             </p:dialog>
+
+
         </h:form>
 
     </ui:define>
