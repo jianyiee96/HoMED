@@ -22,20 +22,20 @@
                     <p:growl id="growlUpdateProfile" globalOnly="true" sticky="true" />
                     <div class="p-grid">
                         <div class="p-col-12">
-                            <div class="card ui-fluid p-formgrid">
-                                <h4>Personal Particulars</h4>
-                                <div class="p-field" style="margin-top: 25px">
+                            <div class="card ui-fluid p-formgrid p-grid">
+                                <div class="p-col-12" style="margin-bottom: 1rem">
+                                    <h4>Personal Particulars</h4>
+                                </div>
+                                <div class="p-field p-col-6">
                                     <i class="pi pi-user p-mr-2 p-ml-2"/>
-                                    <p:outputLabel for="view-name" value="Name" indicateRequired="false"/>
-                                    <p:inputText id="view-name" value="#{profileManagedBean.employee.name}" disabled="true" />
-                                    <p:message class="error-message" for="view-name" />
+                                    <p:outputLabel value="Name"/>
+                                    <h:outputText value="#{profileManagedBean.employee.name}" class="view-text" />
                                 </div>
 
-                                <div class="p-field">
+                                <div class="p-field p-col-6">
                                     <i class="fa fa-venus-mars p-mr-2 p-ml-2"/>
-                                    <p:outputLabel for="view-gender" value="Gender" indicateRequired="false"/>
-                                    <p:inputText id="view-gender" value="#{profileManagedBean.employee.gender}" disabled="true" />
-                                    <p:message class="error-message" for="view-gender" />
+                                    <p:outputLabel value="Gender"/>
+                                    <h:outputText value="#{profileManagedBean.employee.gender}" class="view-text"/>
                                 </div> 
                             </div>
                         </div>
@@ -57,7 +57,7 @@
                         <div class="p-col-12">
                             <div class="card ui-fluid p-formgrid">
                                 <p:outputPanel id="panelContact">
-                                    <div style="display: flex; justify-content: space-between;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem">
                                         <h4>Contact Details</h4>
                                         <div>
                                             <p:commandButton rendered="#{not profileManagedBean.isEditContact}" type="submit" icon="pi pi-pencil" styleClass="rounded-button text-button p-mr-2"
@@ -77,18 +77,20 @@
                                             </ui:fragment>
                                         </div>
                                     </div>
-                                    <div class="p-field" style="margin-top: 25px">
-                                        <i class="fa fa-phone p-mr-2 p-ml-2"/>
-                                        <p:outputLabel for="view-phoneNumber" value="Phone Number" indicateRequired="false"/>
-                                        <p:inputText id="view-phoneNumber" value="#{profileManagedBean.employee.phoneNumber}" disabled="#{not profileManagedBean.isEditContact}" />
-                                        <p:message class="error-message" for="view-phoneNumber" />
-                                    </div>
+                                    <div class="p-grid">
+                                        <div class="p-field p-col-6">
+                                            <i class="fa fa-phone p-mr-2 p-ml-2"/>
+                                            <p:outputLabel for="view-phoneNumber" value="Phone Number" indicateRequired="false"/>
+                                            <p:inputText id="view-phoneNumber" value="#{profileManagedBean.employee.phoneNumber}" rendered="#{profileManagedBean.isEditContact}" />
+                                            <h:outputText rendered="#{not profileManagedBean.isEditContact}" value="#{profileManagedBean.employee.phoneNumber}" class="view-text"/>
+                                            <p:message class="error-message" for="view-phoneNumber" />
+                                        </div>
 
-                                    <div class="p-field">
-                                        <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
-                                        <p:outputLabel for="view-email" value="Email Address" indicateRequired="false"/>
-                                        <p:inputText id="view-email" value="#{profileManagedBean.employee.email}" disabled="true" />
-                                        <p:message class="error-message" for="view-email" />
+                                        <div class="p-field p-col-6">
+                                            <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
+                                            <p:outputLabel value="Email Address" />
+                                            <h:outputText value="#{profileManagedBean.employee.email}" class="view-text"/>
+                                        </div>
                                     </div>
                                 </p:outputPanel>
                             </div>
@@ -121,36 +123,41 @@
                                         <div class="p-field p-col-12 p-lg-4 p-md-12 p-sm-12">
                                             <i class="pi pi-directions-alt p-mr-2 p-ml-2"/>
                                             <p:outputLabel for="view-street-name" value="Street Name"/>
-                                            <p:inputText id="view-street-name" value="#{profileManagedBean.employee.address.streetName}" disabled="#{not profileManagedBean.isEditAddress}"/>
+                                            <p:inputText id="view-street-name" value="#{profileManagedBean.employee.address.streetName}" rendered="#{profileManagedBean.isEditAddress}"/>
+                                            <h:outputText rendered="#{not profileManagedBean.isEditAddress}" value="#{profileManagedBean.employee.address.streetName}" class="view-text"/>
                                             <p:message class="error-message" for="view-street-name" />
                                         </div>
 
                                         <div class="p-field p-col-12 p-lg-4 p-md-12 p-sm-12">
                                             <i class="fa fa-street-view p-mr-2 p-ml-2"/>
                                             <p:outputLabel for="view-unit-number" value="Unit Number"/>
-                                            <p:inputText id="view-unit-number" value="#{profileManagedBean.employee.address.unitNumber}" disabled="#{not profileManagedBean.isEditAddress}"/>
+                                            <p:inputText id="view-unit-number" value="#{profileManagedBean.employee.address.unitNumber}" rendered="#{profileManagedBean.isEditAddress}"/>
+                                            <h:outputText rendered="#{not profileManagedBean.isEditAddress}" value="#{profileManagedBean.employee.address.unitNumber}#{empty profileManagedBean.employee.address.unitNumber ? 'N.A.' : ''}" class="view-text"/>
                                             <p:message class="error-message" for="view-unit-number" />
                                         </div>
 
                                         <div class="p-field p-col-12 p-lg-4 p-md-12 p-sm-12">
                                             <i class="fa fa-building-o p-mr-2 p-ml-2"/>
                                             <p:outputLabel for="view-building-name" value="Building Name"/>
-                                            <p:inputText id="view-building-name" value="#{profileManagedBean.employee.address.buildingName}" disabled="#{not profileManagedBean.isEditAddress}"/>
+                                            <p:inputText id="view-building-name" value="#{profileManagedBean.employee.address.buildingName}" rendered="#{profileManagedBean.isEditAddress}"/>
+                                            <h:outputText rendered="#{not profileManagedBean.isEditAddress}" value="#{profileManagedBean.employee.address.buildingName}#{empty profileManagedBean.employee.address.buildingName ? 'N.A.' : ''}" class="view-text"/>
                                             <p:message class="error-message" for="view-building-name" />
                                         </div>
                                         <div class="p-field p-col-12 p-lg-6 p-md-12 p-sm-12">
                                             <i class="fa fa-globe p-mr-2 p-ml-2"/>
                                             <p:outputLabel for="view-country" value="Country"/>
-                                            <p:selectOneMenu id="view-country" value="#{profileManagedBean.employee.address.country}" disabled="#{not profileManagedBean.isEditAddress}">
+                                            <p:selectOneMenu id="view-country" value="#{profileManagedBean.employee.address.country}" rendered="#{profileManagedBean.isEditAddress}">
                                                 <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
                                             </p:selectOneMenu>
+                                            <h:outputText rendered="#{not profileManagedBean.isEditAddress}" value="#{profileManagedBean.employee.address.country}#{empty profileManagedBean.employee.address.country ? 'N.A.' : ''}" class="view-text"/>
                                             <p:message class="error-message" for="view-country" />
                                         </div>
 
                                         <div class="p-field p-col-12 p-lg-6 p-md-12 p-sm-12">
                                             <i class="fa fa-map-marker p-mr-2 p-ml-2"/>
                                             <p:outputLabel for="view-postal-code" value="Postal Code"/>
-                                            <p:inputText id="view-postal-code" value="#{profileManagedBean.employee.address.postal}" disabled="#{not profileManagedBean.isEditAddress}"/>
+                                            <p:inputText id="view-postal-code" value="#{profileManagedBean.employee.address.postal}" rendered="#{profileManagedBean.isEditAddress}"/>
+                                            <h:outputText rendered="#{not profileManagedBean.isEditAddress}" value="#{profileManagedBean.employee.address.postal}" class="view-text"/>
                                             <p:message class="error-message" for="view-postal-code" />
                                         </div>
                                     </div>

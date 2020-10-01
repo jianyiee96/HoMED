@@ -218,14 +218,18 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
         Query query = em.createQuery("SELECT f FROM FormInstance f WHERE f.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
-
-        return query.getResultList();
+        List<FormInstance> fis = query.getResultList();
+        for (FormInstance fi : fis) {
+            fi.getFormInstanceFields().sort((x, y) -> x.getFormFieldMapping().getPosition() - y.getFormFieldMapping().getPosition());
+        }
+        return fis;
 
     }
 
     @Override
     public FormInstance retrieveFormInstance(Long id) {
         FormInstance formInstance = em.find(FormInstance.class, id);
+        formInstance.getFormInstanceFields().sort((x, y) -> x.getFormFieldMapping().getPosition() - y.getFormFieldMapping().getPosition());
         return formInstance;
     }
 

@@ -2,9 +2,6 @@ package web.filter;
 
 import entity.Employee;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -73,9 +70,9 @@ public class SecurityFilter implements Filter {
             "/medical-centre-management.xhtml", // 3
             "/profile.xhtml", // 4
             "/employee-management.xhtml", // 5
-            "/serviceman-management.xhtml", //6                
-            "/form-util.xhtml", //7
-            "/consultation-util.xhtml" //8
+            "/serviceman-management.xhtml", // 6
+            "/form-util.xhtml", // 7
+            "/consultation-util.xhtml" // 8
 
         };
 
