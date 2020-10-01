@@ -13,12 +13,16 @@ public class ServicemanWrapper {
     private Serviceman existingServiceman;
     private Serviceman newServiceman;
     private List<String> errorMessages;
+    private Boolean isValid;
+    private Boolean isSelected;
 
     public ServicemanWrapper() {
         this.errorMessages = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
             this.errorMessages.add(null);
         }
+        this.isValid = Boolean.TRUE;
+        this.isSelected = Boolean.FALSE;
     }
 
     public Serviceman getExistingServiceman() {
@@ -43,6 +47,22 @@ public class ServicemanWrapper {
 
     public void setErrorMessages(List<String> errorMessages) {
         this.errorMessages = errorMessages;
+    }
+
+    public Boolean getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(Boolean isValid) {
+        this.isValid = isValid;
+    }
+
+    public Boolean getIsSelected() {
+        return isSelected;
+    }
+
+    public void setIsSelected(Boolean isSelected) {
+        this.isSelected = isSelected;
     }
 
 }

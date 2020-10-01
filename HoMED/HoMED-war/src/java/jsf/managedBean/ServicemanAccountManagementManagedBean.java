@@ -163,16 +163,22 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                 if (errorMsg.contains("Name")) {
                     addErrorMessage(validationErrorMessages, 0, "name", name, errorMsg);
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Gender")) {
                     addErrorMessage(validationErrorMessages, 1, "gender", gender, "Please change it to MALE/FEMALE.");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Phone")) {
                     addErrorMessage(validationErrorMessages, 2, "phone", phone, errorMsg);
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Email")) {
                     addErrorMessage(validationErrorMessages, 3, "email", email, errorMsg);
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Blood type")) {
                     addErrorMessage(validationErrorMessages, 9, "blood type", bloodType, "Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("ROD")) {
                     addErrorMessage(validationErrorMessages, 10, "ROD", rod, "Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
             }
         }
@@ -186,8 +192,10 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                 if (errorMsg.contains("Street Name")) {
                     addErrorMessage(validationErrorMessages, 4, "street name", streetName, errorMsg);
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Postal Code")) {
                     addErrorMessage(validationErrorMessages, 8, "postal code", postalCode, errorMsg);
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
             }
         }
@@ -251,7 +259,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         if (date == null) {
             return null;
         }
-        
+
         return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
 
