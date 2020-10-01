@@ -190,7 +190,7 @@ public class FormResource {
 
     @Path("archiveFormInstance")
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response archiveFormInstance(UpdateFormInstanceReq updateFormInstanceReq) {
         
         try {
