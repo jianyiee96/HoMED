@@ -16,6 +16,7 @@ public class ServicemanWrapper {
     private Boolean isValid;
     private Boolean isSelected;
     private Boolean isDismissed;
+    private Boolean isEditMode;
 
     public ServicemanWrapper() {
         this.errorMessages = new ArrayList<>();
@@ -25,6 +26,7 @@ public class ServicemanWrapper {
         this.isValid = Boolean.TRUE;
         this.isSelected = Boolean.FALSE;
         this.isDismissed = Boolean.FALSE;
+        this.isEditMode = Boolean.FALSE;
     }
 
     public Serviceman getExistingServiceman() {
@@ -73,6 +75,14 @@ public class ServicemanWrapper {
 
     public void setIsDismissed(Boolean isDismissed) {
         this.isDismissed = isDismissed;
+    }
+
+    public Boolean getIsEditMode() {
+        return isEditMode;
+    }
+
+    public void setIsEditMode(Boolean isEditMode) {
+        this.isEditMode = isEditMode;
     }
 
 }

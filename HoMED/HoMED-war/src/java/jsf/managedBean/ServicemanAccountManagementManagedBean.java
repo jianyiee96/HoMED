@@ -99,7 +99,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
                     this.servicemanWrappers.add(servicemanWrapper);
 
-                    validateServiceman(serviceman, servicemanWrapper);
+                    validateServicemanByImport(serviceman, servicemanWrapper);
 
                     String email = serviceman[3];
                     try {
@@ -123,7 +123,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
     }
 
-    private void validateServiceman(String[] serviceman, ServicemanWrapper servicemanWrapper) {
+    private void validateServicemanByImport(String[] serviceman, ServicemanWrapper servicemanWrapper) {
         String name = serviceman[0];
         String gender = serviceman[1];
         String phone = serviceman[2];
@@ -143,24 +143,15 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         System.out.println("======================================================================");
 
         Serviceman newServiceman = new Serviceman();
-        Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
-
         newServiceman.setName(name);
         newServiceman.setEmail(email);
         newServiceman.setPhoneNumber(phone);
-        newServiceman.setAddress(address);
-
-        servicemanWrapper.setNewServiceman(newServiceman);
-
-        // Gender
         if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
             newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
         }
-        // Blood Type
         if (BloodTypeEnum.valueOfLabel(bloodType) != null) {
             newServiceman.setBloodType(BloodTypeEnum.valueOfLabel(bloodType));
         }
-        // ROD
         for (String df : dateFormats) {
             try {
                 newServiceman.setRod(new SimpleDateFormat(df).parse(rod));
@@ -168,6 +159,19 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             } catch (ParseException e) {
             }
         }
+        
+        Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
+//        if (unitNumber.equals("")) {
+//            address.setUnitNumber(null);
+//        }
+//        if (buildingName.equals("")) {
+//            address.setBuildingName(null);
+//        }
+//        if (country.equals("")) {
+//            address.setCountry(null);
+//        }
+        newServiceman.setAddress(address);
+        servicemanWrapper.setNewServiceman(newServiceman);
 
         List<String> validationErrorMessages = servicemanWrapper.getErrorMessages();
 
@@ -225,6 +229,12 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             validationErrorMessages.add(errorMsgIdx, (curr + "\nIncorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg));
         } else {
             validationErrorMessages.add(errorMsgIdx, "Incorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg);
+        }
+    }
+
+    public void removeErrorMessagesByEdit(ServicemanWrapper servicemanWrapper) {
+        for (int i = 0; i < servicemanWrapper.getErrorMessages().size(); i++) {
+            servicemanWrapper.getErrorMessages().set(i, null);
         }
     }
 
