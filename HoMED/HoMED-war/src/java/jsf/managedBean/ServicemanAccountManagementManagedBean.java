@@ -76,6 +76,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void initBulkImport() {
+        this.isUploaded = Boolean.FALSE;
         this.servicemanWrappers = new ArrayList<>();
         this.servicemenToCreate = new ArrayList<>();
         this.servicemenToUpdate = new ArrayList<>();
@@ -99,7 +100,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     this.servicemanWrappers.add(servicemanWrapper);
 
                     validateServiceman(serviceman, servicemanWrapper);
-//                    verifyExistingServiceman(serviceman, servicemanWrapper);
 
                     String email = serviceman[3];
                     try {
@@ -262,7 +262,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 printUnexpectedErrorMessage(ex.getMessage());
             }
         }
-        
+
         this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
     }
 
