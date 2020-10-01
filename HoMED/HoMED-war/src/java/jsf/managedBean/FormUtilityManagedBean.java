@@ -25,7 +25,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import jsf.classes.FormFieldWrapper;
+import org.primefaces.PrimeFaces;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
 import util.exceptions.CreateFormTemplateException;
@@ -39,6 +41,9 @@ public class FormUtilityManagedBean implements Serializable {
 
     @EJB
     private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
+
+    @Inject
+    private FormTemplatePreviewManagedBean formTemplatePreviewManagedBean;
 
     private List<FormTemplate> formTemplates;
 
@@ -55,6 +60,10 @@ public class FormUtilityManagedBean implements Serializable {
     private Boolean newFormIsPublic;
 
     private Boolean fieldsDisabled;
+
+    private FormTemplate formToPublish;
+
+    private String publishFormString;
 
     public FormUtilityManagedBean() {
     }
@@ -88,14 +97,13 @@ public class FormUtilityManagedBean implements Serializable {
 
     }
 
-    public void publishForm(ActionEvent event) {
+    public void publishForm() {
 
-        Long id = (Long) event.getComponent().getAttributes().get("formIdToPublish");
-        boolean success = formTemplateSessionBeanLocal.publishFormTemplate(id);
+        boolean success = formTemplateSessionBeanLocal.publishFormTemplate(formToPublish.getFormTemplateId());
         if (success) {
             postConstruct();
             for (FormTemplate ft : formTemplates) {
-                if (ft.getFormTemplateId() == id) {
+                if (ft.getFormTemplateId() == formToPublish.getFormTemplateId()) {
                     setSelectedForm(ft);
                 }
             }
@@ -103,6 +111,25 @@ public class FormUtilityManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to publish form template!", "Please ensure that the form template has at least 1 form field."));
         }
 
+    }
+
+    public void doPublishForm(FormTemplate formTemplate) {
+        formToPublish = formTemplate;
+        if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.ARCHIVED) {
+            this.publishFormString = "Republish an archived form template?";
+        } else if (formToPublish.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {
+            if (selectedForm != null && formToPublish.getFormTemplateId().equals(selectedForm.getFormTemplateId())) {
+                this.publishFormString = "This form is currently opened in the form editor. Any current changes on the form editor will be saved before publishing. Proceed?";
+            } else {
+                this.publishFormString = "You will no longer be able to edit the Form Template. Are you sure?";
+            }
+        }
+
+    }
+
+    public void previewPublishForm() {
+        this.formTemplatePreviewManagedBean.setFormTemplateToView(formToPublish);
+        PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
     }
 
     public void deleteForm(ActionEvent event) {
@@ -183,7 +210,7 @@ public class FormUtilityManagedBean implements Serializable {
 
             if (ffw.getHasInputOption()) {
                 for (String fieldOption : ffw.getFormFieldOptions()) {
-                    formFieldOptions.add(new FormFieldOption(fieldOption));
+                    formFieldOptions.add(new FormFieldOption(fieldOption.trim()));
                 }
             }
             ff.setFormFieldOptions(formFieldOptions);
@@ -231,6 +258,16 @@ public class FormUtilityManagedBean implements Serializable {
                 FormTemplate newFormTemplate = formTemplates.get(formTemplates.size() - 1);
                 setSelectedForm(newFormTemplate);
             }
+        }
+
+    }
+
+    public void previewCurrentForm() {
+        boolean success = saveFormFields();
+
+        if (success) {
+            this.formTemplatePreviewManagedBean.setFormTemplateToView(selectedForm);
+            PrimeFaces.current().executeScript("PF('dlgFormTemplatePreview').show()");
         }
 
     }
@@ -415,6 +452,30 @@ public class FormUtilityManagedBean implements Serializable {
         } else {
             return "private";
         }
+    }
+
+    public FormTemplatePreviewManagedBean getFormTemplatePreviewManagedBean() {
+        return formTemplatePreviewManagedBean;
+    }
+
+    public void setFormTemplatePreviewManagedBean(FormTemplatePreviewManagedBean formTemplatePreviewManagedBean) {
+        this.formTemplatePreviewManagedBean = formTemplatePreviewManagedBean;
+    }
+
+    public FormTemplate getFormToPublish() {
+        return formToPublish;
+    }
+
+    public void setFormToPublish(FormTemplate formToPublish) {
+        this.formToPublish = formToPublish;
+    }
+
+    public String getPublishFormString() {
+        return publishFormString;
+    }
+
+    public void setPublishFormString(String publishFormString) {
+        this.publishFormString = publishFormString;
     }
 
 }

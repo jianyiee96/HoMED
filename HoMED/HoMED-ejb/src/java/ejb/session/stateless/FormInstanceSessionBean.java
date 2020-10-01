@@ -148,27 +148,27 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
-                
+
                 for (FormInstanceField fifPersisted : fiPersisted.getFormInstanceFields()) {
-                    
-                    if(fif.getFormInstanceFieldId().equals(fifPersisted.getFormInstanceFieldId())) {
-                        
+
+                    if (fif.getFormInstanceFieldId().equals(fifPersisted.getFormInstanceFieldId())) {
+
                         List<FormInstanceFieldValue> newFifvs = new ArrayList<>();
-                        
-                        for(FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
-                            
+
+                        for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+
                             FormInstanceFieldValue newFifv = new FormInstanceFieldValue(fifv.getInputValue());
                             em.persist(newFifv);
                             newFifvs.add(newFifv);
-                            
+
                         }
-                        
+
                         fifPersisted.setFormInstanceFieldValues(newFifvs);
-                        
+
                     }
-                    
+
                 }
-                
+
             }
 
         } catch (UpdateFormInstanceException ex) {
@@ -187,14 +187,18 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
         Query query = em.createQuery("SELECT f FROM FormInstance f WHERE f.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
-
-        return query.getResultList();
+        List<FormInstance> fis = query.getResultList();
+        for (FormInstance fi : fis) {
+            fi.getFormInstanceFields().sort((x, y) -> x.getFormFieldMapping().getPosition() - y.getFormFieldMapping().getPosition());
+        }
+        return fis;
 
     }
 
     @Override
     public FormInstance retrieveFormInstance(Long id) {
         FormInstance formInstance = em.find(FormInstance.class, id);
+        formInstance.getFormInstanceFields().sort((x, y) -> x.getFormFieldMapping().getPosition() - y.getFormFieldMapping().getPosition());
         return formInstance;
     }
 

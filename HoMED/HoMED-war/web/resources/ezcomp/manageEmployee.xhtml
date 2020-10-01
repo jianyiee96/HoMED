@@ -65,16 +65,18 @@
                                 <div class="p-field">
                                     <i class="pi pi-user p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-name" value="Name"/>
-                                    <p:inputText id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:inputText id="view-name" value="#{manageEmployeeManagedBean.employeeToView.name}" rendered="#{manageEmployeeManagedBean.isEditMode}" />
+                                    <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.name}" class="view-text" />
                                     <p:message class="error-message" for="view-name" />
                                 </div>
 
                                 <div class="p-field">
                                     <i class="fa fa-venus-mars p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-gender" value="Gender"/>
-                                    <p:selectOneMenu id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}" disabled="#{not manageEmployeeManagedBean.isEditMode}" >
+                                    <p:selectOneMenu id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}" rendered="#{manageEmployeeManagedBean.isEditMode}" >
                                         <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
                                     </p:selectOneMenu>
+                                    <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.gender}" class="view-text" />
                                     <p:message class="error-message" for="view-gender" />
                                 </div> 
                             </div>
@@ -86,14 +88,16 @@
                                 <div class="p-field">
                                     <i class="fa fa-phone p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
-                                    <p:inputText id="view-phoneNumber" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:inputText id="view-phoneNumber" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" rendered="#{manageEmployeeManagedBean.isEditMode}" />
+                                    <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.phoneNumber}" class="view-text" />
                                     <p:message class="error-message" for="view-phoneNumber" />
                                 </div>
 
                                 <div class="p-field">
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" disabled="#{not manageEmployeeManagedBean.isEditMode}" />
+                                    <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" rendered="#{manageEmployeeManagedBean.isEditMode}" />
+                                    <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.email}" class="view-text" />
                                     <p:message class="error-message" for="view-email" />
                                 </div>
                             </div>
@@ -106,36 +110,41 @@
                                     <div class="p-field p-col-12 p-md-4 p-sm-12">
                                         <i class="pi pi-directions-alt p-mr-2 p-ml-2"/>
                                         <p:outputLabel for="view-street-name" value="Street Name"/>
-                                        <p:inputText id="view-street-name" value="#{manageEmployeeManagedBean.employeeToView.address.streetName}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:inputText id="view-street-name" value="#{manageEmployeeManagedBean.employeeToView.address.streetName}" rendered="#{manageEmployeeManagedBean.isEditMode}"/>
+                                        <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address.streetName}" class="view-text" />
                                         <p:message class="error-message" for="view-street-name" />
                                     </div>
 
                                     <div class="p-field p-col-12 p-md-4 p-sm-12">
                                         <i class="fa fa-street-view p-mr-2 p-ml-2"/>
                                         <p:outputLabel for="view-unit-number" value="Unit Number"/>
-                                        <p:inputText id="view-unit-number" value="#{manageEmployeeManagedBean.employeeToView.address.unitNumber}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:inputText id="view-unit-number" value="#{manageEmployeeManagedBean.employeeToView.address.unitNumber}" rendered="#{manageEmployeeManagedBean.isEditMode}"/>
+                                        <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address.unitNumber}#{empty manageEmployeeManagedBean.employeeToView.address.unitNumber ? 'N.A.' : ''}" class="view-text" />
                                         <p:message class="error-message" for="view-unit-number" />
                                     </div>
 
                                     <div class="p-field p-col-12 p-md-4 p-sm-12">
                                         <i class="fa fa-building-o p-mr-2 p-ml-2"/>
                                         <p:outputLabel for="view-building-name" value="Building Name"/>
-                                        <p:inputText id="view-building-name" value="#{manageEmployeeManagedBean.employeeToView.address.buildingName}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:inputText id="view-building-name" value="#{manageEmployeeManagedBean.employeeToView.address.buildingName}" rendered="#{manageEmployeeManagedBean.isEditMode}"/>
+                                        <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address.buildingName}#{empty manageEmployeeManagedBean.employeeToView.address.buildingName ? 'N.A.' : ''}" class="view-text" />
                                         <p:message class="error-message" for="view-building-name" />
                                     </div>
                                     <div class="p-field p-col-12 p-md-6 p-sm-12">
                                         <i class="fa fa-globe p-mr-2 p-ml-2"/>
                                         <p:outputLabel for="view-country" value="Country"/>
-                                        <p:selectOneMenu id="view-country" value="#{manageEmployeeManagedBean.employeeToView.address.country}" disabled="#{not manageEmployeeManagedBean.isEditMode}">
+                                        <p:selectOneMenu id="view-country" value="#{manageEmployeeManagedBean.employeeToView.address.country}" rendered="#{manageEmployeeManagedBean.isEditMode}">
                                             <f:selectItem itemLabel="Singapore" itemValue="Singapore" />
                                         </p:selectOneMenu>
+                                        <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address.country}" class="view-text" />
                                         <p:message class="error-message" for="view-country" />
                                     </div>
 
                                     <div class="p-field p-col-12 p-md-6 p-sm-12">
                                         <i class="fa fa-map-marker p-mr-2 p-ml-2"/>
                                         <p:outputLabel for="view-postal-code" value="Postal Code"/>
-                                        <p:inputText id="view-postal-code" value="#{manageEmployeeManagedBean.employeeToView.address.postal}" disabled="#{not manageEmployeeManagedBean.isEditMode}"/>
+                                        <p:inputText id="view-postal-code" value="#{manageEmployeeManagedBean.employeeToView.address.postal}" rendered="#{manageEmployeeManagedBean.isEditMode}"/>
+                                        <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.address.postal}" class="view-text" />
                                         <p:message class="error-message" for="view-postal-code" />
                                     </div>
                                 </div>

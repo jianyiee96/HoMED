@@ -9,6 +9,7 @@ import entity.FormTemplate;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.CreateConsultationPurposeException;
+import util.exceptions.RelinkFormTemplatesException;
 
 /**
  *
@@ -23,7 +24,7 @@ public interface ConsultationPurposeSessionBeanLocal {
     
     public List<ConsultationPurpose> retrieveAllConsultationPurposes();
     
-    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates);
+    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates) throws RelinkFormTemplatesException;
     
     public List<ConsultationPurpose> retrieveAllFormTemplateLinkedConsultationPurposes(Long id);
     

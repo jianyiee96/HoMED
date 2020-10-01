@@ -45,13 +45,13 @@
                     <po:menu widgetVar="RomaMenuWidget">
 
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
-                        <p:menuitem value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
-                        <p:submenu label="Users Account Management" icon="fa fa-users">
+                        <p:menuitem rendered="#{currentEmployee.role == 'ADMIN'}" value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
+                        <p:submenu rendered="#{currentEmployee.role == 'ADMIN'}" label="Users Account Management" icon="fa fa-users">
                             <p:menuitem value="Employee Account" icon="fa fa-user-md" outcome="/employee-management" />
                             <p:menuitem value="Serviceman Account" icon="fa fa-user" outcome="/serviceman-management" />
                         </p:submenu>
-                        <p:menuitem value="E-Form Utility" icon="fa fa-wrench" outcome="/form-util" />
-                        <p:menuitem value="Consultation Utility" icon="fa fa-wrench" outcome="/consultation-util" />
+                        <p:menuitem rendered="#{currentEmployee.role == 'ADMIN'}" value="E-Form Utility" icon="fa fa-wrench" outcome="/form-util" />
+                        <p:menuitem rendered="#{currentEmployee.role == 'ADMIN'}" value="Consultation Utility" icon="fa fa-wrench" outcome="/consultation-util" />
                     </po:menu>
                 </h:form>
                 <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">

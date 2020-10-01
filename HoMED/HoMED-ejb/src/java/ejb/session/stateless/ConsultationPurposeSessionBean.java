@@ -17,7 +17,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.FormTemplateStatusEnum;
 import util.exceptions.CreateConsultationPurposeException;
+import util.exceptions.RelinkFormTemplatesException;
 
 @Stateless
 public class ConsultationPurposeSessionBean implements ConsultationPurposeSessionBeanLocal {
@@ -63,27 +65,38 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
     }
 
     @Override
-    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates) {
+    public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates) throws RelinkFormTemplatesException {
+        String errorMessage = "Failed to relink Form Templates: ";
 
-        ConsultationPurpose cp = retrieveConsultationPurpose(id);
+        try {
+            ConsultationPurpose cp = retrieveConsultationPurpose(id);
 
-        List<FormTemplate> currentFormTemplates = cp.getFormTemplates();
+            List<FormTemplate> currentFormTemplates = cp.getFormTemplates();
 
-        for (FormTemplate ftLink : formTemplates) {
-            em.merge(ftLink);
+            for (FormTemplate ftLink : formTemplates) {
+                if (ftLink.getFormTemplateStatus() != FormTemplateStatusEnum.PUBLISHED) {
+                    throw new RelinkFormTemplatesException("Form Template " + ftLink.getFormTemplateName() + " has not been published");
+                }
+                em.merge(ftLink);
+            }
+
+            // Unlink All
+            for (FormTemplate ftUnlink : currentFormTemplates) {
+                ftUnlink.getConsultationPurposes().remove(cp);
+            }
+
+            // Link 
+            cp.setFormTemplates(formTemplates);
+            for (FormTemplate ftLink : formTemplates) {
+                ftLink.getConsultationPurposes().add(cp);
+            }
+        } catch (RelinkFormTemplatesException ex) {
+            throw new RelinkFormTemplatesException(errorMessage + ex.getMessage());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RelinkFormTemplatesException(generalUnexpectedErrorMessage + "relinking Form Template");
         }
-
-        // Unlink All
-        for (FormTemplate ftUnlink : currentFormTemplates) {
-            ftUnlink.getConsultationPurposes().remove(cp);
-        }
-
-        // Link 
-        cp.setFormTemplates(formTemplates);
-        for (FormTemplate ftLink : formTemplates) {
-            ftLink.getConsultationPurposes().add(cp);
-        }
-
     }
 
     @Override
@@ -115,7 +128,7 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
 
     @Override
     public void deleteConsultationPurpose(Long id) {
-        
+
         ConsultationPurpose cp = retrieveConsultationPurpose(id);
 
         List<FormTemplate> currentFormTemplates = cp.getFormTemplates();
@@ -124,11 +137,11 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
         for (FormTemplate ftUnlink : currentFormTemplates) {
             ftUnlink.getConsultationPurposes().remove(cp);
         }
-        
+
         em.remove(cp);
-        
+
     }
-    
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<ConsultationPurpose>> constraintViolations) {
         String msg = "";
 
