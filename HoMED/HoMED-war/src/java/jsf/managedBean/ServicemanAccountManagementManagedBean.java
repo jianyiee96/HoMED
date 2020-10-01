@@ -53,7 +53,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     private final List<String> dateFormats;
     private List<ServicemanWrapper> servicemanWrappers;
     private Boolean isUploaded;
-    
+
     private Boolean test;
 
     public ServicemanAccountManagementManagedBean() {
@@ -222,14 +222,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void importSelectedServicemen() {
-        System.out.println("hello");
         for (ServicemanWrapper sw : servicemanWrappers) {
-            System.out.println("          Email: " + sw.getNewServiceman().getEmail());
-            System.out.println("Selected Status: " + sw.getIsSelected());
             if (sw.getIsSelected()) {
-                System.out.println("=======================================================================");
-                System.out.println("==================== Selected Serviceman to Import ====================");
-                System.out.println("=======================================================================");
                 System.out.println("Selected Email: " + sw.getNewServiceman().getEmail());
             }
         }
@@ -316,10 +310,10 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         System.out.println("setting test");
         this.test = test;
     }
-    
+
     public void listener() {
         System.out.println("Toggle");
-        
+
     }
 
 }
