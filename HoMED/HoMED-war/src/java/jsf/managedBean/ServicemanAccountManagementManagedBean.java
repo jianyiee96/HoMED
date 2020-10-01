@@ -162,51 +162,17 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 System.out.println(errorMsg);
 
                 if (errorMsg.contains("Name")) {
-
-                    String curr = validationErrorMessages.get(0);
-                    validationErrorMessages.remove(0);
-                    if (curr != null) {
-                        validationErrorMessages.add(0, (curr + "\nIncorrect name format [" + name + "]. " + errorMsg));
-                    } else {
-                        validationErrorMessages.add(0, "Incorrect name format [" + name + "]. " + errorMsg);
-                    }
-
+                    addErrorMessage(validationErrorMessages, 0, "name", name, errorMsg);
                 } else if (errorMsg.contains("Gender")) {
-
-                    validationErrorMessages.remove(1);
-                    validationErrorMessages.add(1, "Incorrect gender format [" + gender + "]. Please change it to MALE/FEMALE.");
-
+                    addErrorMessage(validationErrorMessages, 1, "gender", gender, "Please change it to MALE/FEMALE.");
                 } else if (errorMsg.contains("Phone")) {
-
-                    String curr = validationErrorMessages.get(2);
-                    validationErrorMessages.remove(2);
-                    if (curr != null) {
-                        validationErrorMessages.add(2, (curr + "\nIncorrect phone number format [" + phone + "]. " + errorMsg));
-                    } else {
-                        validationErrorMessages.add(2, "Incorrect phone number format [" + phone + "]. " + errorMsg);
-                    }
-
+                    addErrorMessage(validationErrorMessages, 2, "phone", phone, errorMsg);
                 } else if (errorMsg.contains("Email")) {
-
-                    String curr = validationErrorMessages.get(3);
-                    validationErrorMessages.remove(3);
-                    if (curr != null) {
-                        validationErrorMessages.add(3, (curr + "\nIncorrect email format [" + email + "]. " + errorMsg));
-                    } else {
-                        validationErrorMessages.add(3, "Incorrect email format [" + email + "]. " + errorMsg);
-                    }
-                    System.out.println("3: " + validationErrorMessages.get(3));
-                                        
+                    addErrorMessage(validationErrorMessages, 3, "email", email, errorMsg);
                 } else if (errorMsg.contains("Blood type")) {
-                    
-                    validationErrorMessages.remove(9);
-                    validationErrorMessages.add(9, "Incorrect blood type format [" + bloodType + "]. Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
-                    
+                    addErrorMessage(validationErrorMessages, 9, "blood type", bloodType, "Please change it to A-/A+/B-/B+/AB-/AB+/O-/O+.");
                 } else if (errorMsg.contains("ROD")) {
-                    
-                    validationErrorMessages.remove(10);
-                    validationErrorMessages.add(10, "Incorrect ROD date format [" + rod + "]. Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
-                    
+                    addErrorMessage(validationErrorMessages, 10, "ROD", rod, "Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
                 }
             }
         }
@@ -219,11 +185,21 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 System.out.println(errorMsg);
 
                 if (errorMsg.contains("Street Name")) {
-                    validationErrorMessages.add(4, "Incorrect street name format [" + streetName + "]. " + errorMsg);
+                    addErrorMessage(validationErrorMessages, 4, "street name", streetName, errorMsg);
                 } else if (errorMsg.contains("Postal Code")) {
-                    validationErrorMessages.add(8, "Incorrect postal code format [" + postalCode + "]. " + errorMsg);
+                    addErrorMessage(validationErrorMessages, 8, "postal code", postalCode, errorMsg);
                 }
             }
+        }
+    }
+
+    private void addErrorMessage(List<String> validationErrorMessages, int errorMsgIdx, String errorType, String inputtedValue, String errorMsg) {
+        String curr = validationErrorMessages.get(errorMsgIdx);
+        validationErrorMessages.remove(errorMsgIdx);
+        if (curr != null) {
+            validationErrorMessages.add(errorMsgIdx, (curr + "\nIncorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg));
+        } else {
+            validationErrorMessages.add(errorMsgIdx, "Incorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg);
         }
     }
 
