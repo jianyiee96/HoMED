@@ -61,7 +61,7 @@
                                 <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman" />
 
                                 <p:menuitem value="Bulk Import" icon="pi pi-upload" title="Import" update="formBulkImportServicemen" process="@this"
-                                            oncomplete="PF('dialogBulkImportServicemen').show()" />
+                                            oncomplete="PF('dialogBulkImportServicemen').show()" actionListener="#{servicemanAccountManagementManagedBean.initBulkImport}" />
                             </p:splitButton>
                         </div>
 
@@ -114,6 +114,40 @@
             </div>
         </h:form>
 
+        <h:form id='formBulkImportServicemenInProgress'>
+            <p:dialog id="dialogBulkImportServicemenInProgress" widgetVar="dialogBulkImportServicemenInProgress" header="Bulk Import" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onHide="PF('dialogBulkImportServicemen').hide()"
+                      width="300">
+                <div class="p-grid">
+                    <div class="p-col">
+                        <div class="grid-item">
+                            <p:ajaxStatus>
+                                <f:facet name="start">
+                                    <div class='p-field'>
+                                        <p:outputLabel value='Operation In-Progress...' />
+                                    </div>
+                                    
+                                    <div class='p-field'>
+                                        <i class="pi pi-spin pi-spinner p-mt-4" style="font-size: 2rem"/>
+                                    </div>
+                                </f:facet>
+
+                                <f:facet name='complete'>
+                                    <div class='p-field'>
+                                        <p:outputLabel value="Operation Completed!" />
+                                    </div>
+                                    
+                                    <div class='p-field'>
+                                        <p:commandButton value="Close" onclick="PF('dialogBulkImportServicemenInProgress').hide()" />
+                                    </div>
+                                </f:facet>
+                            </p:ajaxStatus>
+                        </div>
+                    </div>
+                </div>
+            </p:dialog>
+        </h:form>
+
         <h:form id="formBulkImportServicemen" enctype="multipart/form-data">
             <p:dialog id="dialogBulkImportServicemen" widgetVar="dialogBulkImportServicemen" header="Bulk Import Servicemen" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true"
@@ -121,7 +155,7 @@
                 <p:outputPanel id="panelBulkImportServicemen">
                     <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="panelGroupBulkImportServicemen"
                                   listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
-                    
+
                     <p:separator />
 
                     <h:panelGroup id='panelGroupBulkImportServicemen'>
@@ -487,33 +521,28 @@
                                                             </div>
                                                         </div>
                                                     </h:panelGroup>
-
-
                                                 </div>
                                             </div>
                                         </div>
-
                                     </p:repeat>
 
                                     <div class="ui-fluid">
                                         <div class="p-formgrid p-grid">
                                             <div class="p-field p-col-2 p-offset-5">
                                                 <p:commandButton style="font-size: 18px;" icon="pi pi-upload" disabled="#{servicemanAccountManagementManagedBean.servicemenToCreate.size() eq 0 and servicemanAccountManagementManagedBean.servicemenToUpdate.size() eq 0}" 
-                                                                 value="Import" title="Import" process="@this" update="formAllServicemen" actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}">
+                                                                 value="Import" title="Import" process="@form" update="formAllServicemen" actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" onstart="PF('dialogBulkImportServicemenInProgress').show()">
                                                     <p:confirm header="Bulk Import" escape="false" message="Selected servicemen will be imported to the system. Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                             </div>
                                         </div>
-                                    </div>                                   
-
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </ui:fragment>
                     </h:panelGroup>
                 </p:outputPanel>
             </p:dialog>
-
-
         </h:form>
 
     </ui:define>

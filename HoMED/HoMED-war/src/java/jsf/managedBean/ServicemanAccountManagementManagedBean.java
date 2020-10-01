@@ -63,14 +63,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         validator = validatorFactory.getValidator();
 
         this.dateFormats = Arrays.asList("d-M-yy", "d/M/yy");
-        this.servicemanWrappers = new ArrayList<>();
-        this.servicemenToCreate = new ArrayList<>();
-        this.servicemenToUpdate = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
-        servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
+        this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
     }
 
     public void dialogActionListener() {
@@ -78,14 +75,17 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         PrimeFaces.current().ajax().update("formAllServicemen:dataTableServicemen");
     }
 
-    public void uploadCsv(FileUploadEvent event) {
+    public void initBulkImport() {
         this.servicemanWrappers = new ArrayList<>();
-        System.out.println("Uploading...");
+        this.servicemenToCreate = new ArrayList<>();
+        this.servicemenToUpdate = new ArrayList<>();
+    }
+
+    public void uploadCsv(FileUploadEvent event) {
+        this.initBulkImport();
         UploadedFile csv = event.getFile();
 
         if (csv != null) {
-            System.out.println("Uploaded file --> " + csv.getFileName() + " Size --> " + csv.getSize() + " ContentType --> " + csv.getContentType());
-
             try {
                 InputStream csvInputStream = csv.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(csvInputStream));
@@ -262,6 +262,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 printUnexpectedErrorMessage(ex.getMessage());
             }
         }
+        
+        this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
     }
 
     private void printUnexpectedErrorMessage(String errorMessage) {
