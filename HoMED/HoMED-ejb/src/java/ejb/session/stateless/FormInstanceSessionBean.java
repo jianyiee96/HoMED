@@ -24,8 +24,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
+import util.exceptions.ArchiveFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
 /**
@@ -148,27 +151,27 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
-                
+
                 for (FormInstanceField fifPersisted : fiPersisted.getFormInstanceFields()) {
-                    
-                    if(fif.getFormInstanceFieldId().equals(fifPersisted.getFormInstanceFieldId())) {
-                        
+
+                    if (fif.getFormInstanceFieldId().equals(fifPersisted.getFormInstanceFieldId())) {
+
                         List<FormInstanceFieldValue> newFifvs = new ArrayList<>();
-                        
-                        for(FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
-                            
+
+                        for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+
                             FormInstanceFieldValue newFifv = new FormInstanceFieldValue(fifv.getInputValue());
                             em.persist(newFifv);
                             newFifvs.add(newFifv);
-                            
+
                         }
-                        
+
                         fifPersisted.setFormInstanceFieldValues(newFifvs);
-                        
+
                     }
-                    
+
                 }
-                
+
             }
 
         } catch (UpdateFormInstanceException ex) {
@@ -180,6 +183,32 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             ex.printStackTrace();
             throw new UpdateFormInstanceException(generalUnexpectedErrorMessage + "update Form Instance Field Values");
         }
+    }
+
+    @Override
+    public void submitFormInstance(Long formInstanceId) throws SubmitFormInstanceException {
+        FormInstance formInstance = retrieveFormInstance(formInstanceId);
+
+        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+            throw new SubmitFormInstanceException("Invalid Form Instance status: Status of form instance must be DRAFT");
+        } else if (formInstance == null) {
+            throw new SubmitFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
+    }
+
+    @Override
+    public void archiveFormInstance(Long formInstanceId) throws ArchiveFormInstanceException {
+        FormInstance formInstance = retrieveFormInstance(formInstanceId);
+
+        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
+        } else if (formInstance == null) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.ARCHIVED);
     }
 
     @Override
