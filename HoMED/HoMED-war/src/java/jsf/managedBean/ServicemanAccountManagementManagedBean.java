@@ -248,8 +248,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(date);
+        if (date == null) {
+            return null;
+        }
+        
+        return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
 
     public GenderEnum[] getGenders() {
