@@ -1,10 +1,13 @@
 package ejb.session.stateless;
 
 import entity.Serviceman;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -17,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.email.ServicemanEmailWrapper;
 import util.exceptions.ActivateServicemanException;
 import util.exceptions.ChangeServicemanPasswordException;
 import util.exceptions.CreateServicemanException;
@@ -50,6 +54,52 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         Query query = em.createQuery("SELECT s FROM Serviceman s");
 
         return query.getResultList();
+    }
+
+    @Override
+    public TreeMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
+        TreeMap<Serviceman, CreateServicemanException> map = new TreeMap<>();
+        List<ServicemanEmailWrapper> list = new ArrayList<>();
+        for (Serviceman serviceman : servicemen) {
+            try {
+                String password = CryptographicHelper.getInstance().generateRandomString(8);
+                serviceman.setPassword(password);
+
+                Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
+
+                if (constraintViolations.isEmpty()) {
+                    em.persist(serviceman);
+                    em.flush();
+
+                    Future<Boolean> response = emailSessionBean.emailServicemanOtpAsync(serviceman, password);
+                    list.add(new ServicemanEmailWrapper(response, serviceman));
+                } else {
+                    throw new CreateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
+                }
+            } catch (CreateServicemanException ex) {
+                map.put(serviceman, new CreateServicemanException(ex.getMessage()));
+            } catch (PersistenceException ex) {
+                map.put(serviceman, new CreateServicemanException(preparePersistenceExceptionErrorMessage(ex)));
+            } catch (Exception ex) {
+                map.put(serviceman, new CreateServicemanException("Unknown exception!"));
+            }
+        }
+
+        list.parallelStream()
+                .peek(wrapper -> {
+                    try {
+                        Boolean result = wrapper.getEmailResult().get();
+                        if (!result) {
+                            throw new CreateServicemanException("Email was not sent out successfully!");
+                        }
+                    } catch (CreateServicemanException ex) {
+                        map.put(wrapper.getServiceman(), new CreateServicemanException(ex.getMessage()));
+                    } catch (Exception ex) {
+                        map.put(wrapper.getServiceman(), new CreateServicemanException("Unknown exception!"));
+                    }
+                })
+                .collect(Collectors.toList());
+        return map;
     }
 
     @Override
@@ -96,7 +146,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
-    
+
     @Override
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException {
         Query query = em.createQuery("SELECT s FROM Serviceman s WHERE s.email = :inEmail");
@@ -122,6 +172,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 if (constraintViolations.isEmpty()) {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
 
+                    Boolean emailChangeDetected = false;
+                    if (!servicemanToUpdate.getEmail().equals(serviceman.getEmail())) {
+                        emailChangeDetected = true;
+                    }
+
                     servicemanToUpdate.setName(serviceman.getName());
                     servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setRod(serviceman.getRod());
@@ -131,6 +186,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setAddress(serviceman.getAddress());
 
                     em.flush();
+
+                    if (emailChangeDetected) {
+                        Future<Boolean> response = emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
+                        if (!response.get()) {
+                            throw new UpdateServicemanException("Email was not sent out successfully!");
+                        }
+                    }
 
                     return servicemanToUpdate;
 

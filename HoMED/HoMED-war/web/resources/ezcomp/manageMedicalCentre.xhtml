@@ -15,7 +15,7 @@
 
         <h:form id="formManageMedicalCentre">
             <p:dialog id="dialogManageMedicalCentre" widgetVar="dialogManageMedicalCentre" header="#{manageMedicalCentreManagedBean.isCreateState ? 'Create Medical Centre' : 'Medical Centre Details'}" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageMedicalCentre').initPosition()"
                       minWidth="500" width="900">
                 <p:outputPanel id="panelManageMedicalCentre" rendered="#{not empty manageMedicalCentreManagedBean.medicalCentreToView}">
                     <div class="p-grid">

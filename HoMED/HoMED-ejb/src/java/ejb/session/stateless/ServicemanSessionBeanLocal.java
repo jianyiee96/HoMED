@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Serviceman;
 import java.util.List;
+import java.util.TreeMap;
 import javax.ejb.Local;
 import util.exceptions.ActivateServicemanException;
 import util.exceptions.ChangeServicemanPasswordException;
@@ -44,5 +45,7 @@ public interface ServicemanSessionBeanLocal {
     public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException;
 
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
+
+    public TreeMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen);
     
 }

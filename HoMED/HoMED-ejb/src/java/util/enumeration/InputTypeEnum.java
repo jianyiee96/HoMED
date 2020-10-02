@@ -13,9 +13,9 @@ public enum InputTypeEnum {
     RADIO_BUTTON("Radio Button", "Requires user to select up to one radio option"),
     CHECK_BOX("Check Box", "Requires user to select multiple check box options"),
     SINGLE_DROPDOWN("Single Dropdown", "Requires user to select up to one dropdown option"),
-    MULTI_DROPDOWN("Multi Dropdown", "Requires user to select multiple dropdown options"),
-    FILE_UPLOAD("File Upload", "Requires user to upload file documents. File types will be specified in the future"),
-    IMAGE_UPLOAD("Image Upload", "Requires user to upload image documents. File types will be specified in the future");
+    MULTI_DROPDOWN("Multi Dropdown", "Requires user to select multiple dropdown options");
+//    FILE_UPLOAD("File Upload", "Requires user to upload file documents. File types will be specified in the future"),
+//    IMAGE_UPLOAD("Image Upload", "Requires user to upload image documents. File types will be specified in the future");
 
     private String inputTypeString;
     private String description;

@@ -143,6 +143,8 @@ public class DataInitializationSessionBean {
             initializeMedicalCentres();
             Long formTemplateId = initializeForm();
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
+            
+            initializeVaccinationForm();
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
@@ -153,9 +155,9 @@ public class DataInitializationSessionBean {
     }
 
     private void initializeFormInstance(Long servicemanId, Long formTemplateId) throws GenerateFormInstanceException, UpdateFormInstanceException {
-        Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(servicemanId, formTemplateId);
-        FormInstance formInstance = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-        em.detach(formInstance);
+//        Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(servicemanId, formTemplateId);
+//        FormInstance formInstance = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
+//        em.detach(formInstance);
 
 //        formInstanceSessionBeanLocal.updateFormInstanceFieldValues(formInstance);
     }
@@ -164,30 +166,56 @@ public class DataInitializationSessionBean {
         ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
         consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
 
-        FormTemplate formTemplate = new FormTemplate("Form Template Test 1");
+        FormTemplate formTemplate = new FormTemplate("Form Template Demo 1");
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
 
         List<FormField> formFields = new ArrayList<>();
-        formFields.add(new FormField("This question is a text", 1, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.TRUE, null));
-        formFields.add(new FormField("This question is a text (not required)", 2, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
-        formFields.add(new FormField("This question is a text (doctor only)", 3, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.FALSE, null));
-        formFields.add(new FormField("This question is a header", 4, InputTypeEnum.HEADER, Boolean.FALSE, Boolean.FALSE, null));
-        formFields.add(new FormField("This question is a number", 5, InputTypeEnum.NUMBER, Boolean.TRUE, Boolean.TRUE, null));
-        formFields.add(new FormField("This question is a Date", 6, InputTypeEnum.DATE, Boolean.TRUE, Boolean.TRUE, null));
-        formFields.add(new FormField("This question is a Time", 7, InputTypeEnum.TIME, Boolean.TRUE, Boolean.TRUE, null));
+        formFields.add(new FormField("Basic Questionnaire", 1, InputTypeEnum.HEADER, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("What is your name?", 2, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.TRUE, null));
+        formFields.add(new FormField("What is your middle name?", 3, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
+        formFields.add(new FormField("How old are you?", 4, InputTypeEnum.NUMBER, Boolean.TRUE, Boolean.TRUE, null));
+        formFields.add(new FormField("When was your last vaccination?", 5, InputTypeEnum.DATE, Boolean.TRUE, Boolean.TRUE, null));
+        formFields.add(new FormField("What time do you usually sleep?", 6, InputTypeEnum.TIME, Boolean.TRUE, Boolean.TRUE, null));
         List<FormFieldOption> formFieldOptions = new ArrayList<>();
-        formFieldOptions.add(new FormFieldOption("A"));
-        formFieldOptions.add(new FormFieldOption("B"));
-        formFieldOptions.add(new FormFieldOption("C"));
-        formFieldOptions.add(new FormFieldOption("D"));
-        formFields.add(new FormField("This question is a Radio Button", 8, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
-        formFields.add(new FormField("This question is a Check Box", 9, InputTypeEnum.CHECK_BOX, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
-        formFields.add(new FormField("This question is a Single Dropdown", 10, InputTypeEnum.SINGLE_DROPDOWN, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
-        formFields.add(new FormField("This question is a Multi Dropdown", 11, InputTypeEnum.MULTI_DROPDOWN, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
-        formFields.add(new FormField("This question is a File Upload", 12, InputTypeEnum.FILE_UPLOAD, Boolean.TRUE, Boolean.TRUE, null));
-        formFields.add(new FormField("This question is a Image Upload", 13, InputTypeEnum.IMAGE_UPLOAD, Boolean.TRUE, Boolean.TRUE, null));
+        formFieldOptions.add(new FormFieldOption("MALE"));
+        formFieldOptions.add(new FormFieldOption("FEMALE"));
+        formFields.add(new FormField("What is your gender?", 7, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Do you have any allergies?", 8, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("If yes, what allergies?", 9, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("North"));
+        formFieldOptions.add(new FormFieldOption("South"));
+        formFieldOptions.add(new FormFieldOption("EAST"));
+        formFieldOptions.add(new FormFieldOption("WEST"));
+        formFieldOptions.add(new FormFieldOption("CENTRAL"));
+        formFields.add(new FormField("What is your preferred location?", 10, InputTypeEnum.CHECK_BOX, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("A+"));
+        formFieldOptions.add(new FormFieldOption("A-"));
+        formFieldOptions.add(new FormFieldOption("B+"));
+        formFieldOptions.add(new FormFieldOption("B-"));
+        formFieldOptions.add(new FormFieldOption("AB+"));
+        formFieldOptions.add(new FormFieldOption("AB-"));
+        formFieldOptions.add(new FormFieldOption("O+"));
+        formFieldOptions.add(new FormFieldOption("O-"));
+        formFields.add(new FormField("What is your blood type?", 11, InputTypeEnum.SINGLE_DROPDOWN, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("Monday"));
+        formFieldOptions.add(new FormFieldOption("Tuesday"));
+        formFieldOptions.add(new FormFieldOption("Wednesday"));
+        formFieldOptions.add(new FormFieldOption("Thursday"));
+        formFieldOptions.add(new FormFieldOption("Friday"));
+        formFieldOptions.add(new FormFieldOption("Saturday"));
+        formFieldOptions.add(new FormFieldOption("Sunday"));
+        formFields.add(new FormField("What are your preferred available days?", 12, InputTypeEnum.MULTI_DROPDOWN, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("Doctor Remarks:", 13, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.FALSE, null));
+//        formFields.add(new FormField("This question is a File Upload", 12, InputTypeEnum.FILE_UPLOAD, Boolean.TRUE, Boolean.TRUE, null));
+//        formFields.add(new FormField("This question is a Image Upload", 13, InputTypeEnum.IMAGE_UPLOAD, Boolean.TRUE, Boolean.TRUE, null));
         otherFormTemplate.setFormFields(formFields);
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
         formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
@@ -196,7 +224,64 @@ public class DataInitializationSessionBean {
         formTemplates.add(formTemplate);
         consultationPurposeSessionBeanLocal.relinkFormTemplates(consultationPurpose.getConsultationPurposeId(), formTemplates);
 
-        System.out.println("Successfully created Form Template\n");
+        System.out.println("Successfully created Form Template Demo 1\n");
+        return formTemplate.getFormTemplateId();
+    }
+
+    private Long initializeVaccinationForm() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
+        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Vaccination");
+        consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
+
+        FormTemplate formTemplate = new FormTemplate("Pre-vaccination Questionnaires");
+        Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
+        FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
+        otherFormTemplate.setFormTemplateId(formTemplateId);
+
+        List<FormField> formFields = new ArrayList<>();
+        List<FormFieldOption> formFieldOptions = new ArrayList<>();
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Were you born in Singapore?", 1, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Are you on any long-term medication?", 2, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("If yes, please declare the name of drugs?", 3, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Are you currently having any of the following: fever, acute illness, chronic disease, bleeding disorders?", 4, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Do you have any drug allergies?", 5, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("If yes, please declare your drug allergies?", 6, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("[For Female Patients] Are you currently pregnant or suspect that you may be pregnant?", 7, InputTypeEnum.RADIO_BUTTON, Boolean.FALSE, Boolean.TRUE, formFieldOptions));
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Have you ever had chicken pox before or had the Varicella vaccine", 8, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("Vaccine to be given: Seasonal Flu", 9, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("Vaccine to be given: Tetanus", 10, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("Vaccine to be given: Hepatitis B", 11, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("Vaccine to be given: Hepatitis A", 12, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("Vaccine to be given: Typhoid", 13, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("Vaccine to be given: Varicella", 14, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
+        formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.FALSE, null));
+        
+        otherFormTemplate.setFormFields(formFields);
+        formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
+        formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
+
+        List<FormTemplate> formTemplates = new ArrayList<>();
+        formTemplates.add(formTemplate);
+        consultationPurposeSessionBeanLocal.relinkFormTemplates(consultationPurpose.getConsultationPurposeId(), formTemplates);
+
+        System.out.println("Successfully created Pre-vaccination Questionnaires\n");
         return formTemplate.getFormTemplateId();
     }
 

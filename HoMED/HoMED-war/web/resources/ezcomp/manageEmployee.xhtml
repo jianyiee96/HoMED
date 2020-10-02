@@ -42,7 +42,7 @@
 
         <h:form id="formManageEmployee">
             <p:dialog id="dialogManageEmployee" widgetVar="dialogManageEmployee" header="#{manageEmployeeManagedBean.isCreateState ? 'Create Employee' : 'Employee Details'}" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageEmployee').initPosition()"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">

@@ -38,6 +38,9 @@ public class FormTemplate implements Serializable {
     @Size(min = 1, max = 128, message = "Form Name must be between length 1 to 128")
     private String formTemplateName;
     
+    @Column(nullable = true, length = 8000)
+    private String declaration;
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
@@ -94,6 +97,14 @@ public class FormTemplate implements Serializable {
 
     public void setFormTemplateName(String formTemplateName) {
         this.formTemplateName = formTemplateName;
+    }
+
+    public String getDeclaration() {
+        return declaration;
+    }
+
+    public void setDeclaration(String declaration) {
+        this.declaration = declaration;
     }
 
     public Date getDateCreated() {

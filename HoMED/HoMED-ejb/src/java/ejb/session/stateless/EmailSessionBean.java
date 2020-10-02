@@ -17,7 +17,16 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
     public EmailSessionBean() {
     }
+    
+    @Asynchronous
+    @Override
+    public Future<Boolean> emailEmployeeChangeEmailAsync(Employee employee) throws InterruptedException {
+        EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
+        Boolean result = emailManager.emailEmployeeChangeEmail(employee, FROM_EMAIL);
 
+        return new AsyncResult<>(result);
+    }
+    
     @Asynchronous
     @Override
     public Future<Boolean> emailEmployeeOtpAsync(Employee employee, String otp) throws InterruptedException {
@@ -36,6 +45,15 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
         return new AsyncResult<>(result);
     }
 
+    @Asynchronous
+    @Override
+    public Future<Boolean> emailServicemanChangeEmailAsync(Serviceman serviceman) throws InterruptedException {
+        EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
+        Boolean result = emailManager.emailServicemanChangeEmail(serviceman, FROM_EMAIL);
+
+        return new AsyncResult<>(result);
+    }
+    
     @Asynchronous
     @Override
     public Future<Boolean> emailServicemanOtpAsync(Serviceman serviceman, String otp) throws InterruptedException {

@@ -13,7 +13,7 @@
             <p:idleMonitor id="idleTimer" timeout="900000">
                 <p:ajax event="idle" listener="#{sessionTimeoutManagedBean.startCountdown}" process="@this" update="dlgCountdown" oncomplete="PF('dlgCountdown').show()"/>
             </p:idleMonitor>
-            <p:dialog  id="dlgCountdown" widgetVar="dlgCountdown" header="Session Expiry" showEffect="fade" hideEffect="fade"
+            <p:dialog  id="dlgCountdown" widgetVar="dlgCountdown" header="Session Expiry" showEffect="fade" hideEffect="fade" onShow="PF('dlgCountdown').initPosition()"
                        responsive="true" draggable="false" width="400" modal="true" fitViewport="true" closable="false">
                 <p:outputPanel id="dlgCountdownPanel" rendered="#{sessionTimeoutManagedBean.isCountdownState}">
                     <div class="p-grid p-justify-center">
@@ -27,7 +27,7 @@
                         <div class="p-col-12" style="text-align: center">
                             <div class="p-grid  p-justify-even">
                                 <p:commandButton value="Sign Out" type="submit" actionListener="#{sessionTimeoutManagedBean.employeeLoginManagedBean.logout}" icon="fa fa-sign-out" styleClass="ui-confirmdialog-yes" />
-                                <p:commandButton value="Extend" type="submit" update="formSessionTimeout" oncomplete="PF('dlgCountdown').hide()" icon="fa fa-sign-in" styleClass="ui-confirmdialog-no"/>
+                                <p:commandButton value="Extend" type="submit" actionListener="#{sessionTimeoutManagedBean.stopCountdown()}" update="formSessionTimeout" oncomplete="PF('dlgCountdown').hide()" icon="fa fa-sign-in" styleClass="ui-confirmdialog-no"/>
                             </div>
                         </div>
                     </div>

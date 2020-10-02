@@ -52,6 +52,8 @@ public class FormUtilityManagedBean implements Serializable {
     private List<ConsultationPurpose> selectedFormConsultationPurpose;
 
     private List<FormFieldWrapper> selectedFormFieldWrappers;
+    
+    private FormFieldWrapper selectedDeclarationFieldWrapper;
 
     private String createFormName;
 
@@ -189,34 +191,48 @@ public class FormUtilityManagedBean implements Serializable {
         List<FormField> newFormFields = new ArrayList<>();
         int index = 1;
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
-            if (ffw.getFormField().getQuestion() == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Empty question detected!"));
-                return false;
 
-            } else if (questionSet.contains(ffw.getFormField().getQuestion())) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Duplicate question detected!"));
-                return false;
+            if (ffw.isDeclarationField()) {
 
-            } else if (ffw.getHasInputOption() && ffw.getFormFieldOptions().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Please ensure there is at least one option for applicable fields!"));
-                return false;
+                if (ffw.isDeclarationFieldEnabled() && ffw.getDeclarationText() != null && !ffw.getDeclarationText().trim().equals("")) {
+                    selectedForm.setDeclaration(ffw.getDeclarationText());
+                } else {
+                    ffw.setDeclarationFieldEnabled(false);
+                    ffw.setDeclarationText("");
+                    selectedForm.setDeclaration(null);
+                }
 
             } else {
-                questionSet.add(ffw.getFormField().getQuestion());
-            }
+                if (ffw.getFormField().getQuestion() == null) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Empty question detected!"));
+                    return false;
 
-            FormField ff = ffw.getFormField();
-            List<FormFieldOption> formFieldOptions = new ArrayList<>();
+                } else if (questionSet.contains(ffw.getFormField().getQuestion())) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Duplicate question detected!"));
+                    return false;
 
-            if (ffw.getHasInputOption()) {
-                for (String fieldOption : ffw.getFormFieldOptions()) {
-                    formFieldOptions.add(new FormFieldOption(fieldOption.trim()));
+                } else if (ffw.getHasInputOption() && ffw.getFormFieldOptions().isEmpty()) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to save form template!", "Please ensure there is at least one option for applicable fields!"));
+                    return false;
+
+                } else {
+                    questionSet.add(ffw.getFormField().getQuestion());
                 }
+
+                FormField ff = ffw.getFormField();
+                List<FormFieldOption> formFieldOptions = new ArrayList<>();
+
+                if (ffw.getHasInputOption()) {
+                    for (String fieldOption : ffw.getFormFieldOptions()) {
+                        formFieldOptions.add(new FormFieldOption(fieldOption.trim()));
+                    }
+                }
+                ff.setFormFieldOptions(formFieldOptions);
+                ff.setPosition(index);
+                newFormFields.add(ff);
+                index++;
             }
-            ff.setFormFieldOptions(formFieldOptions);
-            ff.setPosition(index);
-            newFormFields.add(ff);
-            index++;
+
         }
 
         selectedForm.setFormFields(newFormFields);
@@ -347,6 +363,14 @@ public class FormUtilityManagedBean implements Serializable {
 
         Collections.sort(selectedFormFieldWrappers);
 
+        FormFieldWrapper declarationWrapper = new FormFieldWrapper(true);
+        this.selectedDeclarationFieldWrapper = declarationWrapper;
+        if (this.selectedForm.getDeclaration() != null && !this.selectedForm.getDeclaration().equals("")) {
+            declarationWrapper.setDeclarationText(this.selectedForm.getDeclaration());
+            declarationWrapper.setDeclarationFieldEnabled(true);
+        }
+        this.selectedFormFieldWrappers.add(declarationWrapper);
+
         if (this.selectedForm.getFormTemplateStatus() == FormTemplateStatusEnum.DRAFT) {
             this.fieldsDisabled = false;
         } else {
@@ -368,7 +392,7 @@ public class FormUtilityManagedBean implements Serializable {
     public void addCurrentFormFieldWrapper() {
         FormField newff = new FormField();
         FormFieldWrapper newffw = new FormFieldWrapper(newff);
-        this.selectedFormFieldWrappers.add(newffw);
+        this.selectedFormFieldWrappers.add(this.selectedFormFieldWrappers.size() - 1, newffw);
     }
 
     public void removeFormFieldWrapper(ActionEvent event) {
@@ -377,8 +401,8 @@ public class FormUtilityManagedBean implements Serializable {
         List<FormFieldWrapper> remainingFormFieldWrappers = new ArrayList<>();
 
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
-            if (!ffw.getFormFieldCode().equals(fieldToDelete)) {
 
+            if (ffw.isDeclarationField() || !ffw.getFormFieldCode().equals(fieldToDelete)) {
                 remainingFormFieldWrappers.add(ffw);
             }
         }
@@ -415,6 +439,10 @@ public class FormUtilityManagedBean implements Serializable {
 
     public void formFieldWrapperSwapDown(ActionEvent event) {
         String fieldToSwap = (String) event.getComponent().getAttributes().get("formfieldWrapperToSwap");
+        if (fieldToSwap.equals(selectedFormFieldWrappers.get(selectedFormFieldWrappers.size() - 2).getFormFieldCode())) {
+            return;
+        }
+
         List<FormFieldWrapper> swappedFormFieldWrappers = new ArrayList<>();
         int position = 0;
         for (FormFieldWrapper ffw : selectedFormFieldWrappers) {
@@ -477,5 +505,15 @@ public class FormUtilityManagedBean implements Serializable {
     public void setPublishFormString(String publishFormString) {
         this.publishFormString = publishFormString;
     }
+
+    public FormFieldWrapper getSelectedDeclarationFieldWrapper() {
+        return selectedDeclarationFieldWrapper;
+    }
+
+    public void setSelectedDeclarationFieldWrapper(FormFieldWrapper selectedDeclarationFieldWrapper) {
+        this.selectedDeclarationFieldWrapper = selectedDeclarationFieldWrapper;
+    }
+    
+    
 
 }

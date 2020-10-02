@@ -12,6 +12,7 @@ import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
 import entity.Serviceman;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -24,8 +25,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
+import util.enumeration.InputTypeEnum;
+import util.exceptions.ArchiveFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
 /**
@@ -110,6 +115,8 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             if (formInstance == null) {
                 throw new DeleteFormInstanceException("Please supply an existing formInstanceId");
+            } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+                throw new DeleteFormInstanceException("Unable to delete submitted form instances");
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
@@ -180,6 +187,62 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             ex.printStackTrace();
             throw new UpdateFormInstanceException(generalUnexpectedErrorMessage + "update Form Instance Field Values");
         }
+    }
+
+    @Override
+    public void submitFormInstance(Long formInstanceId) throws SubmitFormInstanceException {
+        FormInstance formInstance = retrieveFormInstance(formInstanceId);
+
+        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+            throw new SubmitFormInstanceException("Invalid Form Instance status: Status of form instance must be DRAFT");
+        } else if (formInstance == null) {
+            throw new SubmitFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        // server-side validation
+        String validationMessage = "Form Instance Validation Error:";
+        boolean validationSuccess = true;
+
+        for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
+
+            if (fif.getFormFieldMapping().getIsServicemanEditable()
+                    && fif.getFormFieldMapping().getIsRequired()
+                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER) { // not header, is required, is editabl -> must have content
+                boolean hasContent = false;
+                for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+                    if (fifv.getInputValue() != null && !fifv.getInputValue().equals("")) {
+                        hasContent = true;
+                    }
+                }
+
+                if (!hasContent) {
+                    validationMessage = validationMessage + "\nQuestion: " + fif.getFormFieldMapping().getQuestion() + " is required";
+                    validationSuccess = false;
+                }
+
+            }
+
+        }
+
+        if (!validationSuccess) {
+            throw new SubmitFormInstanceException(validationMessage);
+        }
+
+        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
+        formInstance.setDateSubmitted(new Date());
+    }
+
+    @Override
+    public void archiveFormInstance(Long formInstanceId) throws ArchiveFormInstanceException {
+        FormInstance formInstance = retrieveFormInstance(formInstanceId);
+
+        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
+        } else if (formInstance == null) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.ARCHIVED);
     }
 
     @Override

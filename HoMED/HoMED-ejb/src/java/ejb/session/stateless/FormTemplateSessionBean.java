@@ -124,10 +124,11 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             }
             ft.setFormFields(new ArrayList<>());
             em.flush();
-
+            
             ft.setFormTemplateStatus(formTemplate.getFormTemplateStatus());
             ft.setFormTemplateName(formTemplate.getFormTemplateName());
-
+            ft.setDeclaration(formTemplate.getDeclaration());
+            
             List<FormField> ffs = formTemplate.getFormFields();
 
             for (FormField ff : ffs) {
