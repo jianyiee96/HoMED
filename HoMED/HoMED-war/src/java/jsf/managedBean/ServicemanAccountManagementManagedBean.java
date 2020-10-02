@@ -97,8 +97,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     String[] serviceman = line.split(",");
 
                     ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
-                    this.servicemanWrappers.add(servicemanWrapper);
-
                     validateServicemanByImport(serviceman, servicemanWrapper);
 
                     String email = serviceman[3];
@@ -158,7 +156,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             } catch (ParseException e) {
             }
         }
-        
+
         Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
 //        if (unitNumber.equals("")) {
 //            address.setUnitNumber(null);
@@ -217,6 +215,38 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     addErrorMessage(validationErrorMessages, 8, "postal code", postalCode, errorMsg);
                     servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
+            }
+        }
+
+        validateDuplicateServicemanEmail(servicemanWrapper);
+        this.servicemanWrappers.add(servicemanWrapper);
+    }
+
+    public void doEditServiceman(ServicemanWrapper servicemanWrapper) {
+        for (int i = 0; i < servicemanWrapper.getErrorMessages().size(); i++) {
+            servicemanWrapper.getErrorMessages().set(i, null);
+        }
+
+        servicemanWrapper.setIsValid(Boolean.TRUE);
+        validateDuplicateServicemanEmail(servicemanWrapper);
+        
+        for (String errorMsg : servicemanWrapper.getErrorMessages()) {
+            if (errorMsg != null) {
+                servicemanWrapper.setIsValid(Boolean.FALSE);
+            }
+        }
+    }
+
+    private void validateDuplicateServicemanEmail(ServicemanWrapper servicemanWrapper) {
+        List<String> validationErrorMessages = servicemanWrapper.getErrorMessages();
+
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            String existingEmail = sw.getNewServiceman().getEmail();
+            String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
+            if (sw != servicemanWrapper && existingEmail.equals(incomingEmail)) {
+                servicemanWrapper.setIsDuplicate(Boolean.TRUE);
+                addErrorMessage(validationErrorMessages, 3, "email", existingEmail, "Duplicate email(s) detected!");
+                return;
             }
         }
     }

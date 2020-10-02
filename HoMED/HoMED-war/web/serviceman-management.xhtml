@@ -238,9 +238,8 @@
                                                                     <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
                                                                         <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2"
                                                                                          process="@form" update='panelGroupServicemanHeader panelGroupServicemanDetails formAllServicemen:growl-message'
-                                                                                         actionListener="#{servicemanAccountManagementManagedBean.removeErrorMessagesByEdit(servicemanWrapper)}">
+                                                                                         actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                             <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
-                                                                            <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
                                                                         </p:commandButton>
 
                                                                         <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2"

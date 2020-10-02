@@ -14,6 +14,7 @@ public class ServicemanWrapper {
     private Serviceman newServiceman;
     private List<String> errorMessages;
     private Boolean isValid;
+    private Boolean isDuplicate;
     private Boolean isSelected;
     private Boolean isDismissed;
     private Boolean isEditMode;
@@ -24,6 +25,7 @@ public class ServicemanWrapper {
             this.errorMessages.add(null);
         }
         this.isValid = Boolean.TRUE;
+        this.isDuplicate = Boolean.FALSE;
         this.isSelected = Boolean.FALSE;
         this.isDismissed = Boolean.FALSE;
         this.isEditMode = Boolean.FALSE;
@@ -59,6 +61,14 @@ public class ServicemanWrapper {
 
     public void setIsValid(Boolean isValid) {
         this.isValid = isValid;
+    }
+
+    public Boolean getIsDuplicate() {
+        return isDuplicate;
+    }
+
+    public void setIsDuplicate(Boolean isDuplicate) {
+        this.isDuplicate = isDuplicate;
     }
 
     public Boolean getIsSelected() {
