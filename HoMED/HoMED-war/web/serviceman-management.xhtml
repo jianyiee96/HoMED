@@ -128,8 +128,8 @@
 
         <h:form id='formBulkImportServicemenInProgress'>
             <p:dialog id="dialogBulkImportServicemenInProgress" widgetVar="dialogBulkImportServicemenInProgress" header="Bulk Import" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true" onHide="PF('dialogBulkImportServicemen').hide()"
-                      width="300">
+                      draggable="false" modal="true" responsive="true" fitViewport="true" width="300"
+                      onHide="PF('dialogBulkImportServicemen').hide()" onShow="PF('dialogBulkImportServicemenInProgress').initPosition()">
                 <div class="p-grid">
                     <div class="p-col">
                         <div class="grid-item">
