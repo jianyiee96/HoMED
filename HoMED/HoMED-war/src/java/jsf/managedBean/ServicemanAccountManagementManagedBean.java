@@ -324,7 +324,29 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void hideAllInvalidServicemen() {
+        if (isHideAll) {
+            for (ServicemanWrapper sw : servicemanWrappers) {
+                if (!sw.getIsValid()) {
+                    sw.setIsHidden(Boolean.TRUE);
+                }
+            }
+        } else {
+            for (ServicemanWrapper sw : servicemanWrappers) {
+                if (!sw.getIsValid()) {
+                    sw.setIsHidden(Boolean.FALSE);
+                }
+            }
+        }
+    }
 
+    public void selectServicemanToHide() {
+        for (ServicemanWrapper sw : servicemanWrappers) {
+            if (!sw.getIsValid() && !sw.getIsHidden()) {
+                isHideAll = Boolean.FALSE;
+                return;
+            }
+        }
+        isHideAll = Boolean.TRUE;
     }
 
     public void selectAllValidServicemenToImport() {

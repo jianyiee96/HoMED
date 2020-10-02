@@ -187,10 +187,12 @@
                                                 </div>
 
                                                 <div class="p-field p-m-2">                                
-                                                    <p:inputSwitch>
-
-                                                    </p:inputSwitch>
-                                                    <p:outputLabel value="HIDE ALL" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+                                                    <h:panelGroup id="panelGroupHideAll">
+                                                        <p:inputSwitch value="#{servicemanAccountManagementManagedBean.isHideAll}">
+                                                            <p:ajax update="panelGroupBulkImportServicemen" listener="#{servicemanAccountManagementManagedBean.hideAllInvalidServicemen()}" />
+                                                        </p:inputSwitch>
+                                                        <p:outputLabel value="HIDE ALL" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+                                                    </h:panelGroup>
                                                 </div>
                                             </div>
                                         </div>
@@ -317,7 +319,8 @@
 
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode and not servicemanWrapper.isValid}">
                                                                             <p:selectBooleanCheckbox value="#{servicemanWrapper.isHidden}">
-                                                                                <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails" process="@this" />
+                                                                                <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails formBulkImportServicemen:panelGroupHideAll" process="@this" 
+                                                                                        listener="#{servicemanAccountManagementManagedBean.selectServicemanToHide}" />
                                                                             </p:selectBooleanCheckbox>
                                                                             <p:outputLabel value="HIDE" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
                                                                         </ui:fragment>
