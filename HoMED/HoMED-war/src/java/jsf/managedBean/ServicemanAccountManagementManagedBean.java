@@ -220,6 +220,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             String existingEmail = sw.getNewServiceman().getEmail();
             String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
             if (sw != servicemanWrapper && existingEmail.equals(incomingEmail)) {
+                servicemanWrapper.setIsValid(Boolean.FALSE);
                 servicemanWrapper.setIsDuplicate(Boolean.TRUE);
                 addErrorMessage(validationErrorMessages, 3, "email", existingEmail, "Duplicate email(s) detected!");
                 return;
@@ -261,15 +262,38 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void doEditServiceman(ServicemanWrapper servicemanWrapper) {
-        for (ServicemanWrapper sw : this.servicemanWrappers) {
-            sw.setIsEditable(Boolean.TRUE);
-        }
-
         for (int i = 0; i < servicemanWrapper.getErrorMessages().size(); i++) {
             servicemanWrapper.getErrorMessages().set(i, null);
         }
 
         servicemanWrapper.setIsValid(Boolean.TRUE);
+        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
+
+        // To make all servicemen editable once can save edit.
+        for (ServicemanWrapper sw : servicemanWrappers) {
+            sw.setIsEditable(Boolean.TRUE);
+        }
+
+        String email = servicemanWrapper.getNewServicemanClone().getEmail();
+
+        for (int i = 0; servicemanWrappers.size() > i; i++) {
+            ServicemanWrapper currLoopingServicemanWrapper = servicemanWrappers.get(i);
+
+            // 1st occurrence of duplicates
+            if (servicemanWrapper != currLoopingServicemanWrapper && email.equals(currLoopingServicemanWrapper.getNewServiceman().getEmail())) {
+                currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
+                currLoopingServicemanWrapper.getErrorMessages().set(3, null);
+                
+                for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
+                    if (errorMsg != null) {
+                        return;
+                    }
+                }
+
+                currLoopingServicemanWrapper.setIsValid(Boolean.TRUE);
+                return;
+            }
+        }
     }
 
     public void resetServiceman(ServicemanWrapper servicemanWrapper) {
