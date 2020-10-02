@@ -250,7 +250,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         for (ServicemanWrapper sw : this.servicemanWrappers) {
             String existingEmail = sw.getNewServiceman().getEmail();
             String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
-            if (sw != servicemanWrapper && existingEmail.equals(incomingEmail)) {
+            if (sw != servicemanWrapper && !sw.getIsDuplicate() && existingEmail.equals(incomingEmail)) {
                 servicemanWrapper.setIsDuplicate(Boolean.TRUE);
                 return;
             }
@@ -265,9 +265,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void resetServiceman(ServicemanWrapper servicemanWrapper) {
         servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
-        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
 
-        checkExistingServiceman(servicemanWrapper);
+        validateDuplicateServicemanOnEdit(servicemanWrapper);
     }
 
     private void checkExistingServiceman(ServicemanWrapper servicemanWrapper) {

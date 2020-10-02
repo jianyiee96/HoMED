@@ -231,7 +231,7 @@
                                                                 <!-- Updating of Imported Servicemen -->
                                                                 <div class='p-field p-col-4' style='margin: 1rem 0rem 1rem 0rem; text-align: right;'>
                                                                     <h:panelGroup id="panelGroupUpdateServicemanButtons">
-                                                                        
+
                                                                         <!-- To Enter Edit Mode -->
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
                                                                             <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.cloneServiceman(servicemanWrapper)}"
@@ -255,6 +255,7 @@
                                                                                 <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                             </p:commandButton>
                                                                         </ui:fragment>
+
                                                                     </h:panelGroup>
                                                                 </div>
 
@@ -266,15 +267,32 @@
                                                                     <h5>Serviceman Email:</h5>
                                                                 </div>
 
-                                                                <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) ne null}">
+                                                                <!-- Imported Serviceman with Errors -->
+                                                                <ui:fragment rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(3) ne null}">
                                                                     <div class="p-field p-col-9 error-output-message">
-                                                                        <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                            <h5>#{servicemanWrapper.errorMessages.get(3)}</h5>
-                                                                        </ui:fragment>
-                                                                        <p:inputText rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.email}" />
+                                                                        <h5>#{servicemanWrapper.errorMessages.get(3)}</h5>
                                                                     </div>
                                                                 </ui:fragment>
 
+                                                                <ui:fragment rendered="#{servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(3) ne null}">
+                                                                    <div class="p-field p-col-7 error-output-message">
+                                                                        <p:inputText value="#{servicemanWrapper.newServiceman.email}">
+                                                                            <p:ajax event="keyup" update="panelGroupServicemanExistenceBadge panelGroupDuplicateEmailBadgeForServicemanWithErrors panelGroupUpdateServicemanButtons panelGroupServicemanDetails" 
+                                                                                    listener="#{servicemanAccountManagementManagedBean.validateDuplicateServicemanOnEdit(servicemanWrapper)}" />
+                                                                        </p:inputText>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-2 error-output-message" style="text-align: right;">
+                                                                        <!-- Duplicate Email Badge -->
+                                                                        <h:panelGroup id="panelGroupDuplicateEmailBadgeForServicemanWithErrors">
+                                                                            <ui:fragment rendered="#{servicemanWrapper.isDuplicate}">
+                                                                                <span class="form-status-badge status-duplicate-email">DUPLICATE EMAIL</span>
+                                                                            </ui:fragment>
+                                                                        </h:panelGroup>
+                                                                    </div>
+                                                                </ui:fragment>
+
+                                                                <!-- Imported Serviceman w/o Errors -->
                                                                 <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
 
                                                                     <div class="p-field p-col-7">
@@ -282,7 +300,7 @@
                                                                             <h5>#{servicemanWrapper.newServiceman.email}</h5>
                                                                         </ui:fragment>
                                                                         <p:inputText rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.email}">
-                                                                            <p:ajax event="keyup" update="panelGroupServicemanExistenceBadge panelGroupDuplicateEmailBadge panelGroupUpdateServicemanButtons panelGroupServicemanDetails" 
+                                                                            <p:ajax event="keyup" update="panelGroupServicemanExistenceBadge panelGroupDuplicateEmailBadgeForServicemanWithoutErrors panelGroupUpdateServicemanButtons panelGroupServicemanDetails" 
                                                                                     listener="#{servicemanAccountManagementManagedBean.validateDuplicateServicemanOnEdit(servicemanWrapper)}" />
                                                                         </p:inputText>
                                                                     </div>
@@ -304,7 +322,7 @@
                                                                         </ui:fragment>
 
                                                                         <!-- Duplicate Email Badge -->
-                                                                        <h:panelGroup id="panelGroupDuplicateEmailBadge">
+                                                                        <h:panelGroup id="panelGroupDuplicateEmailBadgeForServicemanWithoutErrors">
                                                                             <ui:fragment rendered="#{servicemanWrapper.isEditMode and servicemanWrapper.isDuplicate}">
                                                                                 <span class="form-status-badge status-duplicate-email">DUPLICATE EMAIL</span>
                                                                             </ui:fragment>
