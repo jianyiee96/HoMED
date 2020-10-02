@@ -14,7 +14,7 @@
     <cc:implementation>
         <h:form id="formManageServiceman">
             <p:dialog id="dialogManageServiceman" widgetVar="dialogManageServiceman" header="#{manageServicemanManagedBean.isCreateState ? 'Create Serviceman' : 'Serviceman Details'}" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageServiceman').initPosition()"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageServiceman" rendered="#{not empty manageServicemanManagedBean.servicemanToView}">
                     <div class="p-grid">

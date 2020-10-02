@@ -271,34 +271,37 @@
                         <ui:fragment rendered="#{not formUtilityManagedBean.fieldsDisabled}">
 
                             <div class="card">
-                                <div class="p-grid">
+                                <div class="p-grid nested-grid">
 
                                     <div class="p-col-8">
-                                        <h:panelGrid columns="7">
-                                            <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mx-2 p-mb-2" />
-                                            <p:commandButton update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
-                                            <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
-                                            <p:outputLabel class="p-mx-2" value="Public: "/>
-                                            <p:selectBooleanCheckbox value="#{formUtilityManagedBean.newFormIsPublic}">
-                                                <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
-                                            </p:selectBooleanCheckbox>
-
-                                            <p:outputLabel class="p-mx-2" value="Enable Declaration: " />
-
-                                            <p:selectBooleanCheckbox value="#{formUtilityManagedBean.selectedDeclarationFieldWrapper.declarationFieldEnabled}">
-                                                <p:ajax update="editorForm"  />
-                                            </p:selectBooleanCheckbox>
-
-                                        </h:panelGrid>
-
-
+                                        <div class="p-grid p-formgrid">
+                                            <div class="p-formgroup-inline p-col">
+                                                <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mr-2 p-mb-2" style="width:100px" />
+                                                <p:commandButton update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mr-2 p-mb-2" style="width:100px"/>
+                                                <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mr-2" style="width:100px" />
+                                            </div>
+                                            <div class="p-formgroup-inline p-col p-lg-5 p-md-12 p-sm-12 p-mt-2">
+                                                <div class="p-field-checkbox">
+                                                    <p:selectBooleanCheckbox id="checkboxPublic" value="#{formUtilityManagedBean.newFormIsPublic}">
+                                                        <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
+                                                    </p:selectBooleanCheckbox>
+                                                    <p:outputLabel for="checkboxPublic" value="Public"/>
+                                                </div>
+                                                <div class="p-field-checkbox">
+                                                    <p:selectBooleanCheckbox id="checkboxDeclaration" value="#{formUtilityManagedBean.selectedDeclarationFieldWrapper.declarationFieldEnabled}">
+                                                        <p:ajax update="editorForm"  />
+                                                    </p:selectBooleanCheckbox>
+                                                    <p:outputLabel for="checkboxDeclaration" value="Declaration"/>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="p-col-4">
-                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-clone" class="p-mx-2 p-mb-2" style="float: right">
+                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(true)}" value="Clone" icon="pi pi-clone" class="p-mx-2 p-mb-2" style="float: right; width:100px">
                                             <p:confirm header="Clone Template" escape="false" message="Any current changes on the form editor will be saved before cloning.&lt;br/&gt;Proceed to clone?" icon="pi pi-exclamation-triangle" />
                                         </p:commandButton>
                                         <p:commandButton type="submit" update="editorForm formAllTemplates ccFormTemplatePreview:formTemplatePreview" actionListener="#{formUtilityManagedBean.previewCurrentForm()}"
-                                                         value="Preview" icon="pi pi-search-plus" style="float:right" class="p-mr-2">
+                                                         value="Preview" icon="pi pi-search-plus" style="float:right; width:100px" class="p-mr-2">
                                             <p:confirm header="Preview Form" escape="false" message="Any current changes on the form editor will be saved before previewing.&lt;br/&gt;Proceed to save and preview?" icon="pi pi-exclamation-triangle" />
                                         </p:commandButton>
                                     </div>

@@ -13,7 +13,7 @@
     <cc:implementation>
         <h:outputStylesheet name="crud-tables.css" library="css" />
         <p:dialog id="dlgFormTemplatePreview" widgetVar="dlgFormTemplatePreview" header="Preview Form Template" showEffect="fade"
-                  draggable="false" modal="true" responsive="true" fitViewport="true"
+                  draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgFormTemplatePreview').initPosition()"
                   minWidth="500" width="700">
             <h:form id="formTemplatePreview">
 
@@ -80,9 +80,6 @@
                                                 </p:selectManyMenu>
                                             </div>
                                         </ui:fragment>
-                                        <div class="p-col-12">
-
-                                        </div>
                                     </ui:fragment>
                                 </div>
 
@@ -91,8 +88,27 @@
                     </div>
 
                 </p:dataList>
+
+                <p:panel rendered="#{not empty formTemplatePreviewManagedBean.formTemplateToView and not empty formTemplatePreviewManagedBean.formTemplateToView.declaration}">
+                    <div class="p-grid">
+                        <div class="p-col-12">
+                            <h:outputText value="Declaration" style="font-size: 20px"/>
+                        </div>
+                        <div class="p-col-12">
+                            <h:outputText value="#{formTemplatePreviewManagedBean.formTemplateToView.declaration}" style="word-wrap: break-word"/>
+                        </div>
+                        <div class="p-col-12">
+                            <div style="float: right">
+                                <p:outputLabel for="declarationCheckbox" value="I AGREE" class="p-mr-2"/>
+                                <p:selectBooleanCheckbox id="declarationCheckbox"/>
+                            </div>
+                        </div>
+                    </div>
+                </p:panel>
+
             </h:form>
         </p:dialog>
+
     </cc:implementation>
 </html>
 
