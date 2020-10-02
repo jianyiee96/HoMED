@@ -74,10 +74,10 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Password must be provided")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
-    
+
     @OneToMany
     private List<FormInstance> formInstances;
-    
+
     @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
@@ -94,8 +94,23 @@ public class Serviceman implements Serializable {
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
-        
+
         this.address = new Address();
+    }
+
+    // Cloning
+    public Serviceman(Serviceman another) {
+        this.name = another.name;
+        this.email = another.email;
+        this.phoneNumber = another.phoneNumber;
+        this.rod = another.rod;
+        this.gender = another.gender;
+        this.bloodType = another.bloodType;
+        this.password = another.password;
+        this.formInstances = another.formInstances;
+        this.address = another.address;
+        this.isActivated = another.isActivated;
+        this.salt = another.salt;
     }
 
     public Serviceman(String name, String email, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
@@ -177,7 +192,6 @@ public class Serviceman implements Serializable {
         }
     }
 
-
     public Address getAddress() {
         return address;
     }
@@ -209,7 +223,7 @@ public class Serviceman implements Serializable {
     public void setFormInstances(List<FormInstance> formInstances) {
         this.formInstances = formInstances;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

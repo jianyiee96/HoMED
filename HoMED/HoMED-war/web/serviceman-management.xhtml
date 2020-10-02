@@ -207,12 +207,14 @@
                                                             <div class="p-formgrid p-grid">
                                                                 <!-- Existence of Imported Servicemen -->
                                                                 <div class='p-field p-col-4' style='margin: 1rem 0rem 1rem 0rem;'>
-                                                                    <ui:fragment rendered="#{servicemanWrapper.existingServiceman eq null}" >
-                                                                        <span class="form-status-badge status-create">CREATE</span>
-                                                                    </ui:fragment>
-                                                                    <ui:fragment rendered="#{servicemanWrapper.existingServiceman ne null}" >
-                                                                        <span class="form-status-badge status-update">UPDATE</span>
-                                                                    </ui:fragment>
+                                                                    <h:panelGroup id="panelGroupServicemanExistenceBadge">
+                                                                        <ui:fragment rendered="#{servicemanWrapper.existingServiceman eq null}" >
+                                                                            <span class="form-status-badge status-create">CREATE</span>
+                                                                        </ui:fragment>
+                                                                        <ui:fragment rendered="#{servicemanWrapper.existingServiceman ne null}" >
+                                                                            <span class="form-status-badge status-update">UPDATE</span>
+                                                                        </ui:fragment>
+                                                                    </h:panelGroup>
                                                                 </div>
 
                                                                 <!-- Validity of Imported Servicemen -->
@@ -220,6 +222,7 @@
                                                                     <ui:fragment rendered="#{servicemanWrapper.isValid}" >
                                                                         <span class="form-status-badge status-valid">VALID</span>
                                                                     </ui:fragment>
+
                                                                     <ui:fragment rendered="#{not servicemanWrapper.isValid}" >
                                                                         <span class="form-status-badge status-invalid">INVALID</span>
                                                                     </ui:fragment>
@@ -227,30 +230,37 @@
 
                                                                 <!-- Updating of Imported Servicemen -->
                                                                 <div class='p-field p-col-4' style='margin: 1rem 0rem 1rem 0rem; text-align: right;'>
+                                                                    <h:panelGroup id="panelGroupUpdateServicemanButtons">
+                                                                        
+                                                                        <!-- To Enter Edit Mode -->
+                                                                        <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
+                                                                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.cloneServiceman(servicemanWrapper)}"
+                                                                                             process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
+                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
+                                                                                <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
+                                                                            </p:commandButton>
+                                                                        </ui:fragment>
 
-                                                                    <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                        <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2"
-                                                                                         process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
-                                                                            <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
-                                                                            <p:resetInput target='panelGroupServicemanDetails' />
-                                                                        </p:commandButton>
-                                                                    </ui:fragment>
-                                                                    <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
-                                                                        <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2"
-                                                                                         process="@form" update='panelGroupServicemanHeader panelGroupServicemanDetails formAllServicemen:growl-message'
-                                                                                         actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
-                                                                            <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
-                                                                        </p:commandButton>
+                                                                        <!-- Currently in Edit Mode -->
+                                                                        <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
+                                                                            <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
+                                                                                             process="@form" update='panelGroupServicemanHeader panelGroupServicemanDetails formAllServicemen:growl-message'
+                                                                                             actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
+                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
+                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
+                                                                            </p:commandButton>
 
-                                                                        <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2"
-                                                                                         process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
-                                                                            <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
-                                                                        </p:commandButton>
-                                                                    </ui:fragment>
+                                                                            <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
+                                                                                             process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
+                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
+                                                                            </p:commandButton>
+                                                                        </ui:fragment>
+                                                                    </h:panelGroup>
                                                                 </div>
 
                                                             </div>
 
+                                                            <!-- Serviceman Email -->
                                                             <div class="p-formgrid p-grid">
                                                                 <div class="p-field p-col-3 #{servicemanWrapper.errorMessages.get(3) ne null ? 'error-label' : null}">
                                                                     <h5>Serviceman Email:</h5>
@@ -266,15 +276,18 @@
                                                                 </ui:fragment>
 
                                                                 <ui:fragment rendered="#{servicemanWrapper.errorMessages.get(3) eq null}">
+
                                                                     <div class="p-field p-col-7">
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
                                                                             <h5>#{servicemanWrapper.newServiceman.email}</h5>
                                                                         </ui:fragment>
-                                                                        <p:inputText rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.email}" />
+                                                                        <p:inputText rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.email}">
+                                                                            <p:ajax event="keyup" update="panelGroupServicemanExistenceBadge panelGroupDuplicateEmailBadge panelGroupUpdateServicemanButtons panelGroupServicemanDetails" 
+                                                                                    listener="#{servicemanAccountManagementManagedBean.validateDuplicateServicemanOnEdit(servicemanWrapper)}" />
+                                                                        </p:inputText>
                                                                     </div>
 
                                                                     <div class="p-col-2" style="text-align: right;">
-
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.isValid}" >
                                                                             <p:selectBooleanCheckbox value="#{servicemanWrapper.isSelected}">
                                                                                 <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails formBulkImportServicemen:buttonImport" process="@this"
@@ -290,7 +303,14 @@
                                                                             <p:outputLabel value="HIDE" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
                                                                         </ui:fragment>
 
+                                                                        <!-- Duplicate Email Badge -->
+                                                                        <h:panelGroup id="panelGroupDuplicateEmailBadge">
+                                                                            <ui:fragment rendered="#{servicemanWrapper.isEditMode and servicemanWrapper.isDuplicate}">
+                                                                                <span class="form-status-badge status-duplicate-email">DUPLICATE EMAIL</span>
+                                                                            </ui:fragment>
+                                                                        </h:panelGroup>
                                                                     </div>
+
                                                                 </ui:fragment>
                                                             </div>
                                                         </div>

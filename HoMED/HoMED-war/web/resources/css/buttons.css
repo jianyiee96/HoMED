@@ -31,13 +31,17 @@
     color: #8A5340;
 }
 
-.status-deleted, .status-invalid {
+.status-deleted, .status-invalid, .status-duplicate-email {
     background: #FFCDD2;
     color: #C63737;
 }
 
 .status-valid, .status-invalid, .status-create, .status-update {
     font-size: 18px;
+}
+
+.status-duplicate-email {
+    font-size: 14px;
 }
 
 .consultation-badge {

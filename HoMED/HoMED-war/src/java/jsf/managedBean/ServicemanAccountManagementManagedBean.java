@@ -236,6 +236,41 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             }
         }
 
+//        try {
+//            Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
+//            servicemanWrapper.setExistingServiceman(existingServiceman);
+//        } catch (ServicemanNotFoundException ex) {
+//            servicemanWrapper.setExistingServiceman(null);
+//        }
+    }
+
+    public void validateDuplicateServicemanOnEdit(ServicemanWrapper servicemanWrapper) {
+        checkExistingServiceman(servicemanWrapper);
+
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            String existingEmail = sw.getNewServiceman().getEmail();
+            String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
+            if (sw != servicemanWrapper && existingEmail.equals(incomingEmail)) {
+                servicemanWrapper.setIsDuplicate(Boolean.TRUE);
+                return;
+            }
+        }
+
+        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
+    }
+
+    public void cloneServiceman(ServicemanWrapper servicemanWrapper) {
+        servicemanWrapper.setNewServicemanClone(new Serviceman(servicemanWrapper.getNewServiceman()));
+    }
+
+    public void resetServiceman(ServicemanWrapper servicemanWrapper) {
+        servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
+        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
+
+        checkExistingServiceman(servicemanWrapper);
+    }
+
+    private void checkExistingServiceman(ServicemanWrapper servicemanWrapper) {
         try {
             Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
             servicemanWrapper.setExistingServiceman(existingServiceman);

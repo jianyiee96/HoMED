@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServicemanWrapper {
-
+    
     private Serviceman existingServiceman;
     private Serviceman newServiceman;
+    private Serviceman newServicemanClone;
     private List<String> errorMessages;
     private Boolean isValid;
     private Boolean isDuplicate;
@@ -31,6 +32,15 @@ public class ServicemanWrapper {
         this.isEditMode = Boolean.FALSE;
     }
 
+    public void cloneServiceman() {
+        this.newServicemanClone = new Serviceman(this.newServiceman);
+    }
+    
+    public void reset() {
+        this.newServiceman = new Serviceman(this.newServicemanClone);
+        this.isDuplicate = Boolean.FALSE;
+    }
+
     public Serviceman getExistingServiceman() {
         return existingServiceman;
     }
@@ -45,6 +55,14 @@ public class ServicemanWrapper {
 
     public void setNewServiceman(Serviceman newServiceman) {
         this.newServiceman = newServiceman;
+    }
+
+    public Serviceman getNewServicemanClone() {
+        return newServicemanClone;
+    }
+
+    public void setNewServicemanClone(Serviceman newServicemanClone) {
+        this.newServicemanClone = newServicemanClone;
     }
 
     public List<String> getErrorMessages() {
