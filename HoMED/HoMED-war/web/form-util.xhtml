@@ -199,49 +199,66 @@
                                         </div>
 
                                     </f:facet>
+                                    <ui:fragment rendered="#{not fieldWrapper.declarationField}">
 
-                                    <div class="card" style="margin-bottom: 5px">
-                                        <div class="p-grid">
-                                            <div class="p-col-11 p-md-11 p-lg-11">
-                                                <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
+                                        <div class="card" style="margin-bottom: 5px">
+                                            <div class="p-grid">
+                                                <div class="p-col-11 p-md-11 p-lg-11">
+                                                    <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
 
-                                                <p:outputLabel rendered="#{fieldWrapper.formField.inputType == 'HEADER'}" value="#{fieldWrapper.formField.question}" style="margin-left: 10px; font-size: 18px; font-weight: bold" />
+                                                    <p:outputLabel rendered="#{fieldWrapper.formField.inputType == 'HEADER'}" value="#{fieldWrapper.formField.question}" style="margin-left: 10px; font-size: 18px; font-weight: bold" />
 
-                                                <h:panelGrid  rendered="#{fieldWrapper.formField.inputType != 'HEADER'}" columns="2" style="margin-bottom:10px" cellpadding="5">
-                                                    <p:outputLabel value="Question: " />
-                                                    <p:outputLabel value="#{fieldWrapper.formField.question}" style="font-size: 14px; font-weight: bold" />
-
-
-                                                    <p:outputLabel value="Input Type: " />
-                                                    <p:outputLabel value="#{fieldWrapper.formField.inputType.inputTypeString}" style="font-size: 14px; font-weight: bold" />
+                                                    <h:panelGrid  rendered="#{fieldWrapper.formField.inputType != 'HEADER'}" columns="2" style="margin-bottom:10px" cellpadding="5">
+                                                        <p:outputLabel value="Question: " />
+                                                        <p:outputLabel value="#{fieldWrapper.formField.question}" style="font-size: 14px; font-weight: bold" />
 
 
-
-                                                    <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
-
-                                                    <ui:repeat rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" var="options">
-                                                        <span class="form-status-badge consultation-badge">#{options}</span>
-                                                    </ui:repeat>
-
-
-                                                    <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
-                                                    <p:outputLabel class="form-status-badge status-published" value="True" rendered="#{not fieldWrapper.isHeader and fieldWrapper.formField.isRequired}" />
-                                                    <p:outputLabel class="form-status-badge status-deleted" value="False" rendered="#{not fieldWrapper.isHeader and not fieldWrapper.formField.isRequired}" />
-
-                                                    <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
-                                                    <p:outputLabel class="form-status-badge status-published" value="True" rendered="#{not fieldWrapper.isHeader and fieldWrapper.formField.isServicemanEditable}" />
-                                                    <p:outputLabel class="form-status-badge status-deleted" value="False" rendered="#{not fieldWrapper.isHeader and not fieldWrapper.formField.isServicemanEditable}" />
+                                                        <p:outputLabel value="Input Type: " />
+                                                        <p:outputLabel value="#{fieldWrapper.formField.inputType.inputTypeString}" style="font-size: 14px; font-weight: bold" />
 
 
 
-                                                </h:panelGrid>
+                                                        <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
+
+                                                        <ui:repeat rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" var="options">
+                                                            <span class="form-status-badge consultation-badge">#{options}</span>
+                                                        </ui:repeat>
 
 
+                                                        <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
+                                                        <p:outputLabel class="form-status-badge status-published" value="True" rendered="#{not fieldWrapper.isHeader and fieldWrapper.formField.isRequired}" />
+                                                        <p:outputLabel class="form-status-badge status-deleted" value="False" rendered="#{not fieldWrapper.isHeader and not fieldWrapper.formField.isRequired}" />
+
+                                                        <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
+                                                        <p:outputLabel class="form-status-badge status-published" value="True" rendered="#{not fieldWrapper.isHeader and fieldWrapper.formField.isServicemanEditable}" />
+                                                        <p:outputLabel class="form-status-badge status-deleted" value="False" rendered="#{not fieldWrapper.isHeader and not fieldWrapper.formField.isServicemanEditable}" />
+
+
+
+                                                    </h:panelGrid>
+
+
+
+                                                </div>
 
                                             </div>
-
                                         </div>
-                                    </div>
+
+                                    </ui:fragment>
+
+                                    <ui:fragment rendered="#{fieldWrapper.declarationField and fieldWrapper.declarationFieldEnabled}">
+                                        <div class="card">
+                                            <div class="p-grid">
+                                                <div class="p-col-12 p-md-12 p-lg-12">
+                                                    <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="Declaration" />
+                                                    <div style="margin: 20px;">
+                                                        <p:outputLabel value="#{fieldWrapper.declarationText}"/>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
 
                                 </p:dataList>
 
@@ -281,10 +298,6 @@
                                     </div>
                                 </div>
 
-
-
-
-
                                 <p:dataList value="#{formUtilityManagedBean.selectedFormFieldWrappers}" rendered="#{formUtilityManagedBean.selectedForm != null}" type="definition" var="fieldWrapper">
 
                                     <f:facet name="header">
@@ -302,56 +315,84 @@
 
                                     </f:facet>
 
-                                    <div class="card" style="margin-bottom: 5px">
-                                        <div class="p-grid">
-                                            <div class="p-col-11 p-md-11 p-lg-11">
-                                                <div style="max-width: 380px">
-                                                    <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
+                                    <ui:fragment rendered="#{not fieldWrapper.declarationField}">
 
-                                                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                                        <p:outputLabel value="Question: " />
+                                        <div class="card" style="margin-bottom: 5px">
+                                            <div class="p-grid">
+                                                <div class="p-col-11 p-md-11 p-lg-11">
+                                                    <div style="max-width: 380px">
+                                                        <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
 
-                                                        <p:inputText style="width: 100%" id="float-input" value="#{fieldWrapper.formField.question}"/>
+                                                        <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                                            <p:outputLabel value="Question: " />
 
-                                                        <p:outputLabel value="Input Type: " />
-                                                        <p:selectOneMenu style="width: 100%" immediate="true" id="inputType" value="#{fieldWrapper.formField.inputType}">
-                                                            <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
-                                                            <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
-                                                        </p:selectOneMenu>
+                                                            <p:inputText style="width: 100%" id="float-input" value="#{fieldWrapper.formField.question}"/>
 
-                                                        <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
-                                                        <p:chips rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
+                                                            <p:outputLabel value="Input Type: " />
+                                                            <p:selectOneMenu style="width: 100%" immediate="true" id="inputType" value="#{fieldWrapper.formField.inputType}">
+                                                                <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
+                                                                <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
+                                                            </p:selectOneMenu>
 
-                                                        <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
-                                                        <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
+                                                            <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
+                                                            <p:chips rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
 
-                                                        <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
-                                                        <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
+                                                            <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
+                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
 
-                                                    </h:panelGrid>
-                                                    <h:panelGrid columns="1" cellpadding="5">
+                                                            <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
+                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
 
-                                                        <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
-                                                            <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
-                                                        </p:commandButton>
+                                                        </h:panelGrid>
+                                                        <h:panelGrid columns="1" cellpadding="5">
 
-                                                    </h:panelGrid>
+                                                            <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
+                                                                <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
+                                                            </p:commandButton>
+
+                                                        </h:panelGrid>
+
+                                                    </div>
 
                                                 </div>
+                                                <div class="p-col-1" style="float: right; text-align: right">
+                                                    <p:commandButton style="height: 50%" class="p-mb-2" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" disabled="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper) == 0}" title="Swap up" icon="fa fa-arrow-up">
+                                                        <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                                    </p:commandButton>
 
-                                            </div>
-                                            <div class="p-col-1" style="float: right; text-align: right">
-                                                <p:commandButton style="height: 50%" class="p-mb-2" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapUp}" title="Swap up" icon="fa fa-arrow-up">
-                                                    <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
-                                                </p:commandButton>
+                                                    <p:commandButton style="height: 50%" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" disabled="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper) == formUtilityManagedBean.selectedFormFieldWrappers.size()-2}"   title="Swap down" icon="fa fa-arrow-down">
+                                                        <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
+                                                    </p:commandButton>
 
-                                                <p:commandButton style="height: 50%" update="editorForm" actionListener="#{formUtilityManagedBean.formFieldWrapperSwapDown}" title="Swap down" icon="fa fa-arrow-down">
-                                                    <f:attribute name="formfieldWrapperToSwap" value="#{fieldWrapper.formFieldCode}" />
-                                                </p:commandButton>
-
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </ui:fragment>
+
+                                    <ui:fragment rendered="#{fieldWrapper.declarationField}">
+                                        <div class="card" style="margin-bottom: 5px">
+                                            <div class="p-grid">
+                                                <div class="p-col-12 p-md-12 p-lg-12">
+                                                    <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="Declaration" />
+
+
+                                                    <div style="margin: 10px">
+                                                        <p:outputLabel class="form-status-badge" value="Enable Declaration: " />
+
+                                                        <p:selectBooleanCheckbox value="#{fieldWrapper.declarationFieldEnabled}">
+                                                            <p:ajax update="editorForm"  />
+                                                        </p:selectBooleanCheckbox>
+                                                        <p:inputTextarea style="margin-top: 5px; width: 100%" disabled="#{!fieldWrapper.declarationFieldEnabled}" value="#{fieldWrapper.declarationText}"/>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+
+
 
                                 </p:dataList>
 
