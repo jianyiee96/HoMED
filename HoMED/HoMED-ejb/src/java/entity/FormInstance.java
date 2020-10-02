@@ -6,6 +6,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +19,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import util.enumeration.FormInstanceStatusEnum;
 
 /**
@@ -31,27 +35,53 @@ public class FormInstance implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formInstanceId;
-        
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    @NotNull
+    private Date dateCreated;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = true)
+    private Date dateSubmitted;
+
     @Enumerated(EnumType.STRING)
     @Column
     private FormInstanceStatusEnum formInstanceStatusEnum;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private FormTemplate formTemplateMapping;
-    
+
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormInstanceField> formInstanceFields;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Serviceman serviceman;
-    
+
     public FormInstance() {
+        this.dateCreated = new Date();
         this.formInstanceStatusEnum = FormInstanceStatusEnum.DRAFT;
         this.formInstanceFields = new ArrayList<>();
     }
-    
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateSubmitted() {
+        return dateSubmitted;
+    }
+
+    public void setDateSubmitted(Date dateSubmitted) {
+        this.dateSubmitted = dateSubmitted;
+    }
+
     public FormInstanceStatusEnum getFormInstanceStatusEnum() {
         return formInstanceStatusEnum;
     }
@@ -116,5 +146,5 @@ public class FormInstance implements Serializable {
     public String toString() {
         return "entity.FromInstance[ id=" + formInstanceId + " ]";
     }
-    
+
 }

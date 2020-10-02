@@ -30,6 +30,21 @@ public class EmailManager {
         this.smtpAuthUser = smtpAuthUser;
         this.smtpAuthPassword = smtpAuthPassword;
     }
+    
+    public Boolean emailEmployeeChangeEmail(Employee employee, String fromEmailAddress) {
+        String toEmail = employee.getEmail();
+        String emailSubject = "HoMED Employee Email Change Notice";
+        String recipientName = employee.getName();
+        String header1 = "HoMED Employee Management System";
+        String header2 = "Email Change By Admin";
+        String header3 = "New Email: " + toEmail;
+        String body = "The admin has changed your email for you. If this is not intended, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
+
+        String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
 
     public Boolean emailEmployeeOtp(Employee employee, String otp, String fromEmailAddress) {
         String toEmail = employee.getEmail();
@@ -57,6 +72,21 @@ public class EmailManager {
         String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
 
         String emailBody = createEmailBodyEmployee(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
+    
+    public Boolean emailServicemanChangeEmail(Serviceman serviceman, String fromEmailAddress) {
+        String toEmail = serviceman.getEmail();
+        String emailSubject = "HoMED Serviceman Email Change Notice";
+        String recipientName = serviceman.getName();
+        String header1 = "HoMED Serviceman System";
+        String header2 = "Email Change By Admin";
+        String header3 = "New Email: " + toEmail;
+        String body = "The admin has changed your email for you. If this is not intended, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
+
+        String emailBody = createEmailBodyServiceman(recipientName, header1, header2, header3, body, disclaimer);
 
         return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
     }

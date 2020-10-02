@@ -63,6 +63,7 @@
                                             <p:commandButton rendered="#{not profileManagedBean.isEditContact}" type="submit" icon="pi pi-pencil" styleClass="rounded-button text-button p-mr-2"
                                                              process="@this" update= "panelContact" >
                                                 <f:setPropertyActionListener target="#{profileManagedBean.isEditContact}" value="true"/>
+                                                <p:resetInput target="panelContact"/>
                                             </p:commandButton>
                                             <ui:fragment rendered="#{profileManagedBean.isEditContact}" >
                                                 <p:commandButton type="submit" icon="pi pi-save" styleClass="rounded-button rtext-button p-mr-1"
@@ -72,7 +73,6 @@
                                                 <p:commandButton type="submit" icon="pi pi-times" styleClass="rounded-button text-button p-mr-2"
                                                                  process="@this" update= "panelContact" >
                                                     <f:setPropertyActionListener target="#{profileManagedBean.isEditContact}" value="false"/>
-                                                    <p:resetInput target="panelContact"/>
                                                 </p:commandButton>
                                             </ui:fragment>
                                         </div>
@@ -105,6 +105,7 @@
                                             <p:commandButton rendered="#{not profileManagedBean.isEditAddress}" type="submit" icon="pi pi-pencil" styleClass="rounded-button text-button p-mr-2"
                                                              process="@this" update= "panelAddress" >
                                                 <f:setPropertyActionListener target="#{profileManagedBean.isEditAddress}" value="true"/>
+                                                <p:resetInput target="panelAddress"/>
                                             </p:commandButton>
                                             <ui:fragment rendered="#{profileManagedBean.isEditAddress}" >
                                                 <p:commandButton type="submit" icon="pi pi-save" styleClass="rounded-button rtext-button p-mr-1"
@@ -114,7 +115,6 @@
                                                 <p:commandButton type="submit" icon="pi pi-times" styleClass="rounded-button text-button p-mr-2"
                                                                  process="@this" update= "panelAddress" >
                                                     <f:setPropertyActionListener target="#{profileManagedBean.isEditAddress}" value="false"/>
-                                                    <p:resetInput target="panelAddress"/>
                                                 </p:commandButton>
                                             </ui:fragment>
                                         </div>

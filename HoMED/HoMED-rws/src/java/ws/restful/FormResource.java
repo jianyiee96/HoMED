@@ -8,7 +8,6 @@ import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import util.exceptions.DeleteFormInstanceException;
 import entity.FormInstance;
-import entity.FormInstanceField;
 import entity.FormTemplate;
 import java.util.List;
 import javax.ws.rs.core.Context;
@@ -22,7 +21,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.ArchiveFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 import ws.datamodel.CreateFormInstanceReq;
 import ws.datamodel.ErrorRsp;
@@ -86,7 +87,7 @@ public class FormResource {
             for (FormInstance fi : formInstances) {
                 fi.setServiceman(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
-                fi.getFormTemplateMapping().setConsultationPurposes(null); 
+                fi.getFormTemplateMapping().setConsultationPurposes(null);
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanFormInstancesRsp(formInstances)).build();
         } catch (Exception ex) {
@@ -117,12 +118,12 @@ public class FormResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
     }
-    
+
     @Path("updateFormInstanceFieldValues")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateFormInstanceFieldValues(UpdateFormInstanceReq updateFormInstanceReq) {
-        
+
         try {
 
             formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
@@ -138,13 +139,14 @@ public class FormResource {
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
-        
+
     }
 
     @Path("deleteFormInstance")
     @DELETE
     @Consumes(MediaType.TEXT_PLAIN)
     public Response deleteFormInstance(@QueryParam("formInstanceId") String formInstanceId) {
+        
         try {
 
             formInstanceSessionBeanLocal.deleteFormInstance(Long.parseLong(formInstanceId));
@@ -161,6 +163,51 @@ public class FormResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
 
+    }
+
+    @Path("submitFormInstance")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response submitFormInstance(UpdateFormInstanceReq updateFormInstanceReq) {
+        
+        try {
+
+            formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
+            formInstanceSessionBeanLocal.submitFormInstance(updateFormInstanceReq.getFormInstance().getFormInstanceId());
+            return Response.status(Response.Status.OK).build();
+
+        } catch (SubmitFormInstanceException | UpdateFormInstanceException ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
+
+    }
+
+    @Path("archiveFormInstance")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response archiveFormInstance(UpdateFormInstanceReq updateFormInstanceReq) {
+        
+        try {
+
+            formInstanceSessionBeanLocal.archiveFormInstance(updateFormInstanceReq.getFormInstance().getFormInstanceId());
+
+            return Response.status(Response.Status.OK).build();
+
+        } catch (ArchiveFormInstanceException ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
     }
 
 }
