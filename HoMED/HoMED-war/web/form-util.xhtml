@@ -171,9 +171,9 @@
 
 
                                     <div class="p-col-4"> 
-                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right" class="p-mr-2 p-mb-2"/>
+                                        <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.cloneCurrentForm(false)}" value="Clone" icon="pi pi-clone" style="float:right; width:100px" class="p-mx-2 p-mb-2"/>
                                         <p:commandButton type="submit" process="@this" update="ccFormTemplatePreview:formTemplatePreview"
-                                                         value="Preview" icon="pi pi-search-plus" style="float:right" class="p-mr-2"
+                                                         value="Preview" icon="pi pi-search-plus" style="float:right; width:100px" class="p-mr-2"
                                                          oncomplete="PF('dlgFormTemplatePreview').show()">
                                             <f:setPropertyActionListener target="#{formUtilityManagedBean.formTemplatePreviewManagedBean.formTemplateToView}" value="#{formUtilityManagedBean.selectedForm}"/>
                                         </p:commandButton>
