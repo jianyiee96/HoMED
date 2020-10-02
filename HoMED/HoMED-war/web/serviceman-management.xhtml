@@ -244,7 +244,7 @@
                                                                         <!-- Currently in Edit Mode -->
                                                                         <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
                                                                             <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
-                                                                                             process="@form" update='panelGroupServicemanHeader panelGroupServicemanDetails formAllServicemen:growl-message'
+                                                                                             process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen formAllServicemen:growl-message'
                                                                                              actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                                 <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                 <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />

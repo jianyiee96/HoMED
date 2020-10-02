@@ -158,15 +158,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
 
         Address address = new Address(streetName, unitNumber, buildingName, country, postalCode);
-//        if (unitNumber.equals("")) {
-//            address.setUnitNumber(null);
-//        }
-//        if (buildingName.equals("")) {
-//            address.setBuildingName(null);
-//        }
-//        if (country.equals("")) {
-//            address.setCountry(null);
-//        }
         newServiceman.setAddress(address);
         servicemanWrapper.setNewServiceman(newServiceman);
 
@@ -218,74 +209,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             }
         }
 
-        validateDuplicateServicemanEmail(servicemanWrapper);
+        validateDuplicateServicemanEmailOnImport(servicemanWrapper);
         this.servicemanWrappers.add(servicemanWrapper);
     }
 
-    public void doEditServiceman(ServicemanWrapper servicemanWrapper) {
-        for (int i = 0; i < servicemanWrapper.getErrorMessages().size(); i++) {
-            servicemanWrapper.getErrorMessages().set(i, null);
-        }
-
-        servicemanWrapper.setIsValid(Boolean.TRUE);
-        validateDuplicateServicemanEmail(servicemanWrapper);
-
-        for (String errorMsg : servicemanWrapper.getErrorMessages()) {
-            if (errorMsg != null) {
-                servicemanWrapper.setIsValid(Boolean.FALSE);
-            }
-        }
-
-//        try {
-//            Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
-//            servicemanWrapper.setExistingServiceman(existingServiceman);
-//        } catch (ServicemanNotFoundException ex) {
-//            servicemanWrapper.setExistingServiceman(null);
-//        }
-    }
-
-    public void validateDuplicateServicemanOnEdit(ServicemanWrapper servicemanWrapper) {
-        checkExistingServiceman(servicemanWrapper);
-
-        for (ServicemanWrapper sw : this.servicemanWrappers) {
-            String existingEmail = sw.getNewServiceman().getEmail();
-            String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
-            if (sw != servicemanWrapper && !sw.getIsDuplicate() && existingEmail.equals(incomingEmail)) {
-                servicemanWrapper.setIsDuplicate(Boolean.TRUE);
-                return;
-            }
-        }
-
-        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
-    }
-
-    public void enterEditMode(ServicemanWrapper servicemanWrapper) {
-        for (ServicemanWrapper sw : this.servicemanWrappers) {
-            sw.setIsEditable(Boolean.FALSE);
-        }
-
-        servicemanWrapper.setNewServicemanClone(new Serviceman(servicemanWrapper.getNewServiceman()));
-    }
-
-    public void resetServiceman(ServicemanWrapper servicemanWrapper) {
-        for (ServicemanWrapper sw : this.servicemanWrappers) {
-            sw.setIsEditable(Boolean.TRUE);
-        }
-
-        servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
-        validateDuplicateServicemanOnEdit(servicemanWrapper);
-    }
-
-    private void checkExistingServiceman(ServicemanWrapper servicemanWrapper) {
-        try {
-            Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
-            servicemanWrapper.setExistingServiceman(existingServiceman);
-        } catch (ServicemanNotFoundException ex) {
-            servicemanWrapper.setExistingServiceman(null);
-        }
-    }
-
-    private void validateDuplicateServicemanEmail(ServicemanWrapper servicemanWrapper) {
+    private void validateDuplicateServicemanEmailOnImport(ServicemanWrapper servicemanWrapper) {
         List<String> validationErrorMessages = servicemanWrapper.getErrorMessages();
 
         for (ServicemanWrapper sw : this.servicemanWrappers) {
@@ -306,6 +234,59 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             validationErrorMessages.add(errorMsgIdx, (curr + "\nIncorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg));
         } else {
             validationErrorMessages.add(errorMsgIdx, "Incorrect " + errorType + " format [" + inputtedValue + "]. " + errorMsg);
+        }
+    }
+
+    public void enterEditMode(ServicemanWrapper servicemanWrapper) {
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            sw.setIsEditable(Boolean.FALSE);
+        }
+
+        servicemanWrapper.setNewServicemanClone(new Serviceman(servicemanWrapper.getNewServiceman()));
+    }
+
+    public void validateDuplicateServicemanOnEdit(ServicemanWrapper servicemanWrapper) {
+        checkExistingServiceman(servicemanWrapper);
+
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            String existingEmail = sw.getNewServiceman().getEmail();
+            String incomingEmail = servicemanWrapper.getNewServiceman().getEmail();
+            if (sw != servicemanWrapper && !sw.getIsDuplicate() && existingEmail.equals(incomingEmail)) {
+                servicemanWrapper.setIsDuplicate(Boolean.TRUE);
+                return;
+            }
+        }
+
+        servicemanWrapper.setIsDuplicate(Boolean.FALSE);
+    }
+
+    public void doEditServiceman(ServicemanWrapper servicemanWrapper) {
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            sw.setIsEditable(Boolean.TRUE);
+        }
+
+        for (int i = 0; i < servicemanWrapper.getErrorMessages().size(); i++) {
+            servicemanWrapper.getErrorMessages().set(i, null);
+        }
+
+        servicemanWrapper.setIsValid(Boolean.TRUE);
+    }
+
+    public void resetServiceman(ServicemanWrapper servicemanWrapper) {
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            sw.setIsEditable(Boolean.TRUE);
+        }
+
+        servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
+        validateDuplicateServicemanOnEdit(servicemanWrapper);
+    }
+
+    private void checkExistingServiceman(ServicemanWrapper servicemanWrapper) {
+        try {
+            Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
+            servicemanWrapper.setExistingServiceman(existingServiceman);
+        } catch (ServicemanNotFoundException ex) {
+            servicemanWrapper.setExistingServiceman(null);
         }
     }
 
