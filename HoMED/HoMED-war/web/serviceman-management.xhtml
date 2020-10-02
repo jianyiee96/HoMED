@@ -621,7 +621,8 @@
                                         <div class="p-formgrid p-grid">
                                             <div class="p-field p-col-2 p-offset-5">
                                                 <p:commandButton id="buttonImport" style="font-size: 18px;" icon="pi pi-upload" disabled="#{servicemanAccountManagementManagedBean.servicemenToCreate.size() eq 0 and servicemanAccountManagementManagedBean.servicemenToUpdate.size() eq 0}" 
-                                                                 value="Import" title="Import" process="@form" update="formAllServicemen" actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" onstart="PF('dialogBulkImportServicemenInProgress').show()">
+                                                                 value="Import (#{servicemanAccountManagementManagedBean.servicemenToCreate.size() + servicemanAccountManagementManagedBean.servicemenToUpdate.size()})" title="Import" process="@form" update="formAllServicemen" 
+                                                                 actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" onstart="PF('dialogBulkImportServicemenInProgress').show()">
                                                     <p:confirm header="Bulk Import" escape="false" message="Selected servicemen will be imported to the system. Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                             </div>
