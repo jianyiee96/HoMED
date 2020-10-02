@@ -16,4 +16,8 @@ public interface EmailSessionBeanLocal {
 
     public Future<Boolean> emailEmployeeResetPasswordAsync(Employee employee, String otp) throws InterruptedException;
 
+    public Future<Boolean> emailServicemanChangeEmailAsync(Serviceman serviceman) throws InterruptedException;
+
+    public Future<Boolean> emailEmployeeChangeEmailAsync(Employee employee) throws InterruptedException;
+
 }

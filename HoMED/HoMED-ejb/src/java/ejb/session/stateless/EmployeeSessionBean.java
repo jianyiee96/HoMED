@@ -148,6 +148,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 if (constraintViolations.isEmpty()) {
                     Employee employeeToUpdate = retrieveEmployeeById(employee.getEmployeeId());
 
+                    Boolean emailChangeDetected = false;
+                    if (!employeeToUpdate.getEmail().equals(employee.getEmail())) {
+                        emailChangeDetected = true;
+                    }
+
                     // Password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
                     employeeToUpdate.setName(employee.getName());
                     employeeToUpdate.setIsActivated(employee.getIsActivated());
@@ -158,6 +163,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employeeToUpdate.setGender(employee.getGender());
 
                     em.flush();
+
+                    if (emailChangeDetected) {
+                        Future<Boolean> response = emailSessionBean.emailEmployeeChangeEmailAsync(employee);
+                        if (!response.get()) {
+                            throw new UpdateEmployeeException("Email was not sent out successfully!");
+                        }
+                    }
 
                     return employeeToUpdate;
 

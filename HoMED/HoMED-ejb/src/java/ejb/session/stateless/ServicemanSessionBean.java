@@ -96,7 +96,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
-    
+
     @Override
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException {
         Query query = em.createQuery("SELECT s FROM Serviceman s WHERE s.email = :inEmail");
@@ -122,6 +122,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 if (constraintViolations.isEmpty()) {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
 
+                    Boolean emailChangeDetected = false;
+                    if (!servicemanToUpdate.getEmail().equals(serviceman.getEmail())) {
+                        emailChangeDetected = true;
+                    }
+
                     servicemanToUpdate.setName(serviceman.getName());
                     servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setRod(serviceman.getRod());
@@ -131,6 +136,13 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setAddress(serviceman.getAddress());
 
                     em.flush();
+
+                    if (emailChangeDetected) {
+                        Future<Boolean> response = emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
+                        if (!response.get()) {
+                            throw new UpdateServicemanException("Email was not sent out successfully!");
+                        }
+                    }
 
                     return servicemanToUpdate;
 

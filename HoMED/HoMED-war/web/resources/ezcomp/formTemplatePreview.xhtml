@@ -49,14 +49,18 @@
                                             <p:outputLabel value="#{formField.question}" indicateRequired="false"
                                                            style="font-size: 20px"/><h:outputText value="#{formField.isRequired ? ' *' : ''}" style="font-size: 20px; color: red;" />
                                         </div>
-                                        <ui:fragment rendered="#{formField.inputType == 'TEXT' or formField.inputType == 'FILE_UPLOAD' or formField.inputType == 'IMAGE_UPLOAD'}">
+                                        <!--or formField.inputType == 'FILE_UPLOAD' or formField.inputType == 'IMAGE_UPLOAD'-->
+                                        <!--<p:fileUpload rendered="" />-->
+                                        <!--formField.inputType == 'FILE_UPLOAD'-->
+                                        <!--<p:fileUpload rendered="" />-->
+                                        <!--formField.inputType == 'IMAGE_UPLOAD'-->
+                                        <ui:fragment rendered="#{formField.inputType == 'TEXT'}">
                                             <div class="p-col-12 ui-fluid">
                                                 <p:inputTextarea rendered="#{formField.inputType == 'TEXT'}" />
-                                                <p:fileUpload rendered="#{formField.inputType == 'FILE_UPLOAD'}" />
-                                                <p:fileUpload rendered="#{formField.inputType == 'IMAGE_UPLOAD'}" />
                                             </div>
                                         </ui:fragment>
-                                        <ui:fragment rendered="#{formField.inputType != 'TEXT' and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'}">
+                                        <!--and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'-->
+                                        <ui:fragment rendered="#{formField.inputType != 'TEXT'}">
                                             <div class="p-col-6 ui-fluid">
                                                 <p:inputNumber rendered="#{formField.inputType == 'NUMBER'}" />
                                                 <p:datePicker rendered="#{formField.inputType == 'DATE'}" pattern="dd/MM/yyyy"/>
