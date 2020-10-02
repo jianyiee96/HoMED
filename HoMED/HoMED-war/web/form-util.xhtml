@@ -252,7 +252,7 @@
                                                 <div class="p-col-12 p-md-12 p-lg-12">
                                                     <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="Declaration" />
                                                     <div style="margin: 20px;">
-                                                        <p:outputLabel value="#{fieldWrapper.declarationText}"/>
+                                                        <h:outputText style="word-wrap: break-word" value="#{fieldWrapper.declarationText}"/>
                                                     </div>
 
                                                 </div>
@@ -274,13 +274,19 @@
                                 <div class="p-grid">
 
                                     <div class="p-col-8">
-                                        <h:panelGrid columns="5">
+                                        <h:panelGrid columns="7">
                                             <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.invokeSaveFormFields()}" value="Save" icon="pi pi-save" class="p-mx-2 p-mb-2" />
                                             <p:commandButton update="editorForm" action="#{formUtilityManagedBean.addCurrentFormFieldWrapper()}" value="Add Field" icon="pi pi-plus" class="p-mx-2 p-mb-2" />
                                             <p:commandButton update="editorForm formAllTemplates" action="#{formUtilityManagedBean.resetEditor()}" value="Reset" icon="pi pi-undo" class="p-mx-2 p-mb-2" />
                                             <p:outputLabel class="p-mx-2" value="Public: "/>
                                             <p:selectBooleanCheckbox value="#{formUtilityManagedBean.newFormIsPublic}">
                                                 <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
+                                            </p:selectBooleanCheckbox>
+
+                                            <p:outputLabel class="p-mx-2" value="Enable Declaration: " />
+
+                                            <p:selectBooleanCheckbox value="#{formUtilityManagedBean.selectedDeclarationFieldWrapper.declarationFieldEnabled}">
+                                                <p:ajax update="editorForm"  />
                                             </p:selectBooleanCheckbox>
 
                                         </h:panelGrid>
@@ -369,20 +375,14 @@
                                         </div>
                                     </ui:fragment>
 
-                                    <ui:fragment rendered="#{fieldWrapper.declarationField}">
+                                    <ui:fragment rendered="#{fieldWrapper.declarationField and fieldWrapper.declarationFieldEnabled}">
                                         <div class="card" style="margin-bottom: 5px">
                                             <div class="p-grid">
                                                 <div class="p-col-12 p-md-12 p-lg-12">
                                                     <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="Declaration" />
 
-
                                                     <div style="margin: 10px">
-                                                        <p:outputLabel class="form-status-badge" value="Enable Declaration: " />
-
-                                                        <p:selectBooleanCheckbox value="#{fieldWrapper.declarationFieldEnabled}">
-                                                            <p:ajax update="editorForm"  />
-                                                        </p:selectBooleanCheckbox>
-                                                        <p:inputTextarea style="margin-top: 5px; width: 100%" disabled="#{!fieldWrapper.declarationFieldEnabled}" value="#{fieldWrapper.declarationText}"/>
+                                                        <p:inputTextarea style="margin-top: 5px; width: 100%" value="#{fieldWrapper.declarationText}"/>
 
                                                     </div>
 
