@@ -178,11 +178,12 @@
                                         <div class="p-formgrid p-grid">
                                             <div class="p-col-2 p-offset-10">
                                                 <div class="p-field p-m-2">
-                                                    <p:inputSwitch>
-
-                                                    </p:inputSwitch>
-                                                    <p:outputLabel value="IMPORT ALL" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
-
+                                                    <h:panelGroup id="panelGroupImportAll">
+                                                        <p:inputSwitch value="#{servicemanAccountManagementManagedBean.isSelectAll}">
+                                                            <p:ajax update="panelGroupBulkImportServicemen" listener="#{servicemanAccountManagementManagedBean.selectAllValidServicemenToImport()}" />
+                                                        </p:inputSwitch>
+                                                        <p:outputLabel value="IMPORT ALL" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
+                                                    </h:panelGroup>
                                                 </div>
 
                                                 <div class="p-field p-m-2">                                
@@ -308,14 +309,14 @@
                                                                     <div class="p-col-2" style="text-align: right;">
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.isValid}" >
                                                                             <p:selectBooleanCheckbox value="#{servicemanWrapper.isSelected}">
-                                                                                <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails formBulkImportServicemen:buttonImport" process="@this"
-                                                                                        listener="#{servicemanAccountManagementManagedBean.selectServicemanToImport(servicemanWrapper)}" />
+                                                                                <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails formBulkImportServicemen:panelGroupImportAll formBulkImportServicemen:buttonImport" process="@this"
+                                                                                        listener="#{servicemanAccountManagementManagedBean.selectServicemanToImport(servicemanWrapper, true)}" />
                                                                             </p:selectBooleanCheckbox>
                                                                             <p:outputLabel value="IMPORT" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
                                                                         </ui:fragment>
 
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode and not servicemanWrapper.isValid}">
-                                                                            <p:selectBooleanCheckbox value="#{servicemanWrapper.isDismissed}">
+                                                                            <p:selectBooleanCheckbox value="#{servicemanWrapper.isHidden}">
                                                                                 <p:ajax update="panelGroupServicemanHeader panelGroupServicemanDetails" process="@this" />
                                                                             </p:selectBooleanCheckbox>
                                                                             <p:outputLabel value="HIDE" style="margin-left: 0.5rem; margin-right: 0.25rem;" />
@@ -337,7 +338,7 @@
                                                     <p:separator style='border-width: 2px;'/>
 
                                                     <h:panelGroup id="panelGroupServicemanDetails">
-                                                        <ui:fragment rendered="#{(servicemanWrapper.errorMessages.get(3) eq null or servicemanWrapper.isEditMode) and not servicemanWrapper.isSelected and not servicemanWrapper.isDismissed}">
+                                                        <ui:fragment rendered="#{(servicemanWrapper.errorMessages.get(3) eq null or servicemanWrapper.isEditMode) and not servicemanWrapper.isSelected and not servicemanWrapper.isHidden}">
                                                             <div class="card ui-fluid" style="padding-top: 0 !important; padding-bottom: 0 !important;">
                                                                 <div class="p-formgrid p-grid">
                                                                     <div class="p-field p-col-12"  style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">Personal</p:outputLabel></div>

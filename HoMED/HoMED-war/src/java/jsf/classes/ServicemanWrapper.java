@@ -17,7 +17,7 @@ public class ServicemanWrapper {
     private Boolean isValid;
     private Boolean isDuplicate;
     private Boolean isSelected;
-    private Boolean isDismissed;
+    private Boolean isHidden;
     private Boolean isEditable;
     private Boolean isEditMode;
 
@@ -29,7 +29,7 @@ public class ServicemanWrapper {
         this.isValid = Boolean.TRUE;
         this.isDuplicate = Boolean.FALSE;
         this.isSelected = Boolean.FALSE;
-        this.isDismissed = Boolean.FALSE;
+        this.isHidden = Boolean.FALSE;
         this.isEditable = Boolean.TRUE;
         this.isEditMode = Boolean.FALSE;
     }
@@ -99,12 +99,12 @@ public class ServicemanWrapper {
         this.isSelected = isSelected;
     }
 
-    public Boolean getIsDismissed() {
-        return isDismissed;
+    public Boolean getIsHidden() {
+        return isHidden;
     }
 
-    public void setIsDismissed(Boolean isDismissed) {
-        this.isDismissed = isDismissed;
+    public void setIsHidden(Boolean isHidden) {
+        this.isHidden = isHidden;
     }
 
     public Boolean getIsEditable() {

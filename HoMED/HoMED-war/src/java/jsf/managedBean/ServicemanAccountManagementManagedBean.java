@@ -58,6 +58,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     private List<Serviceman> servicemenToCreate;
     private List<Serviceman> servicemenToUpdate;
 
+    private Boolean isSelectAll;
+    private Boolean isHideAll;
+
     public ServicemanAccountManagementManagedBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
@@ -283,7 +286,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             if (servicemanWrapper != currLoopingServicemanWrapper && email.equals(currLoopingServicemanWrapper.getNewServiceman().getEmail())) {
                 currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
                 currLoopingServicemanWrapper.getErrorMessages().set(3, null);
-                
+
                 for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
                     if (errorMsg != null) {
                         return;
@@ -320,7 +323,29 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
     }
 
-    public void selectServicemanToImport(ServicemanWrapper servicemanWrapper) {
+    public void hideAllInvalidServicemen() {
+
+    }
+
+    public void selectAllValidServicemenToImport() {
+        if (isSelectAll) {
+            for (ServicemanWrapper sw : servicemanWrappers) {
+                if (sw.getIsValid()) {
+                    sw.setIsSelected(Boolean.TRUE);
+                    selectServicemanToImport(sw, Boolean.FALSE);
+                }
+            }
+        } else {
+            for (ServicemanWrapper sw : servicemanWrappers) {
+                if (sw.getIsValid()) {
+                    sw.setIsSelected(Boolean.FALSE);
+                    selectServicemanToImport(sw, Boolean.FALSE);
+                }
+            }
+        }
+    }
+
+    public void selectServicemanToImport(ServicemanWrapper servicemanWrapper, Boolean checkSelectAll) {
         if (servicemanWrapper.getIsSelected()) {
             if (servicemanWrapper.getExistingServiceman() == null) {
                 servicemenToCreate.add(servicemanWrapper.getNewServiceman());
@@ -330,6 +355,16 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         } else {
             servicemenToCreate.remove(servicemanWrapper.getNewServiceman());
             servicemenToUpdate.remove(servicemanWrapper.getNewServiceman());
+        }
+
+        if (checkSelectAll) {
+            for (ServicemanWrapper sw : servicemanWrappers) {
+                if (sw.getIsValid() && !sw.getIsSelected()) {
+                    isSelectAll = Boolean.FALSE;
+                    return;
+                }
+            }
+            isSelectAll = Boolean.TRUE;
         }
     }
 
@@ -438,6 +473,22 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
 
         return msgs;
+    }
+
+    public Boolean getIsSelectAll() {
+        return isSelectAll;
+    }
+
+    public void setIsSelectAll(Boolean isSelectAll) {
+        this.isSelectAll = isSelectAll;
+    }
+
+    public Boolean getIsHideAll() {
+        return isHideAll;
+    }
+
+    public void setIsHideAll(Boolean isHideAll) {
+        this.isHideAll = isHideAll;
     }
 
 }
