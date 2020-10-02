@@ -229,11 +229,18 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         servicemanWrapper.setIsValid(Boolean.TRUE);
         validateDuplicateServicemanEmail(servicemanWrapper);
-        
+
         for (String errorMsg : servicemanWrapper.getErrorMessages()) {
             if (errorMsg != null) {
                 servicemanWrapper.setIsValid(Boolean.FALSE);
             }
+        }
+
+        try {
+            Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
+            servicemanWrapper.setExistingServiceman(existingServiceman);
+        } catch (ServicemanNotFoundException ex) {
+            servicemanWrapper.setExistingServiceman(null);
         }
     }
 
