@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServicemanWrapper {
-    
+
     private Serviceman existingServiceman;
     private Serviceman newServiceman;
     private Serviceman newServicemanClone;
@@ -18,6 +18,7 @@ public class ServicemanWrapper {
     private Boolean isDuplicate;
     private Boolean isSelected;
     private Boolean isDismissed;
+    private Boolean isEditable;
     private Boolean isEditMode;
 
     public ServicemanWrapper() {
@@ -29,13 +30,14 @@ public class ServicemanWrapper {
         this.isDuplicate = Boolean.FALSE;
         this.isSelected = Boolean.FALSE;
         this.isDismissed = Boolean.FALSE;
+        this.isEditable = Boolean.TRUE;
         this.isEditMode = Boolean.FALSE;
     }
 
     public void cloneServiceman() {
         this.newServicemanClone = new Serviceman(this.newServiceman);
     }
-    
+
     public void reset() {
         this.newServiceman = new Serviceman(this.newServicemanClone);
         this.isDuplicate = Boolean.FALSE;
@@ -103,6 +105,14 @@ public class ServicemanWrapper {
 
     public void setIsDismissed(Boolean isDismissed) {
         this.isDismissed = isDismissed;
+    }
+
+    public Boolean getIsEditable() {
+        return isEditable;
+    }
+
+    public void setIsEditable(Boolean isEditable) {
+        this.isEditable = isEditable;
     }
 
     public Boolean getIsEditMode() {

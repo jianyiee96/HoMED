@@ -259,13 +259,20 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         servicemanWrapper.setIsDuplicate(Boolean.FALSE);
     }
 
-    public void cloneServiceman(ServicemanWrapper servicemanWrapper) {
+    public void enterEditMode(ServicemanWrapper servicemanWrapper) {
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            sw.setIsEditable(Boolean.FALSE);
+        }
+
         servicemanWrapper.setNewServicemanClone(new Serviceman(servicemanWrapper.getNewServiceman()));
     }
 
     public void resetServiceman(ServicemanWrapper servicemanWrapper) {
-        servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
+        for (ServicemanWrapper sw : this.servicemanWrappers) {
+            sw.setIsEditable(Boolean.TRUE);
+        }
 
+        servicemanWrapper.setNewServiceman(new Serviceman(servicemanWrapper.getNewServicemanClone()));
         validateDuplicateServicemanOnEdit(servicemanWrapper);
     }
 

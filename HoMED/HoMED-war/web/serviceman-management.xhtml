@@ -234,8 +234,8 @@
 
                                                                         <!-- To Enter Edit Mode -->
                                                                         <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.cloneServiceman(servicemanWrapper)}"
-                                                                                             process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
+                                                                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}"
+                                                                                             disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
                                                                                 <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
                                                                                 <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
                                                                             </p:commandButton>
@@ -251,7 +251,7 @@
                                                                             </p:commandButton>
 
                                                                             <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
-                                                                                             process="@this" update='panelGroupServicemanHeader panelGroupServicemanDetails'>
+                                                                                             process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
                                                                                 <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                             </p:commandButton>
                                                                         </ui:fragment>
