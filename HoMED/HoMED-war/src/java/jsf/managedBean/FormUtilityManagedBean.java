@@ -52,6 +52,8 @@ public class FormUtilityManagedBean implements Serializable {
     private List<ConsultationPurpose> selectedFormConsultationPurpose;
 
     private List<FormFieldWrapper> selectedFormFieldWrappers;
+    
+    private FormFieldWrapper selectedDeclarationFieldWrapper;
 
     private String createFormName;
 
@@ -192,7 +194,7 @@ public class FormUtilityManagedBean implements Serializable {
 
             if (ffw.isDeclarationField()) {
 
-                if (ffw.isDeclarationFieldEnabled() && ffw.getDeclarationText() != null && !ffw.getDeclarationText().equals("")) {
+                if (ffw.isDeclarationFieldEnabled() && ffw.getDeclarationText() != null && !ffw.getDeclarationText().trim().equals("")) {
                     selectedForm.setDeclaration(ffw.getDeclarationText());
                 } else {
                     ffw.setDeclarationFieldEnabled(false);
@@ -362,6 +364,7 @@ public class FormUtilityManagedBean implements Serializable {
         Collections.sort(selectedFormFieldWrappers);
 
         FormFieldWrapper declarationWrapper = new FormFieldWrapper(true);
+        this.selectedDeclarationFieldWrapper = declarationWrapper;
         if (this.selectedForm.getDeclaration() != null && !this.selectedForm.getDeclaration().equals("")) {
             declarationWrapper.setDeclarationText(this.selectedForm.getDeclaration());
             declarationWrapper.setDeclarationFieldEnabled(true);
@@ -502,5 +505,15 @@ public class FormUtilityManagedBean implements Serializable {
     public void setPublishFormString(String publishFormString) {
         this.publishFormString = publishFormString;
     }
+
+    public FormFieldWrapper getSelectedDeclarationFieldWrapper() {
+        return selectedDeclarationFieldWrapper;
+    }
+
+    public void setSelectedDeclarationFieldWrapper(FormFieldWrapper selectedDeclarationFieldWrapper) {
+        this.selectedDeclarationFieldWrapper = selectedDeclarationFieldWrapper;
+    }
+    
+    
 
 }
