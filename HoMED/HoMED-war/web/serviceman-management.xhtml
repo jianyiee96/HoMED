@@ -73,7 +73,10 @@
                                 <p:resetInput target="ccManageServiceman:formManageServiceman:panelManageServiceman" />
 
                                 <p:menuitem value="Bulk Import" icon="pi pi-upload" title="Import" update="formBulkImportServicemen" process="@this"
-                                            oncomplete="PF('dialogBulkImportServicemen').show()" actionListener="#{servicemanAccountManagementManagedBean.initBulkImport}" />
+                                            oncomplete="PF('dialogBulkImportServicemen').show()" actionListener="#{servicemanAccountManagementManagedBean.initBulkImport}">
+                                    <f:setPropertyActionListener target="#{servicemanAccountManagementManagedBean.isSelectAll}" value="false"/>
+                                    <f:setPropertyActionListener target="#{servicemanAccountManagementManagedBean.isHideAll}" value="false"/>
+                                </p:menuitem>
                             </p:splitButton>
                         </div>
 
@@ -234,29 +237,34 @@
                                                                 <!-- Updating of Imported Servicemen -->
                                                                 <div class='p-field p-col-4' style='margin: 1rem 0rem 1rem 0rem; text-align: right;'>
                                                                     <h:panelGroup id="panelGroupUpdateServicemanButtons">
+                                                                        
+                                                                        <!-- To Hide if already selected/hidden -->
+                                                                        <ui:fragment rendered="#{not servicemanWrapper.isHidden and not servicemanWrapper.isSelected}">
+                                                                            
+                                                                            <!-- To Enter Edit Mode -->
+                                                                            <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
+                                                                                <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}"
+                                                                                                 disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                    <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
+                                                                                    <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
+                                                                                </p:commandButton>
+                                                                            </ui:fragment>
 
-                                                                        <!-- To Enter Edit Mode -->
-                                                                        <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}"
-                                                                                             disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
-                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
-                                                                                <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
-                                                                            </p:commandButton>
-                                                                        </ui:fragment>
+                                                                            <!-- Currently in Edit Mode -->
+                                                                            <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
+                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
+                                                                                                 process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen formAllServicemen:growl-message'
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
+                                                                                    <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
+                                                                                    <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
+                                                                                </p:commandButton>
 
-                                                                        <!-- Currently in Edit Mode -->
-                                                                        <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
-                                                                            <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
-                                                                                             process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen formAllServicemen:growl-message'
-                                                                                             actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
-                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
-                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
-                                                                            </p:commandButton>
-
-                                                                            <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
-                                                                                             process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
-                                                                                <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
-                                                                            </p:commandButton>
+                                                                                <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
+                                                                                                 process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                    <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
+                                                                                </p:commandButton>
+                                                                            </ui:fragment>
+                                                                            
                                                                         </ui:fragment>
 
                                                                     </h:panelGroup>
