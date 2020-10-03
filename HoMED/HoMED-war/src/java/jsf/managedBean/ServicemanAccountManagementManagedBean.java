@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -396,21 +397,21 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void importSelectedServicemen() {
-        for (Serviceman serviceman : servicemenToCreate) {
-            try {
-                System.out.println("Creating serviceman: " + serviceman.getEmail());
-                servicemanSessionBeanLocal.createServiceman(serviceman);
-                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
-            } catch (CreateServicemanException ex) {
-                printUnexpectedErrorMessage(ex.getMessage());
-            }
-        }
-        
-//        TreeMap<Serviceman, CreateServicemanException> bulkCreateResults = servicemanSessionBeanLocal.bulkCreateServicemen(servicemenToCreate);
-//        for (Map.Entry<Serviceman, CreateServicemanException> entrySet : bulkCreateResults.entrySet()) {
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                    entrySet.getKey().getEmail(), "An unexpected error has occurred while importing servicemen in bulk. " + entrySet.getValue().getMessage()));
+//        for (Serviceman serviceman : servicemenToCreate) {
+//            try {
+//                System.out.println("Creating serviceman: " + serviceman.getEmail());
+//                servicemanSessionBeanLocal.createServiceman(serviceman);
+//                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
+//            } catch (CreateServicemanException ex) {
+//                printUnexpectedErrorMessage(ex.getMessage());
+//            }
 //        }
+        
+        HashMap<Serviceman, CreateServicemanException> bulkCreateResults = servicemanSessionBeanLocal.bulkCreateServicemen(servicemenToCreate);
+        for (Map.Entry<Serviceman, CreateServicemanException> entrySet : bulkCreateResults.entrySet()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    entrySet.getKey().getEmail(), "An unexpected error has occurred while importing servicemen in bulk. " + entrySet.getValue().getMessage()));
+        }
 
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
