@@ -113,10 +113,6 @@ public class FormFieldWrapper implements Comparable<FormFieldWrapper> {
         this.declarationFieldEnabled = declarationFieldEnabled;
     }
     
-    public void toggleDeclarationFieldEnabled(){
-        this.declarationFieldEnabled = !this.declarationFieldEnabled;
-    }
-    
     @Override
     public int compareTo(FormFieldWrapper another) {
         try {

@@ -114,9 +114,9 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
             System.out.println("Successfully created employees by init\n");
 
-            Employee emp1Otp = new Admin("Admin OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94362875", GenderEnum.FEMALE);
+            Employee emp1Otp = new Admin("Admin OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
             Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
-            Employee emp3Otp = new Clerk("Clerk OTP", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94326975", GenderEnum.MALE);
+            Employee emp3Otp = new Clerk("Hew Jian Yiee", "hew1521@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
             String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
             String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
             String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
@@ -127,9 +127,9 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + emp3Otp.getEmail() + "\tPhone: " + emp3Otp.getPhoneNumber() + "\tOTP: " + empOtp3);
             System.out.println("Successfully created employees with OTP\n");
 
-            Serviceman serviceman1 = new Serviceman("Audi More", "audi_keynote@hotmail.com", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "bee_board@hotmail.com", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman3 = new Serviceman("Merser D.", "merser_master@hotmail.com", "98765435", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "hew1521@hotmail.com", "97255472", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
             String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
             String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
@@ -274,6 +274,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.FALSE, null));
         
         otherFormTemplate.setFormFields(formFields);
+        otherFormTemplate.setDeclaration("I certify that I have answered the above questionnaire to the best of my knowledge.");
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
         formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
 
