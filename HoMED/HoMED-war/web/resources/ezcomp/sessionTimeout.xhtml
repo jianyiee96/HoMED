@@ -13,7 +13,7 @@
             <p:idleMonitor id="idleTimer" timeout="900000">
                 <p:ajax event="idle" listener="#{sessionTimeoutManagedBean.startCountdown}" process="@this" update="dlgCountdown" oncomplete="PF('dlgCountdown').show()"/>
             </p:idleMonitor>
-            <p:dialog  id="dlgCountdown" widgetVar="dlgCountdown" header="Session Expiry" showEffect="fade" hideEffect="fade"
+            <p:dialog  id="dlgCountdown" widgetVar="dlgCountdown" header="Session Expiry" showEffect="fade" hideEffect="fade" onShow="PF('dlgCountdown').initPosition()"
                        responsive="true" draggable="false" width="400" modal="true" fitViewport="true" closable="false">
                 <p:outputPanel id="dlgCountdownPanel" rendered="#{sessionTimeoutManagedBean.isCountdownState}">
                     <div class="p-grid p-justify-center">
