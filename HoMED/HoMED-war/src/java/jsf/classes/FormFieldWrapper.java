@@ -15,9 +15,20 @@ public class FormFieldWrapper implements Comparable<FormFieldWrapper> {
 
     private List<String> formFieldOptions = new ArrayList<>();
     private FormField formField;
+    
+    private boolean declarationField;
+    private boolean declarationFieldEnabled;
+    private String declarationText;
+    
     private String formFieldCode;
 
+    // Called when creating a declaration field
+    public FormFieldWrapper(boolean declarationField){
+        this.declarationField = declarationField;
+    }
+    
     public FormFieldWrapper(FormField formField) {
+        this(false);
         this.formFieldCode = CryptographicHelper.getInstance().generateRandomString(32);
         this.formField = formField;
 
@@ -78,6 +89,30 @@ public class FormFieldWrapper implements Comparable<FormFieldWrapper> {
         return false;
     }
 
+    public boolean isDeclarationField() {
+        return declarationField;
+    }
+
+    public void setDeclarationField(boolean declarationField) {
+        this.declarationField = declarationField;
+    }
+
+    public String getDeclarationText() {
+        return declarationText;
+    }
+
+    public void setDeclarationText(String declarationText) {
+        this.declarationText = declarationText;
+    }
+
+    public boolean isDeclarationFieldEnabled() {
+        return declarationFieldEnabled;
+    }
+
+    public void setDeclarationFieldEnabled(boolean declarationFieldEnabled) {
+        this.declarationFieldEnabled = declarationFieldEnabled;
+    }
+    
     @Override
     public int compareTo(FormFieldWrapper another) {
         try {
