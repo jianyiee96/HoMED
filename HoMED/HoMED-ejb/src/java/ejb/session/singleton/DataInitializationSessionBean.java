@@ -251,6 +251,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.FALSE, null));
         
         otherFormTemplate.setFormFields(formFields);
+        otherFormTemplate.setDeclaration("I certify that I have answered the above questionnaire to the best of my knowledge.");
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
         formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
 
