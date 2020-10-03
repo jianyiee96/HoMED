@@ -56,15 +56,15 @@
                                         <!--formField.inputType == 'IMAGE_UPLOAD'-->
                                         <ui:fragment rendered="#{formField.inputType == 'TEXT'}">
                                             <div class="p-col-12 ui-fluid">
-                                                <p:inputTextarea rendered="#{formField.inputType == 'TEXT'}" />
+                                                <p:inputTextarea rendered="#{formField.inputType == 'TEXT'}" placeholder="Insert Text"/>
                                             </div>
                                         </ui:fragment>
                                         <!--and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'-->
                                         <ui:fragment rendered="#{formField.inputType != 'TEXT'}">
                                             <div class="p-col-6 ui-fluid">
-                                                <p:inputNumber rendered="#{formField.inputType == 'NUMBER'}" />
-                                                <p:datePicker rendered="#{formField.inputType == 'DATE'}" pattern="dd/MM/yyyy"/>
-                                                <p:datePicker rendered="#{formField.inputType == 'TIME'}" timeOnly="true" pattern="HH:mm"/>
+                                                <p:inputNumber rendered="#{formField.inputType == 'NUMBER'}" placeholder="Insert Number"/>
+                                                <p:datePicker rendered="#{formField.inputType == 'DATE'}" pattern="dd/MM/yyyy" placeholder="Insert Date (DD/MM/YYYY)"/>
+                                                <p:datePicker rendered="#{formField.inputType == 'TIME'}" timeOnly="true" pattern="HH:mm" placeholder="Insert Time (HH:MM)"/>
                                                 <p:selectOneRadio rendered="#{formField.inputType == 'RADIO_BUTTON'}"
                                                                   layout="responsive" columns="1">
                                                     <f:selectItems value="#{formField.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
