@@ -70,32 +70,12 @@ public class DataInitializationSessionBean {
 
     @PostConstruct
     public void postConstruct() {
-        initializeReadFile();
-
         try {
             employeeSessionBeanLocal.retrieveEmployeeById(1l);
             System.out.println("====================== Exiting Data Init [Data Exists] ======================");
         } catch (EmployeeNotFoundException ex) {
             initializeData();
         }
-    }
-
-    private void initializeReadFile() {
-        System.out.println("Initializing files....");
-
-        String csvFile = "C:\\Users\\tanwk\\servicemen-accounts.csv";
-        String line = "";
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                String[] servicemen = line.split(",");
-
-                System.out.println("Name = " + servicemen[0] + " ; " + "NRIC = " + servicemen[1]);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void initializeData() {
