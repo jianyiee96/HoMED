@@ -27,4 +27,13 @@ public enum BloodTypeEnum {
     public String getBloodTypeString() {
         return bloodTypeString;
     }
+    
+    public static BloodTypeEnum valueOfLabel(String label) {
+        for (BloodTypeEnum bt : values()) {
+            if (bt.bloodTypeString.equals(label)) {
+                return bt;
+            }
+        }
+        return null;
+    }
 }

@@ -2,9 +2,9 @@ package ejb.session.stateless;
 
 import entity.Serviceman;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -57,8 +57,8 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public TreeMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
-        TreeMap<Serviceman, CreateServicemanException> map = new TreeMap<>();
+    public HashMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
+        HashMap<Serviceman, CreateServicemanException> map = new HashMap<>();
         List<ServicemanEmailWrapper> list = new ArrayList<>();
         for (Serviceman serviceman : servicemen) {
             try {
