@@ -69,7 +69,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         validator = validatorFactory.getValidator();
 
         this.dateFormats = Arrays.asList("d-M-yy", "d/M/yy");
-        
+
         this.isSelectAll = Boolean.FALSE;
         this.isHideAll = Boolean.FALSE;
     }
@@ -89,6 +89,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         this.servicemanWrappers = new ArrayList<>();
         this.servicemenToCreate = new ArrayList<>();
         this.servicemenToUpdate = new ArrayList<>();
+
+        this.isHideAll = Boolean.FALSE;
+        this.isSelectAll = Boolean.FALSE;
     }
 
     public void uploadCsv(FileUploadEvent event) {
@@ -357,6 +360,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void selectAllValidServicemenToImport() {
         if (isSelectAll) {
+            servicemenToCreate.clear();
+            servicemenToUpdate.clear();
             for (ServicemanWrapper sw : servicemanWrappers) {
                 if (sw.getIsValid()) {
                     sw.setIsSelected(Boolean.TRUE);
@@ -397,21 +402,22 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void importSelectedServicemen() {
-//        for (Serviceman serviceman : servicemenToCreate) {
-//            try {
-//                System.out.println("Creating serviceman: " + serviceman.getEmail());
-//                servicemanSessionBeanLocal.createServiceman(serviceman);
-//                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
-//            } catch (CreateServicemanException ex) {
-//                printUnexpectedErrorMessage(ex.getMessage());
-//            }
-//        }
-        
-        HashMap<Serviceman, CreateServicemanException> bulkCreateResults = servicemanSessionBeanLocal.bulkCreateServicemen(servicemenToCreate);
-        for (Map.Entry<Serviceman, CreateServicemanException> entrySet : bulkCreateResults.entrySet()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    entrySet.getKey().getEmail(), "An unexpected error has occurred while importing servicemen in bulk. " + entrySet.getValue().getMessage()));
+        for (Serviceman serviceman : servicemenToCreate) {
+            try {
+                System.out.println("Creating serviceman: " + serviceman.getEmail());
+                servicemanSessionBeanLocal.createServiceman(serviceman);
+                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
+            } catch (CreateServicemanException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk create. " + ex.getMessage()));
+            }
         }
+
+//        HashMap<Serviceman, CreateServicemanException> bulkCreateResults = servicemanSessionBeanLocal.bulkCreateServicemen(servicemenToCreate);
+//        for (Map.Entry<Serviceman, CreateServicemanException> entrySet : bulkCreateResults.entrySet()) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    entrySet.getKey().getEmail(), "An unexpected error has occurred while importing servicemen in bulk. " + entrySet.getValue().getMessage()));
+//        }
 
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
@@ -419,8 +425,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 servicemanSessionBeanLocal.updateServiceman(serviceman);
                 System.out.println("Updated serviceman successfully!: " + serviceman.getEmail());
             } catch (UpdateServicemanException ex) {
-                System.out.println("errors: " + ex.getMessage());
-                printUnexpectedErrorMessage(ex.getMessage());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk update. " + ex.getMessage()));
             }
         }
 
