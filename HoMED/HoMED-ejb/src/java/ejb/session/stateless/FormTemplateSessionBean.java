@@ -105,7 +105,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         }
 
         newFT.setFormFields(newFFs);
-
+        newFT.setDeclaration(ft.getDeclaration());
         em.persist(newFT);
         em.flush();
 
