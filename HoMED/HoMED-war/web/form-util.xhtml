@@ -329,38 +329,53 @@
                                         <div class="card" style="margin-bottom: 5px">
                                             <div class="p-grid">
                                                 <div class="p-col-11 p-md-11 p-lg-11">
-                                                    <div style="max-width: 380px">
-                                                        <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
+                                                    <div class="p-grid">
+                                                        <div class="p-col-12 p-md-8">
+                                                            <p:outputLabel style="margin-left: -20px;" class="form-status-badge consultation-badge" value="#{formUtilityManagedBean.selectedFormFieldWrappers.indexOf(fieldWrapper)+1}" />
+                                                            <div style="padding:10px">
+                                                                <div  class="ui-fluid">
+                                                                    <div class="p-field p-grid">
+                                                                        <p:outputLabel for="question" styleClass="p-col-12 p-md-4" value="Question:" />
+                                                                        <div class="p-col-12 p-md-8">
+                                                                            <p:inputTextarea rows="1" id="question" value="#{fieldWrapper.formField.question}"/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="p-field p-grid">
+                                                                        <p:outputLabel for="inputType" styleClass="p-col-12 p-md-4" value="Input Type:" />
+                                                                        <div class="p-col-12 p-md-8">
+                                                                            <p:selectOneMenu immediate="true" id="inputType" value="#{fieldWrapper.formField.inputType}">
+                                                                                <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
+                                                                                <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
+                                                                            </p:selectOneMenu>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="p-field p-grid">
+                                                                        <p:outputLabel styleClass="p-col-12 p-md-4" value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
+                                                                        <div class="p-col-12 p-md-8">
+                                                                            <p:chips rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="p-field p-grid">
+                                                                        <p:outputLabel styleClass="p-col-12 p-md-4" value="Required Field:" rendered="#{not fieldWrapper.isHeader}" />
+                                                                        <div class="p-col-12 p-md-8">
+                                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="p-field p-grid">
+                                                                        <p:outputLabel styleClass="p-col-12 p-md-4" value="Serviceman Editable:" rendered="#{not fieldWrapper.isHeader}" />
+                                                                        <div class="p-col-12 p-md-8">
+                                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <p:commandButton class="p-mt-2" update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
+                                                                    <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
+                                                                </p:commandButton>
+                                                            </div>
 
-                                                        <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                                            <p:outputLabel value="Question: " />
 
-                                                            <p:inputText style="width: 100%" id="float-input" value="#{fieldWrapper.formField.question}"/>
 
-                                                            <p:outputLabel value="Input Type: " />
-                                                            <p:selectOneMenu style="width: 100%" immediate="true" id="inputType" value="#{fieldWrapper.formField.inputType}">
-                                                                <f:selectItems value="#{formUtilityManagedBean.inputTypes}" var="inputType" itemLabel="#{inputType.inputTypeString}"/>
-                                                                <p:ajax event="itemSelect" process="editorForm" update="editorForm"/>
-                                                            </p:selectOneMenu>
-
-                                                            <p:outputLabel value="Input Options:" rendered="#{fieldWrapper.hasInputOption}" />
-                                                            <p:chips rendered="#{fieldWrapper.hasInputOption}" value="#{fieldWrapper.formFieldOptions}" />
-
-                                                            <p:outputLabel value="Required Field: " rendered="#{not fieldWrapper.isHeader}" />
-                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isRequired}" />
-
-                                                            <p:outputLabel value="Serviceman Editable: " rendered="#{not fieldWrapper.isHeader}" />
-                                                            <p:toggleSwitch rendered="#{not fieldWrapper.isHeader}" value="#{fieldWrapper.formField.isServicemanEditable}" />
-
-                                                        </h:panelGrid>
-                                                        <h:panelGrid columns="1" cellpadding="5">
-
-                                                            <p:commandButton update="editorForm" actionListener="#{formUtilityManagedBean.removeFormFieldWrapper}" icon="fa fa-remove" title="Delete" value="Remove Field">
-                                                                <f:attribute name="formfieldWrapperToRemove" value="#{fieldWrapper.formFieldCode}" />
-                                                            </p:commandButton>
-
-                                                        </h:panelGrid>
-
+                                                        </div>
                                                     </div>
 
                                                 </div>
