@@ -92,10 +92,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 em.persist(employee);
                 em.flush();
 
-                Future<Boolean> response = emailSessionBean.emailEmployeeOtpAsync(employee, password);
-                if (!response.get()) {
-                    throw new CreateEmployeeException("Email was not sent out successfully!");
-                }
+                emailSessionBean.emailEmployeeOtpAsync(employee, password);
                 return password;
             } else {
                 throw new CreateEmployeeException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -104,8 +101,6 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new CreateEmployeeException(errorMessage + ex.getMessage());
         } catch (PersistenceException ex) {
             throw new CreateEmployeeException(preparePersistenceExceptionErrorMessage(ex));
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new CreateEmployeeException(errorMessage + "Email was not sent out successfully!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new CreateEmployeeException(generalUnexpectedErrorMessage + "creating employee account");
@@ -165,10 +160,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     em.flush();
 
                     if (emailChangeDetected) {
-                        Future<Boolean> response = emailSessionBean.emailEmployeeChangeEmailAsync(employee);
-                        if (!response.get()) {
-                            throw new UpdateEmployeeException("Email was not sent out successfully!");
-                        }
+                        emailSessionBean.emailEmployeeChangeEmailAsync(employee);
                     }
 
                     return employeeToUpdate;
@@ -309,16 +301,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             employee.setPassword(password);
             employee.setIsActivated(false);
 
-            Future<Boolean> response = emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
-            if (!response.get()) {
-                throw new ResetEmployeePasswordException("Email was not sent out successfully!");
-            }
+            emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
         } catch (ResetEmployeePasswordException ex) {
             throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
         } catch (EmployeeNotFoundException ex) {
             throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new ResetEmployeePasswordException(errorMessage + "Email was not sent out successfully!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ResetEmployeePasswordException(generalUnexpectedErrorMessage + "resetting password");
@@ -335,17 +322,10 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             employee.setPassword(password);
             employee.setIsActivated(false);
 
-            Future<Boolean> response = emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
-            if (!response.get()) {
-                throw new ResetEmployeePasswordException("Email was not sent out successfully!");
-            }
+            emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
             return employee;
-        } catch (ResetEmployeePasswordException ex) {
-            throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
         } catch (EmployeeNotFoundException ex) {
             throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new ResetEmployeePasswordException(errorMessage + "Email was not sent out successfully!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ResetEmployeePasswordException(generalUnexpectedErrorMessage + "resetting password by Admin");

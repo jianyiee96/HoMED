@@ -46,7 +46,5 @@ public interface ServicemanSessionBeanLocal {
     public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException;
 
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
-
-    public HashMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen);
     
 }

@@ -8,17 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -412,13 +408,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk create. " + ex.getMessage()));
             }
         }
-
-//        HashMap<Serviceman, CreateServicemanException> bulkCreateResults = servicemanSessionBeanLocal.bulkCreateServicemen(servicemenToCreate);
-//        for (Map.Entry<Serviceman, CreateServicemanException> entrySet : bulkCreateResults.entrySet()) {
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                    entrySet.getKey().getEmail(), "An unexpected error has occurred while importing servicemen in bulk. " + entrySet.getValue().getMessage()));
-//        }
-
+        
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
                 System.out.println("Updating serviceman: " + serviceman.getEmail());
