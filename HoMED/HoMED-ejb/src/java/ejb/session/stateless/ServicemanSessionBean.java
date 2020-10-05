@@ -331,9 +331,5 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
         return msg;
     }
-
-    @Override
-    public HashMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
 }
