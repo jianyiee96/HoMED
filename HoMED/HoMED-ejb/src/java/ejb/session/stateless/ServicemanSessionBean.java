@@ -57,52 +57,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public HashMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
-        HashMap<Serviceman, CreateServicemanException> map = new HashMap<>();
-        List<ServicemanEmailWrapper> list = new ArrayList<>();
-        for (Serviceman serviceman : servicemen) {
-            try {
-                String password = CryptographicHelper.getInstance().generateRandomString(8);
-                serviceman.setPassword(password);
-
-                Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
-
-                if (constraintViolations.isEmpty()) {
-                    em.persist(serviceman);
-                    em.flush();
-
-                    Future<Boolean> response = emailSessionBean.emailServicemanOtpAsync(serviceman, password);
-                    list.add(new ServicemanEmailWrapper(response, serviceman));
-                } else {
-                    throw new CreateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
-                }
-            } catch (CreateServicemanException ex) {
-                map.put(serviceman, new CreateServicemanException(ex.getMessage()));
-            } catch (PersistenceException ex) {
-                map.put(serviceman, new CreateServicemanException(preparePersistenceExceptionErrorMessage(ex)));
-            } catch (Exception ex) {
-                map.put(serviceman, new CreateServicemanException("Unknown exception!"));
-            }
-        }
-
-        list.parallelStream()
-                .peek(wrapper -> {
-                    try {
-                        Boolean result = wrapper.getEmailResult().get();
-                        if (!result) {
-                            throw new CreateServicemanException("Email was not sent out successfully!");
-                        }
-                    } catch (CreateServicemanException ex) {
-                        map.put(wrapper.getServiceman(), new CreateServicemanException(ex.getMessage()));
-                    } catch (Exception ex) {
-                        map.put(wrapper.getServiceman(), new CreateServicemanException("Unknown exception!"));
-                    }
-                })
-                .collect(Collectors.toList());
-        return map;
-    }
-
-    @Override
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException {
         String errorMessage = "Failed to create Serivceman: ";
         try {
@@ -116,10 +70,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 em.persist(newServiceman);
                 em.flush();
 
-                Future<Boolean> response = emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
-                if (!response.get()) {
-                    throw new CreateServicemanException("Email was not sent out successfully!");
-                }
+                emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
                 return password;
             } else {
                 throw new CreateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -128,8 +79,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new CreateServicemanException(errorMessage + ex.getMessage());
         } catch (PersistenceException ex) {
             throw new CreateServicemanException(preparePersistenceExceptionErrorMessage(ex));
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new CreateServicemanException(errorMessage + "Email was not sent out successfully");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new CreateServicemanException(generalUnexpectedErrorMessage + "creating serviceman account");
@@ -188,10 +137,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     em.flush();
 
                     if (emailChangeDetected) {
-                        Future<Boolean> response = emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
-                        if (!response.get()) {
-                            throw new UpdateServicemanException("Email was not sent out successfully!");
-                        }
+                        emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
                     }
 
                     return servicemanToUpdate;
@@ -321,16 +267,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
 
-            Future<Boolean> response = emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
-            if (!response.get()) {
-                throw new ResetServicemanPasswordException("Email was not sent out successfully!");
-            }
+            emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
         } catch (ResetServicemanPasswordException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new ResetServicemanPasswordException(errorMessage + "Email was not sent out successfully!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password");
@@ -347,18 +288,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
 
-            Future<Boolean> response = emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
-            if (!response.get()) {
-                throw new ResetServicemanPasswordException("Email was not sent out successfully!");
-            }
+            emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
             return serviceman;
 
-        } catch (ResetServicemanPasswordException ex) {
-            throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
-        } catch (ExecutionException | InterruptedException ex) {
-            throw new ResetServicemanPasswordException(errorMessage + "Email was not sent out successfully!");
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password by Admin");
@@ -396,5 +330,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         msg = msg.substring(0, msg.length() - 1);
 
         return msg;
+    }
+
+    @Override
+    public HashMap<Serviceman, CreateServicemanException> bulkCreateServicemen(List<Serviceman> servicemen) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
