@@ -32,6 +32,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.CreateServicemanException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
@@ -520,5 +521,8 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void setIsHideAll(Boolean isHideAll) {
         this.isHideAll = isHideAll;
     }
-
+    
+    public ServicemanRoleEnum[] getServicemanRoles() {
+        return ServicemanRoleEnum.values();
+    }
 }

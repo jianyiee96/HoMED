@@ -24,6 +24,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.enumeration.ServicemanRoleEnum;
 import util.security.CryptographicHelper;
 
 /**
@@ -87,6 +88,11 @@ public class Serviceman implements Serializable {
     @NotNull
     private Boolean isActivated;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Role must be provided")
+    protected ServicemanRoleEnum role;
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     private String salt;
@@ -110,14 +116,16 @@ public class Serviceman implements Serializable {
         this.formInstances = another.formInstances;
         this.address = another.address;
         this.isActivated = another.isActivated;
+        this.role = another.role;
         this.salt = another.salt;
     }
 
-    public Serviceman(String name, String email, String phoneNumber, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
+    public Serviceman(String name, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.role = role;
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
@@ -242,6 +250,14 @@ public class Serviceman implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public ServicemanRoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(ServicemanRoleEnum role) {
+        this.role = role;
     }
 
     @Override

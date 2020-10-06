@@ -98,6 +98,10 @@
                             <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.name}" />
                             </p:column>
+                            
+                            <p:column headerText="Role" width="7%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
+                                <h:outputText value="#{serviceman.role}" />
+                            </p:column>
 
                             <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.email}" />

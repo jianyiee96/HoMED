@@ -12,17 +12,57 @@
     </cc:interface>
 
     <cc:implementation>
+
+        <style type="text/css">
+            .role-badge {
+                border-radius: 2px;
+                padding: .25em .5rem;
+                text-transform: uppercase;
+                font-weight: 700;
+                font-size: 25px;
+                letter-spacing: .3px;
+            }
+
+            .role-REGULAR {
+                background: #C8E6C9;
+                color: #256029;
+            }
+
+            .role-NSF {
+                background: #B3E5FC;
+                color: #23547B;
+            }
+
+            .role-NSMEN {
+                background: #FEEDAF;
+                color: #8A5340;
+            }
+
+            .role-OTHERS {
+                background: #FEEDAF;
+                color: #8A5340;
+            }
+        </style>
+
         <h:form id="formManageServiceman">
             <p:dialog id="dialogManageServiceman" widgetVar="dialogManageServiceman" header="#{manageServicemanManagedBean.isCreateState ? 'Create Serviceman' : 'Serviceman Details'}" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageServiceman').initPosition()"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageServiceman" rendered="#{not empty manageServicemanManagedBean.servicemanToView}">
                     <div class="p-grid">
-                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView and manageServicemanManagedBean.isManageState}">
-                            <div class="p-col-12 p-grid p-justify-center">
-                                <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}" />
-                            </div>
-                        </ui:fragment>
+                        <div class="p-col-12 p-grid p-justify-center">
+                            <ui:fragment rendered="#{manageServicemanManagedBean.isManageState}">
+                                <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
+                                <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
+                                    <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
+                                </ui:fragment>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{manageServicemanManagedBean.isCreateState}">
+                                <p:selectOneMenu id="view-role" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.role}" style="width: 150px">
+                                    <f:selectItems value="#{servicemanAccountManagementManagedBean.getServicemanRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                                </p:selectOneMenu>
+                            </ui:fragment>
+                        </div>
 
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
