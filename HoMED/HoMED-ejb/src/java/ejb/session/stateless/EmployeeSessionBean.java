@@ -1,11 +1,13 @@
 package ejb.session.stateless;
 
+import entity.SuperUser;
+import entity.Clerk;
 import util.exceptions.EmployeeNotFoundException;
 import entity.Employee;
+import entity.MedicalBoardAdmin;
+import entity.MedicalOfficer;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.validation.Validator;
@@ -18,6 +20,7 @@ import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.ActivateEmployeeException;
 import util.exceptions.ChangeEmployeePasswordException;
 import util.exceptions.CreateEmployeeException;
@@ -79,9 +82,21 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
     // Creation of employee by admin (w OTP)
     @Override
-    public String createEmployee(Employee employee) throws CreateEmployeeException {
+    public String createEmployee(Employee newEmployee) throws CreateEmployeeException {
         String errorMessage = "Failed to create Employee: ";
         try {
+            Employee employee;
+            if (newEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
+                employee = new SuperUser(newEmployee);
+            } else if (newEmployee.getRole() == EmployeeRoleEnum.CLERK) {
+                employee = new Clerk(newEmployee);
+            } else if (newEmployee.getRole() == EmployeeRoleEnum.MEDICAL_OFFICER) {
+                employee = new MedicalOfficer(newEmployee);
+            } else if (newEmployee.getRole() == EmployeeRoleEnum.MB_ADMIN) {
+                employee = new MedicalBoardAdmin(newEmployee);
+            } else {
+                throw new CreateEmployeeException("No employee role identified");
+            }
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             employee.setPassword(password);
@@ -313,7 +328,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException {
+    public Employee resetEmployeePasswordBySuperUser(Employee currentEmployee) throws ResetEmployeePasswordException {
         String errorMessage = "Failed to reset Employee password: ";
         try {
             Employee employee = retrieveEmployeeByEmail(currentEmployee.getEmail());
@@ -328,7 +343,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new ResetEmployeePasswordException(generalUnexpectedErrorMessage + "resetting password by Admin");
+            throw new ResetEmployeePasswordException(generalUnexpectedErrorMessage + "resetting password by Super User");
         }
     }
 

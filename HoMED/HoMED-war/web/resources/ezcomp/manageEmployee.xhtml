@@ -33,9 +33,14 @@
                 color: #23547B;
             }
 
-            .role-ADMIN {
+            .role-SUPER_USER {
                 background: #FEEDAF;
                 color: #8A5340;
+            }
+
+            .role-MB_ADMIN {
+                background: #DDA0DD;
+                color: #832f83;
             }
         </style>
 
@@ -54,7 +59,7 @@
                                 </ui:fragment>
                             </ui:fragment>
                             <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
-                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 150px">
+                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
                                     <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
                                 </p:selectOneMenu>
                             </ui:fragment>

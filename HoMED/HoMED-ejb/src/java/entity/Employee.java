@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -18,6 +20,7 @@ import util.enumeration.GenderEnum;
 import util.security.CryptographicHelper;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Employee implements Serializable {
     // whenever new attribute is added, remember to update the updateEmployee in employeeSessionBean
 
@@ -35,7 +38,7 @@ public class Employee implements Serializable {
     @NotNull(message = "Email must be provided")
     @Size(max = 64, message = "Proper formatted Email must be provided")
     @Email(message = "Proper formatted Email must be provided")
-    private String email;
+    protected String email;
 
     @Column(nullable = false, unique = true, length = 8)
     @NotNull(message = "Phone Number must be provided")
@@ -56,11 +59,11 @@ public class Employee implements Serializable {
     @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
-    private Address address;
+    protected Address address;
 
     @Column(nullable = false)
     @NotNull
-    private Boolean isActivated;
+    protected Boolean isActivated;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

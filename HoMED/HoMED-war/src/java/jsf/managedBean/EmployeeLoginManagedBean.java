@@ -12,7 +12,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
-import javax.persistence.Column;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -28,7 +27,7 @@ import util.helper.ThemeCustomiser;
 public class EmployeeLoginManagedBean implements Serializable {
 
     private Employee currentEmployee;
-    
+
     @NotNull(message = "Password is required")
     @Size(min = 8, max = 64, message = "Password must be between length 8 to 64")
     private String password;
@@ -124,7 +123,7 @@ public class EmployeeLoginManagedBean implements Serializable {
     }
 
     private void setRoleTheme(EmployeeRoleEnum role) {
-        if (role == EmployeeRoleEnum.ADMIN) {
+        if (role == EmployeeRoleEnum.SUPER_USER) {
             themeCustomiser.setComponentTheme("blbluegreyue");
             themeCustomiser.setTopbarColor("bluegrey");
         } else if (role == EmployeeRoleEnum.CLERK) {
@@ -133,6 +132,9 @@ public class EmployeeLoginManagedBean implements Serializable {
         } else if (role == EmployeeRoleEnum.MEDICAL_OFFICER) {
             themeCustomiser.setComponentTheme("blue");
             themeCustomiser.setTopbarColor("blue");
+        } else if (role == EmployeeRoleEnum.MB_ADMIN) {
+            themeCustomiser.setComponentTheme("brown");
+            themeCustomiser.setTopbarColor("brown");
         }
     }
 

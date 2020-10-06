@@ -84,7 +84,7 @@ public class SecurityFilter implements Filter {
             return 1;
         }
 
-        if (accessRight == EmployeeRoleEnum.ADMIN) {
+        if (accessRight == EmployeeRoleEnum.SUPER_USER) {
 
             if (path.equals(pathArr[3])
                     || path.equals(pathArr[5])
@@ -97,6 +97,8 @@ public class SecurityFilter implements Filter {
 
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
 
+        } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
+            
         }
 
         for (String currentPath : pathArr) {

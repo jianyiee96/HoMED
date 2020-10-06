@@ -46,6 +46,6 @@ public interface EmployeeSessionBeanLocal {
 
     public void resetEmployeePassword(String email, String phoneNumber) throws ResetEmployeePasswordException;
 
-    public Employee resetEmployeePasswordByAdmin(Employee currentEmployee) throws ResetEmployeePasswordException;
+    public Employee resetEmployeePasswordBySuperUser(Employee currentEmployee) throws ResetEmployeePasswordException;
 
 }

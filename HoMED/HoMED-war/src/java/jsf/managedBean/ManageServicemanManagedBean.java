@@ -25,7 +25,6 @@ public class ManageServicemanManagedBean implements Serializable {
 
     private Serviceman servicemanToView;
 
-    private Boolean isManageState;
     private Boolean isCreateState;
 
     private Boolean isAdminView;
@@ -44,7 +43,7 @@ public class ManageServicemanManagedBean implements Serializable {
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
             Employee currentEmployee = (Employee) objCurrentEmployee;
-            if (currentEmployee.getRole() == EmployeeRoleEnum.ADMIN.ADMIN) {
+            if (currentEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
                 this.isAdminView = true;
             }
         }
@@ -92,7 +91,7 @@ public class ManageServicemanManagedBean implements Serializable {
         try {
             this.servicemanToView.setIsActivated(false);
 
-            servicemanSessionBeanLocal.resetServicemanPasswordByAdmin(servicemanToView);
+            servicemanSessionBeanLocal.resetServicemanPasswordBySuperUser(servicemanToView);
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset serviceman's password! Please inform serviceman that OTP has been sent to their email.", null));
         } catch (ResetServicemanPasswordException ex) {

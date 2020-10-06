@@ -44,7 +44,7 @@ public class ManageEmployeeManagedBean implements Serializable {
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
             this.currentEmployee = (Employee) objCurrentEmployee;
-            if (this.currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
+            if (this.currentEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
                 this.isAdminView = true;
             }
         }
@@ -92,7 +92,7 @@ public class ManageEmployeeManagedBean implements Serializable {
         try {
             this.employeeToView.setIsActivated(false);
 
-            employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
+            employeeSessionBean.resetEmployeePasswordBySuperUser(employeeToView);
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset employee's password! Please inform employee that OTP has been sent to their email.", null));
         } catch (ResetEmployeePasswordException ex) {

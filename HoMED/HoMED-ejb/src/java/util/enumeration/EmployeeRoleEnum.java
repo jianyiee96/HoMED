@@ -1,12 +1,13 @@
 package util.enumeration;
 
 public enum EmployeeRoleEnum {
-    ADMIN("Admin"),
+    SUPER_USER("Super User"),
     CLERK("Clerk"),
+    MB_ADMIN("Medical Board Admin"),
     MEDICAL_OFFICER("Medical Officer");
-    
+
     private String stringVal;
-    
+
     private EmployeeRoleEnum(String stringVal) {
         this.stringVal = stringVal;
     }
@@ -14,5 +15,5 @@ public enum EmployeeRoleEnum {
     public String getStringVal() {
         return stringVal;
     }
-    
+
 }

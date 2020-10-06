@@ -274,7 +274,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException {
+    public Serviceman resetServicemanPasswordBySuperUser(Serviceman currentServiceman) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
         try {
             Serviceman serviceman = retrieveServicemanByEmail(currentServiceman.getEmail());
@@ -290,7 +290,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password by Admin");
+            throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password by Super User");
         }
     }
 
