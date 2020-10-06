@@ -123,6 +123,10 @@ public class Employee implements Serializable {
         }
     }
 
+    public void setHashPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }

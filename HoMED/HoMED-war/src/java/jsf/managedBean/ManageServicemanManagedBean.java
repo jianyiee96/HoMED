@@ -1,5 +1,6 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
 import entity.Serviceman;
@@ -13,6 +14,7 @@ import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.CreateServicemanException;
 import util.exceptions.DeleteServicemanException;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.UpdateServicemanException;
 
@@ -20,12 +22,17 @@ import util.exceptions.UpdateServicemanException;
 @ViewScoped
 public class ManageServicemanManagedBean implements Serializable {
 
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+
     @EJB(name = "ServicemanSessionBeanLocal")
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
     private Serviceman servicemanToView;
 
     private Boolean isCreateState;
+
+    private Employee employeeToCopy;
 
     private Boolean isAdminView;
     private Boolean isEditMode;
@@ -40,6 +47,7 @@ public class ManageServicemanManagedBean implements Serializable {
         init();
         this.isCreateState = false;
         this.isAdminView = false;
+        this.employeeToCopy = null;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
             Employee currentEmployee = (Employee) objCurrentEmployee;
@@ -51,6 +59,7 @@ public class ManageServicemanManagedBean implements Serializable {
 
     public void init() {
         this.isHideAdminPanel = false;
+        this.employeeToCopy = null;
     }
 
     public void initCreate() {
@@ -110,6 +119,22 @@ public class ManageServicemanManagedBean implements Serializable {
         }
     }
 
+    public void emailValidation() {
+        try {
+            this.employeeToCopy = employeeSessionBeanLocal.retrieveEmployeeByEmail(this.servicemanToView.getEmail());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Employee with same email detected. All details will also be updated on employee account.", null));
+        } catch (EmployeeNotFoundException ex) {
+            this.employeeToCopy = null;
+        }
+    }
+
+    public void doCopyDetails() {
+        this.servicemanToView.setName(employeeToCopy.getName());
+        this.servicemanToView.setGender(employeeToCopy.getGender());
+        this.servicemanToView.setPhoneNumber(employeeToCopy.getPhoneNumber());
+        this.servicemanToView.setAddress(employeeToCopy.getAddress());
+    }
+
     public Serviceman getServicemanToView() {
         return servicemanToView;
     }
@@ -149,4 +174,13 @@ public class ManageServicemanManagedBean implements Serializable {
     public void setIsCreateState(Boolean isCreateState) {
         this.isCreateState = isCreateState;
     }
+
+    public Employee getEmployeeToCopy() {
+        return employeeToCopy;
+    }
+
+    public void setEmployeeToCopy(Employee employeeToCopy) {
+        this.employeeToCopy = employeeToCopy;
+    }
+
 }

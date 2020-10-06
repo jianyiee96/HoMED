@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.ActivateEmployeeException;
@@ -47,5 +48,7 @@ public interface EmployeeSessionBeanLocal {
     public void resetEmployeePassword(String email, String phoneNumber) throws ResetEmployeePasswordException;
 
     public Employee resetEmployeePasswordBySuperUser(Employee currentEmployee) throws ResetEmployeePasswordException;
+
+    public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated);
 
 }

@@ -51,18 +51,31 @@
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">
-                        <div class="p-col-12 p-grid p-justify-center">
-                            <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode or not manageEmployeeManagedBean.isCreateState}">
-                                <span class="role-badge role-#{manageEmployeeManagedBean.employeeToView.role}">#{manageEmployeeManagedBean.employeeToView.role.stringVal}</span>
-                                <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView}">
-                                    <i style="margin-left: 5px; font-size:25px" class="fa #{manageEmployeeManagedBean.employeeToView.isActivated?'fa-unlock':'fa-lock'}"/>
-                                </ui:fragment>
-                            </ui:fragment>
-                            <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
-                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
-                                    <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
-                                </p:selectOneMenu>
-                            </ui:fragment>
+                        <div class="p-col-12">
+                            <div class="p-grid p-justify-between">
+                                <div style="width: 130px; margin-left: 15px"></div>
+                                <div>
+                                    <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode or not manageEmployeeManagedBean.isCreateState}">
+                                        <span class="role-badge role-#{manageEmployeeManagedBean.employeeToView.role}">#{manageEmployeeManagedBean.employeeToView.role.stringVal}</span>
+                                        <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView}">
+                                            <i style="margin-left: 5px; font-size:25px" class="fa #{manageEmployeeManagedBean.employeeToView.isActivated?'fa-unlock':'fa-lock'}"/>
+                                        </ui:fragment>
+
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
+                                        <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
+                                            <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                                        </p:selectOneMenu>
+                                    </ui:fragment>
+                                </div>
+                                <div style="width: 130px; margin-right: 15px">
+                                    <h:panelGroup id="panelGroupCopyDetailsBtn">
+                                        <p:commandButton update="panelManageEmployee" value="Copy Details" icon="pi pi-clone" style="float:right"
+                                                         actionListener="#{manageEmployeeManagedBean.doCopyDetails()}" process="@this"
+                                                         rendered="#{manageEmployeeManagedBean.servicemanToCopy ne null and manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}"/>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
                         </div>
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
@@ -101,9 +114,11 @@
                                 <div class="p-field">
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" rendered="#{manageEmployeeManagedBean.isEditMode}" />
+                                    <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" rendered="#{manageEmployeeManagedBean.isEditMode}">
+                                        <p:ajax rendered="#{manageEmployeeManagedBean.isCreateState}" event="keyup" listener="#{manageEmployeeManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
+                                    </p:inputText>
                                     <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.email}" class="view-text" />
-                                    <p:message class="error-message" for="view-email" />
+                                    <p:message class="error-message" for="view-email"/>
                                 </div>
                             </div>
                         </div>
@@ -156,9 +171,8 @@
                             </div>
                         </div>
 
-
                         <div class="p-col-12">
-                            <p:messages globalOnly="true" class="error-message" closable="true">
+                            <p:messages globalOnly="true" class="error-message">
                                 <p:autoUpdate/>
                             </p:messages>
                         </div>

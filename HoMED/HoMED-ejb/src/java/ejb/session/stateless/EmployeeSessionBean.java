@@ -6,10 +6,13 @@ import util.exceptions.EmployeeNotFoundException;
 import entity.Employee;
 import entity.MedicalBoardAdmin;
 import entity.MedicalOfficer;
+import entity.Serviceman;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.validation.Validator;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -32,6 +35,9 @@ import util.security.CryptographicHelper;
 
 @Stateless
 public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
+
+    @EJB
+    private ServicemanSessionBeanLocal servicemanSessionBean;
 
     @EJB
     private EmailSessionBeanLocal emailSessionBean;
@@ -107,6 +113,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 em.persist(employee);
                 em.flush();
 
+                Serviceman serviceman = servicemanSessionBean.updateServicemanMatchingAccount(employee, null, null, null);
+                if (serviceman != null) {
+                    employee.setHashPassword(serviceman.getPassword());
+                    employee.setSalt(serviceman.getSalt());
+                    employee.setIsActivated(serviceman.getIsActivated());
+                    password = "Proceed to log in with same details as serviceman account";
+                }
                 emailSessionBean.emailEmployeeOtpAsync(employee, password);
                 return password;
             } else {
@@ -149,6 +162,36 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated) {
+        try {
+            String email = serviceman.getEmail();
+            Employee employee = retrieveEmployeeByEmail(email);
+
+            employee.setName(serviceman.getName());
+            employee.setGender(serviceman.getGender());
+            employee.setPhoneNumber(serviceman.getPhoneNumber());
+            employee.setAddress(serviceman.getAddress());
+
+            if (newEmail != null) {
+                employee.setEmail(newEmail);
+            }
+
+            if (isActivated != null) {
+                employee.setIsActivated(isActivated);
+            }
+
+            if (hashPassword != null) {
+                employee.setHashPassword(hashPassword);
+            }
+
+            return employee;
+        } catch (EmployeeNotFoundException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public Employee updateEmployee(Employee employee) throws UpdateEmployeeException {
         String errorMessage = "Failed to update Employee: ";
         try {
@@ -166,16 +209,16 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     // Password are deliberately NOT updated to demonstrate that client is not allowed to update account credential through this business method
                     employeeToUpdate.setName(employee.getName());
                     employeeToUpdate.setIsActivated(employee.getIsActivated());
-
                     employeeToUpdate.setAddress(employee.getAddress());
-                    employeeToUpdate.setEmail(employee.getEmail());
                     employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     employeeToUpdate.setGender(employee.getGender());
 
-                    em.flush();
-
                     if (emailChangeDetected) {
+                        servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, employee.getEmail(), null, employee.getIsActivated());
+                        employeeToUpdate.setEmail(employee.getEmail());
                         emailSessionBean.emailEmployeeChangeEmailAsync(employee);
+                    } else {
+                        servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, null, null, employee.getIsActivated());
                     }
 
                     return employeeToUpdate;
@@ -260,6 +303,9 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
 
             employee.setPassword(password);
             employee.setIsActivated(true);
+
+            servicemanSessionBean.updateServicemanMatchingAccount(employee, null, employee.getPassword(), true);
+
             return employee;
         } catch (ActivateEmployeeException ex) {
             throw new ActivateEmployeeException(errorMessage + ex.getMessage());
@@ -289,7 +335,9 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                 }
 
                 employee.setPassword(newPassword);
-                em.flush();
+
+                servicemanSessionBean.updateServicemanMatchingAccount(employee, null, employee.getPassword(), null);
+
             } else {
                 throw new ChangeEmployeePasswordException("Entered password do not match password associated with account!");
             }
@@ -316,6 +364,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             employee.setPassword(password);
             employee.setIsActivated(false);
 
+            servicemanSessionBean.updateServicemanMatchingAccount(employee, null, employee.getPassword(), false);
+
             emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
         } catch (ResetEmployeePasswordException ex) {
             throw new ResetEmployeePasswordException(errorMessage + ex.getMessage());
@@ -336,6 +386,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             employee.setPassword(password);
             employee.setIsActivated(false);
+
+            servicemanSessionBean.updateServicemanMatchingAccount(employee, null, employee.getPassword(), false);
 
             emailSessionBean.emailEmployeeResetPasswordAsync(employee, password);
             return employee;

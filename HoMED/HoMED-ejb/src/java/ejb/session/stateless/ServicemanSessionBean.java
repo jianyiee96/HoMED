@@ -1,10 +1,13 @@
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.Serviceman;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -27,6 +30,9 @@ import util.security.CryptographicHelper;
 
 @Stateless
 public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
+
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBean;
 
     @EJB
     private EmailSessionBeanLocal emailSessionBean;
@@ -63,6 +69,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
                 em.flush();
+
+                Employee employee = employeeSessionBean.updateEmployeeMatchingAccount(newServiceman, null, null, null);
+                if (employee != null) {
+                    newServiceman.setHashPassword(employee.getPassword());
+                    newServiceman.setSalt(employee.getSalt());
+                    newServiceman.setIsActivated(employee.getIsActivated());
+                    password = "Proceed to log in with same details as employee account";
+                }
 
                 emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
                 return password;
@@ -106,6 +120,36 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public Serviceman updateServicemanMatchingAccount(Employee employee, String newEmail, String hashPassword, Boolean isActivated) {
+        try {
+            String email = employee.getEmail();
+            Serviceman serviceman = retrieveServicemanByEmail(email);
+
+            serviceman.setName(employee.getName());
+            serviceman.setGender(employee.getGender());
+            serviceman.setPhoneNumber(employee.getPhoneNumber());
+            serviceman.setAddress(employee.getAddress());
+
+            if (newEmail != null) {
+                serviceman.setEmail(newEmail);
+            }
+
+            if (isActivated != null) {
+                serviceman.setIsActivated(isActivated);
+            }
+
+            if (hashPassword != null) {
+                serviceman.setHashPassword(hashPassword);
+            }
+
+            return serviceman;
+        } catch (ServicemanNotFoundException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException {
         String errorMessage = "Failed to update Serviceman: ";
         try {
@@ -121,7 +165,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     }
 
                     servicemanToUpdate.setName(serviceman.getName());
-                    servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setRod(serviceman.getRod());
                     servicemanToUpdate.setGender(serviceman.getGender());
                     servicemanToUpdate.setBloodType(serviceman.getBloodType());
@@ -129,10 +172,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setAddress(serviceman.getAddress());
                     servicemanToUpdate.setRole(serviceman.getRole());
 
-                    em.flush();
-
                     if (emailChangeDetected) {
+                        employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, serviceman.getEmail(), null, serviceman.getIsActivated());
+                        servicemanToUpdate.setEmail(serviceman.getEmail());
                         emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
+                    } else {
+                        employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, null, null, serviceman.getIsActivated());
                     }
 
                     return servicemanToUpdate;
@@ -207,6 +252,9 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
             serviceman.setPassword(password);
             serviceman.setIsActivated(true);
+
+            employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
+
         } catch (ActivateServicemanException ex) {
             throw new ActivateServicemanException(errorMessage + ex.getMessage());
         } catch (ServicemanNotFoundException ex) {
@@ -235,6 +283,9 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 }
 
                 serviceman.setPassword(newPassword);
+
+                employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), null);
+
                 em.flush();
             } else {
                 throw new ChangeServicemanPasswordException("Entered password do not match password associated with account!");
@@ -262,6 +313,8 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
 
+            employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), false);
+
             emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
         } catch (ResetServicemanPasswordException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
@@ -283,9 +336,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
 
+            employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), false);
+
             emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
             return serviceman;
-
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
         } catch (Exception ex) {

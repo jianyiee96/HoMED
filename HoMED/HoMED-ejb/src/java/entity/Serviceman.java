@@ -199,6 +199,10 @@ public class Serviceman implements Serializable {
             this.password = null;
         }
     }
+    
+    public void setHashPassword(String password) {
+        this.password = password;
+    }
 
     public Address getAddress() {
         return address;
