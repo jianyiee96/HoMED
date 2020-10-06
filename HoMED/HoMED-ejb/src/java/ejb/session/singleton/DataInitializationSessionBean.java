@@ -84,10 +84,12 @@ public class DataInitializationSessionBean {
             Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
             Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
             Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
+            Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
             Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
             Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
             Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
             Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
+            Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
@@ -98,7 +100,6 @@ public class DataInitializationSessionBean {
             Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
             Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
             Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
-            Employee emp4Otp = new MedicalBoardAdmin("Medical Board Admin", "dummyemailxxx14@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255262", GenderEnum.MALE);
             String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
             String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
             String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
@@ -112,14 +113,17 @@ public class DataInitializationSessionBean {
             Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98765434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
             String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
             String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
+            String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
 
             System.out.println("Serviceman INFO [OTP]");
             System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
             System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
             System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
+            System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
             System.out.println("Successfully created serivcemen with OTP\n");
 
             initializeMedicalCentres();
