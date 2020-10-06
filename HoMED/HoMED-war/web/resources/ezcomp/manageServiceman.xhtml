@@ -39,8 +39,8 @@
             }
 
             .role-OTHERS {
-                background: #FEEDAF;
-                color: #8A5340;
+                background: #DDA0DD;
+                color: #832f83;
             }
         </style>
 
@@ -51,13 +51,13 @@
                 <p:outputPanel id="panelManageServiceman" rendered="#{not empty manageServicemanManagedBean.servicemanToView}">
                     <div class="p-grid">
                         <div class="p-col-12 p-grid p-justify-center">
-                            <ui:fragment rendered="#{manageServicemanManagedBean.isManageState}">
+                            <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
                                 <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
                                 <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
                                     <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                 </ui:fragment>
                             </ui:fragment>
-                            <ui:fragment rendered="#{manageServicemanManagedBean.isCreateState}">
+                            <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode}">
                                 <p:selectOneMenu id="view-role" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.role}" style="width: 150px">
                                     <f:selectItems value="#{servicemanAccountManagementManagedBean.getServicemanRoles()}" var="role" itemLabel="#{role.stringVal}"/>
                                 </p:selectOneMenu>
@@ -198,7 +198,7 @@
                                         <ui:fragment rendered ="#{manageServicemanManagedBean.isCreateState}">
                                             <p:commandButton actionListener="#{manageServicemanManagedBean.doCreate}" update="panelManageServiceman" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                         </ui:fragment>
-                                        <ui:fragment rendered ="#{manageServicemanManagedBean.isManageState}">
+                                        <ui:fragment rendered ="#{not manageServicemanManagedBean.isCreateState}">
                                             <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
                                                 <p:commandButton update="panelManageServiceman" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
                                                     <f:setPropertyActionListener target="#{manageServicemanManagedBean.isEditMode}" value="true"/>

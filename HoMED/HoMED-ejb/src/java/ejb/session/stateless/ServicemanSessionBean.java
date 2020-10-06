@@ -27,43 +27,43 @@ import util.security.CryptographicHelper;
 
 @Stateless
 public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
-    
+
     @EJB
     private EmailSessionBeanLocal emailSessionBean;
-    
+
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     private final String generalUnexpectedErrorMessage = "An unexpected error has occurred while ";
-    
+
     public ServicemanSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
-    
+
     @Override
     public List<Serviceman> retrieveAllServicemen() {
         Query query = em.createQuery("SELECT s FROM Serviceman s");
-        
+
         return query.getResultList();
     }
-    
+
     @Override
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException {
         String errorMessage = "Failed to create Serivceman: ";
         try {
-            
+
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             newServiceman.setPassword(password);
-            
+
             Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(newServiceman);
-            
+
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
                 em.flush();
-                
+
                 emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
                 return password;
             } else {
@@ -78,23 +78,23 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new CreateServicemanException(generalUnexpectedErrorMessage + "creating serviceman account");
         }
     }
-    
+
     @Override
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException {
         Serviceman serviceman = em.find(Serviceman.class, servicemanId);
-        
+
         if (serviceman != null) {
             return serviceman;
         } else {
             throw new ServicemanNotFoundException("Serviceman ID " + servicemanId + " does not exist!");
         }
     }
-    
+
     @Override
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException {
         Query query = em.createQuery("SELECT s FROM Serviceman s WHERE s.email = :inEmail");
         query.setParameter("inEmail", email);
-        
+
         try {
             return (Serviceman) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
@@ -104,22 +104,22 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanNotFoundException(generalUnexpectedErrorMessage + "retrieving serviceman account by EMAIL");
         }
     }
-    
+
     @Override
     public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException {
         String errorMessage = "Failed to update Serviceman: ";
         try {
             if (serviceman != null && serviceman.getServicemanId() != null) {
-                
+
                 Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(serviceman);
                 if (constraintViolations.isEmpty()) {
                     Serviceman servicemanToUpdate = retrieveServicemanById(serviceman.getServicemanId());
-                    
+
                     Boolean emailChangeDetected = false;
                     if (!servicemanToUpdate.getEmail().equals(serviceman.getEmail())) {
                         emailChangeDetected = true;
                     }
-                    
+
                     servicemanToUpdate.setName(serviceman.getName());
                     servicemanToUpdate.setEmail(serviceman.getEmail());
                     servicemanToUpdate.setRod(serviceman.getRod());
@@ -128,15 +128,15 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                     servicemanToUpdate.setAddress(serviceman.getAddress());
                     servicemanToUpdate.setRole(serviceman.getRole());
-                    
+
                     em.flush();
-                    
+
                     if (emailChangeDetected) {
                         emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
                     }
-                    
+
                     return servicemanToUpdate;
-                    
+
                 } else {
                     throw new UpdateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }
@@ -154,7 +154,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new UpdateServicemanException(generalUnexpectedErrorMessage + "updating serviceman account");
         }
     }
-    
+
     @Override
     public void deleteServiceman(Long servicemanId) throws DeleteServicemanException {
         String errorMessage = "Failed to delete Serviceman: ";
@@ -168,14 +168,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new DeleteServicemanException(generalUnexpectedErrorMessage + "deleting serviceman account");
         }
     }
-    
+
     @Override
     public Serviceman servicemanLogin(String email, String password) throws ServicemanInvalidLoginCredentialException {
         String errorMessage = "Failed to Login: ";
         try {
             Serviceman serviceman = retrieveServicemanByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + serviceman.getSalt()));
-            
+
             if (serviceman.getPassword().equals(passwordHash)) {
                 return serviceman;
             } else {
@@ -190,21 +190,21 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ServicemanInvalidLoginCredentialException(generalUnexpectedErrorMessage + "logging in");
         }
     }
-    
+
     @Override
     public void activateServiceman(String email, String password, String rePassword) throws ActivateServicemanException {
         String errorMessage = "Failed to activate Serviceman account: ";
         if (!password.equals(rePassword)) {
             throw new ActivateServicemanException("Passwords do not match!");
         }
-        
+
         try {
             Serviceman serviceman = retrieveServicemanByEmail(email);
             // HANDLE NEW PASSWORD VALIDATION AT FRONTEND - Password min length
             if (serviceman.getIsActivated()) {
                 throw new ActivateServicemanException("Account has already been activated!");
             }
-            
+
             serviceman.setPassword(password);
             serviceman.setIsActivated(true);
         } catch (ActivateServicemanException ex) {
@@ -216,14 +216,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ActivateServicemanException(generalUnexpectedErrorMessage + "activating serviceman account");
         }
     }
-    
+
     @Override
     public void changeServicemanPassword(String email, String oldPassword, String newPassword, String newRePassword) throws ChangeServicemanPasswordException {
         String errorMessage = "Failed to change Serviceman password: ";
         if (!newPassword.equals(newRePassword)) {
             throw new ChangeServicemanPasswordException("Passwords do not match!");
         }
-        
+
         try {
             Serviceman serviceman = retrieveServicemanByEmail(email);
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(oldPassword + serviceman.getSalt()));
@@ -233,7 +233,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 if (oldPassword.equals(newPassword)) {
                     throw new ChangeServicemanPasswordException("New password cannot be the same as old password!");
                 }
-                
+
                 serviceman.setPassword(newPassword);
                 em.flush();
             } else {
@@ -248,7 +248,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ChangeServicemanPasswordException(generalUnexpectedErrorMessage + "changing password");
         }
     }
-    
+
     @Override
     public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
@@ -257,11 +257,11 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (!phoneNumber.equals(serviceman.getPhoneNumber())) {
                 throw new ResetServicemanPasswordException("Phone number does not match account's phone number!");
             }
-            
+
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
-            
+
             emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
         } catch (ResetServicemanPasswordException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
@@ -272,20 +272,20 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password");
         }
     }
-    
+
     @Override
     public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException {
         String errorMessage = "Failed to reset Serviceman password: ";
         try {
             Serviceman serviceman = retrieveServicemanByEmail(currentServiceman.getEmail());
-            
+
             String password = CryptographicHelper.getInstance().generateRandomString(8);
             serviceman.setPassword(password);
             serviceman.setIsActivated(false);
-            
+
             emailSessionBean.emailServicemanResetPasswordAsync(serviceman, password);
             return serviceman;
-            
+
         } catch (ServicemanNotFoundException ex) {
             throw new ResetServicemanPasswordException(errorMessage + ex.getMessage());
         } catch (Exception ex) {
@@ -293,14 +293,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new ResetServicemanPasswordException(generalUnexpectedErrorMessage + "resetting password by Admin");
         }
     }
-    
+
     private String preparePersistenceExceptionErrorMessage(PersistenceException ex) {
         String result = "";
-        
+
         if (ex.getCause() != null
                 && ex.getCause().getCause() != null
                 && ex.getCause().getCause().getClass().getSimpleName().equals("SQLIntegrityConstraintViolationException")) {
-            
+
             if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
                 result += "Serivceman with same email address already exists\n";
             }
@@ -311,20 +311,20 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             ex.printStackTrace();
             result = "An unexpected database error has occurred!";
         }
-        
+
         return result;
     }
-    
+
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Serviceman>> constraintViolations) {
         String msg = "";
-        
+
         for (ConstraintViolation constraintViolation : constraintViolations) {
             msg += constraintViolation.getMessage() + "\n";
         }
-        
+
         msg = msg.substring(0, msg.length() - 1);
-        
+
         return msg;
     }
-    
+
 }

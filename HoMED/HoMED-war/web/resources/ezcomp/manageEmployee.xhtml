@@ -47,14 +47,14 @@
                 <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">
                         <div class="p-col-12 p-grid p-justify-center">
-                            <ui:fragment rendered="#{manageEmployeeManagedBean.isManageState}">
+                            <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode or not manageEmployeeManagedBean.isCreateState}">
                                 <span class="role-badge role-#{manageEmployeeManagedBean.employeeToView.role}">#{manageEmployeeManagedBean.employeeToView.role.stringVal}</span>
                                 <ui:fragment rendered="#{manageEmployeeManagedBean.isAdminView}">
                                     <i style="margin-left: 5px; font-size:25px" class="fa #{manageEmployeeManagedBean.employeeToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                 </ui:fragment>
                             </ui:fragment>
-                            <ui:fragment rendered="#{manageEmployeeManagedBean.isCreateState}">
-                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}">
+                            <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
+                                <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 150px">
                                     <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
                                 </p:selectOneMenu>
                             </ui:fragment>
@@ -168,7 +168,7 @@
                                         <ui:fragment rendered ="#{manageEmployeeManagedBean.isCreateState}">
                                             <p:commandButton actionListener="#{manageEmployeeManagedBean.doCreate}" update="panelManageEmployee" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                         </ui:fragment>
-                                        <ui:fragment rendered ="#{manageEmployeeManagedBean.isManageState}">
+                                        <ui:fragment rendered ="#{not manageEmployeeManagedBean.isCreateState}">
                                             <ui:fragment rendered="#{not manageEmployeeManagedBean.isEditMode}">
                                                 <p:commandButton update="panelManageEmployee" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
                                                     <f:setPropertyActionListener target="#{manageEmployeeManagedBean.isEditMode}" value="true"/>

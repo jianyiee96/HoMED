@@ -39,7 +39,6 @@ public class ManageServicemanManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         init();
-        this.isManageState = false;
         this.isCreateState = false;
         this.isAdminView = false;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
@@ -58,14 +57,12 @@ public class ManageServicemanManagedBean implements Serializable {
     public void initCreate() {
         init();
         this.servicemanToView = new Serviceman();
-        this.isManageState = false;
         this.isCreateState = true;
         this.isEditMode = true;
     }
 
     public void initManage() {
         init();
-        this.isManageState = true;
         this.isCreateState = false;
         this.isEditMode = false;
     }
@@ -144,14 +141,6 @@ public class ManageServicemanManagedBean implements Serializable {
 
     public void setIsHideAdminPanel(Boolean isHideAdminPanel) {
         this.isHideAdminPanel = isHideAdminPanel;
-    }
-
-    public Boolean getIsManageState() {
-        return isManageState;
-    }
-
-    public void setIsManageState(Boolean isManageState) {
-        this.isManageState = isManageState;
     }
 
     public Boolean getIsCreateState() {
