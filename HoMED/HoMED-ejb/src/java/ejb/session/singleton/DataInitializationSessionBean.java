@@ -95,6 +95,7 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
             System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
             System.out.println("Email: " + emp4.getEmail() + "\tPhone: " + emp4.getPhoneNumber());
+            System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
             System.out.println("Successfully created employees by init\n");
 
             Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
