@@ -120,6 +120,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employee.setIsActivated(serviceman.getIsActivated());
                     password = "Proceed to log in with same details as serviceman account";
                 }
+                
+                em.flush();
                 emailSessionBean.emailEmployeeOtpAsync(employee, password);
                 return password;
             } else {

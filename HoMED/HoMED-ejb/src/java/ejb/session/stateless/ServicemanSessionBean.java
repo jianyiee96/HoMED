@@ -77,6 +77,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     password = "Proceed to log in with same details as employee account";
                 }
 
+                em.flush();
                 emailSessionBean.emailServicemanOtpAsync(newServiceman, password);
                 return password;
             } else {
@@ -142,7 +143,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 serviceman.setHashPassword(hashPassword);
             }
 
-            em.flush();
             return serviceman;
         } catch (ServicemanNotFoundException ex) {
             return null;
