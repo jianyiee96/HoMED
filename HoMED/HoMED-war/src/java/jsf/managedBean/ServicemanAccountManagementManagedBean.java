@@ -82,6 +82,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void initBulkImport() {
+        System.out.println("calling");
         this.isUploaded = Boolean.FALSE;
         this.servicemanWrappers = new ArrayList<>();
         this.servicemenToCreate = new ArrayList<>();
@@ -123,13 +124,16 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
             } catch (IOException ex) {
                 ex.printStackTrace();
                 printUnexpectedErrorMessage("Please contact IT admins for assistance!");
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                ex.printStackTrace();
+                printUnexpectedErrorMessage("Please make sure the CSV file is in the correct format!");
             }
         } else {
             printUnexpectedErrorMessage("Please contact IT admins for assistance!");
         }
     }
 
-    private void validateServicemanByImport(String[] serviceman, ServicemanWrapper servicemanWrapper) {
+    private void validateServicemanByImport(String[] serviceman, ServicemanWrapper servicemanWrapper) throws ArrayIndexOutOfBoundsException {
         String name = serviceman[0];
         String gender = serviceman[1];
         String phone = serviceman[2];
@@ -409,7 +413,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk create. " + ex.getMessage()));
             }
         }
-        
+
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
                 System.out.println("Updating serviceman: " + serviceman.getEmail());
@@ -425,10 +429,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     private void printUnexpectedErrorMessage(String errorMessage) {
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Bulk Import",
-                        "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage)
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Bulk Import",
+                "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage)
         );
     }
 
@@ -521,7 +524,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void setIsHideAll(Boolean isHideAll) {
         this.isHideAll = isHideAll;
     }
-    
+
     public ServicemanRoleEnum[] getServicemanRoles() {
         return ServicemanRoleEnum.values();
     }

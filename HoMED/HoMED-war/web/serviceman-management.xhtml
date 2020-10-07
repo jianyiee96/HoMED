@@ -59,12 +59,13 @@
         <ezcomp:manageServiceman id="ccManageServiceman">
             <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
         </ezcomp:manageServiceman>
+        
+        <p:growl id="growl-message" showDetail="true" sticky="true" />
 
         <h:form id="formAllServicemen">
             <div class="p-grid crud-table">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="growl-message" showDetail="true" sticky="true"/>
 
                         <div class="buttonbar">
                             <p:splitButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
@@ -98,7 +99,7 @@
                             <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.name}" />
                             </p:column>
-                            
+
                             <p:column headerText="Role" width="7%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.role}" />
                             </p:column>
@@ -169,8 +170,8 @@
                       draggable="false" modal="true" responsive="true" fitViewport="true"
                       minWidth="500" width="1200" height="800">
                 <p:outputPanel id="panelBulkImportServicemen">
-                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="panelGroupBulkImportServicemen"
-                                  listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
+                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="growl-message panelGroupBulkImportServicemen" invalidFileMessage="Please only upload CSV files!"
+                                  listener="#{servicemanAccountManagementManagedBean.uploadCsv}" allowTypes="/(\.|\/)csv$/" />
 
                     <p:separator style='border-width: 1px;' />
 
@@ -254,7 +255,7 @@
                                                                             <!-- Currently in Edit Mode -->
                                                                             <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
                                                                                 <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
-                                                                                                 process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen formAllServicemen:growl-message'
+                                                                                                 process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen growl-message'
                                                                                                  actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
@@ -671,7 +672,7 @@
                                         <div class="p-formgrid p-grid">
                                             <div class="p-field p-col-2 p-offset-5">
                                                 <p:commandButton id="buttonImport" style="font-size: 18px;" icon="pi pi-upload" disabled="#{servicemanAccountManagementManagedBean.servicemenToCreate.size() eq 0 and servicemanAccountManagementManagedBean.servicemenToUpdate.size() eq 0}" 
-                                                                 value="Import (#{servicemanAccountManagementManagedBean.servicemenToCreate.size() + servicemanAccountManagementManagedBean.servicemenToUpdate.size()})" title="Import" process="@form" update="formAllServicemen" 
+                                                                 value="Import (#{servicemanAccountManagementManagedBean.servicemenToCreate.size() + servicemanAccountManagementManagedBean.servicemenToUpdate.size()})" title="Import" process="@form" update="formAllServicemen growl-message" 
                                                                  actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" onstart="PF('dialogBulkImportServicemenInProgress').show()">
                                                     <p:confirm header="Bulk Import" escape="false" message="Selected servicemen will be imported to the system. Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
