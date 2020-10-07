@@ -259,11 +259,11 @@
 
                                                                             <!-- Currently in Edit Mode -->
                                                                             <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
-                                                                                <p:commandButton rendered="#{servicemanWrapper.existingEmployee ne null}" icon="pi pi-clone" styleClass="rounded-button p-mr-2" title="Copy Details"
+                                                                                <p:commandButton rendered="#{servicemanWrapper.existingEmployee ne null}" icon="pi pi-clone" styleClass="rounded-button p-mr-2" title="Copy Existing Employee Details"
                                                                                                  process="@this" update="panelGroupServicemanDetails"
                                                                                                  actionListener="#{servicemanAccountManagementManagedBean.copyEmployeeDetails(servicemanWrapper)}" />
 
-                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}" title="Save"
+                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}" title="Save Details"
                                                                                                  process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen growl-message'
                                                                                                  actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />

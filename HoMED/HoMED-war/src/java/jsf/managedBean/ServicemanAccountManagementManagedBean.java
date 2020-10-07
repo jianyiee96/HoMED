@@ -188,11 +188,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         Set<ConstraintViolation<Object>> servicemanConstraintViolations = validator.validate(newServiceman);
         if (!servicemanConstraintViolations.isEmpty()) {
-            System.out.println("----- Serviceman -----");
-
             for (String errorMsg : prepareInputDataValidationErrorsMessage(servicemanConstraintViolations)) {
-                System.out.println(errorMsg);
-
                 if (errorMsg.contains("Name")) {
                     addErrorMessage(validationErrorMessages, 0, "name", name, errorMsg);
                     servicemanWrapper.setIsValid(Boolean.FALSE);
@@ -220,11 +216,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         Set<ConstraintViolation<Object>> addressConstraintViolations = validator.validate(address);
         if (!addressConstraintViolations.isEmpty()) {
-            System.out.println("----- Address -----");
-
             for (String errorMsg : prepareInputDataValidationErrorsMessage(addressConstraintViolations)) {
-                System.out.println(errorMsg);
-
                 if (errorMsg.contains("Street Name")) {
                     addErrorMessage(validationErrorMessages, 4, "street name", streetName, errorMsg);
                     servicemanWrapper.setIsValid(Boolean.FALSE);
@@ -308,17 +300,20 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
             // 1st occurrence of duplicates
             if (servicemanWrapper != currLoopingServicemanWrapper && email.equals(currLoopingServicemanWrapper.getNewServiceman().getEmail())) {
-                currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
-                currLoopingServicemanWrapper.getErrorMessages().set(3, null);
+                // If the email is modified to be different
+                if (!servicemanWrapper.getNewServiceman().getEmail().equals(email)) {
+                    currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
+                    currLoopingServicemanWrapper.getErrorMessages().set(3, null);
 
-                for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
-                    if (errorMsg != null) {
-                        return;
+                    for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
+                        if (errorMsg != null) {
+                            return;
+                        }
                     }
-                }
 
-                currLoopingServicemanWrapper.setIsValid(Boolean.TRUE);
-                return;
+                    currLoopingServicemanWrapper.setIsValid(Boolean.TRUE);
+                    return;
+                }
             }
         }
     }
@@ -441,9 +436,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void importSelectedServicemen() {
         for (Serviceman serviceman : servicemenToCreate) {
             try {
-                System.out.println("Creating serviceman: " + serviceman.getEmail());
                 servicemanSessionBeanLocal.createServiceman(serviceman);
-                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
             } catch (CreateServicemanException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk create. " + ex.getMessage()));
@@ -452,9 +445,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
-                System.out.println("Updating serviceman: " + serviceman.getEmail());
                 servicemanSessionBeanLocal.updateServiceman(serviceman);
-                System.out.println("Updated serviceman successfully!: " + serviceman.getEmail());
             } catch (UpdateServicemanException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk update. " + ex.getMessage()));
@@ -465,9 +456,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     private void printUnexpectedErrorMessage(String errorMessage) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Bulk Import",
-                "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage)
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Bulk Import",
+                        "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage
+                )
         );
     }
 
