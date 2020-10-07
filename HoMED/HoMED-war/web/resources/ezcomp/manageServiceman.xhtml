@@ -54,13 +54,13 @@
                             <div class="p-grid p-justify-between">
                                 <div style="width: 130px; margin-left: 15px"></div>
                                 <div>
-                                    <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode or not manageServicemanManagedBean.isCreateState}">
+                                    <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
                                         <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
                                         <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
                                             <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                         </ui:fragment>
                                     </ui:fragment>
-                                    <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}">
+                                    <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode}">
                                         <p:selectOneMenu id="view-role" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.role}" style="width: 150px">
                                             <f:selectItems value="#{servicemanAccountManagementManagedBean.getServicemanRoles()}" var="role" itemLabel="#{role.stringVal}"/>
                                         </p:selectOneMenu>
