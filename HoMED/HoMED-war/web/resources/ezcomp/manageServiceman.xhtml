@@ -12,17 +12,69 @@
     </cc:interface>
 
     <cc:implementation>
+
+        <style type="text/css">
+            .role-badge {
+                border-radius: 2px;
+                padding: .25em .5rem;
+                text-transform: uppercase;
+                font-weight: 700;
+                font-size: 25px;
+                letter-spacing: .3px;
+            }
+
+            .role-REGULAR {
+                background: #C8E6C9;
+                color: #256029;
+            }
+
+            .role-NSF {
+                background: #B3E5FC;
+                color: #23547B;
+            }
+
+            .role-NSMEN {
+                background: #FEEDAF;
+                color: #8A5340;
+            }
+
+            .role-OTHERS {
+                background: #DDA0DD;
+                color: #832f83;
+            }
+        </style>
+
         <h:form id="formManageServiceman">
             <p:dialog id="dialogManageServiceman" widgetVar="dialogManageServiceman" header="#{manageServicemanManagedBean.isCreateState ? 'Create Serviceman' : 'Serviceman Details'}" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageServiceman').initPosition()"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageServiceman" rendered="#{not empty manageServicemanManagedBean.servicemanToView}">
                     <div class="p-grid">
-                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView and manageServicemanManagedBean.isManageState}">
-                            <div class="p-col-12 p-grid p-justify-center">
-                                <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}" />
+                        <div class="p-col-12">
+                            <div class="p-grid p-justify-between">
+                                <div style="width: 130px; margin-left: 15px"></div>
+                                <div>
+                                    <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode or not manageServicemanManagedBean.isCreateState}">
+                                        <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
+                                        <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
+                                            <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
+                                        </ui:fragment>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}">
+                                        <p:selectOneMenu id="view-role" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.role}" style="width: 150px">
+                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.getServicemanRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                                        </p:selectOneMenu>
+                                    </ui:fragment>
+                                </div>
+                                <div style="width: 130px; margin-right: 15px">
+                                    <h:panelGroup id="panelGroupCopyDetailsBtn">
+                                        <p:commandButton update="panelManageServiceman" value="Copy Details" icon="pi pi-clone" style="float:right"
+                                                         actionListener="#{manageServicemanManagedBean.doCopyDetails()}" process="@this"
+                                                         rendered="#{manageServicemanManagedBean.employeeToCopy ne null and manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}"/>
+                                    </h:panelGroup>
+                                </div>
                             </div>
-                        </ui:fragment>
+                        </div>
 
                         <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
                             <div class="card ui-fluid">
@@ -61,7 +113,9 @@
                                 <div class="p-field">
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
-                                    <p:inputText id="view-email" value="#{manageServicemanManagedBean.servicemanToView.email}" rendered="#{manageServicemanManagedBean.isEditMode}" />
+                                    <p:inputText id="view-email" value="#{manageServicemanManagedBean.servicemanToView.email}" rendered="#{manageServicemanManagedBean.isEditMode}">
+                                        <p:ajax rendered="#{manageServicemanManagedBean.isCreateState}" event="keyup" listener="#{manageServicemanManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
+                                    </p:inputText>
                                     <h:outputText rendered="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.email}" class="view-text" />
                                     <p:message class="error-message" for="view-email" />
                                 </div>
@@ -143,7 +197,7 @@
                         </div>
 
                         <div class="p-col-12">
-                            <p:messages globalOnly="true" class="error-message" closable="true">
+                            <p:messages globalOnly="true" class="error-message">
                                 <p:autoUpdate/>
                             </p:messages>
                         </div>
@@ -158,7 +212,7 @@
                                         <ui:fragment rendered ="#{manageServicemanManagedBean.isCreateState}">
                                             <p:commandButton actionListener="#{manageServicemanManagedBean.doCreate}" update="panelManageServiceman" type="submit" title="Create" value="Create" icon="pi pi-save" styleClass="success-button p-mr-2"/>
                                         </ui:fragment>
-                                        <ui:fragment rendered ="#{manageServicemanManagedBean.isManageState}">
+                                        <ui:fragment rendered ="#{not manageServicemanManagedBean.isCreateState}">
                                             <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
                                                 <p:commandButton update="panelManageServiceman" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
                                                     <f:setPropertyActionListener target="#{manageServicemanManagedBean.isEditMode}" value="true"/>

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 @Named(value = "sessionTimeoutManagedBean")
 @ViewScoped
 public class SessionTimeoutManagedBean implements Serializable {
+
     private Boolean isCountdownState;
     private int countdownRemainingSeconds;
 
@@ -29,7 +30,7 @@ public class SessionTimeoutManagedBean implements Serializable {
         this.isCountdownState = true;
         this.countdownRemainingSeconds = 60;
     }
-    
+
     public void stopCountdown() {
         this.isCountdownState = false;
     }

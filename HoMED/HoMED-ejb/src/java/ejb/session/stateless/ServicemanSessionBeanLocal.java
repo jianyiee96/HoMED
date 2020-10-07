@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
 import entity.Serviceman;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public interface ServicemanSessionBeanLocal {
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException;
 
     public Serviceman retrieveServicemanById(Long servicemanId) throws ServicemanNotFoundException;
-    
+
     public Serviceman retrieveServicemanByEmail(String email) throws ServicemanNotFoundException;
 
     public Serviceman updateServiceman(Serviceman serviceman) throws UpdateServicemanException;
@@ -45,6 +46,8 @@ public interface ServicemanSessionBeanLocal {
 
     public void resetServicemanPassword(String email, String phoneNumber) throws ResetServicemanPasswordException;
 
-    public Serviceman resetServicemanPasswordByAdmin(Serviceman currentServiceman) throws ResetServicemanPasswordException;
-    
+    public Serviceman resetServicemanPasswordBySuperUser(Serviceman currentServiceman) throws ResetServicemanPasswordException;
+
+    public Serviceman updateServicemanMatchingAccount(Employee employee, String newEmail, String hashPassword, Boolean isActivated);
+
 }

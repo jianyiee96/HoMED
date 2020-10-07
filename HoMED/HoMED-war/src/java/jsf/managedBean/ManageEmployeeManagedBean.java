@@ -1,7 +1,9 @@
 package jsf.managedBean;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
+import entity.Serviceman;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -12,12 +14,17 @@ import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
+import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateEmployeeException;
 
 @Named(value = "manageEmployeeManagedBean")
 @ViewScoped
 public class ManageEmployeeManagedBean implements Serializable {
+
+    @EJB
+    private ServicemanSessionBeanLocal servicemanSessionBean;
 
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBean;
@@ -26,8 +33,9 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     private Employee employeeToView;
 
-    private Boolean isManageState;
     private Boolean isCreateState;
+
+    private Serviceman servicemanToCopy;
 
     private Boolean isAdminView;
     private Boolean isEditMode;
@@ -40,13 +48,13 @@ public class ManageEmployeeManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         init();
-        this.isManageState = false;
         this.isCreateState = false;
         this.isAdminView = false;
+        this.servicemanToCopy = null;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
             this.currentEmployee = (Employee) objCurrentEmployee;
-            if (this.currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
+            if (this.currentEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
                 this.isAdminView = true;
             }
         }
@@ -54,19 +62,18 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     private void init() {
         this.isHideAdminPanel = false;
+        this.servicemanToCopy = null;
     }
 
     public void initCreate() {
         init();
         this.employeeToView = new Employee();
-        this.isManageState = false;
         this.isCreateState = true;
         this.isEditMode = true;
     }
 
     public void initManage() {
         init();
-        this.isManageState = true;
         this.isCreateState = false;
         this.isEditMode = false;
     }
@@ -96,7 +103,7 @@ public class ManageEmployeeManagedBean implements Serializable {
         try {
             this.employeeToView.setIsActivated(false);
 
-            employeeSessionBean.resetEmployeePasswordByAdmin(employeeToView);
+            employeeSessionBean.resetEmployeePasswordBySuperUser(employeeToView);
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully reset employee's password! Please inform employee that OTP has been sent to their email.", null));
         } catch (ResetEmployeePasswordException ex) {
@@ -117,6 +124,22 @@ public class ManageEmployeeManagedBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
             }
         }
+    }
+
+    public void emailValidation() {
+        try {
+            this.servicemanToCopy = servicemanSessionBean.retrieveServicemanByEmail(this.employeeToView.getEmail());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Serviceman with same email detected. All details will also be updated on serviceman account.", null));
+        } catch (ServicemanNotFoundException ex) {
+            this.servicemanToCopy = null;
+        }
+    }
+
+    public void doCopyDetails() {
+        this.employeeToView.setName(servicemanToCopy.getName());
+        this.employeeToView.setGender(servicemanToCopy.getGender());
+        this.employeeToView.setPhoneNumber(servicemanToCopy.getPhoneNumber());
+        this.employeeToView.setAddress(servicemanToCopy.getAddress());
     }
 
     public Employee getEmployeeToView() {
@@ -151,20 +174,20 @@ public class ManageEmployeeManagedBean implements Serializable {
         this.isHideAdminPanel = isHideAdminPanel;
     }
 
-    public Boolean getIsManageState() {
-        return isManageState;
-    }
-
-    public void setIsManageState(Boolean isManageState) {
-        this.isManageState = isManageState;
-    }
-
     public Boolean getIsCreateState() {
         return isCreateState;
     }
 
     public void setIsCreateState(Boolean isCreateState) {
         this.isCreateState = isCreateState;
+    }
+
+    public Serviceman getServicemanToCopy() {
+        return servicemanToCopy;
+    }
+
+    public void setServicemanToCopy(Serviceman servicemanToCopy) {
+        this.servicemanToCopy = servicemanToCopy;
     }
 
 }

@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-ejb
- */
 package entity;
 
 import java.io.Serializable;
@@ -9,10 +5,6 @@ import javax.persistence.Entity;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 
-/**
- *
- * @author sunag
- */
 @Entity
 public class Clerk extends Employee implements Serializable {
 
@@ -21,12 +13,17 @@ public class Clerk extends Employee implements Serializable {
 
     public Clerk(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
-        this.role = EmployeeRoleEnum.CLERK;
+        super.role = EmployeeRoleEnum.CLERK;
     }
 
     public Clerk(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
-        this.role = EmployeeRoleEnum.CLERK;
+        super.role = EmployeeRoleEnum.CLERK;
+    }
+
+    public Clerk(Employee e) {
+        super(e.name, e.password, e.email, e.address, e.phoneNumber, e.gender);
+        super.role = EmployeeRoleEnum.CLERK;
     }
 
     @Override

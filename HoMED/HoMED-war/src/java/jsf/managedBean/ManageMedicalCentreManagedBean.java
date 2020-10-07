@@ -48,7 +48,7 @@ public class ManageMedicalCentreManagedBean implements Serializable {
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (objCurrentEmployee != null) {
             this.currentEmployee = (Employee) objCurrentEmployee;
-            if (this.currentEmployee.getRole() == EmployeeRoleEnum.ADMIN) {
+            if (this.currentEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
                 this.isAdminView = true;
             }
         }

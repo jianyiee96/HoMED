@@ -7,21 +7,18 @@ import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Address;
-import entity.Admin;
+import entity.SuperUser;
 import entity.Clerk;
 import entity.ConsultationPurpose;
 import entity.Employee;
 import entity.FormField;
 import entity.FormFieldOption;
-import entity.FormInstance;
 import entity.FormTemplate;
+import entity.MedicalBoardAdmin;
 import entity.MedicalCentre;
 import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.Serviceman;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +34,7 @@ import util.enumeration.BloodTypeEnum;
 import util.enumeration.DayOfWeekEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.InputTypeEnum;
+import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.CreateConsultationPurposeException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.CreateFormTemplateException;
@@ -82,21 +80,27 @@ public class DataInitializationSessionBean {
         try {
             System.out.println("====================== Start of DATA INIT ======================");
 
-            Employee emp1 = new Admin("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
+            Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
             Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
             Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
+            Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
+            Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
             Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
             Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
             Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
+            Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
+            Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
             System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
+            System.out.println("Email: " + emp4.getEmail() + "\tPhone: " + emp4.getPhoneNumber());
+            System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
             System.out.println("Successfully created employees by init\n");
 
-            Employee emp1Otp = new Admin("Admin OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
+            Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
             Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
-            Employee emp3Otp = new Clerk("Hew Jian Yiee", "hew1521@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
+            Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
             String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
             String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
             String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
@@ -107,23 +111,26 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + emp3Otp.getEmail() + "\tPhone: " + emp3Otp.getPhoneNumber() + "\tOTP: " + empOtp3);
             System.out.println("Successfully created employees with OTP\n");
 
-            Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98765434", new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "hew1521@hotmail.com", "97255472", new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
             String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
             String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
+            String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
 
             System.out.println("Serviceman INFO [OTP]");
             System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
             System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
             System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
+            System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
             System.out.println("Successfully created serivcemen with OTP\n");
 
             initializeMedicalCentres();
             Long formTemplateId = initializeForm();
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
-            
+
             initializeVaccinationForm();
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException
@@ -252,7 +259,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Vaccine to be given: Typhoid", 13, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
         formFields.add(new FormField("Vaccine to be given: Varicella", 14, InputTypeEnum.DATE, Boolean.FALSE, Boolean.FALSE, null));
         formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.FALSE, null));
-        
+
         otherFormTemplate.setFormFields(formFields);
         otherFormTemplate.setDeclaration("I certify that I have answered the above questionnaire to the best of my knowledge.");
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
