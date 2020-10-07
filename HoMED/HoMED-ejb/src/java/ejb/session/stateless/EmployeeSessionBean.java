@@ -212,7 +212,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employeeToUpdate.setAddress(employee.getAddress());
                     employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     employeeToUpdate.setGender(employee.getGender());
-
+                    
                     if (emailChangeDetected) {
                         servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, employee.getEmail(), null, employee.getIsActivated());
                         employeeToUpdate.setEmail(employee.getEmail());

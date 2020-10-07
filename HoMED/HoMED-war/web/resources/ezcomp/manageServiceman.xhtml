@@ -70,7 +70,7 @@
                                     <h:panelGroup id="panelGroupCopyDetailsBtn">
                                         <p:commandButton update="panelManageServiceman" value="Copy Details" icon="pi pi-clone" style="float:right"
                                                          actionListener="#{manageServicemanManagedBean.doCopyDetails()}" process="@this"
-                                                         rendered="#{manageServicemanManagedBean.employeeToCopy ne null and manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}"/>
+                                                         rendered="#{manageServicemanManagedBean.employeeToCopy ne null and manageServicemanManagedBean.isEditMode}"/>
                                     </h:panelGroup>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
                                     <p:inputText id="view-email" value="#{manageServicemanManagedBean.servicemanToView.email}" rendered="#{manageServicemanManagedBean.isEditMode}">
-                                        <p:ajax rendered="#{manageServicemanManagedBean.isCreateState}" event="keyup" listener="#{manageServicemanManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
+                                        <p:ajax event="keyup" listener="#{manageServicemanManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
                                     </p:inputText>
                                     <h:outputText rendered="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.email}" class="view-text" />
                                     <p:message class="error-message" for="view-email" />

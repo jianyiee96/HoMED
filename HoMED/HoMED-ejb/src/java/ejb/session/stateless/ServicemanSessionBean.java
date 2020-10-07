@@ -68,7 +68,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
-                em.flush();
 
                 System.out.println("trying to find matching email: " + newServiceman.getEmail());
                 Employee employee = employeeSessionBean.updateEmployeeMatchingAccount(newServiceman, null, null, null);
@@ -173,7 +172,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                     servicemanToUpdate.setAddress(serviceman.getAddress());
                     servicemanToUpdate.setRole(serviceman.getRole());
-
+                    
                     if (emailChangeDetected) {
                         employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, serviceman.getEmail(), null, serviceman.getIsActivated());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
