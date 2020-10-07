@@ -36,7 +36,12 @@
     color: #C63737;
 }
 
-.status-valid, .status-invalid, .status-create, .status-update {
+.status-employee {
+    background: #DDA0DD;
+    color: #832f83;
+}
+
+.status-valid, .status-invalid, .status-create, .status-update, .status-employee {
     font-size: 18px;
 }
 

@@ -222,6 +222,10 @@
                                                                         <ui:fragment rendered="#{servicemanWrapper.existingServiceman ne null}" >
                                                                             <span class="form-status-badge status-update">UPDATE</span>
                                                                         </ui:fragment>
+
+                                                                        <ui:fragment rendered="#{servicemanWrapper.existingEmployee ne null}" >
+                                                                            <span class="form-status-badge status-employee">#{servicemanWrapper.existingEmployee.role.stringVal}</span>
+                                                                        </ui:fragment>
                                                                     </h:panelGroup>
                                                                 </div>
 

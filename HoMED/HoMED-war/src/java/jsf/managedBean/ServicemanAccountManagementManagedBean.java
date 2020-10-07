@@ -1,7 +1,9 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Address;
+import entity.Employee;
 import entity.Serviceman;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +36,7 @@ import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.CreateServicemanException;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
 
@@ -41,6 +44,8 @@ import util.exceptions.UpdateServicemanException;
 @ViewScoped
 public class ServicemanAccountManagementManagedBean implements Serializable {
 
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
@@ -108,16 +113,18 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                     ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
                     validateServicemanByImport(serviceman, servicemanWrapper);
+                    checkExistingServiceman(servicemanWrapper);
+                    checkExistingEmployee(servicemanWrapper);
 
-                    String email = serviceman[3];
-                    try {
-                        Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(email);
-                        servicemanWrapper.setExistingServiceman(existingServiceman);
-                        servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
-                        servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
-                    } catch (ServicemanNotFoundException ex) {
-                        servicemanWrapper.setExistingServiceman(null);
-                    }
+//                    String email = serviceman[3];
+//                    try {
+//                        Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(email);
+//                        servicemanWrapper.setExistingServiceman(existingServiceman);
+//                        servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
+//                        servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
+//                    } catch (ServicemanNotFoundException ex) {
+//                        servicemanWrapper.setExistingServiceman(null);
+//                    }
                 }
 
                 this.isUploaded = Boolean.TRUE;
@@ -268,6 +275,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void validateDuplicateServicemanOnEdit(ServicemanWrapper servicemanWrapper) {
         checkExistingServiceman(servicemanWrapper);
+        checkExistingEmployee(servicemanWrapper);
 
         for (ServicemanWrapper sw : this.servicemanWrappers) {
             String existingEmail = sw.getNewServiceman().getEmail();
@@ -329,8 +337,19 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         try {
             Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
             servicemanWrapper.setExistingServiceman(existingServiceman);
+            servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
+            servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
         } catch (ServicemanNotFoundException ex) {
             servicemanWrapper.setExistingServiceman(null);
+        }
+    }
+
+    private void checkExistingEmployee(ServicemanWrapper servicemanWrapper) {
+        try {
+            Employee existingEmployee = employeeSessionBeanLocal.retrieveEmployeeByEmail(servicemanWrapper.getNewServiceman().getEmail());
+            servicemanWrapper.setExistingEmployee(existingEmployee);
+        } catch (EmployeeNotFoundException ex) {
+            servicemanWrapper.setExistingEmployee(null);
         }
     }
 
@@ -493,7 +512,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public GenderEnum[] getGenders() {
         return GenderEnum.values();
     }
-    
+
     public ServicemanRoleEnum[] getServicemanRoles() {
         return ServicemanRoleEnum.values();
     }

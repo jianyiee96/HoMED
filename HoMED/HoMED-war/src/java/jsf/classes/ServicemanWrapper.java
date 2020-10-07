@@ -4,12 +4,14 @@
  */
 package jsf.classes;
 
+import entity.Employee;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServicemanWrapper {
 
+    private Employee existingEmployee;
     private Serviceman existingServiceman;
     private Serviceman newServiceman;
     private Serviceman newServicemanClone;
@@ -41,6 +43,14 @@ public class ServicemanWrapper {
     public void reset() {
         this.newServiceman = new Serviceman(this.newServicemanClone);
         this.isDuplicate = Boolean.FALSE;
+    }
+
+    public Employee getExistingEmployee() {
+        return existingEmployee;
+    }
+
+    public void setExistingEmployee(Employee existingEmployee) {
+        this.existingEmployee = existingEmployee;
     }
 
     public Serviceman getExistingServiceman() {
