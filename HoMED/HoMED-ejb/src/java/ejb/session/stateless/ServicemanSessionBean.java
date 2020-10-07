@@ -58,7 +58,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
     @Override
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException {
-        String errorMessage = "Failed to create Serivceman: ";
+        String errorMessage = "Failed to create Serviceman: ";
         try {
 
             String password = CryptographicHelper.getInstance().generateRandomString(8);
@@ -69,7 +69,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (constraintViolations.isEmpty()) {
                 em.persist(newServiceman);
 
-                System.out.println("trying to find matching email: " + newServiceman.getEmail());
                 Employee employee = employeeSessionBean.updateEmployeeMatchingAccount(newServiceman, null, null, null);
                 if (employee != null) {
                     newServiceman.setHashPassword(employee.getPassword());
@@ -358,10 +357,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 && ex.getCause().getCause().getClass().getSimpleName().equals("SQLIntegrityConstraintViolationException")) {
 
             if (ex.getCause().getCause().getMessage().contains("EMAIL")) {
-                result += "Serivceman with same email address already exists\n";
+                result += "Serviceman with same email address already exists\n";
             }
             if (ex.getCause().getCause().getMessage().contains("PHONE")) {
-                result += "Serivceman with same phone number already exists\n";
+                result += "Serviceman with same phone number already exists\n";
             }
         } else {
             ex.printStackTrace();

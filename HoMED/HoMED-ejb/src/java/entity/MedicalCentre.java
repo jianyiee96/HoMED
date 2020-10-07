@@ -35,7 +35,7 @@ public class MedicalCentre implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Please provide a telephone number for the medical centre")
     @Size(min = 8, max = 8, message = "Telephone number must be of length 8")
-    @Pattern(regexp = "^[689]\\d{7}", message = "Proper formmated Phone Number must be provided")
+    @Pattern(regexp = "^[689]\\d{7}", message = "Proper formatted Phone Number must be provided")
     private String phone;
 
     @Embedded

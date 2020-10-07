@@ -21,7 +21,7 @@ public class Address implements Serializable {
     private String country;
     @NotNull(message = "Postal Code must be provided")
     @Size(min = 6, max = 6, message = "Postal Code must be of length 6")
-    @Pattern(regexp = "^\\d{6}$", message = "Proper formmated Postal Code must be provided")
+    @Pattern(regexp = "^\\d{6}$", message = "Proper formatted Postal Code must be provided")
     private String postal;
 
     public Address() {
