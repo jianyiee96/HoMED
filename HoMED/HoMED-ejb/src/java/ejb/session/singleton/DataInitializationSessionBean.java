@@ -112,7 +112,7 @@ public class DataInitializationSessionBean {
             System.out.println("Successfully created employees with OTP\n");
 
             Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98765434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
             String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
