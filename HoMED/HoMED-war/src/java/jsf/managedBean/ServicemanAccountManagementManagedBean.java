@@ -87,7 +87,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     public void initBulkImport() {
-        System.out.println("calling");
         this.isUploaded = Boolean.FALSE;
         this.servicemanWrappers = new ArrayList<>();
         this.servicemenToCreate = new ArrayList<>();
@@ -351,6 +350,17 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         } catch (EmployeeNotFoundException ex) {
             servicemanWrapper.setExistingEmployee(null);
         }
+    }
+
+    public void copyEmployeeDetails(ServicemanWrapper servicemanWrapper) {
+        removeErrorMessagesByEdit(servicemanWrapper);
+        Serviceman serviceman = servicemanWrapper.getNewServiceman();
+        Employee employee = servicemanWrapper.getExistingEmployee();
+        
+        serviceman.setName(employee.getName());
+        serviceman.setGender(employee.getGender());
+        serviceman.setPhoneNumber(employee.getPhoneNumber());
+        serviceman.setAddress(employee.getAddress());
     }
 
     public void removeErrorMessagesByEdit(ServicemanWrapper servicemanWrapper) {

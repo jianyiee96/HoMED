@@ -249,8 +249,9 @@
 
                                                                             <!-- To Enter Edit Mode -->
                                                                             <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                                <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}"
-                                                                                                 disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" title="Edit"
+                                                                                                 disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
                                                                                     <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
                                                                                 </p:commandButton>
@@ -258,15 +259,20 @@
 
                                                                             <!-- Currently in Edit Mode -->
                                                                             <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
-                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
+                                                                                <p:commandButton rendered="#{servicemanWrapper.existingEmployee ne null}" icon="pi pi-clone" styleClass="rounded-button p-mr-2" title="Copy Details"
+                                                                                                 process="@this" update="panelGroupServicemanDetails"
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.copyEmployeeDetails(servicemanWrapper)}" />
+
+                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}" title="Save"
                                                                                                  process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen growl-message'
                                                                                                  actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
                                                                                 </p:commandButton>
 
-                                                                                <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
-                                                                                                 process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" title="Cancel"
+                                                                                                 process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                 </p:commandButton>
                                                                             </ui:fragment>
