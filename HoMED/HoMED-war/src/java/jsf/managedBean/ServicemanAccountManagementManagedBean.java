@@ -153,12 +153,6 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         String rod = serviceman[10];
         String role = serviceman[11];
 
-        System.out.println("======================================================================");
-        System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
-                + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
-                + "); Role = " + role + "; Blood Type = " + bloodType + "; ROD = " + rod);
-        System.out.println("======================================================================");
-
         Serviceman newServiceman = new Serviceman();
         newServiceman.setName(name);
         newServiceman.setEmail(email);

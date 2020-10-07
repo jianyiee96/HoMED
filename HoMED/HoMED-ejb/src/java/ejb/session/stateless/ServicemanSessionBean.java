@@ -70,6 +70,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 em.persist(newServiceman);
                 em.flush();
 
+                System.out.println("trying to find matching email: " + newServiceman.getEmail());
                 Employee employee = employeeSessionBean.updateEmployeeMatchingAccount(newServiceman, null, null, null);
                 if (employee != null) {
                     newServiceman.setHashPassword(employee.getPassword());
@@ -120,10 +121,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     }
 
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Serviceman updateServicemanMatchingAccount(Employee employee, String newEmail, String hashPassword, Boolean isActivated) {
+        String email = employee.getEmail();
+
         try {
-            String email = employee.getEmail();
             Serviceman serviceman = retrieveServicemanByEmail(email);
 
             serviceman.setName(employee.getName());
@@ -143,6 +144,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 serviceman.setHashPassword(hashPassword);
             }
 
+            em.flush();
             return serviceman;
         } catch (ServicemanNotFoundException ex) {
             return null;
@@ -175,13 +177,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     if (emailChangeDetected) {
                         employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, serviceman.getEmail(), null, serviceman.getIsActivated());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
+                        em.flush();
                         emailSessionBean.emailServicemanChangeEmailAsync(serviceman);
                     } else {
                         employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, null, null, serviceman.getIsActivated());
+                        em.flush();
                     }
 
                     return servicemanToUpdate;
-
                 } else {
                     throw new UpdateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }

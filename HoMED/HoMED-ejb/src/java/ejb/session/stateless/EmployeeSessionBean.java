@@ -162,10 +162,10 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated) {
+        String email = serviceman.getEmail();
+        
         try {
-            String email = serviceman.getEmail();
             Employee employee = retrieveEmployeeByEmail(email);
 
             employee.setName(serviceman.getName());
@@ -216,13 +216,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     if (emailChangeDetected) {
                         servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, employee.getEmail(), null, employee.getIsActivated());
                         employeeToUpdate.setEmail(employee.getEmail());
+                        em.flush();
                         emailSessionBean.emailEmployeeChangeEmailAsync(employee);
                     } else {
                         servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, null, null, employee.getIsActivated());
+                        em.flush();
                     }
 
                     return employeeToUpdate;
-
                 } else {
                     throw new UpdateEmployeeException(prepareInputDataValidationErrorsMessage(constraintViolations));
                 }
