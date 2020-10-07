@@ -72,7 +72,7 @@
                                     <h:panelGroup id="panelGroupCopyDetailsBtn">
                                         <p:commandButton update="panelManageEmployee" value="Copy Details" icon="pi pi-clone" style="float:right"
                                                          actionListener="#{manageEmployeeManagedBean.doCopyDetails()}" process="@this"
-                                                         rendered="#{manageEmployeeManagedBean.servicemanToCopy ne null and manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}"/>
+                                                         rendered="#{manageEmployeeManagedBean.servicemanToCopy ne null and manageEmployeeManagedBean.isEditMode}"/>
                                     </h:panelGroup>
                                 </div>
                             </div>
@@ -115,7 +115,7 @@
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
                                     <p:inputText id="view-email" value="#{manageEmployeeManagedBean.employeeToView.email}" rendered="#{manageEmployeeManagedBean.isEditMode}">
-                                        <p:ajax rendered="#{manageEmployeeManagedBean.isCreateState}" event="keyup" listener="#{manageEmployeeManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
+                                        <p:ajax event="keyup" listener="#{manageEmployeeManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
                                     </p:inputText>
                                     <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.email}" class="view-text" />
                                     <p:message class="error-message" for="view-email"/>
