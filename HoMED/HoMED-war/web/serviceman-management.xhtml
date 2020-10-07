@@ -59,7 +59,7 @@
         <ezcomp:manageServiceman id="ccManageServiceman">
             <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
         </ezcomp:manageServiceman>
-        
+
         <p:growl id="growl-message" showDetail="true" sticky="true" />
 
         <h:form id="formAllServicemen">
@@ -599,6 +599,37 @@
 
                                                                 <div class="p-formgrid p-grid">
                                                                     <div class="p-field p-col-12"  style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">Others</p:outputLabel></div>
+                                                                </div>
+
+                                                                <!-- Role -->
+                                                                <div class="p-formgrid p-grid">
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-label-existing-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Role</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-output-message-existing-serviceman' : null}">
+                                                                        <h:outputText value="#{servicemanWrapper.existingServiceman.role.stringVal}" />
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.errorMessages.get(11) ne null ? 'error-label' : null}
+                                                                         #{servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-label-new-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Role</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.errorMessages.get(11) ne null ? 'error-output-message' : null}
+                                                                         #{servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-output-message-new-serviceman' : null}">
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(11) eq null}" value="#{servicemanWrapper.newServiceman.role.stringVal}" />
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(11) ne null}" value="#{servicemanWrapper.errorMessages.get(11)}" />
+                                                                        <p:selectOneMenu rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.role}">
+                                                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.servicemanRoles}" var="servicemanRole" itemLabel="#{servicemanRole.stringVal}" />
+                                                                        </p:selectOneMenu>
+                                                                    </div>
                                                                 </div>
 
                                                                 <!-- Blood Type -->

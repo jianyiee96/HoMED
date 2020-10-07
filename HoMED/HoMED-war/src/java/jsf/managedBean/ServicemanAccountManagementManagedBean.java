@@ -145,11 +145,12 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         String postalCode = serviceman[8];
         String bloodType = serviceman[9];
         String rod = serviceman[10];
+        String role = serviceman[11];
 
         System.out.println("======================================================================");
         System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
                 + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
-                + "); Blood Type = " + bloodType + "; ROD = " + rod);
+                + "); Role = " + role + "; Blood Type = " + bloodType + "; ROD = " + rod);
         System.out.println("======================================================================");
 
         Serviceman newServiceman = new Serviceman();
@@ -158,6 +159,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         newServiceman.setPhoneNumber(phone);
         if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
             newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
+        }
+        if (role.toUpperCase().equals("NSF") || role.toUpperCase().equals("NSMEN") || role.toUpperCase().equals("REGULAR") || role.toUpperCase().equals("OTHERS")) {
+            newServiceman.setRole(ServicemanRoleEnum.valueOf(role.toUpperCase()));
         }
         if (BloodTypeEnum.valueOfLabel(bloodType) != null) {
             newServiceman.setBloodType(BloodTypeEnum.valueOfLabel(bloodType));
@@ -200,6 +204,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("ROD")) {
                     addErrorMessage(validationErrorMessages, 10, "ROD", rod, "Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
+                } else if (errorMsg.contains("Role")) {
+                    addErrorMessage(validationErrorMessages, 11, "role", role, "Please change it to REGULAR/NSF/NSMEN/OTHERS");
                     servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
             }
@@ -486,6 +493,10 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public GenderEnum[] getGenders() {
         return GenderEnum.values();
     }
+    
+    public ServicemanRoleEnum[] getServicemanRoles() {
+        return ServicemanRoleEnum.values();
+    }
 
     public BloodTypeEnum[] getBloodTypes() {
         return BloodTypeEnum.values();
@@ -523,9 +534,5 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void setIsHideAll(Boolean isHideAll) {
         this.isHideAll = isHideAll;
-    }
-
-    public ServicemanRoleEnum[] getServicemanRoles() {
-        return ServicemanRoleEnum.values();
     }
 }
