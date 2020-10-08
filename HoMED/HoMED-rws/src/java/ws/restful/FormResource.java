@@ -97,7 +97,6 @@ public class FormResource {
 
     @Path("retrieveAllServicemanFormInstances")
     @GET
-    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveAllServicemanFormInstances(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
 
@@ -205,7 +204,6 @@ public class FormResource {
 
     @Path("deleteFormInstance")
     @DELETE
-    @Consumes(MediaType.TEXT_PLAIN)
     public Response deleteFormInstance(@Context HttpHeaders headers, @QueryParam("formInstanceId") String formInstanceId) {
         
         try {
