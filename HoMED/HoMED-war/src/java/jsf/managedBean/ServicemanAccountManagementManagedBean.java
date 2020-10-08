@@ -1,7 +1,9 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Address;
+import entity.Employee;
 import entity.Serviceman;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +36,7 @@ import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.CreateServicemanException;
+import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
 
@@ -41,6 +44,8 @@ import util.exceptions.UpdateServicemanException;
 @ViewScoped
 public class ServicemanAccountManagementManagedBean implements Serializable {
 
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
@@ -107,29 +112,34 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
                     ServicemanWrapper servicemanWrapper = new ServicemanWrapper();
                     validateServicemanByImport(serviceman, servicemanWrapper);
+                    checkExistingServiceman(servicemanWrapper);
+                    checkExistingEmployee(servicemanWrapper);
 
-                    String email = serviceman[3];
-                    try {
-                        Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(email);
-                        servicemanWrapper.setExistingServiceman(existingServiceman);
-                        servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
-                        servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
-                    } catch (ServicemanNotFoundException ex) {
-                        servicemanWrapper.setExistingServiceman(null);
-                    }
+//                    String email = serviceman[3];
+//                    try {
+//                        Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(email);
+//                        servicemanWrapper.setExistingServiceman(existingServiceman);
+//                        servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
+//                        servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
+//                    } catch (ServicemanNotFoundException ex) {
+//                        servicemanWrapper.setExistingServiceman(null);
+//                    }
                 }
 
                 this.isUploaded = Boolean.TRUE;
             } catch (IOException ex) {
                 ex.printStackTrace();
                 printUnexpectedErrorMessage("Please contact IT admins for assistance!");
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                ex.printStackTrace();
+                printUnexpectedErrorMessage("Please make sure the CSV file is in the correct format!");
             }
         } else {
             printUnexpectedErrorMessage("Please contact IT admins for assistance!");
         }
     }
 
-    private void validateServicemanByImport(String[] serviceman, ServicemanWrapper servicemanWrapper) {
+    private void validateServicemanByImport(String[] serviceman, ServicemanWrapper servicemanWrapper) throws ArrayIndexOutOfBoundsException {
         String name = serviceman[0];
         String gender = serviceman[1];
         String phone = serviceman[2];
@@ -141,12 +151,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         String postalCode = serviceman[8];
         String bloodType = serviceman[9];
         String rod = serviceman[10];
-
-        System.out.println("======================================================================");
-        System.out.println("Name = " + name + "; Gender = " + gender + "; Phone = " + phone + "; Email = " + email
-                + "; Address (" + streetName + ", " + unitNumber + ", " + buildingName + ", " + country + ", " + postalCode
-                + "); Blood Type = " + bloodType + "; ROD = " + rod);
-        System.out.println("======================================================================");
+        String role = serviceman[11];
 
         Serviceman newServiceman = new Serviceman();
         newServiceman.setName(name);
@@ -154,6 +159,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         newServiceman.setPhoneNumber(phone);
         if (gender.toUpperCase().equals("MALE") || gender.toUpperCase().equals("FEMALE")) {
             newServiceman.setGender(GenderEnum.valueOf(gender.toUpperCase()));
+        }
+        if (role.toUpperCase().equals("NSF") || role.toUpperCase().equals("NSMEN") || role.toUpperCase().equals("REGULAR") || role.toUpperCase().equals("OTHERS")) {
+            newServiceman.setRole(ServicemanRoleEnum.valueOf(role.toUpperCase()));
         }
         if (BloodTypeEnum.valueOfLabel(bloodType) != null) {
             newServiceman.setBloodType(BloodTypeEnum.valueOfLabel(bloodType));
@@ -174,11 +182,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
         Set<ConstraintViolation<Object>> servicemanConstraintViolations = validator.validate(newServiceman);
         if (!servicemanConstraintViolations.isEmpty()) {
-            System.out.println("----- Serviceman -----");
-
             for (String errorMsg : prepareInputDataValidationErrorsMessage(servicemanConstraintViolations)) {
-                System.out.println(errorMsg);
-
                 if (errorMsg.contains("Name")) {
                     addErrorMessage(validationErrorMessages, 0, "name", name, errorMsg);
                     servicemanWrapper.setIsValid(Boolean.FALSE);
@@ -197,17 +201,16 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                 } else if (errorMsg.contains("ROD")) {
                     addErrorMessage(validationErrorMessages, 10, "ROD", rod, "Please change it to \"DD/MM/YYYY\" or \"DD-MM-YYYY\".");
                     servicemanWrapper.setIsValid(Boolean.FALSE);
+                } else if (errorMsg.contains("Role")) {
+                    addErrorMessage(validationErrorMessages, 11, "role", role, "Please change it to REGULAR/NSF/NSMEN/OTHERS");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
             }
         }
 
         Set<ConstraintViolation<Object>> addressConstraintViolations = validator.validate(address);
         if (!addressConstraintViolations.isEmpty()) {
-            System.out.println("----- Address -----");
-
             for (String errorMsg : prepareInputDataValidationErrorsMessage(addressConstraintViolations)) {
-                System.out.println(errorMsg);
-
                 if (errorMsg.contains("Street Name")) {
                     addErrorMessage(validationErrorMessages, 4, "street name", streetName, errorMsg);
                     servicemanWrapper.setIsValid(Boolean.FALSE);
@@ -257,6 +260,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void validateDuplicateServicemanOnEdit(ServicemanWrapper servicemanWrapper) {
         checkExistingServiceman(servicemanWrapper);
+        checkExistingEmployee(servicemanWrapper);
 
         for (ServicemanWrapper sw : this.servicemanWrappers) {
             String existingEmail = sw.getNewServiceman().getEmail();
@@ -290,17 +294,20 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
             // 1st occurrence of duplicates
             if (servicemanWrapper != currLoopingServicemanWrapper && email.equals(currLoopingServicemanWrapper.getNewServiceman().getEmail())) {
-                currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
-                currLoopingServicemanWrapper.getErrorMessages().set(3, null);
+                // If the email is modified to be different
+                if (!servicemanWrapper.getNewServiceman().getEmail().equals(email)) {
+                    currLoopingServicemanWrapper.setIsDuplicate(Boolean.FALSE);
+                    currLoopingServicemanWrapper.getErrorMessages().set(3, null);
 
-                for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
-                    if (errorMsg != null) {
-                        return;
+                    for (String errorMsg : currLoopingServicemanWrapper.getErrorMessages()) {
+                        if (errorMsg != null) {
+                            return;
+                        }
                     }
-                }
 
-                currLoopingServicemanWrapper.setIsValid(Boolean.TRUE);
-                return;
+                    currLoopingServicemanWrapper.setIsValid(Boolean.TRUE);
+                    return;
+                }
             }
         }
     }
@@ -318,9 +325,31 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         try {
             Serviceman existingServiceman = servicemanSessionBeanLocal.retrieveServicemanByEmail(servicemanWrapper.getNewServiceman().getEmail());
             servicemanWrapper.setExistingServiceman(existingServiceman);
+            servicemanWrapper.getNewServiceman().setServicemanId(existingServiceman.getServicemanId());
+            servicemanWrapper.getNewServiceman().setPassword(existingServiceman.getPassword());
         } catch (ServicemanNotFoundException ex) {
             servicemanWrapper.setExistingServiceman(null);
         }
+    }
+
+    private void checkExistingEmployee(ServicemanWrapper servicemanWrapper) {
+        try {
+            Employee existingEmployee = employeeSessionBeanLocal.retrieveEmployeeByEmail(servicemanWrapper.getNewServiceman().getEmail());
+            servicemanWrapper.setExistingEmployee(existingEmployee);
+        } catch (EmployeeNotFoundException ex) {
+            servicemanWrapper.setExistingEmployee(null);
+        }
+    }
+
+    public void copyEmployeeDetails(ServicemanWrapper servicemanWrapper) {
+        removeErrorMessagesByEdit(servicemanWrapper);
+        Serviceman serviceman = servicemanWrapper.getNewServiceman();
+        Employee employee = servicemanWrapper.getExistingEmployee();
+        
+        serviceman.setName(employee.getName());
+        serviceman.setGender(employee.getGender());
+        serviceman.setPhoneNumber(employee.getPhoneNumber());
+        serviceman.setAddress(employee.getAddress());
     }
 
     public void removeErrorMessagesByEdit(ServicemanWrapper servicemanWrapper) {
@@ -401,20 +430,16 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     public void importSelectedServicemen() {
         for (Serviceman serviceman : servicemenToCreate) {
             try {
-                System.out.println("Creating serviceman: " + serviceman.getEmail());
                 servicemanSessionBeanLocal.createServiceman(serviceman);
-                System.out.println("Created serviceman successfully!: " + serviceman.getEmail());
             } catch (CreateServicemanException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk create. " + ex.getMessage()));
             }
         }
-        
+
         for (Serviceman serviceman : servicemenToUpdate) {
             try {
-                System.out.println("Updating serviceman: " + serviceman.getEmail());
                 servicemanSessionBeanLocal.updateServiceman(serviceman);
-                System.out.println("Updated serviceman successfully!: " + serviceman.getEmail());
             } catch (UpdateServicemanException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         serviceman.getEmail(), "An unexpected error has occurred while importing servicemen in bulk update. " + ex.getMessage()));
@@ -425,10 +450,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     private void printUnexpectedErrorMessage(String errorMessage) {
-        FacesContext.getCurrentInstance().addMessage(null,
+        FacesContext.getCurrentInstance().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Bulk Import",
-                        "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage)
+                        "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage
+                )
         );
     }
 
@@ -484,6 +510,10 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         return GenderEnum.values();
     }
 
+    public ServicemanRoleEnum[] getServicemanRoles() {
+        return ServicemanRoleEnum.values();
+    }
+
     public BloodTypeEnum[] getBloodTypes() {
         return BloodTypeEnum.values();
     }
@@ -520,9 +550,5 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public void setIsHideAll(Boolean isHideAll) {
         this.isHideAll = isHideAll;
-    }
-    
-    public ServicemanRoleEnum[] getServicemanRoles() {
-        return ServicemanRoleEnum.values();
     }
 }

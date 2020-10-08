@@ -16,4 +16,13 @@ public enum ServicemanRoleEnum {
     public String getStringVal() {
         return stringVal;
     }
+    
+    public  static ServicemanRoleEnum valueOfLabel(String label) {
+        for (ServicemanRoleEnum sr : values()) {
+            if (sr.stringVal.equals(label)) {
+                return sr;
+            }
+        }
+        return null;
+    }
 }

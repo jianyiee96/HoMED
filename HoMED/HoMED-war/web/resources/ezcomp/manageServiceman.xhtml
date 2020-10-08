@@ -54,13 +54,13 @@
                             <div class="p-grid p-justify-between">
                                 <div style="width: 130px; margin-left: 15px"></div>
                                 <div>
-                                    <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode or not manageServicemanManagedBean.isCreateState}">
+                                    <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
                                         <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
                                         <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
                                             <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                         </ui:fragment>
                                     </ui:fragment>
-                                    <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}">
+                                    <ui:fragment rendered="#{manageServicemanManagedBean.isEditMode}">
                                         <p:selectOneMenu id="view-role" disabled="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.role}" style="width: 150px">
                                             <f:selectItems value="#{servicemanAccountManagementManagedBean.getServicemanRoles()}" var="role" itemLabel="#{role.stringVal}"/>
                                         </p:selectOneMenu>
@@ -70,7 +70,7 @@
                                     <h:panelGroup id="panelGroupCopyDetailsBtn">
                                         <p:commandButton update="panelManageServiceman" value="Copy Details" icon="pi pi-clone" style="float:right"
                                                          actionListener="#{manageServicemanManagedBean.doCopyDetails()}" process="@this"
-                                                         rendered="#{manageServicemanManagedBean.employeeToCopy ne null and manageServicemanManagedBean.isEditMode and manageServicemanManagedBean.isCreateState}"/>
+                                                         rendered="#{manageServicemanManagedBean.employeeToCopy ne null and manageServicemanManagedBean.isEditMode}"/>
                                     </h:panelGroup>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
                                     <i class="fa fa-envelope-o p-mr-2 p-ml-2"/>
                                     <p:outputLabel for="view-email" value="Email Address"/>
                                     <p:inputText id="view-email" value="#{manageServicemanManagedBean.servicemanToView.email}" rendered="#{manageServicemanManagedBean.isEditMode}">
-                                        <p:ajax rendered="#{manageServicemanManagedBean.isCreateState}" event="keyup" listener="#{manageServicemanManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
+                                        <p:ajax event="keyup" listener="#{manageServicemanManagedBean.emailValidation}" process="@this" update="panelGroupCopyDetailsBtn"/>
                                     </p:inputText>
                                     <h:outputText rendered="#{not manageServicemanManagedBean.isEditMode}" value="#{manageServicemanManagedBean.servicemanToView.email}" class="view-text" />
                                     <p:message class="error-message" for="view-email" />
@@ -224,7 +224,7 @@
                                                     <p:confirm header="Confirmation" message="Are you sure you want to reset this sericeman's password?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                                 <p:commandButton actionListener="#{manageServicemanManagedBean.doDelete}" update="panelManageServiceman" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
-                                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this serivceman? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
+                                                    <p:confirm header="Confirmation" message="Are you sure you want to delete this serviceman? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                                 <p:commandButton update="panelManageServiceman" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
                                                     <p:resetInput target="panelManageServiceman"/>

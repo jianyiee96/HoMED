@@ -125,7 +125,7 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
             System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
             System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
-            System.out.println("Successfully created serivcemen with OTP\n");
+            System.out.println("Successfully created servicemen with OTP\n");
 
             initializeMedicalCentres();
             Long formTemplateId = initializeForm();

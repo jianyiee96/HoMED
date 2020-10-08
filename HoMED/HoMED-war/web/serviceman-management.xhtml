@@ -60,11 +60,12 @@
             <f:ajax event="dialogCloseEvent" listener="#{servicemanAccountManagementManagedBean.dialogActionListener}"/>
         </ezcomp:manageServiceman>
 
+        <p:growl id="growl-message" showDetail="true" sticky="true" />
+
         <h:form id="formAllServicemen">
             <div class="p-grid crud-table">
                 <div class="p-col-12">
                     <div class="card">
-                        <p:growl id="growl-message" showDetail="true" sticky="true"/>
 
                         <div class="buttonbar">
                             <p:splitButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
@@ -98,7 +99,7 @@
                             <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.name}" />
                             </p:column>
-                            
+
                             <p:column headerText="Role" width="7%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
                                 <h:outputText value="#{serviceman.role}" />
                             </p:column>
@@ -169,8 +170,8 @@
                       draggable="false" modal="true" responsive="true" fitViewport="true"
                       minWidth="500" width="1200" height="800">
                 <p:outputPanel id="panelBulkImportServicemen">
-                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="panelGroupBulkImportServicemen"
-                                  listener="#{servicemanAccountManagementManagedBean.uploadCsv}" />
+                    <p:fileUpload mode="advanced" auto="true" process="@form" dragDropSupport="true" update="growl-message panelGroupBulkImportServicemen" invalidFileMessage="Please only upload CSV files!"
+                                  listener="#{servicemanAccountManagementManagedBean.uploadCsv}" allowTypes="/(\.|\/)csv$/" />
 
                     <p:separator style='border-width: 1px;' />
 
@@ -221,6 +222,10 @@
                                                                         <ui:fragment rendered="#{servicemanWrapper.existingServiceman ne null}" >
                                                                             <span class="form-status-badge status-update">UPDATE</span>
                                                                         </ui:fragment>
+
+                                                                        <ui:fragment rendered="#{servicemanWrapper.existingEmployee ne null}" >
+                                                                            <span class="form-status-badge status-employee">#{servicemanWrapper.existingEmployee.role.stringVal}</span>
+                                                                        </ui:fragment>
                                                                     </h:panelGroup>
                                                                 </div>
 
@@ -244,8 +249,9 @@
 
                                                                             <!-- To Enter Edit Mode -->
                                                                             <ui:fragment rendered="#{not servicemanWrapper.isEditMode}">
-                                                                                <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}"
-                                                                                                 disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                <p:commandButton icon="pi pi-pencil" styleClass="rounded-button p-mr-2" title="Edit"
+                                                                                                 disabled="#{not servicemanWrapper.isEditable}" process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.enterEditMode(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="true" />
                                                                                     <p:resetInput target='panelGroupServicemanHeader panelGroupServicemanDetails' />
                                                                                 </p:commandButton>
@@ -253,15 +259,20 @@
 
                                                                             <!-- Currently in Edit Mode -->
                                                                             <ui:fragment rendered="#{servicemanWrapper.isEditMode}">
-                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}"
-                                                                                                 process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen formAllServicemen:growl-message'
+                                                                                <p:commandButton rendered="#{servicemanWrapper.existingEmployee ne null}" icon="pi pi-clone" styleClass="rounded-button p-mr-2" title="Copy Existing Employee Details"
+                                                                                                 process="@this" update="panelGroupServicemanDetails"
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.copyEmployeeDetails(servicemanWrapper)}" />
+
+                                                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button p-mr-2" disabled="#{servicemanWrapper.isDuplicate}" title="Save Details"
+                                                                                                 process="@form" update='formBulkImportServicemen:panelGroupBulkImportServicemen growl-message'
                                                                                                  actionListener="#{servicemanAccountManagementManagedBean.doEditServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isValid}" value="true" />
                                                                                 </p:commandButton>
 
-                                                                                <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}"
-                                                                                                 process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'>
+                                                                                <p:commandButton icon="pi pi-times" styleClass="secondary-button rounded-button p-mr-2" title="Cancel"
+                                                                                                 process="@this" update='formBulkImportServicemen:panelGroupBulkImportServicemen'
+                                                                                                 actionListener="#{servicemanAccountManagementManagedBean.resetServiceman(servicemanWrapper)}">
                                                                                     <f:setPropertyActionListener target="#{servicemanWrapper.isEditMode}" value="false" />
                                                                                 </p:commandButton>
                                                                             </ui:fragment>
@@ -600,6 +611,37 @@
                                                                     <div class="p-field p-col-12"  style="background-color: rgb(173, 185, 197)"><p:outputLabel class="label">Others</p:outputLabel></div>
                                                                 </div>
 
+                                                                <!-- Role -->
+                                                                <div class="p-formgrid p-grid">
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-label-existing-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Role</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-output-message-existing-serviceman' : null}">
+                                                                        <h:outputText value="#{servicemanWrapper.existingServiceman.role.stringVal}" />
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.errorMessages.get(11) ne null ? 'error-label' : null}
+                                                                         #{servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-label-new-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Role</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.errorMessages.get(11) ne null ? 'error-output-message' : null}
+                                                                         #{servicemanWrapper.existingServiceman.role ne servicemanWrapper.newServiceman.role ? 'modified-output-message-new-serviceman' : null}">
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(11) eq null}" value="#{servicemanWrapper.newServiceman.role.stringVal}" />
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(11) ne null}" value="#{servicemanWrapper.errorMessages.get(11)}" />
+                                                                        <p:selectOneMenu rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.role}">
+                                                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.servicemanRoles}" var="servicemanRole" itemLabel="#{servicemanRole.stringVal}" />
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                </div>
+
                                                                 <!-- Blood Type -->
                                                                 <div class="p-formgrid p-grid">
                                                                     <div class="p-field p-col-2
@@ -671,7 +713,7 @@
                                         <div class="p-formgrid p-grid">
                                             <div class="p-field p-col-2 p-offset-5">
                                                 <p:commandButton id="buttonImport" style="font-size: 18px;" icon="pi pi-upload" disabled="#{servicemanAccountManagementManagedBean.servicemenToCreate.size() eq 0 and servicemanAccountManagementManagedBean.servicemenToUpdate.size() eq 0}" 
-                                                                 value="Import (#{servicemanAccountManagementManagedBean.servicemenToCreate.size() + servicemanAccountManagementManagedBean.servicemenToUpdate.size()})" title="Import" process="@form" update="formAllServicemen" 
+                                                                 value="Import (#{servicemanAccountManagementManagedBean.servicemenToCreate.size() + servicemanAccountManagementManagedBean.servicemenToUpdate.size()})" title="Import" process="@form" update="formAllServicemen growl-message" 
                                                                  actionListener="#{servicemanAccountManagementManagedBean.importSelectedServicemen}" onstart="PF('dialogBulkImportServicemenInProgress').show()">
                                                     <p:confirm header="Bulk Import" escape="false" message="Selected servicemen will be imported to the system. Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
