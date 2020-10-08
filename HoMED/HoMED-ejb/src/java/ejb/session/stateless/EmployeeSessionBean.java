@@ -64,7 +64,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
-
+        
         return query.getResultList();
     }
 
