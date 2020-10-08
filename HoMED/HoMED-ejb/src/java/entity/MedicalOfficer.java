@@ -6,7 +6,7 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 
 @Entity
-public class MedicalOfficer extends Employee implements Serializable {
+public class MedicalOfficer extends MedicalStaff implements Serializable {
 
     public MedicalOfficer() {
     }
