@@ -88,14 +88,20 @@ public class ServicemanResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response servicemanChangePassword(@Context HttpHeaders headers, ServicemanChangePassReq servicemanChangePassReq) {
 
-        String token = headers.getRequestHeader("Token").get(0);
-        String id = headers.getRequestHeader("Id").get(0);
-        
-        if(!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))){
-            ErrorRsp errorRsp = new ErrorRsp("Invalid Token");
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         if (servicemanChangePassReq != null) {
 
             try {
@@ -148,19 +154,25 @@ public class ServicemanResource {
         }
 
     }
-    
+
     @Path("updateServiceman")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateServiceman(@Context HttpHeaders headers, ServicemanUpdateReq servicemanUpdateReq) {
 
-        String token = headers.getRequestHeader("Token").get(0);
-        String id = headers.getRequestHeader("Id").get(0);
-        
-        if(!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))){
-            ErrorRsp errorRsp = new ErrorRsp("Invalid Token");
-            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
 
         if (servicemanUpdateReq != null) {
