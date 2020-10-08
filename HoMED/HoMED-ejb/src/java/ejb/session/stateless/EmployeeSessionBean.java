@@ -5,7 +5,9 @@ import entity.Clerk;
 import util.exceptions.EmployeeNotFoundException;
 import entity.Employee;
 import entity.MedicalBoardAdmin;
+import entity.MedicalCentre;
 import entity.MedicalOfficer;
+import entity.MedicalStaff;
 import entity.Serviceman;
 import java.util.List;
 import java.util.Set;
@@ -25,16 +27,21 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import util.enumeration.EmployeeRoleEnum;
 import util.exceptions.ActivateEmployeeException;
+import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.ChangeEmployeePasswordException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeInvalidLoginCredentialException;
+import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
 import util.security.CryptographicHelper;
 
 @Stateless
 public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
+
+    @EJB
+    private MedicalCentreSessionBeanLocal medicalCentreSessionBean;
 
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBean;
@@ -57,7 +64,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
-
+        
         return query.getResultList();
     }
 
@@ -120,7 +127,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employee.setIsActivated(serviceman.getIsActivated());
                     password = "Proceed to log in with same details as serviceman account";
                 }
-                
+
                 em.flush();
                 emailSessionBean.emailEmployeeOtpAsync(employee, password);
                 return password;
@@ -166,7 +173,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated) {
         String email = serviceman.getEmail();
-        
+
         try {
             Employee employee = retrieveEmployeeByEmail(email);
 
@@ -214,7 +221,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
                     employeeToUpdate.setAddress(employee.getAddress());
                     employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
                     employeeToUpdate.setGender(employee.getGender());
-                    
+
                     if (emailChangeDetected) {
                         servicemanSessionBean.updateServicemanMatchingAccount(employeeToUpdate, employee.getEmail(), null, employee.getIsActivated());
                         employeeToUpdate.setEmail(employee.getEmail());
@@ -399,6 +406,35 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ResetEmployeePasswordException(generalUnexpectedErrorMessage + "resetting password by Super User");
+        }
+    }
+
+    @Override
+    public void assignMedicalStaffToMedicalCentre(Long employeeId, Long medicalCentreId) throws AssignMedicalStaffToMedicalCentreException {
+        String errorMessage = "Failed to assign Medical Staff to Medical Centre: ";
+        try {
+            Employee employeeToUpdate = retrieveEmployeeById(employeeId);
+            if (!(employeeToUpdate instanceof MedicalStaff)) {
+                throw new AssignMedicalStaffToMedicalCentreException("Employee is not a Medical Staff");
+            }
+            MedicalStaff medicalStaff = (MedicalStaff) employeeToUpdate;
+
+            MedicalCentre medicalCentre;
+            if (medicalCentreId != null) {
+                medicalCentre = medicalCentreSessionBean.retrieveMedicalCentreById(medicalCentreId);
+            } else {
+                medicalCentre = null;
+            }
+
+            medicalStaff.setMedicalCentre(medicalCentre);
+
+        } catch (AssignMedicalStaffToMedicalCentreException ex) {
+            throw new AssignMedicalStaffToMedicalCentreException(errorMessage + ex.getMessage());
+        } catch (EmployeeNotFoundException | MedicalCentreNotFoundException ex) {
+            throw new AssignMedicalStaffToMedicalCentreException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new AssignMedicalStaffToMedicalCentreException(generalUnexpectedErrorMessage + "assigning medical staff to medical centre");
         }
     }
 

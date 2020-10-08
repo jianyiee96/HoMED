@@ -9,7 +9,7 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.GenderEnum;
 
 @Entity
-public class MedicalBoardAdmin extends Employee implements Serializable {
+public class MedicalBoardAdmin extends MedicalStaff implements Serializable {
 
     public MedicalBoardAdmin() {
     }
