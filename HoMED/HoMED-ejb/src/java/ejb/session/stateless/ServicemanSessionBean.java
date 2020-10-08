@@ -2,6 +2,10 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -171,7 +175,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                     servicemanToUpdate.setAddress(serviceman.getAddress());
                     servicemanToUpdate.setRole(serviceman.getRole());
-                    
+
                     if (emailChangeDetected) {
                         employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, serviceman.getEmail(), null, serviceman.getIsActivated());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
@@ -223,6 +227,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + serviceman.getSalt()));
 
             if (serviceman.getPassword().equals(passwordHash)) {
+                serviceman.setToken(CryptographicHelper.getInstance().generateRandomString(32));
+                Date now = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(now);
+                c.add(Calendar.DAY_OF_MONTH, 30);
+                serviceman.setTokenExp(c.getTime());
                 return serviceman;
             } else {
                 throw new ServicemanInvalidLoginCredentialException("EMAIL does not exist or invalid password!");
@@ -250,10 +260,9 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (serviceman.getIsActivated()) {
                 throw new ActivateServicemanException("Account has already been activated!");
             }
-
             serviceman.setPassword(password);
             serviceman.setIsActivated(true);
-
+            
             employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
 
         } catch (ActivateServicemanException ex) {
@@ -369,6 +378,24 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
         return result;
     }
+
+    @Override
+    public Boolean verifyToken(Long id, String token) {
+
+        try {
+            Serviceman serviceman = retrieveServicemanById(id);
+            Date now = new Date();
+            if (serviceman.getToken().equals(token) && now.before(serviceman.getTokenExp())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex) {
+            return false;
+        } 
+    }
+
+
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Serviceman>> constraintViolations) {
         String msg = "";

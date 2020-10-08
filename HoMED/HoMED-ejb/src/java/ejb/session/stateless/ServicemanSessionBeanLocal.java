@@ -49,5 +49,7 @@ public interface ServicemanSessionBeanLocal {
     public Serviceman resetServicemanPasswordBySuperUser(Serviceman currentServiceman) throws ResetServicemanPasswordException;
 
     public Serviceman updateServicemanMatchingAccount(Employee employee, String newEmail, String hashPassword, Boolean isActivated);
+    
+    public Boolean verifyToken(Long id, String token);
 
 }
