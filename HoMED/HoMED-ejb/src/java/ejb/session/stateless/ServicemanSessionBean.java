@@ -175,7 +175,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                     servicemanToUpdate.setPhoneNumber(serviceman.getPhoneNumber());
                     servicemanToUpdate.setAddress(serviceman.getAddress());
                     servicemanToUpdate.setRole(serviceman.getRole());
-                    
+
                     if (emailChangeDetected) {
                         employeeSessionBean.updateEmployeeMatchingAccount(servicemanToUpdate, serviceman.getEmail(), null, serviceman.getIsActivated());
                         servicemanToUpdate.setEmail(serviceman.getEmail());
@@ -263,6 +263,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
             serviceman.setPassword(password);
             serviceman.setIsActivated(true);
+            serviceman.setToken(CryptographicHelper.getInstance().generateRandomString(32));
+            Date now = new Date();
+            Calendar c = Calendar.getInstance();
+            c.setTime(now);
+            c.add(Calendar.DAY_OF_MONTH, 30);
+            serviceman.setTokenExp(c.getTime());
 
             employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
 
@@ -379,6 +385,26 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
         return result;
     }
+
+    public Boolean verifyToken(Long id, String token) {
+
+        try {
+            Serviceman serviceman = retrieveServicemanById(id);
+
+            if (!serviceman.getToken().equals(token)) {
+                return false;
+            } else {
+                
+                
+            }
+        } catch (ServicemanNotFoundException ex) {
+
+            return false;
+        }
+        return true;
+    }
+
+
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Serviceman>> constraintViolations) {
         String msg = "";
