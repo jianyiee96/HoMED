@@ -386,22 +386,20 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         return result;
     }
 
+    @Override
     public Boolean verifyToken(Long id, String token) {
 
         try {
             Serviceman serviceman = retrieveServicemanById(id);
-
-            if (!serviceman.getToken().equals(token)) {
-                return false;
+            Date now = new Date();
+            if (serviceman.getToken().equals(token) && now.before(serviceman.getTokenExp())) {
+                return true;
             } else {
-                
-                
+                return false;
             }
-        } catch (ServicemanNotFoundException ex) {
-
+        } catch (Exception ex) {
             return false;
-        }
-        return true;
+        } 
     }
 
 

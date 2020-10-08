@@ -86,8 +86,16 @@ public class ServicemanResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response servicemanChangePassword(ServicemanChangePassReq servicemanChangePassReq) {
+    public Response servicemanChangePassword(@Context HttpHeaders headers, ServicemanChangePassReq servicemanChangePassReq) {
 
+        String token = headers.getRequestHeader("Token").get(0);
+        String id = headers.getRequestHeader("Id").get(0);
+        
+        if(!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))){
+            ErrorRsp errorRsp = new ErrorRsp("Invalid Token");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+        }
+        
         if (servicemanChangePassReq != null) {
 
             try {
@@ -140,20 +148,7 @@ public class ServicemanResource {
         }
 
     }
-
-    @Path("testToken")
-    @POST
-    public Response testToken(@Context HttpHeaders headers) {
-        String token = headers.getRequestHeader("Token").get(0);
-        String id = headers.getRequestHeader("Id").get(0);
-
-        System.out.println(token);
-        System.out.println(id);
-
-        return Response.status(Response.Status.OK).build();
-
-    }
-
+    
     @Path("updateServiceman")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -165,7 +160,6 @@ public class ServicemanResource {
         
         if(!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))){
             ErrorRsp errorRsp = new ErrorRsp("Invalid Token");
-
             return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
         }
 
