@@ -97,7 +97,7 @@ public class SchedulerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response scheduleBooking(@Context HttpHeaders headers, CancelBookingReq cancelBookingReq) {
+    public Response cancelBooking(@Context HttpHeaders headers, CancelBookingReq cancelBookingReq) {
 
 //        try {
 //            String token = headers.getRequestHeader("Token").get(0);
