@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.ActivateServicemanException;
@@ -57,9 +58,9 @@ public class ServicemanResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response servicemanLogin(ServicemanLoginReq servicemanLoginReq) {
-        
+
         if (servicemanLoginReq != null) {
-            
+
             try {
                 Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getEmail(), servicemanLoginReq.getPassword());
                 serviceman.setFormInstances(null);
@@ -77,7 +78,7 @@ public class ServicemanResource {
             ErrorRsp errorRsp = new ErrorRsp("Invalid login request");
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
-        }          
+        }
 
     }
 
@@ -85,7 +86,21 @@ public class ServicemanResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response servicemanChangePassword(ServicemanChangePassReq servicemanChangePassReq) {
+    public Response servicemanChangePassword(@Context HttpHeaders headers, ServicemanChangePassReq servicemanChangePassReq) {
+
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
 
         if (servicemanChangePassReq != null) {
 
@@ -109,7 +124,7 @@ public class ServicemanResource {
         }
 
     }
-    
+
     @Path("activateAccount")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -131,7 +146,7 @@ public class ServicemanResource {
 
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
             }
-            
+
         } else {
             ErrorRsp errorRsp = new ErrorRsp("Invalid activate account request");
 
@@ -144,7 +159,22 @@ public class ServicemanResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateServiceman(ServicemanUpdateReq servicemanUpdateReq) {
+    public Response updateServiceman(@Context HttpHeaders headers, ServicemanUpdateReq servicemanUpdateReq) {
+
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
         if (servicemanUpdateReq != null) {
 
             try {
