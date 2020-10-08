@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -19,6 +20,16 @@ public class BookingSlot extends Slot implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private MedicalCentre medicalCentre;
+
+    public BookingSlot() {
+    }
+
+    public BookingSlot(MedicalCentre medicalCentre, Date start, Date end) {
+        this();
+        this.medicalCentre = medicalCentre;
+        super.setStartDateTime(start);
+        super.setEndDateTime(end);
+    }
 
     public Booking getBooking() {
         return booking;
