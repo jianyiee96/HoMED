@@ -46,7 +46,7 @@ public class MedicalCentre implements Serializable {
     @OneToMany
     private List<OperatingHours> operatingHours;
 
-    @OneToMany(mappedBy = "medicalStaff")
+    @OneToMany
     private List<MedicalStaff> medicalStaffList;
 
     public MedicalCentre() {
