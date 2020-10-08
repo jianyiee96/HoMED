@@ -261,15 +261,6 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 throw new ActivateServicemanException("Account has already been activated!");
             }
 
-            serviceman.setPassword(password);
-            serviceman.setIsActivated(true);
-            serviceman.setToken(CryptographicHelper.getInstance().generateRandomString(32));
-            Date now = new Date();
-            Calendar c = Calendar.getInstance();
-            c.setTime(now);
-            c.add(Calendar.DAY_OF_MONTH, 30);
-            serviceman.setTokenExp(c.getTime());
-
             employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
 
         } catch (ActivateServicemanException ex) {
