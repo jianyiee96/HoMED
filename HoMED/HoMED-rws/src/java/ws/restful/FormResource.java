@@ -6,6 +6,7 @@ package ws.restful;
 
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
+import ejb.session.stateless.ServicemanSessionBeanLocal;
 import util.exceptions.DeleteFormInstanceException;
 import entity.FormInstance;
 import entity.FormTemplate;
@@ -19,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.ArchiveFormInstanceException;
@@ -47,20 +49,37 @@ public class FormResource {
     private final FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
 
     private final FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
+    
+    private final ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
     public FormResource() {
 
         this.sessionBeanLookup = new SessionBeanLookup();
         this.formInstanceSessionBeanLocal = this.sessionBeanLookup.lookupFormInstanceSessionBeanLocal();
         this.formTemplateSessionBeanLocal = this.sessionBeanLookup.lookupFormTemplateSessionBeanLocal();
+        this.servicemanSessionBeanLocal = this.sessionBeanLookup.lookupServicemanSessionBeanLocal();
 
     }
 
     @Path("retrieveAllFormTemplates")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response retrieveAllFormTemplates() {
+    public Response retrieveAllFormTemplates(@Context HttpHeaders headers) {
 
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+        
         try {
             List<FormTemplate> formTemplates = formTemplateSessionBeanLocal.retrieveAllPublishedFormTemplates();
             for (FormTemplate ft : formTemplates) {
@@ -80,8 +99,22 @@ public class FormResource {
     @GET
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response retrieveAllServicemanFormInstances(@QueryParam("servicemanId") String servicemanId) {
+    public Response retrieveAllServicemanFormInstances(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
 
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+        
         try {
             List<FormInstance> formInstances = formInstanceSessionBeanLocal.retrieveServicemanFormInstances(Long.parseLong(servicemanId));
             for (FormInstance fi : formInstances) {
@@ -100,8 +133,22 @@ public class FormResource {
     @Path("createFormInstance")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createFormInstance(CreateFormInstanceReq createFormInstanceReq) {
+    public Response createFormInstance(@Context HttpHeaders headers, CreateFormInstanceReq createFormInstanceReq) {
 
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+        
         try {
 
             formInstanceSessionBeanLocal.generateFormInstance(createFormInstanceReq.getServicemanId(), createFormInstanceReq.getFormTemplateId());
@@ -122,8 +169,22 @@ public class FormResource {
     @Path("updateFormInstanceFieldValues")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateFormInstanceFieldValues(UpdateFormInstanceReq updateFormInstanceReq) {
+    public Response updateFormInstanceFieldValues(@Context HttpHeaders headers, UpdateFormInstanceReq updateFormInstanceReq) {
 
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+        
         try {
 
             formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
@@ -145,7 +206,21 @@ public class FormResource {
     @Path("deleteFormInstance")
     @DELETE
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response deleteFormInstance(@QueryParam("formInstanceId") String formInstanceId) {
+    public Response deleteFormInstance(@Context HttpHeaders headers, @QueryParam("formInstanceId") String formInstanceId) {
+        
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
         
         try {
 
@@ -168,7 +243,21 @@ public class FormResource {
     @Path("submitFormInstance")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response submitFormInstance(UpdateFormInstanceReq updateFormInstanceReq) {
+    public Response submitFormInstance(@Context HttpHeaders headers, UpdateFormInstanceReq updateFormInstanceReq) {
+        
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
         
         try {
 
@@ -191,7 +280,21 @@ public class FormResource {
     @Path("archiveFormInstance")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response archiveFormInstance(UpdateFormInstanceReq updateFormInstanceReq) {
+    public Response archiveFormInstance(@Context HttpHeaders headers, UpdateFormInstanceReq updateFormInstanceReq) {
+        
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
         
         try {
 
