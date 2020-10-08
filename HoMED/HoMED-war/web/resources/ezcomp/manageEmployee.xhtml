@@ -171,6 +171,26 @@
                             </div>
                         </div>
 
+                        <ui:fragment rendered="#{manageEmployeeManagedBean.employeeToView.role != 'SUPER_USER'}">
+                            <div class="p-col-12">
+                                <div class="card ui-fluid">
+                                    <h5>Attached Medical Centre</h5>
+                                    <div class="p-formgrid p-grid">
+                                        <div class="p-field p-col-12">
+                                            <i class="fa fa-hospital-o p-mr-2 p-ml-2"/>
+                                            <p:outputLabel for="view-medical-centre" value="Medical Centre"/>
+                                            <p:selectOneMenu id="view-medical-centre" value="#{manageEmployeeManagedBean.medicalCentreId}" rendered="#{manageEmployeeManagedBean.isEditMode}">
+                                                <f:selectItem value="#{null}" itemLabel="N.A."/>
+                                                <f:selectItems value="#{manageEmployeeManagedBean.medicalCentres}" var="mc" itemValue="#{mc.medicalCentreId}" itemLabel="#{mc.name}"/>
+                                            </p:selectOneMenu>
+                                            <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.medicalCentreId ne null ? manageEmployeeManagedBean.medicalCentresHm.get(manageEmployeeManagedBean.medicalCentreId).name : 'N.A.'}" class="view-text" />
+                                            <p:message class="error-message" for="view-medical-centre" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ui:fragment>
+
                         <div class="p-col-12">
                             <p:messages globalOnly="true" class="error-message">
                                 <p:autoUpdate/>
@@ -201,7 +221,7 @@
                                                 <p:commandButton actionListener="#{manageEmployeeManagedBean.doDelete}" update="panelManageEmployee" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
                                                     <p:confirm header="Confirmation" message="Are you sure you want to delete this employee? Actions cannot be reverted" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
-                                                <p:commandButton update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
+                                                <p:commandButton actionListener="#{manageEmployeeManagedBean.doReset}" update="panelManageEmployee" type="submit" process="@this" title="Cancel" icon="pi pi-times" styleClass="secondary-button p-mr-2">
                                                     <p:resetInput target="panelManageEmployee"/>
                                                     <f:setPropertyActionListener target="#{manageEmployeeManagedBean.isEditMode}" value="false"/>
                                                 </p:commandButton>

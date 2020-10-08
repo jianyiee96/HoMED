@@ -61,7 +61,7 @@ public class MedicalCentreResource {
         try {
             List<MedicalCentre> medicalCentres = medicalCentreSessionBeanLocal.retrieveAllMedicalCentres();
             for (MedicalCentre mc : medicalCentres) {
-                // Set employee to null when Bryan and Weekeat branch ready
+                mc.setMedicalStaffList(null);
                 mc.setBookingSlots(null);
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllMedicalCentreRsp(medicalCentres)).build();
