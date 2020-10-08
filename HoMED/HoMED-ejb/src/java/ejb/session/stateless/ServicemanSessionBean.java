@@ -260,7 +260,9 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             if (serviceman.getIsActivated()) {
                 throw new ActivateServicemanException("Account has already been activated!");
             }
-
+            serviceman.setPassword(password);
+            serviceman.setIsActivated(true);
+            
             employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
 
         } catch (ActivateServicemanException ex) {
