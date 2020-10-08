@@ -46,9 +46,13 @@ public class MedicalCentre implements Serializable {
     @OneToMany
     private List<OperatingHours> operatingHours;
 
+    @OneToMany
+    private List<BookingSlot> bookingSlots;
+
     public MedicalCentre() {
         this.address = new Address();
         this.operatingHours = new ArrayList<>(8);
+        this.bookingSlots = new ArrayList<>();
 
         operatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, null, null));
         operatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, null, null));
@@ -107,6 +111,14 @@ public class MedicalCentre implements Serializable {
 
     public void setOperatingHours(List<OperatingHours> operatingHours) {
         this.operatingHours = operatingHours;
+    }
+
+    public List<BookingSlot> getBookingSlots() {
+        return bookingSlots;
+    }
+
+    public void setBookingSlots(List<BookingSlot> bookingSlots) {
+        this.bookingSlots = bookingSlots;
     }
 
     @Override

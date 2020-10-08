@@ -20,9 +20,12 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(ws.restful.ConsultationResource.class);
         resources.add(ws.restful.CorsFilter.class);
         resources.add(ws.restful.EmployeeResource.class);
         resources.add(ws.restful.FormResource.class);
+        resources.add(ws.restful.MedicalCentreResource.class);
+        resources.add(ws.restful.SchedulerResource.class);
         resources.add(ws.restful.ServicemanResource.class);
     }
     
