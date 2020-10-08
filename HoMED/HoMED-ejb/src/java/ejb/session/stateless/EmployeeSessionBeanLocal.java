@@ -10,6 +10,7 @@ import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.ActivateEmployeeException;
+import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.ChangeEmployeePasswordException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
@@ -50,5 +51,7 @@ public interface EmployeeSessionBeanLocal {
     public Employee resetEmployeePasswordBySuperUser(Employee currentEmployee) throws ResetEmployeePasswordException;
 
     public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated);
+
+    public void assignMedicalStaffToMedicalCentre(Long employeeId, Long medicalCentreId) throws AssignMedicalStaffToMedicalCentreException;
 
 }
