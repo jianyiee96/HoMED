@@ -2,6 +2,10 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -223,6 +227,12 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             String passwordHash = CryptographicHelper.getInstance().byteArrayToHexString(CryptographicHelper.getInstance().doMD5Hashing(password + serviceman.getSalt()));
 
             if (serviceman.getPassword().equals(passwordHash)) {
+                serviceman.setToken(CryptographicHelper.getInstance().generateRandomString(32));
+                Date now = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(now);
+                c.add(Calendar.DAY_OF_MONTH, 30);
+                serviceman.setTokenExp(c.getTime());
                 return serviceman;
             } else {
                 throw new ServicemanInvalidLoginCredentialException("EMAIL does not exist or invalid password!");

@@ -96,7 +96,13 @@ public class Serviceman implements Serializable {
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     private String salt;
+    
+    @Column(columnDefinition = "CHAR(32)")
+    private String token;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date tokenExp;
+    
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
@@ -264,6 +270,22 @@ public class Serviceman implements Serializable {
         this.role = role;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Date getTokenExp() {
+        return tokenExp;
+    }
+
+    public void setTokenExp(Date tokenExp) {
+        this.tokenExp = tokenExp;
+    }
+    
     @Override
     public String toString() {
         return "entity.Serviceman[ id=" + servicemanId + " ]";
