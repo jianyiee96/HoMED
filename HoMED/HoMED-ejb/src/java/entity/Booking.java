@@ -52,6 +52,14 @@ public class Booking implements Serializable {
     
     public Booking() {
         this.formInstances = new ArrayList<>();
+        this.bookingStatusEnum = BookingStatusEnum.UPCOMING;
+    }
+    
+    public Booking(Serviceman serviceman, ConsultationPurpose consultationPurpose, BookingSlot bookingSlot) {
+        this();
+        this.serviceman = serviceman;
+        this.consultationPurpose = consultationPurpose;
+        this.bookingSlot = bookingSlot;
     }
     
     public Long getBookingId() {

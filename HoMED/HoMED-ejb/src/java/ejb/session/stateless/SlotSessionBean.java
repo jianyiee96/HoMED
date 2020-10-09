@@ -14,7 +14,9 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.exceptions.MedicalCentreNotFoundException;
+import util.exceptions.RetrieveBookingSlotsException;
 import util.exceptions.ScheduleBookingSlotException;
 
 @Stateless
@@ -32,11 +34,10 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         try {
             MedicalCentre mc = medicalCentreSessionbeanLocal.retrieveMedicalCentreById(medicalCentreId);
 
-//            rangeStart = floorDate15Minute(rangeStart); //For testing.
-//            rangeEnd = ceilDate15Minute(rangeEnd);      //For testing.
-            
-            rangeStart = roundDate15Minute(rangeStart);
-            rangeEnd = roundDate15Minute(rangeEnd);
+            rangeStart = floorDate15Minute(rangeStart); //For testing.
+            rangeEnd = ceilDate15Minute(rangeEnd);      //For testing.
+//            rangeStart = roundDate15Minute(rangeStart);
+//            rangeEnd = roundDate15Minute(rangeEnd);
 
             if (!rangeStart.before(rangeEnd)) {
                 throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
@@ -46,8 +47,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             Calendar rangeEndCalendar = Calendar.getInstance();
             rangeEndCalendar.setTime(rangeEnd);
 
-//            rangeStartCalendar.add(Calendar.MINUTE, -150); // For testing: mass populate slots.
-            
+            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 
             while (rangeStartCalendar.before(rangeEndCalendar)) {
@@ -61,13 +61,42 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 em.flush();
                 createdBookingSlots.add(bs);
             }
-            
+
+            System.out.println("Created " + createdBookingSlots.size());
             return createdBookingSlots;
 
         } catch (MedicalCentreNotFoundException ex) {
             throw new ScheduleBookingSlotException("Invalid Medical Centre Id");
         }
 
+    }
+
+    @Override
+    public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId) {
+        Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id ");
+        query.setParameter("id", medicalCentreId);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<BookingSlot> retrieveMedicalCentreBookingSlotsByDate(Long medicalCentreId, Date date) {
+
+        List<BookingSlot> bookingSlots = retrieveBookingSlotsByMedicalCentre(medicalCentreId);
+        List<BookingSlot> filteredBookingSlot = new ArrayList<>();
+
+        for (BookingSlot b : bookingSlots) {
+            if (isSameDay(date, b.getStartDateTime())) {
+                filteredBookingSlot.add(b);
+            }
+        }
+
+        return filteredBookingSlot;
+    }
+
+    @Override
+    public BookingSlot retrieveBookingSlotById(Long id) {
+        BookingSlot bookingSlot = em.find(BookingSlot.class, id);
+        return bookingSlot;
     }
 
     // Helper functions.
@@ -88,7 +117,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
         int minutes = calendar.get(Calendar.MINUTE);
         int mod = (minutes % 15);
-        minutes += mod < 8 ? (-mod) : (15-mod);
+        minutes += mod < 8 ? (-mod) : (15 - mod);
 
         calendar.set(Calendar.MINUTE, minutes);
         calendar.set(Calendar.SECOND, 0);

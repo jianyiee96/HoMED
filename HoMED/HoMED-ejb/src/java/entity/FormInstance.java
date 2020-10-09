@@ -59,6 +59,9 @@ public class FormInstance implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Serviceman serviceman;
+    
+    @ManyToOne(optional = true)
+    private Booking booking;
 
     public FormInstance() {
         this.dateCreated = new Date();
@@ -122,6 +125,14 @@ public class FormInstance implements Serializable {
         this.formInstanceId = formInstanceId;
     }
 
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

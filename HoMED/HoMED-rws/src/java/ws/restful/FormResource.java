@@ -118,6 +118,7 @@ public class FormResource {
             List<FormInstance> formInstances = formInstanceSessionBeanLocal.retrieveServicemanFormInstances(Long.parseLong(servicemanId));
             for (FormInstance fi : formInstances) {
                 fi.setServiceman(null);
+                fi.setBooking(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
             }

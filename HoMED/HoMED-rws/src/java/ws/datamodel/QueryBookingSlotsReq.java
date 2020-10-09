@@ -9,23 +9,23 @@ import java.util.Date;
 
 public class QueryBookingSlotsReq {
     
-    Long medicalCenterId;
+    Long medicalCentreId;
     Date queryDate;
 
     public QueryBookingSlotsReq() {
     }
 
-    public QueryBookingSlotsReq(Long medicalCenterId, Date queryDate) {
-        this.medicalCenterId = medicalCenterId;
+    public QueryBookingSlotsReq(Long medicalCentreId, Date queryDate) {
+        this.medicalCentreId = medicalCentreId;
         this.queryDate = queryDate;
     }
 
-    public Long getMedicalCenterId() {
-        return medicalCenterId;
+    public Long getMedicalCentreId() {
+        return medicalCentreId;
     }
 
-    public void setMedicalCenterId(Long medicalCenterId) {
-        this.medicalCenterId = medicalCenterId;
+    public void setMedicalCentreId(Long medicalCentreId) {
+        this.medicalCentreId = medicalCentreId;
     }
 
     public Date getQueryDate() {

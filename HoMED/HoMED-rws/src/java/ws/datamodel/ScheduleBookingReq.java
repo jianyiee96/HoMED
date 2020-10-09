@@ -8,16 +8,14 @@ public class ScheduleBookingReq {
     
     Long servicemanId;
     Long consultationPurposeId;
-    Long medicalCentreId;
     Long bookingSlotId;
 
     public ScheduleBookingReq() {
     }
 
-    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long medicalCentreId, Long bookingSlotId) {
+    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) {
         this.servicemanId = servicemanId;
         this.consultationPurposeId = consultationPurposeId;
-        this.medicalCentreId = medicalCentreId;
         this.bookingSlotId = bookingSlotId;
     }
 
@@ -35,14 +33,6 @@ public class ScheduleBookingReq {
 
     public void setConsultationPurposeId(Long consultationPurposeId) {
         this.consultationPurposeId = consultationPurposeId;
-    }
-
-    public Long getMedicalCentreId() {
-        return medicalCentreId;
-    }
-
-    public void setMedicalCentreId(Long medicalCentreId) {
-        this.medicalCentreId = medicalCentreId;
     }
 
     public Long getBookingSlotId() {

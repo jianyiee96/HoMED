@@ -1,5 +1,6 @@
 package ws.restful;
 
+import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
@@ -59,7 +60,7 @@ public class SessionBeanLookup {
             throw new RuntimeException(ne);
         }
     }
-    
+
     public MedicalCentreSessionBeanLocal lookupMedicalCentreSessionBeanLocal() {
         try {
             javax.naming.Context c = new InitialContext();
@@ -69,7 +70,7 @@ public class SessionBeanLookup {
             throw new RuntimeException(ne);
         }
     }
-    
+
     public ConsultationPurposeSessionBeanLocal lookupConsultationPurposeSessionBeanLocal() {
         try {
             javax.naming.Context c = new InitialContext();
@@ -79,11 +80,21 @@ public class SessionBeanLookup {
             throw new RuntimeException(ne);
         }
     }
-    
+
     public SlotSessionBeanLocal lookupSlotPurposeSessionBeanLocal() {
         try {
             javax.naming.Context c = new InitialContext();
             return (SlotSessionBeanLocal) c.lookup(ejbModuleJndiPath + "SlotSessionBean!ejb.session.stateless.SlotSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    public BookingSessionBeanLocal lookupBookingPurposeSessionBeanLocal() {
+        try {
+            javax.naming.Context c = new InitialContext();
+            return (BookingSessionBeanLocal) c.lookup(ejbModuleJndiPath + "BookingSessionBean!ejb.session.stateless.BookingSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
