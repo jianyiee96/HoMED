@@ -59,15 +59,6 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 throw new CreateBookingException("Booking Slot not valid: Invalid Start Date");
             }
 
-            System.out.println("Create booking called");
-            System.out.println("Serviceman Name: " + serviceman.getName());
-            System.out.println("Consultation Purpose " + consultationPurpose.getConsultationPurposeName());
-            System.out.println("Booking start time: " + bookingSlot.getStartDateTime());
-            System.out.println("Booking end time: " + bookingSlot.getEndDateTime());
-            System.out.println("Number of generated forms: " + consultationPurpose.getFormTemplates().size());
-            System.out.println("Generated forms: " + consultationPurpose.getFormTemplates().toString());
-            System.out.println("Medical Centre: " + bookingSlot.getMedicalCentre().getName());
-
             Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
             
             bookingSlot.setBooking(newBooking);
@@ -77,20 +68,20 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             em.persist(newBooking);
             em.flush();
             
+            // Generate and form templates that are linked to cosultation purpose
             for (FormTemplate ft : consultationPurpose.getFormTemplates()) {
                 try {
                     Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(serviceman.getServicemanId(), ft.getFormTemplateId());
-                    System.out.println("Generate form instance: " + formInstanceId);
                     FormInstance fi = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-                    System.out.println("Instance Name: " + fi.getFormTemplateMapping().getFormTemplateName());
                     newBooking.getFormInstances().add(fi);
                     fi.setBooking(newBooking);
 
                 } catch (GenerateFormInstanceException ex) {
-                    System.out.println("Exception CAUGHT " + ex.getMessage());
                     continue;
                 }
             }
+            
+            // Notification module can fire here
             
             return newBooking;
 
