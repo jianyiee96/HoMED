@@ -32,10 +32,10 @@ public class MedicalCentreStaffManagementManagedBean implements Serializable {
     private Long medicalCentreToViewId;
     private MedicalCentre medicalCentreToView;
 
-    private List<MedicalStaff> unassignedMedicalStaff;
+    private List<MedicalStaff> unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre;
 
     public MedicalCentreStaffManagementManagedBean() {
-        this.unassignedMedicalStaff = new ArrayList<>();
+        this.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre = new ArrayList<>();
 
         try {
             this.medicalCentreToViewId = Long.parseLong(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("medicalCentreToViewId"));
@@ -60,7 +60,7 @@ public class MedicalCentreStaffManagementManagedBean implements Serializable {
     }
 
     public void initAssignMedicalCentreStaff() {
-        this.unassignedMedicalStaff = medicalCentreSessionBeanLocal.retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(medicalCentreToView);
+        this.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre = medicalCentreSessionBeanLocal.retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(medicalCentreToView);
     }
 
     public void assignMedicalStaffToMedicalCentre(MedicalStaff medicalStaff) {
@@ -71,7 +71,17 @@ public class MedicalCentreStaffManagementManagedBean implements Serializable {
             initAssignMedicalCentreStaff();
         } catch (AssignMedicalStaffToMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Centre Staff Management", ex.getMessage()));
+        }
+    }
 
+    public void unassignMedicalStaffFromMedicalCentre(MedicalStaff medicalStaff) {
+        try {
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(medicalStaff.getEmployeeId(), null);
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Centre Staff Management", "Successfully unassigning medical staff!"));
+            refreshMedicalCentreToView(medicalCentreToView.getMedicalCentreId());
+            initAssignMedicalCentreStaff();
+        } catch (AssignMedicalStaffToMedicalCentreException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Centre Staff Management", ex.getMessage()));
         }
     }
 
@@ -91,12 +101,12 @@ public class MedicalCentreStaffManagementManagedBean implements Serializable {
         this.medicalCentreToView = medicalCentreToView;
     }
 
-    public List<MedicalStaff> getUnassignedMedicalStaff() {
-        return unassignedMedicalStaff;
+    public List<MedicalStaff> getUnassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre() {
+        return unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre;
     }
 
-    public void setUnassignedMedicalStaff(List<MedicalStaff> unassignedMedicalStaff) {
-        this.unassignedMedicalStaff = unassignedMedicalStaff;
+    public void setUnassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre(List<MedicalStaff> unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre) {
+        this.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre = unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre;
     }
 
 }

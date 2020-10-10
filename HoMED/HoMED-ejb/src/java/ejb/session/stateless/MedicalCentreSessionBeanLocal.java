@@ -6,7 +6,6 @@ package ejb.session.stateless;
 
 import entity.MedicalCentre;
 import entity.MedicalStaff;
-import entity.OperatingHours;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.AssignMedicalStaffToMedicalCentreException;

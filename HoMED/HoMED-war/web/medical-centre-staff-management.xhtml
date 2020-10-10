@@ -99,7 +99,7 @@
                     <div class="p-col-12">
                         <div class="card">
                             <p:dataView id="dataViewAssignMedicalCentreStaff" widgetVar="dataViewAssignMedicalCentreStaff" 
-                                        var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaff}" 
+                                        var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre}" 
                                         listIcon="pi pi-bars" paginator="true" rows="10" layout="list" paginatorPosition="bottom">
 
                                 <p:dataViewListItem>
@@ -113,10 +113,13 @@
                                         </div>
 
                                         <div class="data-view-list-action">
-
-                                            <p:commandButton value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
+                                            <p:commandButton rendered="#{medicalStaff.medicalCentre eq null}" value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
                                                              update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
                                                              actionListener="#{medicalCentreStaffManagementManagedBean.assignMedicalStaffToMedicalCentre(medicalStaff)}" />
+
+                                            <p:commandButton rendered="#{medicalStaff.medicalCentre ne null}" value="Unassign" title="Assign Medical Centre Staff" icon="pi pi-user-minus" styleClass="warning-button"
+                                                             update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                             actionListener="#{medicalCentreStaffManagementManagedBean.unassignMedicalStaffFromMedicalCentre(medicalStaff)}" />
                                         </div>
                                     </div>
                                 </p:dataViewListItem>
