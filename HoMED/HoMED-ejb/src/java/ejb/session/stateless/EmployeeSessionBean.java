@@ -64,7 +64,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
-        
+
         return query.getResultList();
     }
 
@@ -168,6 +168,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             ex.printStackTrace();
             throw new EmployeeNotFoundException(generalUnexpectedErrorMessage + "retrieving employee account by Email");
         }
+    }
+
+    @Override
+    public List<MedicalStaff> retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(MedicalCentre medicalCentre) {
+        Query query = em.createQuery("SELECT ms FROM MedicalStaff ms WHERE ms.medicalCentre IS NULL OR ms.medicalCentre = :inMedicalCentre ORDER BY ms.employeeId ASC");
+        query.setParameter("inMedicalCentre", medicalCentre);
+
+        return query.getResultList();
     }
 
     @Override

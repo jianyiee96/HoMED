@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.MedicalCentre;
+import entity.MedicalStaff;
 import entity.Serviceman;
 import java.util.List;
 import javax.ejb.Local;
@@ -36,6 +38,8 @@ public interface EmployeeSessionBeanLocal {
 
     public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException;
 
+    public List<MedicalStaff> retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(MedicalCentre medicalCentre);
+    
     public Employee updateEmployee(Employee employee) throws UpdateEmployeeException;
 
     public void deleteEmployee(Long employeeId) throws DeleteEmployeeException;

@@ -60,7 +60,7 @@ public class MedicalCentreStaffManagementManagedBean implements Serializable {
     }
 
     public void initAssignMedicalCentreStaff() {
-        this.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre = medicalCentreSessionBeanLocal.retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(medicalCentreToView);
+        this.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre = employeeSessionBeanLocal.retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(medicalCentreToView);
     }
 
     public void assignMedicalStaffToMedicalCentre(MedicalStaff medicalStaff) {

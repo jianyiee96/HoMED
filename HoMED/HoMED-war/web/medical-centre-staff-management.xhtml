@@ -98,33 +98,39 @@
                 <div class="p-grid data-view">
                     <div class="p-col-12">
                         <div class="card">
-                            <p:dataView id="dataViewAssignMedicalCentreStaff" widgetVar="dataViewAssignMedicalCentreStaff" 
-                                        var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre}" 
-                                        listIcon="pi pi-bars" paginator="true" rows="10" layout="list" paginatorPosition="bottom">
+                            <h:panelGroup rendered="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre.size() gt 0}">
+                                <p:dataView id="dataViewAssignMedicalCentreStaff" widgetVar="dataViewAssignMedicalCentreStaff" 
+                                            var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre}" 
+                                            listIcon="pi pi-bars" paginator="true" rows="10" layout="list" paginatorPosition="bottom">
 
-                                <p:dataViewListItem>
-                                    <div class="data-view-list-item">
-                                        <div class="data-view-list-detail">
-                                            <span class="data-view-name">#{medicalStaff.name}</span>
-                                            <span class="role-badge role-#{medicalStaff.role}">#{medicalStaff.role.stringVal}</span>
+                                    <p:dataViewListItem>
+                                        <div class="data-view-list-item">
+                                            <div class="data-view-list-detail">
+                                                <span class="data-view-name">#{medicalStaff.name}</span>
+                                                <span class="role-badge role-#{medicalStaff.role}">#{medicalStaff.role.stringVal}</span>
 
-                                            <div class="data-view-description">#{medicalStaff.email}</div>
-                                            <div class="data-view-description">#{medicalStaff.phoneNumber}</div>
+                                                <div class="data-view-description">#{medicalStaff.email}</div>
+                                                <div class="data-view-description">#{medicalStaff.phoneNumber}</div>
+                                            </div>
+
+                                            <div class="data-view-list-action">
+                                                <p:commandButton rendered="#{medicalStaff.medicalCentre eq null}" value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
+                                                                 update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                                 actionListener="#{medicalCentreStaffManagementManagedBean.assignMedicalStaffToMedicalCentre(medicalStaff)}" />
+
+                                                <p:commandButton rendered="#{medicalStaff.medicalCentre ne null}" value="Unassign" title="Assign Medical Centre Staff" icon="pi pi-user-minus" styleClass="warning-button"
+                                                                 update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                                 actionListener="#{medicalCentreStaffManagementManagedBean.unassignMedicalStaffFromMedicalCentre(medicalStaff)}" />
+                                            </div>
                                         </div>
+                                    </p:dataViewListItem>
 
-                                        <div class="data-view-list-action">
-                                            <p:commandButton rendered="#{medicalStaff.medicalCentre eq null}" value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
-                                                             update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
-                                                             actionListener="#{medicalCentreStaffManagementManagedBean.assignMedicalStaffToMedicalCentre(medicalStaff)}" />
-
-                                            <p:commandButton rendered="#{medicalStaff.medicalCentre ne null}" value="Unassign" title="Assign Medical Centre Staff" icon="pi pi-user-minus" styleClass="warning-button"
-                                                             update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
-                                                             actionListener="#{medicalCentreStaffManagementManagedBean.unassignMedicalStaffFromMedicalCentre(medicalStaff)}" />
-                                        </div>
-                                    </div>
-                                </p:dataViewListItem>
-
-                            </p:dataView>
+                                </p:dataView>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup rendered="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre.size() eq 0}">
+                                <h4>No medical staff is available for assignment now.</h4>
+                            </h:panelGroup>
                         </div>
                     </div>
                 </div>
