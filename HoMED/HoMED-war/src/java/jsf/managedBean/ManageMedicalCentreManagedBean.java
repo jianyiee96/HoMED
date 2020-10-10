@@ -89,6 +89,14 @@ public class ManageMedicalCentreManagedBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
+    
+//    public void doViewAssignedMedicalStaff() {
+//        try {
+//            
+//        } catch () {
+//            
+//        }
+//    }
 
     // Need to check if there is any association with consultations/employees in the future.
     public void doDelete() {
