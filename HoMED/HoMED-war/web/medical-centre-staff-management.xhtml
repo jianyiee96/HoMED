@@ -8,12 +8,72 @@
     <ui:define name="title">Medical Centre Staff Management</ui:define>
 
     <ui:define name="content">
-        
+
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style>
+            .filter-container .ui-inputtext {
+                width: 100%;
+            }
+        </style>
+
         <f:metadata>
             <f:viewParam name="medicalCentreToViewId" value="#{medicalCentreStaffManagementManagedBean.medicalCentreToViewId}" />
         </f:metadata>
 
         <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <h:form id="formAllMedicalCentreStaff">
+            <ui:fragment rendered="#{medicalCentreStaffManagementManagedBean.medicalCentreToView ne null}">
+                <div class="p-grid crud-table">
+                    <div class="p-col-12">
+                        <div class="card">
+                            <h2>#{medicalCentreStaffManagementManagedBean.medicalCentreToView.name}</h2>
+
+                            <p:dataTable id="dataTableMedicalCentreStaff" widgetVar="dataTableMedicalCentreStaff" var="medicalCentreStaff" value="#{medicalCentreStaffManagementManagedBean.medicalCentreToView.medicalStaffList}" sortBy="#{medicalCentreStaff.employeeId}"
+                                         styleClass="crud-management-table" rowKey="#{medicalCentre.medicalCentreId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                                <f:facet name="header">
+                                    <div class="crud-table-header">
+                                        <span style="font-weight: bold">Medical Centre Staff Details</span>
+
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableMedicalCentreStaff').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Staff ID" width="10%" sortBy="#{medicalCentreStaff.employeeId}" filterBy="#{medicalCentreStaff.employeeId}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.employeeId}" />
+                                </p:column>
+
+                                <p:column headerText="Name" width="20%" sortBy="#{medicalCentreStaff.name}" filterBy="#{medicalCentreStaff.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.name}" />
+                                </p:column>
+
+                                <p:column headerText="Gender" width="15%" sortBy="#{medicalCentreStaff.gender}" filterBy="#{medicalCentreStaff.gender}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.gender}" />
+                                </p:column>
+
+                                <p:column headerText="Role" width="15%" sortBy="#{medicalCentreStaff.role}" filterBy="#{medicalCentreStaff.role}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.role}" />
+                                </p:column>
+
+                                <p:column headerText="Phone" width="15%" sortBy="#{medicalCentreStaff.phoneNumber}" filterBy="#{medicalCentreStaff.phoneNumber}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.phoneNumber}" />
+                                </p:column>
+
+                                <p:column headerText="Email" width="25%" sortBy="#{medicalCentreStaff.email}" filterBy="#{medicalCentreStaff.email}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.email}" />
+                                </p:column>
+                            </p:dataTable>
+
+                        </div>
+                    </div>
+                </div>
+            </ui:fragment>
+        </h:form>
 
     </ui:define>
 </ui:composition>
