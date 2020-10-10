@@ -72,8 +72,8 @@ public class SecurityFilter implements Filter {
             "/employee-management.xhtml", // 5
             "/serviceman-management.xhtml", // 6
             "/form-util.xhtml", // 7
-            "/consultation-util.xhtml" // 8
-
+            "/consultation-util.xhtml", // 8
+            "/medical-centre-staff-management.xhtml" // 9
         };
 
         // Pages that all logged in users can enter
@@ -90,7 +90,8 @@ public class SecurityFilter implements Filter {
                     || path.equals(pathArr[5])
                     || path.equals(pathArr[6])
                     || path.equals(pathArr[7])
-                    || path.equals(pathArr[8])) {
+                    || path.equals(pathArr[8])
+                    || path.equals(pathArr[9])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {

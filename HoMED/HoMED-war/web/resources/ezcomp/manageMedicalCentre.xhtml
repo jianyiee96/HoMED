@@ -208,6 +208,11 @@
 
                                         <ui:fragment rendered ="#{manageMedicalCentreManagedBean.isManageState}">
                                             <ui:fragment rendered="#{not manageMedicalCentreManagedBean.isEditMode}">
+                                                <p:button title="Manage Medical Staff Assignment" outcome="medical-centre-staff-management" includeViewParams="true"
+                                                          icon="pi pi-users" styleClass="help-button p-mr-2">
+                                                    <f:param name="medicalCentreToViewId" value="#{manageMedicalCentreManagedBean.medicalCentreToView.medicalCentreId}" />
+                                                </p:button>
+
                                                 <p:commandButton update="panelManageMedicalCentre" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
                                                     <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.isEditMode}" value="true"/>
                                                 </p:commandButton>
@@ -215,7 +220,6 @@
 
                                             <ui:fragment rendered="#{manageMedicalCentreManagedBean.isEditMode}">
                                                 <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doSave}" update="panelManageMedicalCentre" type="submit" title="Save Changes" icon="pi pi-save" styleClass="success-button p-mr-2"/>
-                                                <p:commandButton update="ccManageMedicalCentre:formManageMedicalCentreEmployees:dialogManageMedicalCentreEmployees" title="View Assigned Medical Staff" type="submit" icon="pi pi-users" styleClass="info-button p-mr-2" oncomplete="PF('dialogManageMedicalCentreEmployees').show()"/>
                                                 <p:commandButton actionListener="#{manageMedicalCentreManagedBean.doDelete}" update="panelManageMedicalCentre" type="submit" process="@this" title="Delete" icon="pi pi-trash" styleClass="danger-button p-mr-2">
                                                     <p:confirm header="Confirmation" message="Are you sure you want to delete this medical centre? Actions cannot be reverted!" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
@@ -237,50 +241,5 @@
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
         </h:form>
-
-        <h:form id="formManageMedicalCentreEmployees">
-            <p:dialog id="dialogManageMedicalCentreEmployees" widgetVar="dialogManageMedicalCentreEmployees" header="Medical Centre Staff Details">                
-                <p:dataTable id="dataTableViewMedicalCentreEmployees" widgetVar="dataTableViewMedicalCentreEmployees" value="#{manageMedicalCentreManagedBean.medicalCentreToView.medicalStaffList}" var="medicalStaff"
-                             sortBy="#{medicalStaff.employeeId}" styleClass="crud-management-table" rowKey="#{medicalStaff.employeeId}" paginator="true" rows="10" paginatorPosition="bottom">
-
-                    <f:facet name="header">
-                        <div class="crud-table-header">
-                            <span style="font-weight: bold">#{manageMedicalCentreManagedBean.medicalCentreToView.name}</span>
-
-                            <span class="filter-container ui-input-icon-left">
-                                <i class="pi pi-search" />
-                                <p:inputText id="globalFilter" onkeyup="PF('dataTableViewMedicalCentreEmployees').filter()" placeholder="Search" />
-                            </span>
-                        </div>
-                    </f:facet>
-
-                    <p:column headerText="Medical Staff ID" width="10%" sortBy="#{medicalStaff.employeeId}" filterBy="#{medicalStaff.employeeId}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.employeeId}" />
-                    </p:column>
-
-                    <p:column headerText="Name" width="20%" sortBy="#{medicalStaff.name}" filterBy="#{medicalStaff.name}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.name}" />
-                    </p:column>
-
-                    <p:column headerText="Role" width="15%" sortBy="#{medicalStaff.role}" filterBy="#{medicalStaff.role}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.role}" />
-                    </p:column>
-
-                    <p:column headerText="Email" width="35%" sortBy="#{medicalStaff.email}" filterBy="#{medicalStaff.email}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.email}" />
-                    </p:column>
-                    
-                    <p:column headerText="Gender" width="10%" sortBy="#{medicalStaff.gender}" filterBy="#{medicalStaff.gender}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.gender}" />
-                    </p:column>
-
-                    <p:column headerText="Phone Number" width="10%" sortBy="#{medicalStaff.phoneNumber}" filterBy="#{medicalStaff.phoneNumber}" filterMatchMode="contains">
-                        <h:outputText value="#{medicalStaff.phoneNumber}" />
-                    </p:column>
-
-                </p:dataTable>
-            </p:dialog>
-        </h:form>
-
     </cc:implementation>
 </html>
