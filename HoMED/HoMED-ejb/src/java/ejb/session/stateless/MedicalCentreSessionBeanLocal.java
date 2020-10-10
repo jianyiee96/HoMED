@@ -30,4 +30,6 @@ public interface MedicalCentreSessionBeanLocal {
 
     public void assignListOfMedicalStaffToMedicalCentre(Long medicalCentreId, List<MedicalStaff> medicalStaffList) throws AssignMedicalStaffToMedicalCentreException;
 
+    public List<MedicalStaff> retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(MedicalCentre medicalCentre);
+
 }

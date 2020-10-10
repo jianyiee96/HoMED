@@ -11,9 +11,14 @@
 
         <h:outputStylesheet name="crud-tables.css" library="css" />
 
-        <style>
+        <style type="text/css">
             .filter-container .ui-inputtext {
                 width: 100%;
+            }
+
+            .role-badge {
+                font-size: 13px;
+                padding: .3em .6rem;
             }
         </style>
 
@@ -27,8 +32,18 @@
             <ui:fragment rendered="#{medicalCentreStaffManagementManagedBean.medicalCentreToView ne null}">
                 <div class="p-grid crud-table">
                     <div class="p-col-12">
-                        <div class="card">
-                            <h2>#{medicalCentreStaffManagementManagedBean.medicalCentreToView.name}</h2>
+                        <div class="card ui-fluid">
+
+                            <div class="p-grid p-justify-between">
+                                <div class='p-col-11'>
+                                    <h3>#{medicalCentreStaffManagementManagedBean.medicalCentreToView.name}</h3>
+                                </div>
+                                <div class='p-col-1'>
+                                    <p:commandButton value="Assign" title="Assign Medical Centre Staff" styleClass="success-button" 
+                                                     update="formAssignMedicalCentreStaff" process="@this"
+                                                     actionListener="#{medicalCentreStaffManagementManagedBean.initAssignMedicalCentreStaff}" oncomplete="PF('dialogAssignMedicalCentreStaff').show()" />
+                                </div>
+                            </div>
 
                             <p:dataTable id="dataTableMedicalCentreStaff" widgetVar="dataTableMedicalCentreStaff" var="medicalCentreStaff" value="#{medicalCentreStaffManagementManagedBean.medicalCentreToView.medicalStaffList}" sortBy="#{medicalCentreStaff.employeeId}"
                                          styleClass="crud-management-table" rowKey="#{medicalCentre.medicalCentreId}" paginator="true" rows="10" paginatorPosition="bottom">
@@ -73,6 +88,45 @@
                     </div>
                 </div>
             </ui:fragment>
+        </h:form>
+
+        <h:form id="formAssignMedicalCentreStaff">
+            <p:dialog id="dialogAssignMedicalCentreStaff" widgetVar="dialogAssignMedicalCentreStaff" header="Assign Medical Centre Staff" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAssignMedicalCentreStaff').initPosition()"
+                      minWidth="500" width="900">
+
+                <div class="p-grid data-view">
+                    <div class="p-col-12">
+                        <div class="card">
+                            <p:dataView id="dataViewAssignMedicalCentreStaff" widgetVar="dataViewAssignMedicalCentreStaff" 
+                                        var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaff}" 
+                                        listIcon="pi pi-bars" paginator="true" rows="10" layout="list" paginatorPosition="bottom">
+
+                                <p:dataViewListItem>
+                                    <div class="data-view-list-item">
+                                        <div class="data-view-list-detail">
+                                            <span class="data-view-name">#{medicalStaff.name}</span>
+                                            <span class="role-badge role-#{medicalStaff.role}">#{medicalStaff.role.stringVal}</span>
+
+                                            <div class="data-view-description">#{medicalStaff.email}</div>
+                                            <div class="data-view-description">#{medicalStaff.phoneNumber}</div>
+                                        </div>
+
+                                        <div class="data-view-list-action">
+
+                                            <p:commandButton value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
+                                                             update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                             actionListener="#{medicalCentreStaffManagementManagedBean.assignMedicalStaffToMedicalCentre(medicalStaff)}" />
+                                        </div>
+                                    </div>
+                                </p:dataViewListItem>
+
+                            </p:dataView>
+                        </div>
+                    </div>
+                </div>
+
+            </p:dialog>
         </h:form>
 
     </ui:define>

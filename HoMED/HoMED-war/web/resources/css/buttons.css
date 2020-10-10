@@ -64,6 +64,34 @@
     color: #805B36;
 }
 
+.role-badge {
+    border-radius: 2px;
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 25px;
+    letter-spacing: .3px;
+}
+
+.role-MEDICAL_OFFICER {
+    background: #C8E6C9;
+    color: #256029;
+}
+
+.role-CLERK {
+    background: #B3E5FC;
+    color: #23547B;
+}
+
+.role-SUPER_USER {
+    background: #FEEDAF;
+    color: #8A5340;
+}
+
+.role-MB_ADMIN {
+    background: #DDA0DD;
+    color: #832f83;
+}
 
 .button-margin {
     margin: 2px;

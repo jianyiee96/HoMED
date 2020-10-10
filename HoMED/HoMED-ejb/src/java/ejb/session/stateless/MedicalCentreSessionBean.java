@@ -151,6 +151,14 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
     }
 
     @Override
+    public List<MedicalStaff> retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(MedicalCentre medicalCentre) {
+        Query query = em.createQuery("SELECT ms FROM MedicalStaff ms WHERE ms.medicalCentre IS NULL OR ms.medicalCentre = :inMedicalCentre ORDER BY ms.employeeId ASC");
+        query.setParameter("inMedicalCentre", medicalCentre);
+        
+        return query.getResultList();
+    }
+
+    @Override
     public void assignListOfMedicalStaffToMedicalCentre(Long medicalCentreId, List<MedicalStaff> medicalStaffList) throws AssignMedicalStaffToMedicalCentreException {
         String errorMessage = "Failed to assign Medical Staff to Medical Centre: ";
         try {
