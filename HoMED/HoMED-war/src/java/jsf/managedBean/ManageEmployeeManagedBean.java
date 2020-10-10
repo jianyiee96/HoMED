@@ -1,10 +1,17 @@
 package jsf.managedBean;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
+import entity.MedicalCentre;
+import entity.MedicalStaff;
 import entity.Serviceman;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -12,6 +19,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.EmployeeRoleEnum;
+import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.DeleteEmployeeException;
 import util.exceptions.EmployeeNotFoundException;
@@ -22,6 +30,9 @@ import util.exceptions.UpdateEmployeeException;
 @Named(value = "manageEmployeeManagedBean")
 @ViewScoped
 public class ManageEmployeeManagedBean implements Serializable {
+
+    @EJB
+    private MedicalCentreSessionBeanLocal medicalCentreSessionBean;
 
     @EJB
     private ServicemanSessionBeanLocal servicemanSessionBean;
@@ -37,12 +48,19 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     private Serviceman servicemanToCopy;
 
+    private List<MedicalCentre> medicalCentres;
+    private HashMap<Long, MedicalCentre> medicalCentresHm;
+
+    private Long medicalCentreId;
+
     private Boolean isAdminView;
     private Boolean isEditMode;
     private Boolean isHideAdminPanel;
 
     public ManageEmployeeManagedBean() {
         this.employeeToView = new Employee();
+        this.medicalCentres = new ArrayList<>();
+        this.medicalCentresHm = new HashMap<>();
     }
 
     @PostConstruct
@@ -52,6 +70,11 @@ public class ManageEmployeeManagedBean implements Serializable {
         this.isAdminView = false;
         this.servicemanToCopy = null;
         Object objCurrentEmployee = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
+        this.medicalCentres = medicalCentreSessionBean.retrieveAllMedicalCentres();
+        for (MedicalCentre mc : medicalCentres) {
+            this.medicalCentresHm.put(mc.getMedicalCentreId(), mc);
+        }
+
         if (objCurrentEmployee != null) {
             this.currentEmployee = (Employee) objCurrentEmployee;
             if (this.currentEmployee.getRole() == EmployeeRoleEnum.SUPER_USER) {
@@ -81,10 +104,13 @@ public class ManageEmployeeManagedBean implements Serializable {
     public void doCreate() {
         try {
             employeeSessionBean.createEmployee(employeeToView);
+            if (employeeToView instanceof MedicalStaff) {
+                employeeSessionBean.assignMedicalStaffToMedicalCentre(employeeToView.getEmployeeId(), medicalCentreId);
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created Employee! Please inform employee that OTP has been sent to their email.", null));
             this.isHideAdminPanel = true;
             this.isEditMode = false;
-        } catch (CreateEmployeeException ex) {
+        } catch (CreateEmployeeException | AssignMedicalStaffToMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
@@ -92,9 +118,12 @@ public class ManageEmployeeManagedBean implements Serializable {
     public void doSave() {
         try {
             employeeSessionBean.updateEmployee(employeeToView);
+            if (employeeToView instanceof MedicalStaff) {
+                employeeSessionBean.assignMedicalStaffToMedicalCentre(employeeToView.getEmployeeId(), medicalCentreId);
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
-        } catch (UpdateEmployeeException ex) {
+        } catch (UpdateEmployeeException | AssignMedicalStaffToMedicalCentreException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
@@ -126,6 +155,14 @@ public class ManageEmployeeManagedBean implements Serializable {
         }
     }
 
+    public void doReset() {
+        try {
+            setEmployeeToView(employeeSessionBean.retrieveEmployeeById(this.employeeToView.getEmployeeId()));
+        } catch (EmployeeNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
+    }
+
     public void emailValidation() {
         try {
             this.servicemanToCopy = servicemanSessionBean.retrieveServicemanByEmail(this.employeeToView.getEmail());
@@ -147,6 +184,12 @@ public class ManageEmployeeManagedBean implements Serializable {
     }
 
     public void setEmployeeToView(Employee employeeToView) {
+        if (employeeToView instanceof MedicalStaff) {
+            MedicalCentre mc = ((MedicalStaff) employeeToView).getMedicalCentre();
+            if (mc != null) {
+                this.medicalCentreId = mc.getMedicalCentreId();
+            }
+        }
         this.employeeToView = employeeToView;
     }
 
@@ -186,8 +229,24 @@ public class ManageEmployeeManagedBean implements Serializable {
         return servicemanToCopy;
     }
 
-    public void setServicemanToCopy(Serviceman servicemanToCopy) {
-        this.servicemanToCopy = servicemanToCopy;
+    public Long getMedicalCentreId() {
+        return medicalCentreId;
+    }
+
+    public void setMedicalCentreId(Long medicalCentreId) {
+        this.medicalCentreId = medicalCentreId;
+    }
+
+    public List<MedicalCentre> getMedicalCentres() {
+        return medicalCentres;
+    }
+
+    public void setMedicalCentres(List<MedicalCentre> medicalCentres) {
+        this.medicalCentres = medicalCentres;
+    }
+
+    public HashMap<Long, MedicalCentre> getMedicalCentresHm() {
+        return medicalCentresHm;
     }
 
 }
