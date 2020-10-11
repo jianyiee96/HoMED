@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Scheduler Management</ui:define>
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col-12">
+                <div class="card" >
+                    <h:form id="formSchedule">
+                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+                        <div class="p-grid p-justify-center">
+                            <div class="buttonbar p-col-12">
+                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" class="p-mx-1">
+                                </p:commandButton>
+                            </div>
+
+                            <h:panelGrid columnClasses="value" class="p-col-6">
+                                <p:schedule id="schedule" value="#{schedulerManagedBean.eventModel}" widgetVar="myschedule">
+
+                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" />
+                                    <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" />
+                                    <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" update="growl-message" />
+                                    <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" update="growl-message" />
+
+                                </p:schedule>
+                            </h:panelGrid>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>
