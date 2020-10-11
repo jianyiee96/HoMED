@@ -2,11 +2,9 @@ package ejb.session.stateless;
 
 import entity.Address;
 import entity.MedicalCentre;
-import entity.MedicalStaff;
 import entity.OperatingHours;
 import java.util.List;
 import java.util.Set;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -16,19 +14,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.CreateMedicalCentreException;
 import util.exceptions.DeleteMedicalCentreException;
-import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.UpdateMedicalCentreException;
 
 @Stateless
 public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
-
-    @EJB
-    private EmployeeSessionBeanLocal employeeSessionBean;
-
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
@@ -147,28 +139,6 @@ public class MedicalCentreSessionBean implements MedicalCentreSessionBeanLocal {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new UpdateMedicalCentreException(generalUnexpectedErrorMessage + "updating medical centre");
-        }
-    }
-
-    @Override
-    public void assignListOfMedicalStaffToMedicalCentre(Long medicalCentreId, List<MedicalStaff> medicalStaffList) throws AssignMedicalStaffToMedicalCentreException {
-        String errorMessage = "Failed to assign Medical Staff to Medical Centre: ";
-        try {
-            MedicalCentre medicalCentre = retrieveMedicalCentreById(medicalCentreId);
-
-            for (MedicalStaff ms : medicalCentre.getMedicalStaffList()) {
-                ms.setMedicalCentre(null);
-            }
-
-            for (MedicalStaff ms : medicalStaffList) {
-                ms = (MedicalStaff) employeeSessionBean.retrieveEmployeeById(ms.getEmployeeId());
-                ms.setMedicalCentre(medicalCentre);
-            }
-
-        } catch (MedicalCentreNotFoundException | EmployeeNotFoundException ex) {
-            throw new AssignMedicalStaffToMedicalCentreException(errorMessage + ex.getMessage());
-        } catch (Exception ex) {
-            throw new AssignMedicalStaffToMedicalCentreException(generalUnexpectedErrorMessage + "assigning list of medical staff to medical centre");
         }
     }
 

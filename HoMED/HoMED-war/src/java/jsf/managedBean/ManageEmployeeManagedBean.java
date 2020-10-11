@@ -84,6 +84,8 @@ public class ManageEmployeeManagedBean implements Serializable {
     }
 
     private void init() {
+        // Wee Keat to Bryan: Added this to ensure the ID is refreshed whenever a new employee is selected.
+        this.medicalCentreId = null;
         this.isHideAdminPanel = false;
         this.servicemanToCopy = null;
     }

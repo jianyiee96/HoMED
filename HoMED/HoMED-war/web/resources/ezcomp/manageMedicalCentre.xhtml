@@ -107,7 +107,7 @@
                                                         <p:ajax update="manage-group-1" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                     <h:outputText rendered="#{not manageMedicalCentreManagedBean.isEditMode}" class="operating-hours-badge #{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen ? 'status-published' : 'privacy-private'}"
-                                                                   value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen ? 'Open' : 'Close'}" />
+                                                                  value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index).isOpen ? 'Open' : 'Close'}" />
                                                 </h5>
 
                                                 <div class="p-formgrid p-grid">
@@ -151,7 +151,7 @@
                                                         <p:ajax update="manage-group-2" resetValues="true" />
                                                     </p:selectBooleanButton>
                                                     <h:outputText rendered="#{not manageMedicalCentreManagedBean.isEditMode}" class="operating-hours-badge #{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen ? 'status-published' : 'privacy-private'}"
-                                                                   value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen ? 'Open' : 'Close'}" />
+                                                                  value="#{manageMedicalCentreManagedBean.medicalCentreToView.operatingHours.get(status.index + 1).isOpen ? 'Open' : 'Close'}" />
                                                 </h5>
 
                                                 <div class="p-formgrid p-grid">
@@ -208,6 +208,11 @@
 
                                         <ui:fragment rendered ="#{manageMedicalCentreManagedBean.isManageState}">
                                             <ui:fragment rendered="#{not manageMedicalCentreManagedBean.isEditMode}">
+                                                <p:button title="Manage Medical Staff Assignment" outcome="medical-centre-staff-management" includeViewParams="true"
+                                                          icon="pi pi-users" styleClass="help-button p-mr-2">
+                                                    <f:param name="medicalCentreToViewId" value="#{manageMedicalCentreManagedBean.medicalCentreToView.medicalCentreId}" />
+                                                </p:button>
+
                                                 <p:commandButton update="panelManageMedicalCentre" type="submit" title="Edit" icon="pi pi-pencil" styleClass="p-mr-2">
                                                     <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.isEditMode}" value="true"/>
                                                 </p:commandButton>
@@ -236,6 +241,5 @@
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
         </h:form>
-
     </cc:implementation>
 </html>

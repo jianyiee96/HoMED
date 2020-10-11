@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Medical Centre Staff Management</ui:define>
+
+    <ui:define name="content">
+
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .filter-container .ui-inputtext {
+                width: 100%;
+            }
+
+            .role-badge {
+                font-size: 13px;
+                padding: .3em .6rem;
+            }
+        </style>
+
+        <f:metadata>
+            <f:viewParam name="medicalCentreToViewId" value="#{medicalCentreStaffManagementManagedBean.medicalCentreToViewId}" />
+        </f:metadata>
+
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <h:form id="formAllMedicalCentreStaff">
+            <ui:fragment rendered="#{medicalCentreStaffManagementManagedBean.medicalCentreToView ne null}">
+                <div class="p-grid crud-table">
+                    <div class="p-col-12">
+                        <div class="card ui-fluid">
+
+                            <div class="p-grid p-justify-between">
+                                <div class='p-col-11'>
+                                    <h3>#{medicalCentreStaffManagementManagedBean.medicalCentreToView.name}</h3>
+                                </div>
+                                <div class='p-col-1'>
+                                    <p:commandButton value="Assign" title="Assign Medical Centre Staff" styleClass="success-button" 
+                                                     update="formAssignMedicalCentreStaff" process="@this"
+                                                     actionListener="#{medicalCentreStaffManagementManagedBean.initAssignMedicalCentreStaff}" oncomplete="PF('dialogAssignMedicalCentreStaff').show()" />
+                                </div>
+                            </div>
+
+                            <p:dataTable id="dataTableMedicalCentreStaff" widgetVar="dataTableMedicalCentreStaff" var="medicalCentreStaff" value="#{medicalCentreStaffManagementManagedBean.medicalCentreToView.medicalStaffList}" sortBy="#{medicalCentreStaff.employeeId}"
+                                         styleClass="crud-management-table" rowKey="#{medicalCentre.medicalCentreId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                                <f:facet name="header">
+                                    <div class="crud-table-header">
+                                        <span style="font-weight: bold">Medical Centre Staff Details</span>
+
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableMedicalCentreStaff').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Staff ID" width="10%" sortBy="#{medicalCentreStaff.employeeId}" filterBy="#{medicalCentreStaff.employeeId}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.employeeId}" />
+                                </p:column>
+
+                                <p:column headerText="Name" width="20%" sortBy="#{medicalCentreStaff.name}" filterBy="#{medicalCentreStaff.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.name}" />
+                                </p:column>
+
+                                <p:column headerText="Gender" width="15%" sortBy="#{medicalCentreStaff.gender}" filterBy="#{medicalCentreStaff.gender}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.gender}" />
+                                </p:column>
+
+                                <p:column headerText="Role" width="15%" sortBy="#{medicalCentreStaff.role}" filterBy="#{medicalCentreStaff.role}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.role}" />
+                                </p:column>
+
+                                <p:column headerText="Phone" width="15%" sortBy="#{medicalCentreStaff.phoneNumber}" filterBy="#{medicalCentreStaff.phoneNumber}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.phoneNumber}" />
+                                </p:column>
+
+                                <p:column headerText="Email" width="25%" sortBy="#{medicalCentreStaff.email}" filterBy="#{medicalCentreStaff.email}" filterMatchMode="contains">
+                                    <h:outputText value="#{medicalCentreStaff.email}" />
+                                </p:column>
+                            </p:dataTable>
+
+                        </div>
+                    </div>
+                </div>
+            </ui:fragment>
+        </h:form>
+
+        <h:form id="formAssignMedicalCentreStaff">
+            <p:dialog id="dialogAssignMedicalCentreStaff" widgetVar="dialogAssignMedicalCentreStaff" header="Assign Medical Centre Staff" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAssignMedicalCentreStaff').initPosition()"
+                      minWidth="500" width="900">
+
+                <div class="p-grid data-view">
+                    <div class="p-col-12">
+                        <div class="card">
+                            <h:panelGroup rendered="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre.size() gt 0}">
+                                <p:dataView id="dataViewAssignMedicalCentreStaff" widgetVar="dataViewAssignMedicalCentreStaff" 
+                                            var="medicalStaff" value="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre}" 
+                                            listIcon="pi pi-bars" paginator="true" rows="10" layout="list" paginatorPosition="bottom">
+
+                                    <p:dataViewListItem>
+                                        <div class="data-view-list-item">
+                                            <div class="data-view-list-detail">
+                                                <span class="data-view-name">#{medicalStaff.name}</span>
+                                                <span class="role-badge role-#{medicalStaff.role}">#{medicalStaff.role.stringVal}</span>
+
+                                                <div class="data-view-description">#{medicalStaff.email}</div>
+                                                <div class="data-view-description">#{medicalStaff.phoneNumber}</div>
+                                            </div>
+
+                                            <div class="data-view-list-action">
+                                                <p:commandButton rendered="#{medicalStaff.medicalCentre eq null}" value="Assign" title="Assign Medical Centre Staff" icon="pi pi-user-plus" styleClass="info-button"
+                                                                 update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                                 actionListener="#{medicalCentreStaffManagementManagedBean.assignMedicalStaffToMedicalCentre(medicalStaff)}" />
+
+                                                <p:commandButton rendered="#{medicalStaff.medicalCentre ne null}" value="Unassign" title="Assign Medical Centre Staff" icon="pi pi-user-minus" styleClass="warning-button"
+                                                                 update="formAllMedicalCentreStaff formAssignMedicalCentreStaff:dataViewAssignMedicalCentreStaff growl-message" process="@this"
+                                                                 actionListener="#{medicalCentreStaffManagementManagedBean.unassignMedicalStaffFromMedicalCentre(medicalStaff)}" />
+                                            </div>
+                                        </div>
+                                    </p:dataViewListItem>
+
+                                </p:dataView>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup rendered="#{medicalCentreStaffManagementManagedBean.unassignedMedicalStaffAndAssignedMedicalStaffForThisMedicalCentre.size() eq 0}">
+                                <h4>No medical staff is available for assignment now.</h4>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+
+            </p:dialog>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
