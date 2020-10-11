@@ -59,7 +59,9 @@ public class SchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response queryBookingSlots(@Context HttpHeaders headers, QueryBookingSlotsReq queryBookingSlotsReq) {
-
+        
+        System.out.println("Query Date: " + queryBookingSlotsReq.getQueryDate());
+        
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);

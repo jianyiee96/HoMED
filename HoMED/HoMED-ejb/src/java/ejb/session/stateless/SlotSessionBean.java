@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -34,10 +35,10 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         try {
             MedicalCentre mc = medicalCentreSessionbeanLocal.retrieveMedicalCentreById(medicalCentreId);
 
-            rangeStart = floorDate15Minute(rangeStart); //For testing.
-            rangeEnd = ceilDate15Minute(rangeEnd);      //For testing.
-//            rangeStart = roundDate15Minute(rangeStart);
-//            rangeEnd = roundDate15Minute(rangeEnd);
+//            rangeStart = floorDate15Minute(rangeStart); //For testing.
+//            rangeEnd = ceilDate15Minute(rangeEnd);      //For testing.
+            rangeStart = roundDate15Minute(rangeStart);
+            rangeEnd = roundDate15Minute(rangeEnd);
 
             if (!rangeStart.before(rangeEnd)) {
                 throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
@@ -47,7 +48,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             Calendar rangeEndCalendar = Calendar.getInstance();
             rangeEndCalendar.setTime(rangeEnd);
 
-            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
+//            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 
             while (rangeStartCalendar.before(rangeEndCalendar)) {
@@ -64,6 +65,66 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
             System.out.println("Created " + createdBookingSlots.size());
             return createdBookingSlots;
+
+        } catch (MedicalCentreNotFoundException ex) {
+            throw new ScheduleBookingSlotException("Invalid Medical Centre Id");
+        }
+
+    }
+
+    @Override
+    public void createBookingSlotsDataInit(Long medicalCentreId, Date date) throws ScheduleBookingSlotException {
+
+        try {
+            MedicalCentre mc = medicalCentreSessionbeanLocal.retrieveMedicalCentreById(medicalCentreId);
+
+            Calendar rangeStartCalendar = Calendar.getInstance();
+            rangeStartCalendar.setTime(date);
+            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+            rangeStartCalendar.set(Calendar.MINUTE, 0);
+            rangeStartCalendar.set(Calendar.SECOND, 0);
+            rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+            Calendar rangeEndCalendar = Calendar.getInstance();
+            rangeEndCalendar.setTime(date);
+            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+            rangeEndCalendar.set(Calendar.MINUTE, 0);
+            rangeEndCalendar.set(Calendar.SECOND, 0);
+            rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+            while (rangeStartCalendar.before(rangeEndCalendar)) {
+                Date currStart = rangeStartCalendar.getTime();
+                rangeStartCalendar.add(Calendar.MINUTE, 15);
+                Date currEnd = rangeStartCalendar.getTime();
+                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
+                mc.getBookingSlots().add(bs);
+                em.persist(bs);
+                em.flush();
+            }
+
+            rangeStartCalendar.add(Calendar.DATE, 1);
+            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+            rangeStartCalendar.set(Calendar.MINUTE, 0);
+            rangeStartCalendar.set(Calendar.SECOND, 0);
+            rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+            rangeEndCalendar.add(Calendar.DATE, 1);
+            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+            rangeEndCalendar.set(Calendar.MINUTE, 0);
+            rangeEndCalendar.set(Calendar.SECOND, 0);
+            rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+            while (rangeStartCalendar.before(rangeEndCalendar)) {
+                Date currStart = rangeStartCalendar.getTime();
+                rangeStartCalendar.add(Calendar.MINUTE, 15);
+                Date currEnd = rangeStartCalendar.getTime();
+                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
+                mc.getBookingSlots().add(bs);
+                em.persist(bs);
+                em.flush();
+            }
 
         } catch (MedicalCentreNotFoundException ex) {
             throw new ScheduleBookingSlotException("Invalid Medical Centre Id");

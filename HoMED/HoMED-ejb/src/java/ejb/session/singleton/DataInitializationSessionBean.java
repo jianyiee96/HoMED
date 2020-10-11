@@ -6,6 +6,7 @@ import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
+import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Address;
 import entity.SuperUser;
 import entity.Clerk;
@@ -43,6 +44,7 @@ import util.exceptions.CreateServicemanException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.RelinkFormTemplatesException;
+import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.UpdateFormInstanceException;
 
 @Singleton
@@ -65,6 +67,8 @@ public class DataInitializationSessionBean {
     private FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
     @EJB
     private FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
+    @EJB
+    private SlotSessionBeanLocal slotSessionBeanLocal;
 
     @PostConstruct
     public void postConstruct() {
@@ -132,10 +136,15 @@ public class DataInitializationSessionBean {
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
             initializeVaccinationForm();
+            
+            slotSessionBeanLocal.createBookingSlotsDataInit(1l, new Date());
+            
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
-                | CreateFormTemplateException | GenerateFormInstanceException | RelinkFormTemplatesException | UpdateFormInstanceException ex) {
+                | CreateFormTemplateException | GenerateFormInstanceException 
+                | RelinkFormTemplatesException | UpdateFormInstanceException
+                | ScheduleBookingSlotException ex) {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
