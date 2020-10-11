@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -79,6 +80,9 @@ public class Serviceman implements Serializable {
     @OneToMany
     private List<FormInstance> formInstances;
 
+    @OneToMany
+    private List<Booking> bookings;
+    
     @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
@@ -106,8 +110,9 @@ public class Serviceman implements Serializable {
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
-
         this.address = new Address();
+        this.formInstances = new ArrayList<>();
+        this.bookings = new ArrayList<>();
     }
 
     // Cloning
@@ -242,6 +247,14 @@ public class Serviceman implements Serializable {
         this.formInstances = formInstances;
     }
 
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

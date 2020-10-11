@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -36,8 +37,12 @@ public class ConsultationPurpose implements Serializable {
     @ManyToMany
     private List<FormTemplate> formTemplates;
     
+    @OneToMany
+    private List<Booking> bookings;
+    
     public ConsultationPurpose() {
         formTemplates = new ArrayList<>();
+        bookings = new ArrayList<>();
     }
     
     public ConsultationPurpose(String consultationPurposeName) {
@@ -67,6 +72,16 @@ public class ConsultationPurpose implements Serializable {
     public void setFormTemplates(List<FormTemplate> formTemplates) {
         this.formTemplates = formTemplates;
     }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+    
+    
 
     @Override
     public int hashCode() {
