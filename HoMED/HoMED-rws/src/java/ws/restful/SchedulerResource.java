@@ -96,7 +96,7 @@ public class SchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response scheduleBooking(@Context HttpHeaders headers, ScheduleBookingReq scheduleBookingReq) {
-
+            
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);

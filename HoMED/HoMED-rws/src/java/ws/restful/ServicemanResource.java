@@ -64,6 +64,7 @@ public class ServicemanResource {
             try {
                 Serviceman serviceman = servicemanSessionBeanLocal.servicemanLogin(servicemanLoginReq.getEmail(), servicemanLoginReq.getPassword());
                 serviceman.setFormInstances(null);
+                serviceman.setBookings(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
             } catch (ServicemanInvalidLoginCredentialException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
