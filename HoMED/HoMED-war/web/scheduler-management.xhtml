@@ -17,13 +17,27 @@
             }
         </script>
 
-        <ui:fragment rendered="#{schedulerManagedBean.currentMedicalCentre != null}">
+
+
+        <ui:fragment rendered="#{schedulerManagedBean.selectedMedicalCentre eq null}">
+            <h1>You are currently not assigned to any medical centre!</h1>
+        </ui:fragment>
+
+
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <ui:fragment rendered='#{schedulerManagedBean.selectedMedicalCentre ne null}'>
             <div class="p-grid">
                 <div class="p-col-12">
                     <div class="card" >
-                        <h:form id="formSchedule">
-                            <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
+                        <h:form id="formSchedule">
+
+                            <div class='p-grid'>
+                                <div class='p-offset-1 p-col-10'>
+                                    <h2>#{schedulerManagedBean.selectedMedicalCentre.name}</h2>
+                                </div>
+                            </div>
                             <div class="p-grid">
                                 <div class="buttonbar p-offset-1 p-col-10">
                                     <h:panelGroup id='panelGroupButtons'>
@@ -53,11 +67,14 @@
                                     </h:panelGroup>
                                 </div>
 
+
+                            </div>
+                            <div class='grid'>
                                 <div class="p-offset-1 p-col-10">
                                     <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
                                                 timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                                aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate=""
-                                                draggable="false" resizable="false">
+                                                aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="timeGridWeek"
+                                                draggable="false" resizable="false" minTime="#{schedulerManagedBean.minTime}" maxTime="#{schedulerManagedBean.maxTime}">
 
                                         <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
                                         <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message'  />
@@ -75,16 +92,6 @@
 
 
         </ui:fragment>
-
-
-        <ui:fragment rendered="#{schedulerManagedBean.currentMedicalCentre == null}">
-
-            You are not allocated to any medical centre. The scheduler function has been disabled. 
-            Please contact System Administrator.
-
-        </ui:fragment>
-
-
 
     </ui:define>
 

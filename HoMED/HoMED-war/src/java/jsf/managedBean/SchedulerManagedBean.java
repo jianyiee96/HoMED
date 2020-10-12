@@ -18,6 +18,7 @@ import javax.inject.Named;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -41,7 +42,7 @@ public class SchedulerManagedBean implements Serializable {
 
     private MedicalStaff currentMedicalStaff;
 
-    private MedicalCentre currentMedicalCentre;
+    private MedicalCentre selectedMedicalCentre;
 
     private List<BookingSlot> bookingSlots;
 
@@ -65,69 +66,26 @@ public class SchedulerManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
-        if (currentEmployee != null) {
-            try {
-                currentEmployee = employeeSessionBeanLocal.retrieveEmployeeById(currentEmployee.getEmployeeId());
-                if (currentEmployee instanceof MedicalStaff) {
-                    currentMedicalStaff = (MedicalStaff) currentEmployee;
-                    currentMedicalCentre = currentMedicalStaff.getMedicalCentre();
-                }
-            } catch (EmployeeNotFoundException ex) {
-                addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
-            }
+        if (currentEmployee != null && currentEmployee instanceof MedicalStaff) {
+            currentMedicalStaff = (MedicalStaff) currentEmployee;
+            selectedMedicalCentre = currentMedicalStaff.getMedicalCentre();
         }
-
-        if (currentMedicalCentre != null) {
-            refreshBookingSlots();
-        }
+        refreshBookingSlots();
     }
 
     private void refreshBookingSlots() {
         existingEventModel.clear();
         newEventModel.clear();
-        Date now = new Date();
-        bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L);
-        for (BookingSlot bs : bookingSlots) {
 
-            if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
-                existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                        .title("Upcoming Booking")
-                        .startDate(bs
-                                .getStartDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime())
-                        .endDate(bs
-                                .getEndDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime())
-                        .overlapAllowed(false)
-                        .editable(false)
-                        .styleClass("booked-booking-slot")
-                        .build());
-            } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
-                existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                        .title("Past Booking")
-                        .startDate(bs
-                                .getStartDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime())
-                        .endDate(bs
-                                .getEndDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime())
-                        .overlapAllowed(false)
-                        .editable(false)
-                        .styleClass("past-booking-slot")
-                        .build());
-            } else if (bs.getBooking() == null) {
+        if (selectedMedicalCentre != null) {
+            Date now = new Date();
 
-                if (bs.getEndDateTime().after(now)) {
+            bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(selectedMedicalCentre.getMedicalCentreId());
+            for (BookingSlot bs : bookingSlots) {
+
+                if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title("Available")
+                            .title("Upcoming Booking")
                             .startDate(bs
                                     .getStartDateTime()
                                     .toInstant()
@@ -140,12 +98,11 @@ public class SchedulerManagedBean implements Serializable {
                                     .toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass("booking-slot")
+                            .styleClass("booked-booking-slot")
                             .build());
-
-                } else {
+                } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title("Expired")
+                            .title("Past Booking")
                             .startDate(bs
                                     .getStartDateTime()
                                     .toInstant()
@@ -158,12 +115,53 @@ public class SchedulerManagedBean implements Serializable {
                                     .toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass("expired-booking-slot")
+                            .styleClass("past-booking-slot")
                             .build());
+                } else if (bs.getBooking() == null) {
+
+                    if (bs.getEndDateTime().after(now)) {
+                        existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                                .title("Available")
+                                .startDate(bs
+                                        .getStartDateTime()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime())
+                                .endDate(bs
+                                        .getEndDateTime()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime())
+                                .overlapAllowed(false)
+                                .editable(false)
+                                .styleClass("booking-slot")
+                                .build());
+
+                    } else {
+                        existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                                .title("Expired")
+                                .startDate(bs
+                                        .getStartDateTime()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime())
+                                .endDate(bs
+                                        .getEndDateTime()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime())
+                                .overlapAllowed(false)
+                                .editable(false)
+                                .styleClass("expired-booking-slot")
+                                .build());
+                    }
+
                 }
-
             }
 
+        } else {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not Link to Medical Centre", "You are currently not assigned to any medical centre!"));
+            PrimeFaces.current().ajax().update(":growl-message");
         }
     }
 
@@ -187,9 +185,6 @@ public class SchedulerManagedBean implements Serializable {
 
                 existingEventModel.addEvent(event);
                 newEventModel.addEvent(event);
-                System.out.println("=== Start of Event ===");
-                newEventModel.getEvents().forEach(e -> System.out.println(e));
-                System.out.println("===  End of Event  ===");
             } else {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
             }
@@ -269,21 +264,62 @@ public class SchedulerManagedBean implements Serializable {
         }
     }
 
+    public void onEventResize(ScheduleEntryResizeEvent event) {
+        System.out.println("eventResized");
+
+        // Moved delta duration
+        Duration startDurationDelta = event.getDeltaStartAsDuration();
+        Duration endDurationDelta = event.getDeltaEndAsDuration();
+
+        LocalDateTime originalStartDateTime = event.getScheduleEvent().getStartDate().minus(startDurationDelta);
+        LocalDateTime originalEndDateTime = event.getScheduleEvent().getEndDate().minus(endDurationDelta);
+
+        // If not in schedule state, disable resizing.
+        if (!isScheduleState) {
+
+            revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Not In Schedule Mode", "Please enter schedule mode to schedule booking slots!"));
+
+        } else {
+
+            for (BookingSlot bs : bookingSlots) {
+
+                // If the slot currently exists in the database, disable resizing.
+                if (bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalStartDateTime)
+                        && bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalEndDateTime)) {
+
+                    revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slots Updating Prohibited", "Updating of existing booking slots is not allowed!"));
+                    break;
+
+                }
+            }
+        }
+    }
+
     private void revertEventDateTime(ScheduleEvent existingEvent, LocalDateTime originalStartDateTime, LocalDateTime originalEndDateTime) {
         existingEvent.setStartDate(originalStartDateTime);
         existingEvent.setEndDate(originalEndDateTime);
     }
 
-    public void onEventResize(ScheduleEntryResizeEvent event) {
-
-//        System.out.println("eventResized");
-//        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Start-Delta:" + event.getDeltaStartAsDuration() + ", End-Delta: " + event.getDeltaEndAsDuration());
-//
-//        addMessage(message);
-    }
-
     private void addMessage(FacesMessage message) {
         FacesContext.getCurrentInstance().addMessage("growl-message", message);
+    }
+
+    public MedicalStaff getCurrentMedicalStaff() {
+        return currentMedicalStaff;
+    }
+
+    public void setCurrentMedicalStaff(MedicalStaff currentMedicalStaff) {
+        this.currentMedicalStaff = currentMedicalStaff;
+    }
+
+    public MedicalCentre getSelectedMedicalCentre() {
+        return selectedMedicalCentre;
+    }
+
+    public void setSelectedMedicalCentre(MedicalCentre selectedMedicalCentre) {
+        this.selectedMedicalCentre = selectedMedicalCentre;
     }
 
     public Boolean getIsScheduleState() {
@@ -340,22 +376,6 @@ public class SchedulerManagedBean implements Serializable {
 
     public void setMaxTime(String maxTime) {
         this.maxTime = maxTime;
-    }
-
-    public MedicalStaff getCurrentMedicalStaff() {
-        return currentMedicalStaff;
-    }
-
-    public void setCurrentMedicalStaff(MedicalStaff currentMedicalStaff) {
-        this.currentMedicalStaff = currentMedicalStaff;
-    }
-
-    public MedicalCentre getCurrentMedicalCentre() {
-        return currentMedicalCentre;
-    }
-
-    public void setCurrentMedicalCentre(MedicalCentre currentMedicalCentre) {
-        this.currentMedicalCentre = currentMedicalCentre;
     }
 
 }
