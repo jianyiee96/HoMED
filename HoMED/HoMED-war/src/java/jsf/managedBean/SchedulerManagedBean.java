@@ -125,19 +125,12 @@ public class SchedulerManagedBean implements Serializable {
 
                 existingEventModel.addEvent(event);
                 newEventModel.addEvent(event);
-//                System.out.println("=== Start of Event ===");
-//                newEventModel.getEvents().forEach(e -> System.out.println(e));
-//                System.out.println("===  End of Event  ===");
             } else {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
             }
         }
 
         event = new DefaultScheduleEvent();
-    }
-
-    public void initSchedule() {
-
     }
 
     public void saveSchedule() {

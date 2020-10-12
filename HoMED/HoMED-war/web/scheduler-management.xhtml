@@ -39,8 +39,7 @@
                                 <div class="buttonbar p-offset-1 p-col-10">
                                     <h:panelGroup id='panelGroupButtons'>
                                         <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
-                                                         update='panelGroupButtons' process="@this" oncomplete="PF('bookingSlots').update()"
-                                                         actionListener="#{schedulerManagedBean.initSchedule}">
+                                                         update='panelGroupButtons' process="@this" oncomplete="PF('bookingSlots').update()">
                                             <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
                                         </p:commandButton>
 
@@ -56,7 +55,7 @@
                                 <div class="p-offset-1 p-col-10">
                                     <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
                                                 timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                                aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate=""
+                                                aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="timeGridWeek"
                                                 draggable="false" resizable="false" minTime="#{schedulerManagedBean.minTime}" maxTime="#{schedulerManagedBean.maxTime}">
 
                                         <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
