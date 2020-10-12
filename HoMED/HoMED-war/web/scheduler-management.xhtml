@@ -17,47 +17,62 @@
             }
         </script>
 
-        <div class="p-grid">
-            <div class="p-col-12">
-                <div class="card" >
-                    <h:form id="formSchedule">
-                        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+        <ui:fragment rendered="#{schedulerManagedBean.selectedMedicalCentre eq null}">
+            <h1>You are currently not assigned to any medical centre!</h1>
+        </ui:fragment>
+        
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
-                        <div class="p-grid">
-                            <div class="buttonbar p-offset-1 p-col-10">
-                                <h:panelGroup id='panelGroupButtons'>
-                                    <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
-                                                     update='panelGroupButtons' process="@this" oncomplete="PF('bookingSlots').update()">
-                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
-                                    </p:commandButton>
+        <ui:fragment rendered='#{schedulerManagedBean.selectedMedicalCentre ne null}'>
+            <div class="p-grid">
+                <div class="p-col-12">
+                    <div class="card" >
 
-                                    <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="secondary-button" title="Schedule Booking Slots"
-                                                     update='panelGroupButtons growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
-                                                     actionListener="#{schedulerManagedBean.saveSchedule}">
-                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
-                                    </p:commandButton>
-                                </h:panelGroup>
+                        <h:form id="formSchedule">
+
+                            <div class='p-grid'>
+                                <div class='p-offset-1 p-col-10'>
+                                    <h2>#{schedulerManagedBean.selectedMedicalCentre.name}</h2>
+                                </div>
                             </div>
+                            <div class="p-grid">
+                                <div class="buttonbar p-offset-1 p-col-10">
+                                    <h:panelGroup id='panelGroupButtons'>
+                                        <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
+                                                         update='panelGroupButtons' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                         actionListener="#{schedulerManagedBean.initSchedule}">
+                                            <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
+                                        </p:commandButton>
 
-                            <div class="p-offset-1 p-col-10">
-                                <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
-                                            timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                            aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="timeGridWeek"
-                                            draggable="false" resizable="false">
-
-                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
-                                    <!--                                    <p:ajax event="eventSelect"  />-->
-                                    <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
-                                    <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
-
-                                </p:schedule>
+                                        <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="secondary-button" title="Schedule Booking Slots"
+                                                         update='panelGroupButtons growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                         actionListener="#{schedulerManagedBean.saveSchedule}">
+                                            <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
+                                        </p:commandButton>
+                                    </h:panelGroup>
+                                </div>
                             </div>
-                        </div> 
+                            <div class='grid'>
+                                <div class="p-offset-1 p-col-10">
+                                    <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
+                                                timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
+                                                aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate=""
+                                                draggable="false" resizable="false" minTime="#{schedulerManagedBean.minTime}" maxTime="#{schedulerManagedBean.maxTime}">
 
-                    </h:form>
+                                        <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
+                                        <!--                                    <p:ajax event="eventSelect"  />-->
+                                        <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+                                        <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+
+                                    </p:schedule>
+                                </div>
+                            </div> 
+
+                        </h:form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </ui:fragment>
 
     </ui:define>
 

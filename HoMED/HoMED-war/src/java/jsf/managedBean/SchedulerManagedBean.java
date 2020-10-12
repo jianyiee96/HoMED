@@ -4,6 +4,7 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.BookingSlot;
 import entity.Employee;
+import entity.MedicalCentre;
 import entity.MedicalStaff;
 import java.io.Serializable;
 import java.time.Duration;
@@ -17,6 +18,7 @@ import javax.inject.Named;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -38,6 +40,7 @@ public class SchedulerManagedBean implements Serializable {
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
     private MedicalStaff currentMedicalStaff;
+    private MedicalCentre selectedMedicalCentre;
 
     private List<BookingSlot> bookingSlots;
 
@@ -61,15 +64,13 @@ public class SchedulerManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
-        if (currentEmployee != null) {
-            try {
-                currentEmployee = employeeSessionBeanLocal.retrieveEmployeeById(currentEmployee.getEmployeeId());
-                if (currentEmployee instanceof MedicalStaff) {
-                    currentMedicalStaff = (MedicalStaff) currentEmployee;
-                }
-            } catch (EmployeeNotFoundException ex) {
-                addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
-            }
+        System.out.println("currentEmployee: " + currentEmployee);
+
+        if (currentEmployee != null && currentEmployee instanceof MedicalStaff) {
+            currentMedicalStaff = (MedicalStaff) currentEmployee;
+            System.out.println("currentMedicalStaff: " + currentMedicalStaff);
+
+            selectedMedicalCentre = currentMedicalStaff.getMedicalCentre();
         }
 
         refreshBookingSlots();
@@ -79,23 +80,29 @@ public class SchedulerManagedBean implements Serializable {
         existingEventModel.clear();
         newEventModel.clear();
 
-        bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L);
-        for (BookingSlot bs : bookingSlots) {
-            String title = bs.getBooking() == null ? "Unbooked Slot" : "Booked Slot";
-            existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                    .title(title)
-                    .startDate(bs
-                            .getStartDateTime()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime())
-                    .endDate(bs
-                            .getEndDateTime()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime())
-                    .overlapAllowed(false)
-                    .build());
+//        bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L); // For Testing
+        if (selectedMedicalCentre != null) {
+            bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(selectedMedicalCentre.getMedicalCentreId());
+            for (BookingSlot bs : bookingSlots) {
+                String title = bs.getBooking() == null ? "Unbooked Slot" : "Booked Slot";
+                existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                        .title(title)
+                        .startDate(bs
+                                .getStartDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .endDate(bs
+                                .getEndDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .overlapAllowed(false)
+                        .build());
+            }
+        } else {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not Link to Medical Centre", "You are currently not assigned to any medical centre!"));
+            PrimeFaces.current().ajax().update(":growl-message");
         }
     }
 
@@ -118,15 +125,19 @@ public class SchedulerManagedBean implements Serializable {
 
                 existingEventModel.addEvent(event);
                 newEventModel.addEvent(event);
-                System.out.println("=== Start of Event ===");
-                newEventModel.getEvents().forEach(e -> System.out.println(e));
-                System.out.println("===  End of Event  ===");
+//                System.out.println("=== Start of Event ===");
+//                newEventModel.getEvents().forEach(e -> System.out.println(e));
+//                System.out.println("===  End of Event  ===");
             } else {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
             }
         }
 
         event = new DefaultScheduleEvent();
+    }
+
+    public void initSchedule() {
+
     }
 
     public void saveSchedule() {
@@ -198,7 +209,7 @@ public class SchedulerManagedBean implements Serializable {
         // Moved delta duration
         Duration startDurationDelta = event.getDeltaStartAsDuration();
         Duration endDurationDelta = event.getDeltaEndAsDuration();
-        
+
         LocalDateTime originalStartDateTime = event.getScheduleEvent().getStartDate().minus(startDurationDelta);
         LocalDateTime originalEndDateTime = event.getScheduleEvent().getEndDate().minus(endDurationDelta);
 
@@ -209,7 +220,7 @@ public class SchedulerManagedBean implements Serializable {
             addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Not In Schedule Mode", "Please enter schedule mode to schedule booking slots!"));
 
         } else {
-            
+
             for (BookingSlot bs : bookingSlots) {
 
                 // If the slot currently exists in the database, disable resizing.
@@ -232,6 +243,22 @@ public class SchedulerManagedBean implements Serializable {
 
     private void addMessage(FacesMessage message) {
         FacesContext.getCurrentInstance().addMessage("growl-message", message);
+    }
+
+    public MedicalStaff getCurrentMedicalStaff() {
+        return currentMedicalStaff;
+    }
+
+    public void setCurrentMedicalStaff(MedicalStaff currentMedicalStaff) {
+        this.currentMedicalStaff = currentMedicalStaff;
+    }
+
+    public MedicalCentre getSelectedMedicalCentre() {
+        return selectedMedicalCentre;
+    }
+
+    public void setSelectedMedicalCentre(MedicalCentre selectedMedicalCentre) {
+        this.selectedMedicalCentre = selectedMedicalCentre;
     }
 
     public Boolean getIsScheduleState() {
