@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Booking Management</ui:define>
+
+    <ui:define name="content">
+
+        <style type="text/css">
+        </style>
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+        <ezcomp:manageServiceman id="ccManageServiceman">
+        </ezcomp:manageServiceman>
+        <h:form id="formAllBookings">
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+            <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre == null}">
+                <h1>You are currently not assigned to any medical centre!</h1>
+            </ui:fragment>
+            <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre != null}">
+
+                <div class="p-grid crud-table">
+                    <div class="p-col-12">
+                        <div class="card">
+                            <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+                            <div class="buttonbar">
+                                <!--oncomplete="PF('dialogManageMedicalCentre').show()"-->
+                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
+                                                 process="@this" >
+                                    <p:resetInput target="ccManageMedicalCentre:formManageMedicalCentre:panelManageMedicalCentre" />
+                                </p:commandButton>
+                            </div>
+
+                            <p:dataTable id="dataTableBookings" widgetVar="dataTableBookings" var="slot" value="#{bookingManagedBean.bookingSlots}" sortBy="#{slot.slotId}"
+                                         styleClass="crud-management-table" rowKey="#{slot.slotId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                                <f:facet name="header">
+                                    <div class="crud-table-header">
+                                        <span style="font-weight: bold">Bookings for #{bookingManagedBean.currentMedicalCentre.name}</span>
+
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableBookings').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Booking ID" width="10%" sortBy="#{slot.booking.bookingId}" filterBy="#{slot.booking.bookingId}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.booking.bookingId}" />
+                                </p:column>
+
+                                <p:column headerText="Serviceman ID" width="10%" sortBy="#{slot.booking.serviceman.servicemanId}" filterBy="#{slot.booking.serviceman.servicemanId}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.booking.serviceman.servicemanId}" />
+                                </p:column>
+
+                                <p:column headerText="Serviceman Name" width="25%" sortBy="#{slot.booking.serviceman.name}" filterBy="#{slot.booking.serviceman.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.booking.serviceman.name}" />
+                                </p:column>
+
+                                <p:column headerText="Consultation Purpose" width="25%" sortBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.booking.consultationPurpose.consultationPurposeName}" />
+                                </p:column>
+
+                                <p:column headerText="Booking Status" width="15%" sortBy="#{slot.booking.bookingStatusEnum}" filterBy="#{slot.booking.bookingStatusEnum}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.booking.bookingStatusEnum}" />
+                                </p:column>
+
+
+                                <p:column headerText="Date" width="15%" sortBy="#{slot.startDateTime}" filterBy="#{slot.startDateTime}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.startDateTime}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Time" width="15%" sortBy="#{slot.startDateTime}" filterBy="#{slot.startDateTime}" filterMatchMode="contains">
+                                    <h:outputText value="#{slot.startDateTime}" >
+                                        <f:convertDateTime pattern="HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Action" width="7%">
+                                    <!--update="ccManageMedicalCentre:formManageMedicalCentre"--> 
+                                    <!--actionListener=""--> 
+                                    <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
+                                                     process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
+                                        <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{slot.booking.serviceman}" />
+                                    </p:commandButton>
+                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" actionListener="#{bookingManagedBean.deleteBooking}">
+                                        <p:confirm header="Delete Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
+                                    </p:commandButton>
+                                </p:column>
+
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </ui:fragment>
+        </h:form>
+    </ui:define>
+</ui:composition>

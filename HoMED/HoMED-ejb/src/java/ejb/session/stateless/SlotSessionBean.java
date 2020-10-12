@@ -5,23 +5,34 @@
 package ejb.session.stateless;
 
 import entity.BookingSlot;
+import entity.ConsultationPurpose;
 import entity.MedicalCentre;
+import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exceptions.CreateBookingException;
 import util.exceptions.MedicalCentreNotFoundException;
-import util.exceptions.RetrieveBookingSlotsException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ServicemanNotFoundException;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
+
+    @EJB(name = "BookingSessionBeanLocal")
+    private BookingSessionBeanLocal bookingSessionBeanLocal;
+
+    @EJB(name = "ConsultationPurposeSessionBeanLocal")
+    private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
+
+    @EJB(name = "ServicemanSessionBeanLocal")
+    private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
     @EJB
     MedicalCentreSessionBeanLocal medicalCentreSessionbeanLocal;
@@ -73,10 +84,12 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
-    public void createBookingSlotsDataInit(Long medicalCentreId, Date date) throws ScheduleBookingSlotException {
+    public void createBookingSlotsDataInit(Long medicalCentreId, Date date, Long servicemanId, Long consultationPurposeId) throws ScheduleBookingSlotException {
 
         try {
             MedicalCentre mc = medicalCentreSessionbeanLocal.retrieveMedicalCentreById(medicalCentreId);
+            Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);
+            ConsultationPurpose consultationPurpose = consultationPurposeSessionBeanLocal.retrieveConsultationPurpose(consultationPurposeId);
 
             Calendar rangeStartCalendar = Calendar.getInstance();
             rangeStartCalendar.setTime(date);
@@ -96,7 +109,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 Date currStart = rangeStartCalendar.getTime();
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
-                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
                 BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
                 mc.getBookingSlots().add(bs);
                 em.persist(bs);
@@ -119,15 +132,25 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 Date currStart = rangeStartCalendar.getTime();
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
-                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
                 BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
                 mc.getBookingSlots().add(bs);
                 em.persist(bs);
                 em.flush();
+                if (Math.random() < 0.2) {
+                    try {
+                        bookingSessionBeanLocal.createBooking(servicemanId, consultationPurposeId, bs.getSlotId());
+                        System.out.println("Booking Created: Start[" + currStart + "+] End[" + currEnd + "]");
+                    } catch (CreateBookingException ex) {
+                        System.out.println("Failed to create booking slot for serviceman");
+                    }
+                }
             }
 
         } catch (MedicalCentreNotFoundException ex) {
             throw new ScheduleBookingSlotException("Invalid Medical Centre Id");
+        } catch (ServicemanNotFoundException ex) {
+            throw new ScheduleBookingSlotException("Invalid Serviceman Id");
         }
 
     }
@@ -138,14 +161,12 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         query.setParameter("id", medicalCentreId);
         return query.getResultList();
     }
-    
+
     @Override
     public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id AND b.booking IS NOT NULL");
         query.setParameter("id", medicalCentreId);
-        List<BookingSlot> list = query.getResultList();
-        System.out.println("LIST SIZE: " + list.size());
-        return list;
+        return query.getResultList();
     }
 
     @Override

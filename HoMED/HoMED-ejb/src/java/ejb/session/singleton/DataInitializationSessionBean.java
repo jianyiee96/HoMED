@@ -86,7 +86,7 @@ public class DataInitializationSessionBean {
             System.out.println("====================== Start of DATA INIT ======================");
 
             Long mcId1 = initializeMedicalCentres();
-            
+
             Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
             Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
             Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
@@ -112,7 +112,7 @@ public class DataInitializationSessionBean {
             String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
             String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
             String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
-            
+
             System.out.println("EMPLOYEE INFO [OTP]");
             System.out.println("Email: " + emp1Otp.getEmail() + "\tPhone: " + emp1Otp.getPhoneNumber() + "\tOTP: " + empOtp1);
             System.out.println("Email: " + emp2Otp.getEmail() + "\tPhone: " + emp2Otp.getPhoneNumber() + "\tOTP: " + empOtp2);
@@ -135,17 +135,20 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
             System.out.println("Successfully created servicemen with OTP\n");
 
-            Long formTemplateId = initializeForm();
+            ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
+            consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
+            ConsultationPurpose vaccinationConsultationPurpose = new ConsultationPurpose("Vaccination");
+            consultationPurposeSessionBeanLocal.createConsultationPurpose(vaccinationConsultationPurpose);
+            Long formTemplateId = initializeForm(consultationPurpose);
+            Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
-            initializeVaccinationForm();
-            
-            slotSessionBeanLocal.createBookingSlotsDataInit(1l, new Date());
-            
+            slotSessionBeanLocal.createBookingSlotsDataInit(1l, new Date(), serviceman1.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
-                | CreateFormTemplateException | GenerateFormInstanceException 
+                | CreateFormTemplateException | GenerateFormInstanceException
                 | RelinkFormTemplatesException | UpdateFormInstanceException
                 | ScheduleBookingSlotException ex) {
             System.out.println(ex.getMessage());
@@ -161,10 +164,7 @@ public class DataInitializationSessionBean {
 //        formInstanceSessionBeanLocal.updateFormInstanceFieldValues(formInstance);
     }
 
-    private Long initializeForm() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
-        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
-        consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
-
+    private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         FormTemplate formTemplate = new FormTemplate("Form Template Demo 1");
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
@@ -227,10 +227,7 @@ public class DataInitializationSessionBean {
         return formTemplate.getFormTemplateId();
     }
 
-    private Long initializeVaccinationForm() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
-        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Vaccination");
-        consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
-
+    private Long initializeVaccinationForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         FormTemplate formTemplate = new FormTemplate("Pre-vaccination Questionnaires");
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());

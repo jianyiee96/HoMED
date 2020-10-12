@@ -15,8 +15,6 @@ public interface SlotSessionBeanLocal {
 
     public List<BookingSlot> createBookingSlots(Long medicalCentreId, Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException;
 
-    public void createBookingSlotsDataInit(Long medicalCentreId, Date date) throws ScheduleBookingSlotException;
-    
     public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId);
     
     public List<BookingSlot> retrieveMedicalCentreBookingSlotsByDate(Long medicalCentreId, Date date);
@@ -24,5 +22,7 @@ public interface SlotSessionBeanLocal {
     public BookingSlot retrieveBookingSlotById(Long id);
 
     public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId);
+
+    public void createBookingSlotsDataInit(Long medicalCentreId, Date date, Long servicemanId, Long consultationPurposeId) throws ScheduleBookingSlotException;
     
 }

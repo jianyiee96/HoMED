@@ -10,7 +10,6 @@ import entity.ConsultationPurpose;
 import entity.FormInstance;
 import entity.FormTemplate;
 import entity.Serviceman;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
