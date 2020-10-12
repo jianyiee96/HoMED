@@ -160,15 +160,34 @@ public class SchedulerManagedBean implements Serializable {
 
         // If not in schedule state, disable dragging.
         if (!isScheduleState) {
+
             revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Not In Schedule Mode", "Please enter schedule mode to schedule booking slots!"));
+
         } else {
+
+            boolean error = false;
+            
             for (BookingSlot bs : bookingSlots) {
+
                 // If the slot currently exists in the database, disable dragging.
                 if (bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalStartDateTime)
                         && bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalEndDateTime)) {
+
                     revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slots Updating Prohibited", "Updating of existing booking slots is not allowed!"));
+                    error = true;
                     break;
+
                 }
+            }
+
+            // If the slot does not exist, but drag to invalid slots (past dates), revert.
+            if (!error && event.getScheduleEvent().getStartDate().isBefore(LocalDateTime.now())) {
+
+                revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Dragged", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
+
             }
         }
     }
@@ -176,7 +195,6 @@ public class SchedulerManagedBean implements Serializable {
     private void revertEventDateTime(ScheduleEvent existingEvent, LocalDateTime originalStartDateTime, LocalDateTime originalEndDateTime) {
         existingEvent.setStartDate(originalStartDateTime);
         existingEvent.setEndDate(originalEndDateTime);
-        addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slots Updating Prohibited", "Updating of existing booking slots is not allowed!"));
     }
 
     public void onEventResize(ScheduleEntryResizeEvent event) {
