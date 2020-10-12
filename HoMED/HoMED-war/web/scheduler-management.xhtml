@@ -18,13 +18,13 @@
                         <div class="p-grid">
                             <div class="buttonbar p-offset-1 p-col-10">
                                 <h:panelGroup id='panelGroupButtons'>
-                                    <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="success-button" title="Schedule Booking Slots"
-                                                     update='panelGroupButtons' process="@this" oncomplete="PF('myschedule').update()">
+                                    <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
+                                                     update='panelGroupButtons' process="@this" oncomplete="PF('bookingSlots').update()">
                                         <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
                                     </p:commandButton>
 
-                                    <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
-                                                     update='panelGroupButtons' process="@this" oncomplete="PF('myschedule').update()"
+                                    <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="secondary-button" title="Schedule Booking Slots"
+                                                     update='panelGroupButtons growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
                                                      actionListener="#{schedulerManagedBean.saveSchedule}">
                                         <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
                                     </p:commandButton>
@@ -32,13 +32,13 @@
                             </div>
 
                             <div class="p-offset-1 p-col-10">
-                                <p:schedule id="schedule" value="#{schedulerManagedBean.eventModel}" widgetVar="myschedule" 
+                                <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
                                             timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
                                             aspectRatio="1.5" view="listYear" allDaySlot="false" rightHeaderTemplate="listMonth,timeGridWeek"
-                                            draggable="false" resizable="#{schedulerManagedBean.isScheduleState}">
+                                            draggable="false" resizable="false">
 
-                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('myschedule').update()" update='growl-message' />
-                                    <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" />
+                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
+<!--                                    <p:ajax event="eventSelect"  />-->
                                     <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" update="growl-message" />
                                     <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" update="growl-message" />
 

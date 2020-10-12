@@ -1,11 +1,19 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.SlotSessionBeanLocal;
+import entity.BookingSlot;
+import entity.Employee;
+import entity.MedicalStaff;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -18,28 +26,79 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.ScheduleBookingSlotException;
 
 @Named(value = "schedulerManagedBean")
 @ViewScoped
 public class SchedulerManagedBean implements Serializable {
 
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+
+    @EJB(name = "SlotSessionBeanLocal")
+    private SlotSessionBeanLocal slotSessionBeanLocal;
+
+    private MedicalStaff currentMedicalStaff;
+
+    private List<BookingSlot> bookingSlots;
+
     private Boolean isScheduleState;
 
-    private ScheduleModel eventModel;
+    private ScheduleModel existingEventModel;
+    private ScheduleModel newEventModel;
     private ScheduleEvent event;
 
     private String slotLabelInterval = "01:00";
-    private String scrollTime = "06:00:00";
     private String minTime = "04:00:00";
     private String maxTime = "20:00:00";
-    private String locale = "en";
-    private String timeZone = "";
-    private String clientTimeZone = "local";
 
     public SchedulerManagedBean() {
         this.isScheduleState = Boolean.FALSE;
-        this.eventModel = new DefaultScheduleModel();
+        this.existingEventModel = new DefaultScheduleModel();
+        this.newEventModel = new DefaultScheduleModel();
         this.event = new DefaultScheduleEvent();
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
+        if (currentEmployee != null) {
+            try {
+                currentEmployee = employeeSessionBeanLocal.retrieveEmployeeById(currentEmployee.getEmployeeId());
+                if (currentEmployee instanceof MedicalStaff) {
+                    currentMedicalStaff = (MedicalStaff) currentEmployee;
+                }
+            } catch (EmployeeNotFoundException ex) {
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
+            }
+        }
+
+        refreshBookingSlots();
+    }
+
+    private void refreshBookingSlots() {
+        existingEventModel.clear();
+        newEventModel.clear();
+        
+        bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L);
+        for (BookingSlot bs : bookingSlots) {
+            String title = bs.getBooking() == null ? "Unbooked Slot" : "Booked Slot";
+            existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                    .title(title)
+                    .startDate(bs
+                            .getStartDateTime()
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime())
+                    .endDate(bs
+                            .getEndDateTime()
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime())
+                    .overlapAllowed(false)
+                    .build());
+        }
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
@@ -51,7 +110,6 @@ public class SchedulerManagedBean implements Serializable {
         System.out.println("dateSelected");
 
         if (isScheduleState && event.getId() == null) {
-
             if (selectEvent.getObject().isAfter(LocalDateTime.now())) {
                 event = DefaultScheduleEvent.builder()
                         .title("Scheduled Slot")
@@ -60,39 +118,38 @@ public class SchedulerManagedBean implements Serializable {
                         .overlapAllowed(false)
                         .build();
 
-                eventModel.addEvent(event);
-//                System.out.println("=== Start of Event ===");
-//                eventModel.getEvents().forEach(e -> System.out.println(e));
-//                System.out.println("===  End of Event  ===");
+                existingEventModel.addEvent(event);
+                newEventModel.addEvent(event);
+                System.out.println("=== Start of Event ===");
+                newEventModel.getEvents().forEach(e -> System.out.println(e));
+                System.out.println("===  End of Event  ===");
             } else {
-                addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Scheduler", "Schedules cannot be made on past dates!"));
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
             }
-
         }
 
         event = new DefaultScheduleEvent();
     }
 
     public void saveSchedule() {
-        List<ScheduleEvent<?>> originalEvents = eventModel.getEvents();
-        List<ScheduleEvent<?>> modifiedEvents = new ArrayList<>();
-        
-        originalEvents.forEach(e -> {
-            System.out.println(e);
-            while (!e.getStartDate().isEqual(e.getEndDate())) {
-                modifiedEvents.add(DefaultScheduleEvent.builder()
-                        .title("Unbooked Slot")
-                        .startDate(e.getStartDate())
-                        .endDate(e.getStartDate().plusMinutes(15))
-                        .overlapAllowed(false)
-                        .build()
-                );
-                e.setStartDate(e.getStartDate().plusMinutes(15));
+        newEventModel.getEvents().forEach(e -> {
+            try {
+                Date rangeStart = Date
+                        .from(e.getStartDate()
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant());
+                Date rangeEnd = Date
+                        .from(e.getEndDate()
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant());
+                slotSessionBeanLocal.createBookingSlots(1L, rangeStart, rangeEnd);
+            } catch (ScheduleBookingSlotException ex) {
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
             }
         });
         
-        eventModel.clear();
-        modifiedEvents.forEach(e -> eventModel.addEvent(e));
+        refreshBookingSlots();
+        addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Booking Slots Created", "Booking slots for consultations have been created successfully!"));
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -121,8 +178,20 @@ public class SchedulerManagedBean implements Serializable {
         this.isScheduleState = isScheduleState;
     }
 
-    public ScheduleModel getEventModel() {
-        return eventModel;
+    public ScheduleModel getExistingEventModel() {
+        return existingEventModel;
+    }
+
+    public void setExistingEventModel(ScheduleModel existingEventModel) {
+        this.existingEventModel = existingEventModel;
+    }
+
+    public ScheduleModel getNewEventModel() {
+        return newEventModel;
+    }
+
+    public void setNewEventModel(ScheduleModel newEventModel) {
+        this.newEventModel = newEventModel;
     }
 
     public ScheduleEvent getEvent() {
@@ -141,14 +210,6 @@ public class SchedulerManagedBean implements Serializable {
         this.slotLabelInterval = slotLabelInterval;
     }
 
-    public String getScrollTime() {
-        return scrollTime;
-    }
-
-    public void setScrollTime(String scrollTime) {
-        this.scrollTime = scrollTime;
-    }
-
     public String getMinTime() {
         return minTime;
     }
@@ -163,74 +224,6 @@ public class SchedulerManagedBean implements Serializable {
 
     public void setMaxTime(String maxTime) {
         this.maxTime = maxTime;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String locale) {
-        this.locale = locale;
-    }
-
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    public String getClientTimeZone() {
-        return clientTimeZone;
-    }
-
-    public void setClientTimeZone(String clientTimeZone) {
-        this.clientTimeZone = clientTimeZone;
-    }
-
-    private LocalDateTime previousDay8Pm() {
-        return LocalDateTime.now().minusDays(1).withHour(20).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime previousDay11Pm() {
-        return LocalDateTime.now().minusDays(1).withHour(23).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime today1Pm() {
-        return LocalDateTime.now().withHour(13).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime theDayAfter3Pm() {
-        return LocalDateTime.now().plusDays(1).withHour(15).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime today6Pm() {
-        return LocalDateTime.now().withHour(18).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime nextDay9Am() {
-        return LocalDateTime.now().plusDays(1).withHour(9).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime nextDay11Am() {
-        return LocalDateTime.now().plusDays(1).withHour(11).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime fourDaysLater3pm() {
-        return LocalDateTime.now().plusDays(4).withHour(15).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime sevenDaysLater0am() {
-        return LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    private LocalDateTime eightDaysLater0am() {
-        return LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0);
-    }
-
-    public LocalDate getInitialDate() {
-        return LocalDate.now().plusDays(1);
     }
 
 }
