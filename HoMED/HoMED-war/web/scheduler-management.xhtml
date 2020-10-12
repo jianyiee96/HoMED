@@ -38,11 +38,11 @@
 
                                 <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
                                             timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                            aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="timeGridWeek"
+                                            aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
                                             draggable="false" resizable="false" minTime="#{schedulerManagedBean.minTime}" maxTime="#{schedulerManagedBean.maxTime}">
 
                                     <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
-                                    <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message @form'  />
+                                    <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message rightPanel'  />
                                     <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
                                     <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
 
@@ -56,44 +56,55 @@
                     <div class="p-col-4">
                         <div class="card">
 
+
                             <h2>Control Panel</h2>
 
-                            <h:panelGrid columns="4" id='panelGroupButtons'>
-                                <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
-                                                 update="panelGroupButtons bookingSlots" process="@this" oncomplete="PF('bookingSlots').update()">
-                                    <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
-                                </p:commandButton>
 
-                                <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
-                                                 update='panelGroupButtons bookingSlots growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
-                                                 actionListener="#{schedulerManagedBean.saveSchedule}">
-                                    <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
-                                </p:commandButton>
-
-                                <p:commandButton  rendered="#{schedulerManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
-                                                  update='panelGroupButtons bookingSlots growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
-                                                  actionListener="#{schedulerManagedBean.reset}">
-                                    <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
-                                </p:commandButton>
-
-                                <p:commandButton  rendered="#{schedulerManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
-                                                  update='panelGroupButtons bookingSlots growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
-                                                  actionListener="#{schedulerManagedBean.reset}">
-                                    <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
-                                </p:commandButton>
-
-                            </h:panelGrid>
+                            <h:panelGrid width="100%" columns="1" id='rightPanel'>
 
 
+                                <h:panelGrid columns="4">
+                                    <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
+                                                     update="rightPanel @form" process="@this" oncomplete="PF('bookingSlots').update()">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
+                                    </p:commandButton>
+
+                                    <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
+                                                     update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                     actionListener="#{schedulerManagedBean.saveSchedule}">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
+                                    </p:commandButton>
+
+                                    <p:commandButton  rendered="#{schedulerManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
+                                                      update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      actionListener="#{schedulerManagedBean.reset}">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
+                                    </p:commandButton>
+
+                                    <p:commandButton  rendered="#{schedulerManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
+                                                      update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      actionListener="#{schedulerManagedBean.reset}">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
+                                    </p:commandButton>
+
+                                </h:panelGrid>
+
+                                <h:panelGrid width="100%" rendered="#{schedulerManagedBean.selectedBookingSlots.size() != 0}" columns="2">
+                                    <h2>Selected Booking Slots</h2>
 
 
-                            <h:panelGroup rendered="#{schedulerManagedBean.selectedBookingSlots.size() > 0}" id="selectedSlotList">
+                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{schedulerManagedBean.deleteAllSelectedBookingSlots}"
+                                                     disabled="#{schedulerManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('bookingSlots').update()"
+                                                     style="margin-bottom: 15px; float: right"
+                                                     styleClass="danger-button" title="Close" icon="pi pi-trash">
+                                    </p:commandButton>
+                                </h:panelGrid>
 
 
-                                <h2>Selected Booking Slots</h2>
-                                <p:dataList value="#{schedulerManagedBean.selectedBookingSlots}" type="definition" var="bookingSlot">
 
-                                    <p:commandButton update=":formSchedule" actionListener="#{schedulerManagedBean.closeBookingSlot}"
+                                <p:dataList rendered="#{schedulerManagedBean.selectedBookingSlots.size() != 0}" widgetVar="dataList" value="#{schedulerManagedBean.selectedBookingSlots}" type="definition" var="bookingSlot">
+
+                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{schedulerManagedBean.closeBookingSlot}"
                                                      styleClass="rounded-button text-button" style="float: right; margin-bottom: -30px" title="Close" icon="pi pi-times">
                                         <f:attribute name="bookingSlot" value="#{bookingSlot}" />
                                     </p:commandButton>
@@ -120,8 +131,8 @@
                                             </h:panelGrid>
                                         </p:outputPanel>
 
-                                        <p:commandButton update=":formSchedule" value="Delete Booking Slot" actionListener="#{schedulerManagedBean.deleteBookingSlot}"
-                                                         rendered="#{bookingSlot.booking == null}"
+                                        <p:commandButton update="formSchedule:rightPanel" value="Delete Booking Slot" actionListener="#{schedulerManagedBean.deleteBookingSlot}"
+                                                         disabled="#{schedulerManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null}" oncomplete="PF('bookingSlots').update()"
                                                          styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash">
                                             <f:attribute name="bookingSlot" value="#{bookingSlot}" />
                                         </p:commandButton>
@@ -130,7 +141,7 @@
 
                                 </p:dataList>
 
-                            </h:panelGroup>
+                            </h:panelGrid>
 
 
                         </div>

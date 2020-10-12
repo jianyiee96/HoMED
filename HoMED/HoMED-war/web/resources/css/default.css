@@ -46,3 +46,7 @@
     border: 1px solid #55555A !important;
     font-family: "Courier New" !important;
 }
+
+.fc-center{
+    float:right;
+}

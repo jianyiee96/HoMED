@@ -202,13 +202,11 @@ public class SchedulerManagedBean implements Serializable {
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
-        System.out.println("eventSelected");
         event = selectEvent.getObject();
 
         if (event.getData() != null) {
             BookingSlot bs = (BookingSlot) event.getData();
             if (!this.selectedBookingSlots.contains(bs)) {
-                System.out.println("Added!");
                 this.selectedBookingSlots.add(bs);
             }
         }
@@ -281,6 +279,31 @@ public class SchedulerManagedBean implements Serializable {
         } catch (RemoveSlotException ex) {
             System.out.println("Unable to remove booking slot: " + ex.getMessage());
         }
+
+    }
+
+    public void deleteAllSelectedBookingSlots() {
+
+        List<BookingSlot> removedBs = new ArrayList<>();
+        
+        
+        this.selectedBookingSlots.forEach(bs -> {
+            if (bs.getBooking() == null) {
+                try {
+                    slotSessionBeanLocal.removeBookingSlot(bs.getSlotId());
+                    removedBs.add(bs);
+                } catch (RemoveSlotException ex) {
+                    System.out.println("Unable to remove booking slot: " + ex.getMessage());
+                }
+
+            }
+        });
+        
+        removedBs.forEach(bs -> {
+            this.selectedBookingSlots.remove(bs);
+        });
+        
+        refreshBookingSlots();
 
     }
 
