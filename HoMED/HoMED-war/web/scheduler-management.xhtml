@@ -42,7 +42,7 @@
                             <div class="p-offset-1 p-col-10">
                                 <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{schedulerManagedBean.existingEventModel}" 
                                             timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                            aspectRatio="1.5" view="listYear" allDaySlot="false" rightHeaderTemplate="listMonth,timeGridWeek"
+                                            aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="timeGridWeek"
                                             draggable="false" resizable="false">
 
                                     <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />

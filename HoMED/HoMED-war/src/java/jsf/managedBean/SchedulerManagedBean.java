@@ -167,7 +167,7 @@ public class SchedulerManagedBean implements Serializable {
         } else {
 
             boolean error = false;
-            
+
             for (BookingSlot bs : bookingSlots) {
 
                 // If the slot currently exists in the database, disable dragging.
@@ -192,17 +192,42 @@ public class SchedulerManagedBean implements Serializable {
         }
     }
 
+    public void onEventResize(ScheduleEntryResizeEvent event) {
+        System.out.println("eventResized");
+
+        // Moved delta duration
+        Duration startDurationDelta = event.getDeltaStartAsDuration();
+        Duration endDurationDelta = event.getDeltaEndAsDuration();
+        
+        LocalDateTime originalStartDateTime = event.getScheduleEvent().getStartDate().minus(startDurationDelta);
+        LocalDateTime originalEndDateTime = event.getScheduleEvent().getEndDate().minus(endDurationDelta);
+
+        // If not in schedule state, disable resizing.
+        if (!isScheduleState) {
+
+            revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Not In Schedule Mode", "Please enter schedule mode to schedule booking slots!"));
+
+        } else {
+            
+            for (BookingSlot bs : bookingSlots) {
+
+                // If the slot currently exists in the database, disable resizing.
+                if (bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalStartDateTime)
+                        && bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalEndDateTime)) {
+
+                    revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slots Updating Prohibited", "Updating of existing booking slots is not allowed!"));
+                    break;
+
+                }
+            }
+        }
+    }
+
     private void revertEventDateTime(ScheduleEvent existingEvent, LocalDateTime originalStartDateTime, LocalDateTime originalEndDateTime) {
         existingEvent.setStartDate(originalStartDateTime);
         existingEvent.setEndDate(originalEndDateTime);
-    }
-
-    public void onEventResize(ScheduleEntryResizeEvent event) {
-
-        System.out.println("eventResized");
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Start-Delta:" + event.getDeltaStartAsDuration() + ", End-Delta: " + event.getDeltaEndAsDuration());
-
-        addMessage(message);
     }
 
     private void addMessage(FacesMessage message) {
