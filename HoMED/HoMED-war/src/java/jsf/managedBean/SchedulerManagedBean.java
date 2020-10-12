@@ -6,10 +6,9 @@ import entity.BookingSlot;
 import entity.Employee;
 import entity.MedicalStaff;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -23,7 +22,6 @@ import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
-import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import util.exceptions.EmployeeNotFoundException;
@@ -80,7 +78,7 @@ public class SchedulerManagedBean implements Serializable {
     private void refreshBookingSlots() {
         existingEventModel.clear();
         newEventModel.clear();
-        
+
         bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L);
         for (BookingSlot bs : bookingSlots) {
             String title = bs.getBooking() == null ? "Unbooked Slot" : "Booked Slot";
@@ -147,19 +145,42 @@ public class SchedulerManagedBean implements Serializable {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
             }
         });
-        
+
         refreshBookingSlots();
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Booking Slots Created", "Booking slots for consultations have been created successfully!"));
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
         System.out.println("eventMoved");
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Delta:" + event.getDeltaAsDuration());
 
-        addMessage(message);
+        // Moved delta duration
+        Duration duration = event.getDeltaAsDuration();
+        LocalDateTime originalStartDateTime = event.getScheduleEvent().getStartDate().minus(duration);
+        LocalDateTime originalEndDateTime = event.getScheduleEvent().getEndDate().minus(duration);
+
+        // If not in schedule state, disable dragging.
+        if (!isScheduleState) {
+            revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+        } else {
+            for (BookingSlot bs : bookingSlots) {
+                // If the slot currently exists in the database, disable dragging.
+                if (bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalStartDateTime)
+                        && bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().isEqual(originalEndDateTime)) {
+                    revertEventDateTime(event.getScheduleEvent(), originalStartDateTime, originalEndDateTime);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void revertEventDateTime(ScheduleEvent existingEvent, LocalDateTime originalStartDateTime, LocalDateTime originalEndDateTime) {
+        existingEvent.setStartDate(originalStartDateTime);
+        existingEvent.setEndDate(originalEndDateTime);
+        addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slots Updating Prohibited", "Updating of existing booking slots is not allowed!"));
     }
 
     public void onEventResize(ScheduleEntryResizeEvent event) {
+
         System.out.println("eventResized");
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Start-Delta:" + event.getDeltaStartAsDuration() + ", End-Delta: " + event.getDeltaEndAsDuration());
 

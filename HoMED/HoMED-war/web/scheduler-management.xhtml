@@ -9,6 +9,14 @@
 
     <ui:define name="content">
 
+        <script>
+            function updateEditable() {
+                $('#calendar').fullCalendar({
+                    eventStartEditable: false;
+                })
+            }
+        </script>
+
         <div class="p-grid">
             <div class="p-col-12">
                 <div class="card" >
@@ -38,9 +46,9 @@
                                             draggable="false" resizable="false">
 
                                     <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
-<!--                                    <p:ajax event="eventSelect"  />-->
-                                    <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" update="growl-message" />
-                                    <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" update="growl-message" />
+                                    <!--                                    <p:ajax event="eventSelect"  />-->
+                                    <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+                                    <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
 
                                 </p:schedule>
                             </div>
