@@ -181,6 +181,7 @@ public class ServicemanResource {
             try {
                 Serviceman updatedServiceman = servicemanSessionBeanLocal.updateServiceman(servicemanUpdateReq.getServiceman());
                 updatedServiceman.setFormInstances(null);
+                updatedServiceman.setBookings(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanUpdateRsp(updatedServiceman)).build();
             } catch (UpdateServicemanException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
