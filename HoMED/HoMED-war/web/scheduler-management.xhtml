@@ -17,16 +17,27 @@
 
                         <div class="p-grid">
                             <div class="buttonbar p-offset-1 p-col-10">
-                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" class="p-mx-1">
-                                </p:commandButton>
+                                <h:panelGroup id='panelGroupButtons'>
+                                    <p:commandButton rendered="#{not schedulerManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="success-button" title="Schedule Booking Slots"
+                                                     update='panelGroupButtons' process="@this" oncomplete="PF('myschedule').update()">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="true" />
+                                    </p:commandButton>
+
+                                    <p:commandButton rendered="#{schedulerManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
+                                                     update='panelGroupButtons' process="@this" oncomplete="PF('myschedule').update()"
+                                                     actionListener="#{schedulerManagedBean.saveSchedule}">
+                                        <f:setPropertyActionListener target="#{schedulerManagedBean.isScheduleState}" value="false" />
+                                    </p:commandButton>
+                                </h:panelGroup>
                             </div>
 
                             <div class="p-offset-1 p-col-10">
                                 <p:schedule id="schedule" value="#{schedulerManagedBean.eventModel}" widgetVar="myschedule" 
                                             timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{schedulerManagedBean.slotLabelInterval}"
-                                            aspectRatio="1.5" view="listYear" allDaySlot="false" rightHeaderTemplate="listMonth,timeGridWeek">
+                                            aspectRatio="1.5" view="listYear" allDaySlot="false" rightHeaderTemplate="listMonth,timeGridWeek"
+                                            draggable="false" resizable="#{schedulerManagedBean.isScheduleState}">
 
-                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('myschedule').update()" />
+                                    <p:ajax event="dateSelect" listener="#{schedulerManagedBean.onDateSelect}" oncomplete="PF('myschedule').update()" update='growl-message' />
                                     <p:ajax event="eventSelect" listener="#{schedulerManagedBean.onEventSelect}" />
                                     <p:ajax event="eventMove" listener="#{schedulerManagedBean.onEventMove}" update="growl-message" />
                                     <p:ajax event="eventResize" listener="#{schedulerManagedBean.onEventResize}" update="growl-message" />
