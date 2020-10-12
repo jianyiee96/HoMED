@@ -1,12 +1,13 @@
 package jsf.managedBean;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
-import javax.enterprise.context.Dependent;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
@@ -17,34 +18,30 @@ import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
 @Named(value = "schedulerManagedBean")
-@Dependent
-public class SchedulerManagedBean {
+@ViewScoped
+public class SchedulerManagedBean implements Serializable {
+
+    private Boolean isCreateState;
 
     private ScheduleModel eventModel;
+    private ScheduleEvent event;
 
-    private ScheduleModel lazyEventModel;
-
-    private ScheduleEvent event = new DefaultScheduleEvent();
-
-    private boolean showWeekends = true;
-    private boolean tooltip = true;
-    private boolean allDaySlot = true;
-
-    private String timeFormat;
-    private String slotDuration = "00:30:00";
-    private String slotLabelInterval;
+    private String slotLabelInterval = "01:00";
     private String scrollTime = "06:00:00";
     private String minTime = "04:00:00";
     private String maxTime = "20:00:00";
     private String locale = "en";
     private String timeZone = "";
     private String clientTimeZone = "local";
-    private String columnHeaderFormat = "";
+
+    public SchedulerManagedBean() {
+        this.isCreateState = Boolean.FALSE;
+        this.eventModel = new DefaultScheduleModel();
+        this.event = new DefaultScheduleEvent();
+    }
 
     @PostConstruct
     public void postConstruct() {
-        eventModel = new DefaultScheduleModel();
-
         DefaultScheduleEvent event = DefaultScheduleEvent.builder()
                 .title("Champions League Match")
                 .startDate(previousDay8Pm())
@@ -87,20 +84,14 @@ public class SchedulerManagedBean {
                 .allDay(true)
                 .build();
         eventModel.addEvent(scheduleEventAllDay);
-
-        lazyEventModel = new LazyScheduleModel() {
-
-            @Override
-            public void loadEvents(LocalDateTime start, LocalDateTime end) {
-                for (int i = 1; i <= 5; i++) {
-                    LocalDateTime random = getRandomDateTime(start);
-                    addEvent(DefaultScheduleEvent.builder().title("Lazy Event " + i).startDate(random).endDate(random.plusHours(3)).build());
-                }
-            }
-        };
     }
 
-    public SchedulerManagedBean() {
+    public Boolean getIsCreateState() {
+        return isCreateState;
+    }
+
+    public void setIsCreateState(Boolean isCreateState) {
+        this.isCreateState = isCreateState;
     }
 
     public LocalDateTime getRandomDateTime(LocalDateTime base) {
@@ -110,10 +101,6 @@ public class SchedulerManagedBean {
 
     public ScheduleModel getEventModel() {
         return eventModel;
-    }
-
-    public ScheduleModel getLazyEventModel() {
-        return lazyEventModel;
     }
 
     private LocalDateTime previousDay8Pm() {
@@ -178,11 +165,16 @@ public class SchedulerManagedBean {
 
         if (event.getId() == null) {
             eventModel.addEvent(event);
+            System.out.println("event added");
+            System.out.println("start date: " + event.getStartDate());
+            System.out.println("  end date: " + event.getEndDate());
+
+            eventModel.getEvents().forEach(e -> System.out.println(e));
         } else {
             eventModel.updateEvent(event);
         }
 
-        event = new DefaultScheduleEvent();
+//        event = new DefaultScheduleEvent();
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
@@ -190,7 +182,19 @@ public class SchedulerManagedBean {
     }
 
     public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
-        event = DefaultScheduleEvent.builder().startDate(selectEvent.getObject()).endDate(selectEvent.getObject().plusHours(1)).build();
+
+        if (event.getId() == null) {
+            event = DefaultScheduleEvent.builder()
+                    .title("Scheduled Slot")
+                    .startDate(selectEvent.getObject())
+                    .endDate(selectEvent.getObject().plusMinutes(15))
+                    .overlapAllowed(false)
+                    .build();
+            
+            eventModel.addEvent(event);
+        }
+        
+        event = new DefaultScheduleEvent();
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -207,46 +211,6 @@ public class SchedulerManagedBean {
 
     private void addMessage(FacesMessage message) {
         FacesContext.getCurrentInstance().addMessage(null, message);
-    }
-
-    public boolean isShowWeekends() {
-        return showWeekends;
-    }
-
-    public void setShowWeekends(boolean showWeekends) {
-        this.showWeekends = showWeekends;
-    }
-
-    public boolean isTooltip() {
-        return tooltip;
-    }
-
-    public void setTooltip(boolean tooltip) {
-        this.tooltip = tooltip;
-    }
-
-    public boolean isAllDaySlot() {
-        return allDaySlot;
-    }
-
-    public void setAllDaySlot(boolean allDaySlot) {
-        this.allDaySlot = allDaySlot;
-    }
-
-    public String getTimeFormat() {
-        return timeFormat;
-    }
-
-    public void setTimeFormat(String timeFormat) {
-        this.timeFormat = timeFormat;
-    }
-
-    public String getSlotDuration() {
-        return slotDuration;
-    }
-
-    public void setSlotDuration(String slotDuration) {
-        this.slotDuration = slotDuration;
     }
 
     public String getSlotLabelInterval() {
@@ -303,14 +267,6 @@ public class SchedulerManagedBean {
 
     public void setClientTimeZone(String clientTimeZone) {
         this.clientTimeZone = clientTimeZone;
-    }
-
-    public String getColumnHeaderFormat() {
-        return columnHeaderFormat;
-    }
-
-    public void setColumnHeaderFormat(String columnHeaderFormat) {
-        this.columnHeaderFormat = columnHeaderFormat;
     }
 
 }
