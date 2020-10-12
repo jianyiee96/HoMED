@@ -22,5 +22,7 @@ public interface SlotSessionBeanLocal {
     public List<BookingSlot> retrieveMedicalCentreBookingSlotsByDate(Long medicalCentreId, Date date);
     
     public BookingSlot retrieveBookingSlotById(Long id);
+
+    public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId);
     
 }

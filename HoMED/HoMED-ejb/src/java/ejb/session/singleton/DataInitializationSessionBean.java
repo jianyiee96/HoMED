@@ -36,6 +36,7 @@ import util.enumeration.DayOfWeekEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.InputTypeEnum;
 import util.enumeration.ServicemanRoleEnum;
+import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.CreateConsultationPurposeException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.CreateFormTemplateException;
@@ -84,6 +85,8 @@ public class DataInitializationSessionBean {
         try {
             System.out.println("====================== Start of DATA INIT ======================");
 
+            Long mcId1 = initializeMedicalCentres();
+            
             Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
             Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
             Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
@@ -94,6 +97,7 @@ public class DataInitializationSessionBean {
             Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
             Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
             Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
@@ -131,7 +135,6 @@ public class DataInitializationSessionBean {
             System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
             System.out.println("Successfully created servicemen with OTP\n");
 
-            initializeMedicalCentres();
             Long formTemplateId = initializeForm();
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
@@ -140,7 +143,7 @@ public class DataInitializationSessionBean {
             slotSessionBeanLocal.createBookingSlotsDataInit(1l, new Date());
             
             System.out.println("====================== End of DATA INIT ======================");
-        } catch (CreateEmployeeException | CreateServicemanException
+        } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | GenerateFormInstanceException 
                 | RelinkFormTemplatesException | UpdateFormInstanceException
@@ -282,7 +285,7 @@ public class DataInitializationSessionBean {
         return formTemplate.getFormTemplateId();
     }
 
-    private void initializeMedicalCentres() throws CreateMedicalCentreException {
+    private Long initializeMedicalCentres() throws CreateMedicalCentreException {
         MedicalCentre newMedicalCentre = new MedicalCentre();
         newMedicalCentre.setName("HOME TEAM ACADEMY MEDICAL CENTRE");
         newMedicalCentre.setPhone("64653921");
@@ -302,5 +305,6 @@ public class DataInitializationSessionBean {
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
         System.out.println("Successfully created medical centres\n");
+        return medicalCentreId1;
     }
 }

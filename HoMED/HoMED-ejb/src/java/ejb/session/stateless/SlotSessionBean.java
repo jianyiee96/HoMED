@@ -138,6 +138,15 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         query.setParameter("id", medicalCentreId);
         return query.getResultList();
     }
+    
+    @Override
+    public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId) {
+        Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id AND b.booking IS NOT NULL");
+        query.setParameter("id", medicalCentreId);
+        List<BookingSlot> list = query.getResultList();
+        System.out.println("LIST SIZE: " + list.size());
+        return list;
+    }
 
     @Override
     public List<BookingSlot> retrieveMedicalCentreBookingSlotsByDate(Long medicalCentreId, Date date) {
