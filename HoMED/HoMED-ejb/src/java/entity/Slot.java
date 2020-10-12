@@ -6,6 +6,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -51,11 +52,23 @@ public abstract class Slot implements Serializable {
     public void setStartDateTime(Date startDateTime) {
         this.startDateTime = startDateTime;
     }
-
+    
     public Date getEndDateTime() {
         return endDateTime;
     }
 
+    public int getStartHour(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(this.startDateTime);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+    
+    public int getEndHour(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(this.endDateTime);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+    
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }

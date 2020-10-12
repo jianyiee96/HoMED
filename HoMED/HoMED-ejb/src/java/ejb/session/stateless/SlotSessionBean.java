@@ -19,6 +19,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exceptions.CreateBookingException;
 import util.exceptions.MedicalCentreNotFoundException;
+import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
 
@@ -182,6 +183,17 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         }
 
         return filteredBookingSlot;
+    }
+
+    @Override
+    public void removeBookingSlot(Long bookingSlotId) throws RemoveSlotException {
+        BookingSlot bookingSlot = retrieveBookingSlotById(bookingSlotId);
+        if (bookingSlot.getBooking() == null) {
+            em.remove(bookingSlot);
+            bookingSlot.getMedicalCentre().getBookingSlots().remove(bookingSlot);
+        } else {
+            throw new RemoveSlotException("Unable to remove BookingSlot: Booking Exist");
+        }
     }
 
     @Override
