@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exceptions.MedicalCentreNotFoundException;
+import util.exceptions.RemoveSlotException;
 import util.exceptions.RetrieveBookingSlotsException;
 import util.exceptions.ScheduleBookingSlotException;
 
@@ -96,7 +97,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 Date currStart = rangeStartCalendar.getTime();
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
-                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
                 BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
                 mc.getBookingSlots().add(bs);
                 em.persist(bs);
@@ -119,7 +120,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 Date currStart = rangeStartCalendar.getTime();
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
-                System.out.println("Booking Slot Created: Start["+currStart+"+] End["+currEnd+"]");
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
                 BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
                 mc.getBookingSlots().add(bs);
                 em.persist(bs);
@@ -152,6 +153,17 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         }
 
         return filteredBookingSlot;
+    }
+
+    @Override
+    public void removeBookingSlot(Long bookingSlotId) throws RemoveSlotException {
+        BookingSlot bookingSlot = retrieveBookingSlotById(bookingSlotId);
+        if (bookingSlot.getBooking() == null) {
+            em.remove(bookingSlot);
+            bookingSlot.getMedicalCentre().getBookingSlots().remove(bookingSlot);
+        } else {
+            throw new RemoveSlotException("Unable to remove BookingSlot: Booking Exist");
+        }
     }
 
     @Override
