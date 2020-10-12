@@ -108,7 +108,7 @@ public class DataInitializationSessionBean {
             String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
             String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
             String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
-
+            
             System.out.println("EMPLOYEE INFO [OTP]");
             System.out.println("Email: " + emp1Otp.getEmail() + "\tPhone: " + emp1Otp.getPhoneNumber() + "\tOTP: " + empOtp1);
             System.out.println("Email: " + emp2Otp.getEmail() + "\tPhone: " + emp2Otp.getPhoneNumber() + "\tOTP: " + empOtp2);

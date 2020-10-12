@@ -98,6 +98,10 @@ public class SecurityFilter implements Filter {
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
+            
+            if (path.equals(pathArr[10])) {
+                return 1;
+            }
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
         }
 

@@ -4,6 +4,7 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.BookingSlot;
 import entity.Employee;
+import entity.MedicalCentre;
 import entity.MedicalStaff;
 import java.io.Serializable;
 import java.time.Duration;
@@ -24,6 +25,7 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import util.enumeration.BookingStatusEnum;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ScheduleBookingSlotException;
 
@@ -38,6 +40,8 @@ public class SchedulerManagedBean implements Serializable {
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
     private MedicalStaff currentMedicalStaff;
+
+    private MedicalCentre currentMedicalCentre;
 
     private List<BookingSlot> bookingSlots;
 
@@ -66,36 +70,100 @@ public class SchedulerManagedBean implements Serializable {
                 currentEmployee = employeeSessionBeanLocal.retrieveEmployeeById(currentEmployee.getEmployeeId());
                 if (currentEmployee instanceof MedicalStaff) {
                     currentMedicalStaff = (MedicalStaff) currentEmployee;
+                    currentMedicalCentre = currentMedicalStaff.getMedicalCentre();
                 }
             } catch (EmployeeNotFoundException ex) {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
             }
         }
 
-        refreshBookingSlots();
+        if (currentMedicalCentre != null) {
+            refreshBookingSlots();
+        }
     }
 
     private void refreshBookingSlots() {
         existingEventModel.clear();
         newEventModel.clear();
-
+        Date now = new Date();
         bookingSlots = slotSessionBeanLocal.retrieveBookingSlotsByMedicalCentre(1L);
         for (BookingSlot bs : bookingSlots) {
-            String title = bs.getBooking() == null ? "Unbooked Slot" : "Booked Slot";
-            existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                    .title(title)
-                    .startDate(bs
-                            .getStartDateTime()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime())
-                    .endDate(bs
-                            .getEndDateTime()
-                            .toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDateTime())
-                    .overlapAllowed(false)
-                    .build());
+
+            if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+                existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                        .title("Upcoming Booking")
+                        .startDate(bs
+                                .getStartDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .endDate(bs
+                                .getEndDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .overlapAllowed(false)
+                        .editable(false)
+                        .styleClass("booked-booking-slot")
+                        .build());
+            } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
+                existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                        .title("Past Booking")
+                        .startDate(bs
+                                .getStartDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .endDate(bs
+                                .getEndDateTime()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime())
+                        .overlapAllowed(false)
+                        .editable(false)
+                        .styleClass("past-booking-slot")
+                        .build());
+            } else if (bs.getBooking() == null) {
+
+                if (bs.getEndDateTime().after(now)) {
+                    existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                            .title("Available")
+                            .startDate(bs
+                                    .getStartDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .endDate(bs
+                                    .getEndDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .overlapAllowed(false)
+                            .editable(false)
+                            .styleClass("booking-slot")
+                            .build());
+
+                } else {
+                    existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                            .title("Expired")
+                            .startDate(bs
+                                    .getStartDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .endDate(bs
+                                    .getEndDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .overlapAllowed(false)
+                            .editable(false)
+                            .styleClass("expired-booking-slot")
+                            .build());
+                }
+
+            }
+
         }
     }
 
@@ -110,10 +178,11 @@ public class SchedulerManagedBean implements Serializable {
         if (isScheduleState && event.getId() == null) {
             if (selectEvent.getObject().isAfter(LocalDateTime.now())) {
                 event = DefaultScheduleEvent.builder()
-                        .title("Scheduled Slot")
+                        .title("New Booking Slots")
                         .startDate(selectEvent.getObject())
                         .endDate(selectEvent.getObject().plusMinutes(15))
                         .overlapAllowed(false)
+                        .styleClass("new-booking-slot")
                         .build();
 
                 existingEventModel.addEvent(event);
@@ -130,24 +199,32 @@ public class SchedulerManagedBean implements Serializable {
     }
 
     public void saveSchedule() {
-        newEventModel.getEvents().forEach(e -> {
-            try {
-                Date rangeStart = Date
-                        .from(e.getStartDate()
-                                .atZone(ZoneId.systemDefault())
-                                .toInstant());
-                Date rangeEnd = Date
-                        .from(e.getEndDate()
-                                .atZone(ZoneId.systemDefault())
-                                .toInstant());
-                slotSessionBeanLocal.createBookingSlots(1L, rangeStart, rangeEnd);
-            } catch (ScheduleBookingSlotException ex) {
-                addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
-            }
-        });
+
+        if (!newEventModel.getEvents().isEmpty()) {
+            newEventModel.getEvents().forEach(e -> {
+                try {
+                    Date rangeStart = Date
+                            .from(e.getStartDate()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant());
+                    Date rangeEnd = Date
+                            .from(e.getEndDate()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant());
+                    slotSessionBeanLocal.createBookingSlots(1L, rangeStart, rangeEnd);
+                } catch (ScheduleBookingSlotException ex) {
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
+                }
+            });
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Booking Slots Created", "Booking slots for consultations have been created successfully!"));
+        }
 
         refreshBookingSlots();
-        addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Booking Slots Created", "Booking slots for consultations have been created successfully!"));
+
+    }
+
+    public void reset() {
+        refreshBookingSlots();
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -167,7 +244,7 @@ public class SchedulerManagedBean implements Serializable {
         } else {
 
             boolean error = false;
-            
+
             for (BookingSlot bs : bookingSlots) {
 
                 // If the slot currently exists in the database, disable dragging.
@@ -199,10 +276,10 @@ public class SchedulerManagedBean implements Serializable {
 
     public void onEventResize(ScheduleEntryResizeEvent event) {
 
-        System.out.println("eventResized");
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Start-Delta:" + event.getDeltaStartAsDuration() + ", End-Delta: " + event.getDeltaEndAsDuration());
-
-        addMessage(message);
+//        System.out.println("eventResized");
+//        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Start-Delta:" + event.getDeltaStartAsDuration() + ", End-Delta: " + event.getDeltaEndAsDuration());
+//
+//        addMessage(message);
     }
 
     private void addMessage(FacesMessage message) {
@@ -263,6 +340,22 @@ public class SchedulerManagedBean implements Serializable {
 
     public void setMaxTime(String maxTime) {
         this.maxTime = maxTime;
+    }
+
+    public MedicalStaff getCurrentMedicalStaff() {
+        return currentMedicalStaff;
+    }
+
+    public void setCurrentMedicalStaff(MedicalStaff currentMedicalStaff) {
+        this.currentMedicalStaff = currentMedicalStaff;
+    }
+
+    public MedicalCentre getCurrentMedicalCentre() {
+        return currentMedicalCentre;
+    }
+
+    public void setCurrentMedicalCentre(MedicalCentre currentMedicalCentre) {
+        this.currentMedicalCentre = currentMedicalCentre;
     }
 
 }
