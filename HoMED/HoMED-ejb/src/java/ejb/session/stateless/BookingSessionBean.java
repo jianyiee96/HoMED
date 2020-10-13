@@ -17,8 +17,11 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.BookingStatusEnum;
+import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.GenerateFormInstanceException;
+import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
 
 @Stateless
@@ -59,14 +62,14 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             }
 
             Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
-            
+
             bookingSlot.setBooking(newBooking);
             serviceman.getBookings().add(newBooking);
             consultationPurpose.getBookings().add(newBooking);
-            
+
             em.persist(newBooking);
             em.flush();
-            
+
             // Generate and form templates that are linked to cosultation purpose
             for (FormTemplate ft : consultationPurpose.getFormTemplates()) {
                 try {
@@ -79,9 +82,8 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                     continue;
                 }
             }
-            
+
             // Notification module can fire here
-            
             return newBooking;
 
         } catch (ServicemanNotFoundException ex) {
@@ -89,12 +91,54 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
     }
-    
+
     @Override
-    public List<Booking> retrieveServicemanBookings(Long servicemanId){
+    public List<Booking> retrieveServicemanBookings(Long servicemanId) {
         Query query = em.createQuery("SELECT b FROM Booking b WHERE b.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
         return query.getResultList();
+    }
+
+    @Override
+    public Booking retrieveBookingById(Long bookingId) {
+        Booking booking = em.find(Booking.class, bookingId);
+        return booking;
+    }
+
+    @Override
+    public void cancelBooking(Long bookingId) throws CancelBookingException {
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking != null) {
+
+            if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+
+                booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+                BookingSlot replacementSlot = new BookingSlot(
+                        booking.getBookingSlot().getMedicalCentre(),
+                        booking.getBookingSlot().getStartDateTime(),
+                        booking.getBookingSlot().getEndDateTime()
+                );
+
+                try {
+                    slotSessionBeanLocal.createBookingSlots(
+                            booking.getBookingSlot().getMedicalCentre().getMedicalCentreId(),
+                            booking.getBookingSlot().getStartDateTime(),
+                            booking.getBookingSlot().getEndDateTime());
+
+                } catch (ScheduleBookingSlotException ex) {
+                    throw new CancelBookingException("Unable to create replacement booking slot: " + ex.getMessage());
+
+                }
+
+            } else {
+                throw new CancelBookingException("Invalid Booking Status: Booking must be upcoming");
+            }
+
+        } else {
+            throw new CancelBookingException("Invalid Booking Id");
+        }
+
     }
 
 }

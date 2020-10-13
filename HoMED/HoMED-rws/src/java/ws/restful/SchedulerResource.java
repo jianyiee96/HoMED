@@ -23,6 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.RetrieveBookingSlotsException;
 import util.exceptions.ScheduleBookingSlotException;
@@ -144,6 +145,14 @@ public class SchedulerResource {
 //            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
 //            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
 //        }
+
+        try {
+            bookingSessionBeanLocal.cancelBooking(cancelBookingReq.getBookingId());
+        } catch (CancelBookingException ex){
+             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
         ErrorRsp errorRsp = new ErrorRsp("Not implemented");
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
