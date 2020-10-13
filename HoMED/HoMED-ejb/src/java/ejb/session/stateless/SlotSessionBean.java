@@ -206,6 +206,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         }
     }
 
+    @Override
     public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
 
         rangeStart = roundDate30Minute(rangeStart);

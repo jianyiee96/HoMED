@@ -17,16 +17,16 @@
 
                         <div class='buttonbar'>
                             <h2>MEDICAL BOARD SLOT MANAGEMENT</h2>
-                            
+
                             <p:schedule id="medicalBoardSlots" widgetVar="medicalBoardSlots" value="#{medicalBoardSlotManagementManagedBean.existingEventModel}" 
                                         timeFormat="HH:mm" slotDuration="00:30:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
                                         aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
                                         draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
 
-                                <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
-                                <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message'  />
-                                <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
-                                <p:ajax event="eventResize" listener="#{medicalBoardSlotManagementManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+                                <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />
+                                <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message'  />
+                                <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
+                                <p:ajax event="eventResize" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
 
                             </p:schedule>
                         </div>
@@ -39,6 +39,36 @@
                     <div class="card">
 
                         <h2>Control Panel</h2>
+
+                        <h:panelGrid width="100%" columns="1" id='rightPanel'>
+
+                            <h:panelGrid columns="4">
+                                <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Medical Board Slots"
+                                                 update="rightPanel @form" process="@this" oncomplete="PF('medicalBoardSlots').update()">
+                                    <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
+                                </p:commandButton>
+
+                                <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Medical Board Slots"
+                                                 update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                 actionListener="#{medicalBoardSlotManagementManagedBean.saveSchedule}">
+                                    <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
+                                </p:commandButton>
+
+                                <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
+                                                  update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
+                                    <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
+                                </p:commandButton>
+
+                                <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
+                                                  update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
+                                    <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
+                                </p:commandButton>
+
+                            </h:panelGrid>
+
+                        </h:panelGrid>
 
 
                     </div>

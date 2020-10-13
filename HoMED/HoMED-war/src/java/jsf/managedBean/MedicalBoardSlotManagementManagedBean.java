@@ -13,6 +13,8 @@ import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
 import entity.MedicalStaff;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +26,15 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.ScheduleEntryMoveEvent;
+import org.primefaces.event.ScheduleEntryResizeEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import util.enumeration.BookingStatusEnum;
+import util.exceptions.ScheduleBookingSlotException;
 
 @Named(value = "medicalBoardSlotManagementManagedBean")
 @ViewScoped
@@ -164,7 +170,90 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
         this.minTime = startHour + ":00:00";
         this.maxTime = endHour + ":00:00";
+    }
 
+    public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
+        System.out.println("onEventSelect");
+        event = selectEvent.getObject();
+
+        if (event.getData() != null) {
+            MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
+            if (!this.selectedMedicalBoardSlots.contains(mbs)) {
+                this.selectedMedicalBoardSlots.add(mbs);
+            }
+        }
+    }
+
+    public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
+        System.out.println("onDateSelect");
+        if (isScheduleState && event.getId() == null) {
+            if (selectEvent.getObject().isAfter(LocalDateTime.now())) {
+                event = DefaultScheduleEvent.builder()
+                        .title("New Medical Board Slots")
+                        .startDate(selectEvent.getObject())
+                        .endDate(selectEvent.getObject().plusMinutes(30))
+                        .overlapAllowed(false)
+                        .styleClass("new-booking-slot")
+                        .build();
+
+                existingEventModel.addEvent(event);
+                newEventModel.addEvent(event);
+            } else {
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Medical Board Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling medical board slots!"));
+            }
+        }
+
+        event = new DefaultScheduleEvent();
+    }
+
+    public void onEventMove(ScheduleEntryMoveEvent event) {
+        ScheduleEvent updatedEvent = event.getScheduleEvent();
+
+        // Moved delta duration
+        Duration duration = event.getDeltaAsDuration();
+        LocalDateTime originalStartDateTime = updatedEvent.getStartDate().minus(duration);
+        LocalDateTime originalEndDateTime = updatedEvent.getEndDate().minus(duration);
+
+        // If the slot does not exist, but drag to invalid slots (past dates), revert.
+        if (updatedEvent.getStartDate().isBefore(LocalDateTime.now())) {
+            updatedEvent.setStartDate(originalStartDateTime);
+            updatedEvent.setEndDate(originalEndDateTime);
+
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Medical Board Slots Dragged", "Schedules cannot be made on past dates! Please select future dates for scheduling medical board slots!"));
+        }
+    }
+
+    public void saveSchedule() {
+
+        if (!newEventModel.getEvents().isEmpty()) {
+            newEventModel.getEvents().forEach(e -> {
+                try {
+                    Date rangeStart = Date
+                            .from(e.getStartDate()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant());
+                    Date rangeEnd = Date
+                            .from(e.getEndDate()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant());
+                    slotSessionBeanLocal.createMedicalBoardSlots(rangeStart, rangeEnd);
+                } catch (ScheduleBookingSlotException ex) {
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
+                }
+            });
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slots Created", "Medical Board slots for consultations have been created successfully!"));
+        }
+
+        refreshBookingSlots();
+
+    }
+
+    public void reset() {
+        refreshBookingSlots();
+    }
+
+    private void addMessage(FacesMessage message) {
+        FacesContext.getCurrentInstance().addMessage("growl-message", message);
     }
 
     public MedicalStaff getCurrentMedicalBoardAdmin() {
@@ -246,7 +335,5 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     public void setMaxTime(String maxTime) {
         this.maxTime = maxTime;
     }
-    
-    
 
 }
