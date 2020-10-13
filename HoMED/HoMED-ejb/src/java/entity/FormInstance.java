@@ -62,6 +62,9 @@ public class FormInstance implements Serializable {
     
     @ManyToOne(optional = true)
     private Booking booking;
+    
+    @ManyToOne(optional = true)
+    private MedicalOfficer signedBy;
 
     public FormInstance() {
         this.dateCreated = new Date();
@@ -132,7 +135,15 @@ public class FormInstance implements Serializable {
     public void setBooking(Booking booking) {
         this.booking = booking;
     }
-    
+
+    public MedicalOfficer getSignedBy() {
+        return signedBy;
+    }
+
+    public void setSignedBy(MedicalOfficer signedBy) {
+        this.signedBy = signedBy;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
