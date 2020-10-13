@@ -21,7 +21,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     @Override
     public List<Consultation> retrieveWaitingConsultationsByMedicalCentre(Long medicalCentreId) {
 
-        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.bookingSlot.medicalCentre.medicalCentreId = :id AND c.booking.bookingStatusEnum = :status");
+        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.bookingSlot.medicalCentre.medicalCentreId = :id AND c.consultationStatusEnum = :status");
         query.setParameter("id", medicalCentreId);
         query.setParameter("status", ConsultationStatusEnum.WAITING);
 
