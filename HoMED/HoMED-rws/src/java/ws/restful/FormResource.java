@@ -223,7 +223,7 @@ public class FormResource {
         
         try {
 
-            formInstanceSessionBeanLocal.deleteFormInstance(Long.parseLong(formInstanceId));
+            formInstanceSessionBeanLocal.deleteFormInstance(Long.parseLong(formInstanceId), Boolean.FALSE);
 
             return Response.status(Response.Status.OK).build();
 

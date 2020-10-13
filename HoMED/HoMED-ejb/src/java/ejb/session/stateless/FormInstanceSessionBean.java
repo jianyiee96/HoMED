@@ -106,7 +106,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     }
 
     @Override
-    public void deleteFormInstance(Long formInstanceId) throws DeleteFormInstanceException {
+    public void deleteFormInstance(Long formInstanceId, Boolean systemCall) throws DeleteFormInstanceException {
         String errorMessage = "Failed to delete Form Instance: ";
 
         try {
@@ -115,8 +115,10 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             if (formInstance == null) {
                 throw new DeleteFormInstanceException("Please supply an existing formInstanceId");
-            } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+            } else if (!systemCall && formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
                 throw new DeleteFormInstanceException("Unable to delete submitted form instances");
+            } else if (!systemCall && formInstance.getBooking() != null) {
+                throw new DeleteFormInstanceException("Unable to delete form instance with link to booking");
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
@@ -128,6 +130,14 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             formInstance.getFormTemplateMapping().getFormInstances().remove(formInstance);
 
+            if (formInstance.getBooking() != null) {
+                
+                formInstance.getBooking().getFormInstances().remove(formInstance);
+                formInstance.setBooking(null);
+                
+            }
+            
+            
             em.remove(formInstance);
             em.flush();
 

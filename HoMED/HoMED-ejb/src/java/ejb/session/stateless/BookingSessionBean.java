@@ -20,6 +20,7 @@ import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
+import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
@@ -118,15 +119,21 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
             if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
 
-                booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
-                
                 try {
+                    booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+
+                    for(FormInstance fi : booking.getFormInstances()) {
+                        
+                        formInstanceSessionBeanLocal.deleteFormInstance(fi.getFormInstanceId(), Boolean.TRUE);
+                        
+                    }
+                    
                     slotSessionBeanLocal.createBookingSlots(
                             booking.getBookingSlot().getMedicalCentre().getMedicalCentreId(),
                             booking.getBookingSlot().getStartDateTime(),
                             booking.getBookingSlot().getEndDateTime());
 
-                } catch (ScheduleBookingSlotException ex) {
+                } catch (ScheduleBookingSlotException | DeleteFormInstanceException ex) {
                     throw new CancelBookingException("Unable to create replacement booking slot: " + ex.getMessage());
 
                 }
