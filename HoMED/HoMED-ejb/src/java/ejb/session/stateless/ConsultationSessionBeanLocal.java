@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.Consultation;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.CreateConsultationException;
 
 /**
  *
@@ -14,6 +15,8 @@ import javax.ejb.Local;
  */
 @Local
 public interface ConsultationSessionBeanLocal {
+    
+    public void createConsultation(Long bookingId) throws CreateConsultationException;
     
     public List<Consultation> retrieveWaitingConsultationsByMedicalCentre(Long medicalCentreId);
     

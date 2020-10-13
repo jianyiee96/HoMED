@@ -12,13 +12,18 @@ import entity.MedicalCentre;
 import entity.MedicalOfficer;
 import entity.MedicalStaff;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.faces.event.ActionEvent;
+import util.exceptions.MarkBookingAttendanceException;
 
 @Named(value = "queueManagementManagedBean")
 @ViewScoped
@@ -31,6 +36,8 @@ public class QueueManagementManagedBean implements Serializable {
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
     private List<Consultation> waitingConsultations;
+
+    private Consultation selectedConsultation;
 
     private MedicalStaff currentMedicalOfficer;
 
@@ -46,8 +53,13 @@ public class QueueManagementManagedBean implements Serializable {
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
             currentMedicalOfficer = (MedicalOfficer) currentEmployee;
             currentMedicalCentre = currentMedicalOfficer.getMedicalCentre();
-            refreshConsultations();
-
+        }
+        refreshConsultations();
+        
+        try {
+            bookingSessionBeanLocal.markBookingAttendance(25l);
+        } catch (MarkBookingAttendanceException ex) {
+            System.out.println("Test mark attandance error: " + ex.getMessage());
         }
 
     }
@@ -55,17 +67,29 @@ public class QueueManagementManagedBean implements Serializable {
     private void refreshConsultations() {
 
         if (currentMedicalCentre != null) {
-            System.out.println("Kin");
+
             bookingSessionBeanLocal.retrieveAllBookings();
             this.waitingConsultations = consultationSessionBeanLocal.retrieveWaitingConsultationsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
-            System.out.println("Pin");
-            System.out.println(this.waitingConsultations);
-            System.out.println("Din");
+
         }
 
     }
 
-    public String foo() {
-        return "fool";
+    public void selectConsultation(ActionEvent event) {
+        this.selectedConsultation = (Consultation) event.getComponent().getAttributes().get("selectedConsultation");
     }
+
+    public List<Consultation> getWaitingConsultations() {
+        return waitingConsultations;
+    }
+
+    public void setWaitingConsultations(List<Consultation> waitingConsultations) {
+        this.waitingConsultations = waitingConsultations;
+    }
+
+    public String renderTime(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss");
+        return dateFormat.format(date);
+    }
+
 }
