@@ -7,6 +7,8 @@ package ws.restful;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
+import entity.Booking;
+import entity.BookingSlot;
 import util.exceptions.DeleteFormInstanceException;
 import entity.FormInstance;
 import entity.FormTemplate;
@@ -49,7 +51,7 @@ public class FormResource {
     private final FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
 
     private final FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
-    
+
     private final ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
     public FormResource() {
@@ -79,7 +81,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
             List<FormTemplate> formTemplates = formTemplateSessionBeanLocal.retrieveAllPublishedFormTemplates();
             for (FormTemplate ft : formTemplates) {
@@ -113,12 +115,19 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
             List<FormInstance> formInstances = formInstanceSessionBeanLocal.retrieveServicemanFormInstances(Long.parseLong(servicemanId));
             for (FormInstance fi : formInstances) {
+
+                BookingSlot emptyBs = new BookingSlot();
+                emptyBs.setSlotId(fi.getBooking().getBookingSlot().getSlotId());
+
+                Booking emptyBooking = new Booking();
+                emptyBooking.setBookingSlot(emptyBs);
+
                 fi.setServiceman(null);
-                fi.setBooking(null);
+                fi.setBooking(emptyBooking);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
             }
@@ -148,7 +157,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
 
             formInstanceSessionBeanLocal.generateFormInstance(createFormInstanceReq.getServicemanId(), createFormInstanceReq.getFormTemplateId());
@@ -184,7 +193,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
 
             formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
@@ -206,7 +215,7 @@ public class FormResource {
     @Path("deleteFormInstance")
     @DELETE
     public Response deleteFormInstance(@Context HttpHeaders headers, @QueryParam("formInstanceId") String formInstanceId) {
-        
+
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);
@@ -220,7 +229,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
 
             formInstanceSessionBeanLocal.deleteFormInstance(Long.parseLong(formInstanceId), Boolean.FALSE);
@@ -243,7 +252,7 @@ public class FormResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response submitFormInstance(@Context HttpHeaders headers, UpdateFormInstanceReq updateFormInstanceReq) {
-        
+
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);
@@ -257,7 +266,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
 
             formInstanceSessionBeanLocal.updateFormInstanceFieldValues(updateFormInstanceReq.getFormInstance());
@@ -280,7 +289,7 @@ public class FormResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response archiveFormInstance(@Context HttpHeaders headers, UpdateFormInstanceReq updateFormInstanceReq) {
-        
+
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);
@@ -294,7 +303,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-        
+
         try {
 
             formInstanceSessionBeanLocal.archiveFormInstance(updateFormInstanceReq.getFormInstance().getFormInstanceId());
