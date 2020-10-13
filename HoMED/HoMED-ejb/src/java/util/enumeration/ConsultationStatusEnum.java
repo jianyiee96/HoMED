@@ -4,9 +4,9 @@
  */
 package util.enumeration;
 
-public enum BookingStatusEnum {
-    UPCOMING,
-    CANCELLED,
-    ABSENT,
-    PAST,
+
+public enum ConsultationStatusEnum {
+    WAITING,
+    ONGOING,
+    COMPLETED
 }

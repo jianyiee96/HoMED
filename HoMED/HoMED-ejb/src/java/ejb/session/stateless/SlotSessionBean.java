@@ -95,37 +95,14 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
             Calendar rangeStartCalendar = Calendar.getInstance();
             rangeStartCalendar.setTime(date);
-            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 1);
             rangeStartCalendar.set(Calendar.MINUTE, 0);
             rangeStartCalendar.set(Calendar.SECOND, 0);
             rangeStartCalendar.set(Calendar.MILLISECOND, 0);
 
             Calendar rangeEndCalendar = Calendar.getInstance();
             rangeEndCalendar.setTime(date);
-            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
-            rangeEndCalendar.set(Calendar.MINUTE, 0);
-            rangeEndCalendar.set(Calendar.SECOND, 0);
-            rangeEndCalendar.set(Calendar.MILLISECOND, 0);
-
-            while (rangeStartCalendar.before(rangeEndCalendar)) {
-                Date currStart = rangeStartCalendar.getTime();
-                rangeStartCalendar.add(Calendar.MINUTE, 15);
-                Date currEnd = rangeStartCalendar.getTime();
-                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
-                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
-                mc.getBookingSlots().add(bs);
-                em.persist(bs);
-                em.flush();
-            }
-
-            rangeStartCalendar.add(Calendar.DATE, 1);
-            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
-            rangeStartCalendar.set(Calendar.MINUTE, 0);
-            rangeStartCalendar.set(Calendar.SECOND, 0);
-            rangeStartCalendar.set(Calendar.MILLISECOND, 0);
-
-            rangeEndCalendar.add(Calendar.DATE, 1);
-            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 23);
             rangeEndCalendar.set(Calendar.MINUTE, 0);
             rangeEndCalendar.set(Calendar.SECOND, 0);
             rangeEndCalendar.set(Calendar.MILLISECOND, 0);
@@ -140,12 +117,62 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 em.persist(bs);
                 em.flush();
                 if (Math.random() < 0.2) {
-                    try {
-                        bookingSessionBeanLocal.createBooking(servicemanId, consultationPurposeId, bs.getSlotId());
-                        System.out.println("Booking Created: Start[" + currStart + "+] End[" + currEnd + "]");
-                    } catch (CreateBookingException ex) {
-                        System.out.println("Failed to create booking slot for serviceman");
-                    }
+                    bookingSessionBeanLocal.createBookingByInit(servicemanId, consultationPurposeId, bs.getSlotId());
+                    System.out.println("Booking Created: Start[" + currStart + "+] End[" + currEnd + "]");
+                }
+            }
+
+            rangeStartCalendar.add(Calendar.DATE, 1);
+            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 1);
+            rangeStartCalendar.set(Calendar.MINUTE, 0);
+            rangeStartCalendar.set(Calendar.SECOND, 0);
+            rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+            rangeEndCalendar.add(Calendar.DATE, 1);
+            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            rangeEndCalendar.set(Calendar.MINUTE, 0);
+            rangeEndCalendar.set(Calendar.SECOND, 0);
+            rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+            while (rangeStartCalendar.before(rangeEndCalendar)) {
+                Date currStart = rangeStartCalendar.getTime();
+                rangeStartCalendar.add(Calendar.MINUTE, 15);
+                Date currEnd = rangeStartCalendar.getTime();
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
+                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
+                mc.getBookingSlots().add(bs);
+                em.persist(bs);
+                em.flush();
+                if (Math.random() < 0.2) {
+                    bookingSessionBeanLocal.createBookingByInit(servicemanId, consultationPurposeId, bs.getSlotId());
+                    System.out.println("Booking Created: Start[" + currStart + "+] End[" + currEnd + "]");
+                }
+            }
+
+            rangeStartCalendar.add(Calendar.DATE, -2);
+            rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 1);
+            rangeStartCalendar.set(Calendar.MINUTE, 0);
+            rangeStartCalendar.set(Calendar.SECOND, 0);
+            rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+            rangeEndCalendar.add(Calendar.DATE, -2);
+            rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            rangeEndCalendar.set(Calendar.MINUTE, 0);
+            rangeEndCalendar.set(Calendar.SECOND, 0);
+            rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+            while (rangeStartCalendar.before(rangeEndCalendar)) {
+                Date currStart = rangeStartCalendar.getTime();
+                rangeStartCalendar.add(Calendar.MINUTE, 15);
+                Date currEnd = rangeStartCalendar.getTime();
+                System.out.println("Booking Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
+                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
+                mc.getBookingSlots().add(bs);
+                em.persist(bs);
+                em.flush();
+                if (Math.random() < 0.2) {
+                    bookingSessionBeanLocal.createBookingByInit(servicemanId, consultationPurposeId, bs.getSlotId());
+                    System.out.println("Booking Created: Start[" + currStart + "+] End[" + currEnd + "]");
                 }
             }
 
@@ -161,7 +188,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id ");
         query.setParameter("id", medicalCentreId);
-        List<BookingSlot> bookingSlots =  query.getResultList();
+        List<BookingSlot> bookingSlots = query.getResultList();
         Collections.sort(bookingSlots);
         return bookingSlots;
     }
@@ -170,7 +197,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id AND b.booking IS NOT NULL");
         query.setParameter("id", medicalCentreId);
-        List<BookingSlot> bookingSlots =  query.getResultList();
+        List<BookingSlot> bookingSlots = query.getResultList();
         Collections.sort(bookingSlots);
         return bookingSlots;
     }

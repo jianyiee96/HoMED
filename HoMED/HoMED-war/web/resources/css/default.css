@@ -19,13 +19,16 @@
     color: #ffffff;
 }*/
 
-.booking-slot {
-    font-family: "Courier New" !important;
-}
 
 .new-booking-slot {
     background: #A24E77 !important;
     border: 1px solid #A24E77 !important;
+    font-family: "Courier New" !important;
+}
+
+.available-booking-slot {
+    background: #4ea279 !important;
+    border: 1px solid #4ea279 !important;
     font-family: "Courier New" !important;
 }
 
@@ -37,6 +40,7 @@
 
 .past-booking-slot {
     background: #C0C0E1 !important;
+    color: black !important;
     border: 1px solid #C0C0E1 !important;
     font-family: "Courier New" !important;
 }
@@ -44,6 +48,12 @@
 .expired-booking-slot {
     background: #55555A !important;
     border: 1px solid #55555A !important;
+    font-family: "Courier New" !important;
+}
+
+.absent-booking-slot {
+    background: #C76D09 !important;
+    border: 1px solid #C76D09 !important;
     font-family: "Courier New" !important;
 }
 
