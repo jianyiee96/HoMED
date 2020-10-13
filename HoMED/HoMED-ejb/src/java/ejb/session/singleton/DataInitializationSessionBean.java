@@ -97,6 +97,7 @@ public class DataInitializationSessionBean {
             Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
             Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
             Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId2, mcId1);
             employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());

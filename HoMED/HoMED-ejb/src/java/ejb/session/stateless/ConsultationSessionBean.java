@@ -4,53 +4,29 @@
  */
 package ejb.session.stateless;
 
-import entity.Booking;
-import javax.ejb.EJB;
+import entity.Consultation;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import util.enumeration.BookingStatusEnum;
-import util.exceptions.CreateConsultationException;
-import util.exceptions.EndConsultationException;
-import util.exceptions.InvalidateConsultationException;
-import util.exceptions.StartConsultationException;
+import javax.persistence.Query;
+import util.enumeration.ConsultationStatusEnum;
 
 @Stateless
 public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
-
-    @EJB
-    private BookingSessionBeanLocal bookingSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
     @Override
-    public void createConsultationForBooking(Long bookingId) throws CreateConsultationException {
+    public List<Consultation> retrieveWaitingConsultationsByMedicalCentre(Long medicalCentreId) {
 
-        Booking booking = bookingSessionBeanLocal.retrieveBookingById(bookingId);
+        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.bookingSlot.medicalCentre.medicalCentreId = :id AND c.booking.bookingStatusEnum = :status");
+        query.setParameter("id", medicalCentreId);
+        query.setParameter("status", ConsultationStatusEnum.WAITING);
 
-        if (booking != null && booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
-            throw new CreateConsultationException("Not implemented");
+        return query.getResultList();
 
-            
-            
-        } else {
-            throw new CreateConsultationException("Invalid Booking Id Supplied: Ensure booking id is for booking in upcoming status");
-        }
-        
-    }
-    
-    public void startConsultation(Long consultationId, Long medicalOfficerId) throws StartConsultationException {
-        
-    }
-    
-    
-    public void endConsultation(Long medicalOfficerId) throws EndConsultationException {
-        
-    }
-    
-    public void invalidateConsultation(Long medicalOfficerId) throws InvalidateConsultationException {
-        
     }
 
 }
