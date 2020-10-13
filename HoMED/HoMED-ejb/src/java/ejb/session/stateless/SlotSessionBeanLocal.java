@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.BookingSlot;
+import entity.MedicalBoardSlot;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -27,5 +28,9 @@ public interface SlotSessionBeanLocal {
     public List<BookingSlot> retrieveBookingSlotsWithBookingsByMedicalCentre(Long medicalCentreId);
 
     public void createBookingSlotsDataInit(Long medicalCentreId, Date date, Long servicemanId, Long consultationPurposeId) throws ScheduleBookingSlotException;
+
+    public List<MedicalBoardSlot> retrieveMedicalBoardSlots();
+
+    public void createMedicalBoardSlotsDataInit(Date date);
     
 }

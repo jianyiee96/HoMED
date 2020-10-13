@@ -145,6 +145,7 @@ public class DataInitializationSessionBean {
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
             slotSessionBeanLocal.createBookingSlotsDataInit(mcId1, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+            slotSessionBeanLocal.createMedicalBoardSlotsDataInit(new Date());
 
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
