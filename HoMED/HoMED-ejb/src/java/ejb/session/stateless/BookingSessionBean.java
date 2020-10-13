@@ -100,7 +100,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
     }
-    
+
     @Override
     public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException {
 
@@ -141,7 +141,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                     continue;
                 }
             }
-            
+
             for (Long ftId : additionalFormTemplateIds) {
                 try {
                     Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(serviceman.getServicemanId(), ftId);

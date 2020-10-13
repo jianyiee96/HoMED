@@ -28,10 +28,11 @@
                 <div class="p-grid crud-table">
                     <div class="p-col-12">
                         <div class="card">
-                            <p:growl id="growl-message" for="growl-message" showDetail="true" />
+                            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                                <p:autoUpdate/>
+                            </p:growl>
 
                             <div class="buttonbar">
-                                <!--oncomplete="PF('dialogManageMedicalCentre').show()"-->
                                 <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" process="@this" oncomplete="PF('dialogCreateBooking').show()" 
                                                  update="panelCreateBooking" actionListener="#{bookingManagedBean.initCreate}">
                                     <p:resetInput target="panelCreateBooking" />
@@ -86,13 +87,13 @@
                                 </p:column>
 
                                 <p:column headerText="Action" width="7%">
-                                    <!--update="ccManageMedicalCentre:formManageMedicalCentre"--> 
-                                    <!--actionListener=""--> 
                                     <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
                                                      process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
                                         <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{slot.booking.serviceman}" />
                                     </p:commandButton>
-                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" actionListener="#{bookingManagedBean.deleteBooking}">
+                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete"
+                                                     actionListener="#{bookingManagedBean.deleteBooking(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
+                                                     update="dataTableBookings">
                                         <p:confirm header="Delete Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </p:column>

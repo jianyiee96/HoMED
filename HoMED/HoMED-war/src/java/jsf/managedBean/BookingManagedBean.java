@@ -14,6 +14,7 @@ import entity.FormTemplate;
 import entity.MedicalCentre;
 import entity.MedicalStaff;
 import entity.Serviceman;
+import entity.Slot;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import org.primefaces.PrimeFaces;
 import util.enumeration.BookingStatusEnum;
+import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ServicemanNotFoundException;
@@ -64,8 +66,6 @@ public class BookingManagedBean implements Serializable {
     private MedicalCentre currentMedicalCentre;
 
     private List<BookingSlot> bookingSlots;
-
-    private BookingSlot bookingSlotToCreate;
 
     private Serviceman servicemanToCreateBooking;
 
@@ -100,7 +100,6 @@ public class BookingManagedBean implements Serializable {
 
     public BookingManagedBean() {
         bookingSlots = new ArrayList<>();
-        bookingSlotToCreate = new BookingSlot();
         servicemanToCreateBooking = new Serviceman();
         formTemplateHm = new HashMap<>();
     }
@@ -129,7 +128,6 @@ public class BookingManagedBean implements Serializable {
     }
 
     public void initCreate() {
-        bookingSlotToCreate = new BookingSlot();
         servicemanToCreateBooking = new Serviceman();
         servicemen = servicemanSessionBean.retrieveAllServicemen();
         dateToCreateBooking = null;
@@ -143,15 +141,21 @@ public class BookingManagedBean implements Serializable {
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
     }
 
-    public void deleteBooking() {
-
+    public void deleteBooking(BookingSlot slot) {
+        try {
+            bookingSessionBean.cancelBooking(slot.getBooking().getBookingId());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + slot.getBooking()));
+            initBookingSlots();
+        } catch (CancelBookingException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking", ex.getMessage()));
+        }
     }
 
     public void createBooking() {
         try {
             Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Bookings", "Successfully created booking " + booking));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created booking " + booking));
             initBookingSlots();
         } catch (CreateBookingException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
@@ -214,7 +218,6 @@ public class BookingManagedBean implements Serializable {
         additionalFormTemplates = publishedFormTemplates.stream()
                 .filter(ft -> alreadyLinkedFormTemplates.stream().noneMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
                 .collect(Collectors.toList());
-        publishedFormTemplates.stream().forEach(x -> System.out.println("FORMTEMPLATE ID: " + x.getFormTemplateId()));
     }
 
     public MedicalStaff getCurrentMedicalStaff() {
