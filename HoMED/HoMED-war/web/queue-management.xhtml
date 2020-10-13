@@ -11,11 +11,57 @@
 
     <ui:define name="content">
 
-        
-        <h1>Queue Management</h1>
 
-        
-        #{queueManagementManagedBean.foo()}
+
+        <div class="p-grid">
+
+            <div class="p-col-12 p-md-12 p-lg-7">
+                <div class="card">
+
+                    <h2>Queue Management</h2>
+
+                    <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{queueManagementManagedBean.waitingConsultations}"
+                                 rowKey="#{consultation.consultationId}"
+                                 styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+
+                        <f:facet id="dataViewListHeader" name="header">
+                            <span style="font-weight: bold">SERVICEMAN IN QUEUE</span>
+                        </f:facet>
+                        <p:column headerText="Serviceman Name">
+                            <h:outputText value="#{consultation.booking.serviceman.name}" />
+                        </p:column>
+                        <p:column headerText="Queueing Since">
+                            <h:outputText value="#{queueManagementManagedBean.renderTime(consultation.joinQueueDateTime)}" />
+                        </p:column>
+                        <p:column headerText="Appointment Time">
+                            <h:outputText value="#{queueManagementManagedBean.renderTime(consultation.booking.bookingSlot.startDateTime)}" />
+                        </p:column>
+                        <p:column headerText="Consultation Purpose">
+                            <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
+                        </p:column>
+                        
+                        
+                        
+
+                        <p:column style="text-align: center" exportable="false">
+
+                            <p:commandButton class="rounded-button info-button" style="margin: 3px" icon="pi pi-search" title="View" actionListener="#{queueManagementManagedBean.selectConsultation}">
+                                <f:attribute name="selectedConsultation" value="#{consultation}" />
+                            </p:commandButton> 
+
+                        </p:column>
+                    </p:dataTable>
+
+                </div>
+
+            </div>
+            <div class="p-col-12 p-md-12 p-lg-5">
+                <div class="card">
+                    <h2>Selected Consultation</h2>
+                </div>
+
+            </div>
+        </div>        
     </ui:define>
 
 </ui:composition>

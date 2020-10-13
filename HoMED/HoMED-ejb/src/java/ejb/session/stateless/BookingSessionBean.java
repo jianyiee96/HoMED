@@ -19,8 +19,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.FormInstanceStatusEnum;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
+import util.exceptions.CreateConsultationException;
 import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.MarkBookingAbsentException;
@@ -42,6 +44,9 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
     @EJB
     private FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
+
+    @EJB
+    private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -192,7 +197,43 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     @Override
     public void markBookingAttendance(Long bookingId) throws MarkBookingAttendanceException {
 
-        throw new MarkBookingAttendanceException("Not implemented");
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking == null) {
+            throw new MarkBookingAttendanceException("Invalid Booking Id");
+        } else if (booking.getBookingStatusEnum() != BookingStatusEnum.UPCOMING) {
+            throw new MarkBookingAttendanceException("Invalid Booking Status: Status must be UPCOMING. Current status: " + booking.getBookingStatusEnum().toString());
+        }
+
+        String formInstanceNames = "";
+        for (FormInstance fi : booking.getFormInstances()) {
+
+            if (fi.getFormInstanceStatusEnum() == FormInstanceStatusEnum.DRAFT) {
+
+                if (formInstanceNames.equals("")) {
+                    formInstanceNames = fi.getFormTemplateMapping().getFormTemplateName();
+                } else {
+                    formInstanceNames = formInstanceNames + ", " + fi.getFormTemplateMapping().getFormTemplateName();
+                }
+
+            }
+
+        }
+
+        if (formInstanceNames.equals("")) {
+
+            try {
+
+                consultationSessionBeanLocal.createConsultation(booking.getBookingId());
+                booking.setBookingStatusEnum(BookingStatusEnum.PAST);
+
+            } catch (CreateConsultationException ex) {
+                throw new MarkBookingAttendanceException("Unable to create consultation for booking: " + ex.getMessage());
+            }
+
+        } else {
+            throw new MarkBookingAttendanceException("Unable to mark attandance due to unsubmitted forms: " + formInstanceNames);
+        }
 
     }
 
