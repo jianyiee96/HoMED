@@ -120,16 +120,20 @@ public class FormResource {
             List<FormInstance> formInstances = formInstanceSessionBeanLocal.retrieveServicemanFormInstances(Long.parseLong(servicemanId));
             for (FormInstance fi : formInstances) {
 
-                BookingSlot emptyBs = new BookingSlot();
-                emptyBs.setSlotId(fi.getBooking().getBookingSlot().getSlotId());
+                if (fi.getBooking() != null) {
+                    BookingSlot emptyBs = new BookingSlot();
+                    emptyBs.setSlotId(fi.getBooking().getBookingSlot().getSlotId());
 
-                Booking emptyBooking = new Booking();
-                emptyBooking.setBookingSlot(emptyBs);
+                    Booking emptyBooking = new Booking();
+                    emptyBooking.setBookingSlot(emptyBs);
+
+                    fi.setBooking(emptyBooking);
+                }
 
                 fi.setServiceman(null);
-                fi.setBooking(emptyBooking);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
+                
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanFormInstancesRsp(formInstances)).build();
         } catch (Exception ex) {
