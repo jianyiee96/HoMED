@@ -32,5 +32,7 @@ public interface BookingSessionBeanLocal {
     public List<Booking> retrieveAllBookings();
     
     public List<Booking> retrieveAllUpcomingBookings();
+
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException;
     
 }

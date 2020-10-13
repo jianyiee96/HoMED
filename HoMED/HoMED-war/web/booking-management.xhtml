@@ -38,7 +38,7 @@
                                 </p:commandButton>
                             </div>
 
-                            <p:dataTable id="dataTableBookings" widgetVar="dataTableBookings" var="slot" value="#{bookingManagedBean.bookingSlots}" sortBy="#{slot.slotId}"
+                            <p:dataTable id="dataTableBookings" widgetVar="dataTableBookings" var="slot" value="#{bookingManagedBean.bookingSlots}" sortBy="#{slot}" sortFunction="#{bookingManagedBean.sortByCustom}"
                                          styleClass="crud-management-table" rowKey="#{slot.slotId}" paginator="true" rows="10" paginatorPosition="bottom">
 
                                 <f:facet name="header">
@@ -106,7 +106,7 @@
             <p:dialog id="dialogCreateBooking" widgetVar="dialogCreateBooking" header="Create Booking" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogCreateBooking').initPosition()"
                       minWidth="500" width="700">
-                <p:outputPanel id="panelCreateBooking" rendered="#{not empty bookingManagedBean.bookingSlotToCreate}">
+                <p:outputPanel id="panelCreateBooking">
                     <div class="p-col-12 p-mb-5">
                         <div class="p-grid p-justify-center">
                             <p:steps activeIndex="#{bookingManagedBean.createBookingIdx}" style="width: 100%">
@@ -223,12 +223,12 @@
                                     <f:selectItems value="#{bookingManagedBean.consultationPurposes}" var="cp" itemLabel="#{cp.consultationPurposeName}" itemValue="#{cp.consultationPurposeId}" />
                                     <p:ajax event="valueChange" listener="#{bookingManagedBean.selectConsultationPurpose}"  update="panelLinkedForms select-formTemplates" oncomplete="PF('dialogCreateBooking').initPosition()"/>
                                 </p:selectOneMenu>
-                                <p:message class="error-message" for="view-bookingSlot" />
+                                <p:message class="error-message" for="view-consultationPurpose" />
                             </div>
                             <div class="p-field  p-col-12">
                                 <h:panelGroup id="panelLinkedForms">
                                     <p:outputLabel value="Currently Linked Forms" style="font-weight: bold"/><br/>
-                                    <h:outputText rendered="#{bookingManagedBean.consultationPurposeToCreateId eq null}" value="Please select an consultation purpose first"/>
+                                    <h:outputText rendered="#{bookingManagedBean.consultationPurposeToCreateId eq null}" value="Please select a consultation purpose first"/>
                                     <h:outputText rendered="#{bookingManagedBean.consultationPurposeToCreateId ne null and bookingManagedBean.alreadyLinkedFormTemplates eq null}" value="Please select a consultation purpose first"/>
                                     <ul>
                                         <ui:repeat rendered="#{bookingManagedBean.consultationPurposeToCreateId ne null and bookingManagedBean.alreadyLinkedFormTemplates ne null}" value="#{bookingManagedBean.alreadyLinkedFormTemplates}" var="ft">
@@ -264,9 +264,8 @@
                                                  oncomplete="PF('dialogCreateBooking').initPosition()">
                                     <f:setPropertyActionListener target="#{bookingManagedBean.createBookingIdx}" value="#{bookingManagedBean.createBookingIdx - 1}"/>
                                 </p:commandButton>
-                                <p:commandButton value="Create Booking" icon="pi pi-calendar-plus" styleClass="p-mr-2 p-mb-2"
-                                                 rendered="#{bookingManagedBean.createBookingIdx == 2}"
-                                                 oncomplete="PF('dialogCreateBooking').hide()">
+                                <p:commandButton value="Create Booking" icon="pi pi-calendar-plus" styleClass="p-mr-2 p-mb-2"  update="panelCreateBooking growl-message dataTableBookings" process="panelCreateBooking"
+                                                 rendered="#{bookingManagedBean.createBookingIdx == 2}" actionListener="#{bookingManagedBean.createBooking()}" >
                                     <p:confirm header="Create Booking" escape="false" message="Confirm create booking?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                                 <p:commandButton update="panelCreateBooking" icon="pi pi-angle-right" styleClass="rounded-button outlined-button p-mr-2 p-mb-2" process="panelCreateBooking"
@@ -277,9 +276,6 @@
                             </div>
                         </div>
                     </h:panelGroup>
-
-
-
                 </p:outputPanel>
             </p:dialog>
         </h:form>

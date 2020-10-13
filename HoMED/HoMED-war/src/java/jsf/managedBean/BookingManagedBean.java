@@ -6,6 +6,7 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
+import entity.Booking;
 import entity.BookingSlot;
 import entity.ConsultationPurpose;
 import entity.Employee;
@@ -30,6 +31,9 @@ import javax.faces.view.ViewScoped;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import org.primefaces.PrimeFaces;
+import util.enumeration.BookingStatusEnum;
+import util.exceptions.CreateBookingException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ServicemanNotFoundException;
 
@@ -111,13 +115,17 @@ public class BookingManagedBean implements Serializable {
                     currentMedicalStaff = (MedicalStaff) currentEmployee;
                     currentMedicalCentre = currentMedicalStaff.getMedicalCentre();
                     if (currentMedicalCentre != null) {
-                        bookingSlots = slotSessionBean.retrieveBookingSlotsWithBookingsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
+                        initBookingSlots();
                     }
                 }
             } catch (EmployeeNotFoundException ex) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Bookings", ex.getMessage()));
             }
         }
+    }
+
+    public void initBookingSlots() {
+        bookingSlots = slotSessionBean.retrieveBookingSlotsWithBookingsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
     }
 
     public void initCreate() {
@@ -137,6 +145,36 @@ public class BookingManagedBean implements Serializable {
 
     public void deleteBooking() {
 
+    }
+
+    public void createBooking() {
+        try {
+            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate);
+            PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Bookings", "Successfully created booking " + booking));
+            initBookingSlots();
+        } catch (CreateBookingException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        }
+    }
+
+    public int sortByCustom(Object obj1, Object obj2) {
+        BookingSlot slot1 = (BookingSlot) obj1;
+        BookingSlot slot2 = (BookingSlot) obj2;
+
+        if (slot1.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING && slot2.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+            if (slot1.getStartDateTime().before(slot2.getStartDateTime())) {
+                return -1;
+            } else {
+                return 1;
+            }
+        } else {
+            if (slot1.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
     }
 
     public List<String> completeEmail(String email) {
@@ -160,7 +198,7 @@ public class BookingManagedBean implements Serializable {
     public void retrieveMedicalCentreBookingSlots() {
         Date currentTime = new Date();
         bookingSlotsToCreate = slotSessionBean.retrieveMedicalCentreBookingSlotsByDate(currentMedicalCentre.getMedicalCentreId(), dateToCreateBooking).stream()
-                .filter(bs -> bs.getStartDateTime().after(currentTime))
+                .filter(bs -> bs.getStartDateTime().after(currentTime) && bs.getBooking() == null)
                 .collect(Collectors.toList());
     }
 
@@ -174,9 +212,9 @@ public class BookingManagedBean implements Serializable {
                 .orElse(new ArrayList<>());
 
         additionalFormTemplates = publishedFormTemplates.stream()
-                .filter(ft -> !alreadyLinkedFormTemplates.stream()
-                .anyMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
+                .filter(ft -> alreadyLinkedFormTemplates.stream().noneMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
                 .collect(Collectors.toList());
+        publishedFormTemplates.stream().forEach(x -> System.out.println("FORMTEMPLATE ID: " + x.getFormTemplateId()));
     }
 
     public MedicalStaff getCurrentMedicalStaff() {
@@ -201,14 +239,6 @@ public class BookingManagedBean implements Serializable {
 
     public void setBookingSlots(List<BookingSlot> bookingSlots) {
         this.bookingSlots = bookingSlots;
-    }
-
-    public BookingSlot getBookingSlotToCreate() {
-        return bookingSlotToCreate;
-    }
-
-    public void setBookingSlotToCreate(BookingSlot bookingSlotToCreate) {
-        this.bookingSlotToCreate = bookingSlotToCreate;
     }
 
     public Serviceman getServicemanToCreateBooking() {
