@@ -10,6 +10,7 @@ import entity.MedicalCentre;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -160,7 +161,9 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id ");
         query.setParameter("id", medicalCentreId);
-        return query.getResultList();
+        List<BookingSlot> bookingSlots =  query.getResultList();
+        Collections.sort(bookingSlots);
+        return bookingSlots;
     }
 
     @Override

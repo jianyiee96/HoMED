@@ -107,6 +107,11 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
     @Override
     public void cancelBooking(Long bookingId) throws CancelBookingException {
+
+        if (bookingId == null) {
+            throw new CancelBookingException("Please supply a valid Booking Id");
+        }
+
         Booking booking = retrieveBookingById(bookingId);
 
         if (booking != null) {
@@ -114,12 +119,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
 
                 booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
-                BookingSlot replacementSlot = new BookingSlot(
-                        booking.getBookingSlot().getMedicalCentre(),
-                        booking.getBookingSlot().getStartDateTime(),
-                        booking.getBookingSlot().getEndDateTime()
-                );
-
+                
                 try {
                     slotSessionBeanLocal.createBookingSlots(
                             booking.getBookingSlot().getMedicalCentre().getMedicalCentreId(),
@@ -132,7 +132,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
 
             } else {
-                throw new CancelBookingException("Invalid Booking Status: Booking must be upcoming");
+                throw new CancelBookingException("Invalid Booking Status: You can only cancel bookings with upcoming");
             }
 
         } else {
