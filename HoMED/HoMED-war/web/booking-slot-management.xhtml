@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Scheduler Management</ui:define>
+
+    <ui:define name="content">
+
+        <script>
+            function updateEditable() {
+                $('#calendar').fullCalendar({
+                    eventStartEditable: false;
+                })
+            }
+        </script>
+
+        <ui:fragment rendered="#{bookingSlotManagementManagedBean.selectedMedicalCentre eq null}">
+            <h1>You are currently not assigned to any medical centre!</h1>
+        </ui:fragment>
+
+
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <ui:fragment rendered='#{bookingSlotManagementManagedBean.selectedMedicalCentre ne null}'>
+
+            <h:form id="formSchedule">
+                <div class="p-grid">
+                    <div class="p-col-8">
+                        <div class="card">
+
+                            <div class='buttonbar'>
+                                <h2>#{bookingSlotManagementManagedBean.selectedMedicalCentre.name}</h2>
+
+                                <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{bookingSlotManagementManagedBean.existingEventModel}" 
+                                            timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{bookingSlotManagementManagedBean.slotLabelInterval}"
+                                            aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
+                                            draggable="false" resizable="false" minTime="#{bookingSlotManagementManagedBean.minTime}" maxTime="#{bookingSlotManagementManagedBean.maxTime}">
+
+                                    <p:ajax event="dateSelect" listener="#{bookingSlotManagementManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
+                                    <p:ajax event="eventSelect" listener="#{bookingSlotManagementManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message rightPanel'  />
+                                    <p:ajax event="eventMove" listener="#{bookingSlotManagementManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+                                    <p:ajax event="eventResize" listener="#{bookingSlotManagementManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+
+                                </p:schedule>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="p-col-4">
+                        <div class="card">
+
+                            <h2>Control Panel</h2>
+
+                            <h:panelGrid width="100%" columns="1" id='rightPanel'>
+
+                                <h:panelGrid columns="4">
+                                    <p:commandButton rendered="#{not bookingSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
+                                                     update="rightPanel @form" process="@this" oncomplete="PF('bookingSlots').update()">
+                                        <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
+                                    </p:commandButton>
+
+                                    <p:commandButton rendered="#{bookingSlotManagementManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
+                                                     update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                     actionListener="#{bookingSlotManagementManagedBean.saveSchedule}">
+                                        <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="false" />
+                                    </p:commandButton>
+
+                                    <p:commandButton  rendered="#{bookingSlotManagementManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
+                                                      update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      actionListener="#{bookingSlotManagementManagedBean.reset}">
+                                        <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
+                                    </p:commandButton>
+
+                                    <p:commandButton  rendered="#{bookingSlotManagementManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
+                                                      update='rightPanel @form growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      actionListener="#{bookingSlotManagementManagedBean.reset}">
+                                        <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="false" />
+                                    </p:commandButton>
+
+                                </h:panelGrid>
+
+                                <h:panelGrid width="100%" rendered="#{bookingSlotManagementManagedBean.selectedBookingSlots.size() != 0}" columns="2">
+                                    <h2>Selected Booking Slots</h2>
+
+                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{bookingSlotManagementManagedBean.deleteAllSelectedBookingSlots}"
+                                                     disabled="#{bookingSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('bookingSlots').update()"
+                                                     style="margin-bottom: 15px; float: right"
+                                                     styleClass="danger-button" title="Close" icon="pi pi-trash">
+                                    </p:commandButton>
+                                </h:panelGrid>
+
+                                <p:dataList rendered="#{bookingSlotManagementManagedBean.selectedBookingSlots.size() != 0}" widgetVar="dataList" value="#{bookingSlotManagementManagedBean.selectedBookingSlots}" type="definition" var="bookingSlot">
+
+                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{bookingSlotManagementManagedBean.closeBookingSlot}"
+                                                     styleClass="rounded-button text-button" style="float: right; margin-bottom: -30px" title="Close" icon="pi pi-times">
+                                        <f:attribute name="bookingSlot" value="#{bookingSlot}" />
+                                    </p:commandButton>
+                                    <h:panelGrid style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px" columns="2" >
+
+                                        <p:outputPanel>
+                                            <h:panelGrid columns="2">
+                                                <h:outputText value="Start Time:" />
+                                                <p:outputLabel value="#{bookingSlotManagementManagedBean.renderDate(bookingSlot.startDateTime)}" />
+
+                                                <h:outputText value="End Time:" />
+                                                <p:outputLabel value="#{bookingSlotManagementManagedBean.renderDate(bookingSlot.endDateTime)}" />
+
+                                                <h:outputText value="Booked By:" />
+                                                <p:outputLabel value="#{ bookingSlot.booking == null ? 'N.A' : bookingSlot.booking.serviceman.name }" />
+
+                                                <h:outputText value="Booking Status:" />
+                                                <p:outputLabel value="#{ bookingSlot.booking == null ? 'N.A' : bookingSlot.booking.bookingStatusEnum }" />
+
+                                            </h:panelGrid>
+                                        </p:outputPanel>
+
+                                        <p:commandButton update="formSchedule:rightPanel" value="Delete Booking Slot" actionListener="#{bookingSlotManagementManagedBean.deleteBookingSlot}"
+                                                         disabled="#{bookingSlotManagementManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null}" oncomplete="PF('bookingSlots').update()"
+                                                         styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash">
+                                            <f:attribute name="bookingSlot" value="#{bookingSlot}" />
+                                        </p:commandButton>
+
+                                    </h:panelGrid>
+
+                                </p:dataList>
+
+                            </h:panelGrid>
+
+                        </div>
+                        
+                    </div>
+
+                </div>
+            </h:form>
+
+        </ui:fragment>
+
+    </ui:define>
+
+</ui:composition>

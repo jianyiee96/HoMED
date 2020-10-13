@@ -36,9 +36,9 @@ import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 
-@Named(value = "schedulerManagedBean")
+@Named(value = "bookingSlotManagementManagedBean")
 @ViewScoped
-public class SchedulerManagedBean implements Serializable {
+public class BookingSlotManagementManagedBean implements Serializable {
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -64,7 +64,7 @@ public class SchedulerManagedBean implements Serializable {
     private String minTime = "00:00:00";
     private String maxTime = "24:00:00";
 
-    public SchedulerManagedBean() {
+    public BookingSlotManagementManagedBean() {
         this.isScheduleState = Boolean.FALSE;
         this.existingEventModel = new DefaultScheduleModel();
         this.newEventModel = new DefaultScheduleModel();
