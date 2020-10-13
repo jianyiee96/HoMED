@@ -101,7 +101,7 @@ public class SchedulerManagedBean implements Serializable {
 
                 if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title("Upcoming Booking")
+                            .title("Upcoming")
                             .startDate(bs
                                     .getStartDateTime()
                                     .toInstant()
@@ -117,7 +117,25 @@ public class SchedulerManagedBean implements Serializable {
                             .styleClass("booked-booking-slot")
                             .data(bs)
                             .build());
-                } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
+                } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.ABSENT) {
+                    existingEventModel.addEvent(DefaultScheduleEvent.builder()
+                            .title("Absent")
+                            .startDate(bs
+                                    .getStartDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .endDate(bs
+                                    .getEndDateTime()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime())
+                            .overlapAllowed(false)
+                            .editable(false)
+                            .styleClass("absent-booking-slot")
+                            .data(bs)
+                            .build());
+                } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.PAST) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
                             .title("Past Booking")
                             .startDate(bs
@@ -137,7 +155,7 @@ public class SchedulerManagedBean implements Serializable {
                             .build());
                 } else if (bs.getBooking() == null) {
 
-                    if (bs.getEndDateTime().after(now)) {
+                    if (bs.getStartDateTime().after(now)) {
                         existingEventModel.addEvent(DefaultScheduleEvent.builder()
                                 .title("Available")
                                 .startDate(bs
@@ -152,7 +170,7 @@ public class SchedulerManagedBean implements Serializable {
                                         .toLocalDateTime())
                                 .overlapAllowed(false)
                                 .editable(false)
-                                .styleClass("booking-slot")
+                                .styleClass("available-booking-slot")
                                 .data(bs)
                                 .build());
 
@@ -288,7 +306,7 @@ public class SchedulerManagedBean implements Serializable {
         
         
         this.selectedBookingSlots.forEach(bs -> {
-            if (bs.getBooking() == null) {
+            if (bs.getBooking() == null && !beforeNow(bs.getStartDateTime())) {
                 try {
                     slotSessionBeanLocal.removeBookingSlot(bs.getSlotId());
                     removedBs.add(bs);
@@ -390,6 +408,10 @@ public class SchedulerManagedBean implements Serializable {
     private void revertEventDateTime(ScheduleEvent existingEvent, LocalDateTime originalStartDateTime, LocalDateTime originalEndDateTime) {
         existingEvent.setStartDate(originalStartDateTime);
         existingEvent.setEndDate(originalEndDateTime);
+    }
+    
+    public boolean beforeNow(Date date) {
+        return date.before(new Date());
     }
 
     private void addMessage(FacesMessage message) {

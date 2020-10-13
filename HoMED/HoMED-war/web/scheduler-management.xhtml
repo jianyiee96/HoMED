@@ -132,7 +132,7 @@
                                         </p:outputPanel>
 
                                         <p:commandButton update="formSchedule:rightPanel" value="Delete Booking Slot" actionListener="#{schedulerManagedBean.deleteBookingSlot}"
-                                                         disabled="#{schedulerManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null}" oncomplete="PF('bookingSlots').update()"
+                                                         disabled="#{schedulerManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null and !schedulerManagedBean.beforeNow(bookingSlot.startDateTime)}" oncomplete="PF('bookingSlots').update()"
                                                          styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash">
                                             <f:attribute name="bookingSlot" value="#{bookingSlot}" />
                                         </p:commandButton>
