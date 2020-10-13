@@ -143,7 +143,7 @@ public class DataInitializationSessionBean {
             Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
-            slotSessionBeanLocal.createBookingSlotsDataInit(1l, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+            slotSessionBeanLocal.createBookingSlotsDataInit(mcId1, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
 
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
