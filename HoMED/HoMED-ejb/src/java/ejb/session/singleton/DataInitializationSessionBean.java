@@ -166,6 +166,7 @@ public class DataInitializationSessionBean {
 
     private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         FormTemplate formTemplate = new FormTemplate("Form Template Demo 1");
+        formTemplate.setIsPublic(Boolean.TRUE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
