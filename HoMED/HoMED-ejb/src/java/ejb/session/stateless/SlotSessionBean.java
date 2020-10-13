@@ -182,6 +182,28 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             em.persist(mbs);
             em.flush();
         }
+
+        rangeStartCalendar.add(Calendar.DATE, 1);
+        rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+        rangeStartCalendar.set(Calendar.MINUTE, 0);
+        rangeStartCalendar.set(Calendar.SECOND, 0);
+        rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+        rangeEndCalendar.add(Calendar.DATE, 1);
+        rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+        rangeEndCalendar.set(Calendar.MINUTE, 0);
+        rangeEndCalendar.set(Calendar.SECOND, 0);
+        rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+        while (rangeStartCalendar.before(rangeEndCalendar)) {
+            Date currStart = rangeStartCalendar.getTime();
+            rangeStartCalendar.add(Calendar.MINUTE, 30);
+            Date currEnd = rangeStartCalendar.getTime();
+            System.out.println("Medical Board Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
+            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+            em.persist(mbs);
+            em.flush();
+        }
     }
 
     public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {

@@ -167,4 +167,86 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
     }
 
+    public MedicalStaff getCurrentMedicalBoardAdmin() {
+        return currentMedicalBoardAdmin;
+    }
+
+    public void setCurrentMedicalBoardAdmin(MedicalStaff currentMedicalBoardAdmin) {
+        this.currentMedicalBoardAdmin = currentMedicalBoardAdmin;
+    }
+
+    public List<MedicalBoardSlot> getMedicalBoardSlots() {
+        return medicalBoardSlots;
+    }
+
+    public void setMedicalBoardSlots(List<MedicalBoardSlot> medicalBoardSlots) {
+        this.medicalBoardSlots = medicalBoardSlots;
+    }
+
+    public TreeSet<MedicalBoardSlot> getSelectedMedicalBoardSlots() {
+        return selectedMedicalBoardSlots;
+    }
+
+    public void setSelectedMedicalBoardSlots(TreeSet<MedicalBoardSlot> selectedMedicalBoardSlots) {
+        this.selectedMedicalBoardSlots = selectedMedicalBoardSlots;
+    }
+
+    public Boolean getIsScheduleState() {
+        return isScheduleState;
+    }
+
+    public void setIsScheduleState(Boolean isScheduleState) {
+        this.isScheduleState = isScheduleState;
+    }
+
+    public ScheduleModel getExistingEventModel() {
+        return existingEventModel;
+    }
+
+    public void setExistingEventModel(ScheduleModel existingEventModel) {
+        this.existingEventModel = existingEventModel;
+    }
+
+    public ScheduleModel getNewEventModel() {
+        return newEventModel;
+    }
+
+    public void setNewEventModel(ScheduleModel newEventModel) {
+        this.newEventModel = newEventModel;
+    }
+
+    public ScheduleEvent getEvent() {
+        return event;
+    }
+
+    public void setEvent(ScheduleEvent event) {
+        this.event = event;
+    }
+
+    public String getSlotLabelInterval() {
+        return slotLabelInterval;
+    }
+
+    public void setSlotLabelInterval(String slotLabelInterval) {
+        this.slotLabelInterval = slotLabelInterval;
+    }
+
+    public String getMinTime() {
+        return minTime;
+    }
+
+    public void setMinTime(String minTime) {
+        this.minTime = minTime;
+    }
+
+    public String getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(String maxTime) {
+        this.maxTime = maxTime;
+    }
+    
+    
+
 }

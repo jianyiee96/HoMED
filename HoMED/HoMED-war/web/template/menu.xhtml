@@ -55,7 +55,7 @@
                         </p:submenu>
                         <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Scheduler Management" icon="pi pi-calendar" >
                             <p:menuitem value="Booking Slot Management"  icon="pi pi-calendar" outcome="/booking-slot-management" />
-                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management"  icon="pi pi-calendar" outcome="/booking-slot-management" />
+                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management"  icon="pi pi-calendar" outcome="/medical-board-slot-management" />
                         </p:submenu>
                             <p:menuitem value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
                     </po:menu>

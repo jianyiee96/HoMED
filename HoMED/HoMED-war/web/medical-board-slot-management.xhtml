@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Medical Board Slot Management</ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <h:form id="formSchedule">
+            <div class="p-grid">
+                <div class="p-col-8">
+                    <div class="card">
+
+                        <div class='buttonbar'>
+                            <h2>MEDICAL BOARD SLOT MANAGEMENT</h2>
+                            
+                            <p:schedule id="medicalBoardSlots" widgetVar="medicalBoardSlots" value="#{medicalBoardSlotManagementManagedBean.existingEventModel}" 
+                                        timeFormat="HH:mm" slotDuration="00:30:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
+                                        aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
+                                        draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
+
+                                <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message' />
+                                <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('bookingSlots').update()" update='growl-message'  />
+                                <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+                                <p:ajax event="eventResize" listener="#{medicalBoardSlotManagementManagedBean.onEventResize}" oncomplete="PF('bookingSlots').update()" update="growl-message" />
+
+                            </p:schedule>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="p-col-4">
+                    <div class="card">
+
+                        <h2>Control Panel</h2>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
