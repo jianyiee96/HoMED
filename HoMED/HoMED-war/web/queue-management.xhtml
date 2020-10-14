@@ -92,18 +92,20 @@
                                 </ui:repeat>
                             </li>
                             <li>
-                                <p:commandButton disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation != null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION"></p:commandButton>
+                                <p:commandButton disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation != null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION">
+                                    <p:confirm header="Consultation" message="Confirm Start Consultation?" icon="pi pi-exclamation-triangle" />
+
+                                </p:commandButton>
                             </li>
                         </ul>
                     </div>
-
-
-
-
                 </div>
             </div>        
 
-
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
         </h:form>
 
     </ui:define>
