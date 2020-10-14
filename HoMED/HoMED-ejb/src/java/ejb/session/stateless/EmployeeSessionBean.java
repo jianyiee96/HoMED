@@ -154,6 +154,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new EmployeeNotFoundException("Employee ID " + id + " does not exist!");
         }
     }
+    
+    @Override 
+    public MedicalOfficer retrieveMedicalOfficerById(Long id) {
+        MedicalOfficer medicalOfficer = em.find(MedicalOfficer.class, id);
+        return medicalOfficer;
+    }
 
     @Override
     public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException {

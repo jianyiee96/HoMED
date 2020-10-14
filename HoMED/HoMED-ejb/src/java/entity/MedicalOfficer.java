@@ -13,7 +13,7 @@ import util.enumeration.GenderEnum;
 public class MedicalOfficer extends MedicalStaff implements Serializable {
 
     @OneToMany(mappedBy = "medicalOfficer")
-    private List<Consultation> consultations;
+    private List<Consultation> completedConsultations;
 
     @OneToMany(mappedBy = "signedBy")
     private List<FormInstance> signedFormInstances;
@@ -22,36 +22,36 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     private Consultation currentConsultation;
 
     public MedicalOfficer() {
-        this.consultations = new ArrayList<>();
+        this.completedConsultations = new ArrayList<>();
     }
 
     public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
-        this.consultations = new ArrayList<>();
+        this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
 
     public MedicalOfficer(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
-        this.consultations = new ArrayList<>();
+        this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
 
     public MedicalOfficer(Employee e) {
         super(e.name, e.password, e.email, e.address, e.phoneNumber, e.gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
-        this.consultations = new ArrayList<>();
+        this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
 
-    public List<Consultation> getConsultations() {
-        return consultations;
+    public List<Consultation> getCompletedConsultations() {
+        return completedConsultations;
     }
 
-    public void setConsultations(List<Consultation> consultations) {
-        this.consultations = consultations;
+    public void setCompletedConsultations(List<Consultation> completedConsultations) {
+        this.completedConsultations = completedConsultations;
     }
 
     public Consultation getCurrentConsultation() {

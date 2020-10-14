@@ -8,6 +8,8 @@ import entity.Consultation;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.CreateConsultationException;
+import util.exceptions.EndConsultationException;
+import util.exceptions.StartConsultationException;
 
 /**
  *
@@ -15,9 +17,17 @@ import util.exceptions.CreateConsultationException;
  */
 @Local
 public interface ConsultationSessionBeanLocal {
-    
+
     public void createConsultation(Long bookingId) throws CreateConsultationException;
-    
+
+    public void startConsultation(Long consultationId, Long medicalOfficerId) throws StartConsultationException;
+
+    public void endConsultation(Long consultationId, String remarks, String remarksForServiceman) throws EndConsultationException;
+
+    public Consultation retrieveConsultationById(Long consultationId);
+
     public List<Consultation> retrieveWaitingConsultationsByMedicalCentre(Long medicalCentreId);
-    
+
+    public List<Consultation> retrieveServicemanNonWaitingConsultation(Long servicemanId);
+
 }
