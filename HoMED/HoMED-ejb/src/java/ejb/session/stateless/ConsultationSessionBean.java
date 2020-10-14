@@ -89,11 +89,11 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             throw new EndConsultationException("Invalid Consultation Status: Consultation is not in ONGOING status");
         }
 
-        for (FormInstance fi : consultation.getBooking().getFormInstances()) {
-            if (fi.getSignedBy() == null) {
-                throw new EndConsultationException("Unable to end Consultation: All form instances are required to be signed by attending medical officer");
-            }
-        }
+//        for (FormInstance fi : consultation.getBooking().getFormInstances()) {
+//            if (fi.getSignedBy() == null) {
+//                throw new EndConsultationException("Unable to end Consultation: All form instances are required to be signed by attending medical officer");
+//            }
+//        }
         
         try {
             consultation.setEndDateTime(new Date());

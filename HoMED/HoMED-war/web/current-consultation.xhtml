@@ -96,12 +96,12 @@
                                         <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}"/>
 
                                         <p:outputLabel value="ROD date: " />
-                                        <p:outputLabel value="#{currentConsultationManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
+                                        <p:outputLabel value="#{currentConsultationManagedBean.renderDate(currentConsultationManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
                                     </h:panelGrid>
                                 </li>
                                 <li>
                                     <h5>Forms</h5>
-                                    <h:dataTable cellpadding="5" rendered="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances.size() != 0}" value="#{queueManagementManagedBean.selectedConsultation.booking.formInstances}" var="instance">
+                                    <h:dataTable cellpadding="5" rendered="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances.size() != 0}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
                                         <h:column>
                                             <p:outputLabel value="#{instance.formTemplateMapping.formTemplateName}"/>
                                         </h:column>
@@ -181,12 +181,12 @@
                                         <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}"/>
 
                                         <p:outputLabel value="ROD date: " />
-                                        <p:outputLabel value="#{currentConsultationManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
+                                        <p:outputLabel value="#{currentConsultationManagedBean.renderDate(currentConsultationManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
                                     </h:panelGrid>
                                 </li>
                                 <li>
                                     <h5>Forms (view only)</h5>
-                                    <h:dataTable cellpadding="5" rendered="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances.size() != 0}" value="#{queueManagementManagedBean.selectedConsultation.booking.formInstances}" var="instance">
+                                    <h:dataTable cellpadding="5" rendered="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances.size() != 0}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
                                         <h:column>
                                             <p:outputLabel value="#{instance.formTemplateMapping.formTemplateName}"/>
                                         </h:column>

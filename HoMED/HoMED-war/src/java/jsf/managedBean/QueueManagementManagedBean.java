@@ -4,14 +4,13 @@
  */
 package jsf.managedBean;
 
-import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Consultation;
 import entity.Employee;
 import entity.MedicalCentre;
 import entity.MedicalOfficer;
-import entity.MedicalStaff;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,22 +24,19 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import javax.faces.event.ActionEvent;
-import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.StartConsultationException;
 
 @Named(value = "queueManagementManagedBean")
 @ViewScoped
 public class QueueManagementManagedBean implements Serializable {
 
-    @EJB
-    private BookingSessionBeanLocal bookingSessionBeanLocal;
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
-    @EJB 
+    @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
-    
+
     private List<Consultation> waitingConsultations;
 
     private Consultation selectedConsultation;
@@ -60,13 +56,6 @@ public class QueueManagementManagedBean implements Serializable {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
             currentMedicalCentre = currentMedicalOfficer.getMedicalCentre();
         }
-        
-        // Custom mark attendance
-//        try {
-//            bookingSessionBeanLocal.markBookingAttendance(47l);
-//        } catch (MarkBookingAttendanceException ex) {
-//            System.out.println("Test mark attandance error: " + ex.getMessage());
-//        }
 
         refreshConsultations();
 
@@ -90,10 +79,15 @@ public class QueueManagementManagedBean implements Serializable {
 
         try {
             consultationSessionBeanLocal.startConsultation(this.selectedConsultation.getConsultationId(), this.currentMedicalOfficer.getEmployeeId());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started consultation!", "To-do: implement redirect"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started consultation!", "You will be redirected to current consultation page"));
+
+            FacesContext.getCurrentInstance().getExternalContext().redirect("current-consultation.xhtml");
 
         } catch (StartConsultationException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start consultation!", ex.getMessage()));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+
         }
     }
 
