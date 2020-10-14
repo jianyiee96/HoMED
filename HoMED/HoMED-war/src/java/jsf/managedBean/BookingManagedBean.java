@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +35,11 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import org.primefaces.PrimeFaces;
 import util.enumeration.BookingStatusEnum;
+import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.ServicemanNotFoundException;
 
 @Named(value = "bookingManagedBean")
@@ -67,6 +70,10 @@ public class BookingManagedBean implements Serializable {
 
     private List<BookingSlot> bookingSlots;
 
+    private List<BookingSlot> filteredBookingSlots;
+
+    private String servicemanEmailToCreate;
+
     private Serviceman servicemanToCreateBooking;
 
     private Long bookingSlotToCreateId;
@@ -87,6 +94,10 @@ public class BookingManagedBean implements Serializable {
 
     private HashMap<Long, String> formTemplateHm;
 
+    private BookingSlot bookingSlotToAttachForms;
+
+    private Integer filterOption;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
     private Date dateToCreateBooking;
@@ -100,12 +111,14 @@ public class BookingManagedBean implements Serializable {
 
     public BookingManagedBean() {
         bookingSlots = new ArrayList<>();
+        filteredBookingSlots = new ArrayList<>();
         servicemanToCreateBooking = new Serviceman();
         formTemplateHm = new HashMap<>();
     }
 
     @PostConstruct
     public void postConstruct() {
+        filterOption = 1;
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null) {
             try {
@@ -125,9 +138,11 @@ public class BookingManagedBean implements Serializable {
 
     public void initBookingSlots() {
         bookingSlots = slotSessionBean.retrieveBookingSlotsWithBookingsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
+        doFilterBookings();
     }
 
     public void initCreate() {
+        servicemanEmailToCreate = "";
         servicemanToCreateBooking = new Serviceman();
         servicemen = servicemanSessionBean.retrieveAllServicemen();
         dateToCreateBooking = null;
@@ -139,6 +154,8 @@ public class BookingManagedBean implements Serializable {
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         formTemplateHm = new HashMap<>();
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
+        alreadyLinkedFormTemplates = new ArrayList<>();
+        additionalFormTemplates = new ArrayList<>();
     }
 
     public void deleteBooking(BookingSlot slot) {
@@ -148,6 +165,43 @@ public class BookingManagedBean implements Serializable {
             initBookingSlots();
         } catch (CancelBookingException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking", ex.getMessage()));
+        }
+    }
+
+    public void doAttachFormInstances(BookingSlot slot) {
+        bookingSlotToAttachForms = slot;
+        selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
+        publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
+        formTemplateHm = new HashMap<>();
+        publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
+
+        alreadyLinkedFormTemplates = bookingSlotToAttachForms.getBooking().getFormInstances().stream()
+                .map(fi -> fi.getFormTemplateMapping())
+                .collect(Collectors.toList());
+
+        additionalFormTemplates = publishedFormTemplates.stream()
+                .filter(ft -> alreadyLinkedFormTemplates.stream().noneMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
+                .collect(Collectors.toList());
+    }
+
+    public void attachFormInstances() {
+        try {
+            bookingSessionBean.attachFormInstancesByClerk(bookingSlotToAttachForms.getSlotId(), selectedAdditionalFormTemplatesToCreate);
+            PrimeFaces.current().executeScript("PF('dialogAttachAdditionalForms').hide()");
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Attach Additional Forms", "Successfully attached additional forms for booking " + bookingSlotToAttachForms.getBooking()));
+            initBookingSlots();
+        } catch (AttachFormInstancesException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Attach Additional Forms", ex.getMessage()));
+        }
+    }
+
+    public void markAttendance(BookingSlot slot) {
+        try {
+            bookingSessionBean.markBookingAttendance(slot.getBooking().getBookingId());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Mark Attendance", "Successfully marked attendance for booking " + slot.getBooking()));
+            initBookingSlots();
+        } catch (MarkBookingAttendanceException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Attendance", ex.getMessage()));
         }
     }
 
@@ -193,7 +247,7 @@ public class BookingManagedBean implements Serializable {
 
     public void retrieveServiceman() {
         try {
-            servicemanToCreateBooking = servicemanSessionBean.retrieveServicemanByEmail(servicemanToCreateBooking.getEmail());
+            servicemanToCreateBooking = servicemanSessionBean.retrieveServicemanByEmail(servicemanEmailToCreate);
         } catch (ServicemanNotFoundException ex) {
             servicemanToCreateBooking = new Serviceman();
         }
@@ -207,17 +261,76 @@ public class BookingManagedBean implements Serializable {
     }
 
     public void selectConsultationPurpose() {
-        selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
 
-        alreadyLinkedFormTemplates = consultationPurposes.stream()
-                .filter(cp -> cp.getConsultationPurposeId().equals(this.consultationPurposeToCreateId))
-                .findFirst()
-                .map(cp -> cp.getFormTemplates())
-                .orElse(new ArrayList<>());
+        if (consultationPurposeToCreateId == null) {
+            alreadyLinkedFormTemplates = new ArrayList<>();
+            additionalFormTemplates = new ArrayList<>();
+        } else {
+            selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
 
-        additionalFormTemplates = publishedFormTemplates.stream()
-                .filter(ft -> alreadyLinkedFormTemplates.stream().noneMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
+            alreadyLinkedFormTemplates = consultationPurposes.stream()
+                    .filter(cp -> cp.getConsultationPurposeId().equals(this.consultationPurposeToCreateId))
+                    .findFirst()
+                    .map(cp -> cp.getFormTemplates())
+                    .orElse(new ArrayList<>());
+
+            additionalFormTemplates = publishedFormTemplates.stream()
+                    .filter(ft -> alreadyLinkedFormTemplates.stream().noneMatch(lft -> lft.getFormTemplateId().equals(ft.getFormTemplateId())))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void doFilterBookings() {
+        // 1 - Day
+        // 2 - Week
+        // 3 - Month
+        // 4 - All
+        filteredBookingSlots = bookingSlots.stream()
+                .filter(bs -> {
+                    if (filterOption == 1) {
+                        return isDateInCurrentDay(bs.getStartDateTime());
+                    } else if (filterOption == 2) {
+                        return isDateInCurrentWeek(bs.getStartDateTime());
+                    } else if (filterOption == 3) {
+                        return isDateinCurrentMonth(bs.getStartDateTime());
+                    } else {
+                        return true;
+                    }
+                })
                 .collect(Collectors.toList());
+    }
+
+    public boolean isDateInCurrentDay(Date date) {
+        Calendar currentCalendar = Calendar.getInstance();
+        int day = currentCalendar.get(Calendar.DAY_OF_YEAR);
+        int year = currentCalendar.get(Calendar.YEAR);
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.setTime(date);
+        int targetDay = targetCalendar.get(Calendar.DAY_OF_YEAR);
+        int targetYear = targetCalendar.get(Calendar.YEAR);
+        return day == targetDay && year == targetYear;
+    }
+
+    public boolean isDateInCurrentWeek(Date date) {
+        Calendar currentCalendar = Calendar.getInstance();
+        int week = currentCalendar.get(Calendar.WEEK_OF_YEAR);
+        int year = currentCalendar.get(Calendar.YEAR);
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.setTime(date);
+        int targetWeek = targetCalendar.get(Calendar.WEEK_OF_YEAR);
+        int targetYear = targetCalendar.get(Calendar.YEAR);
+        return week == targetWeek && year == targetYear;
+    }
+
+    public boolean isDateinCurrentMonth(Date date) {
+        Calendar currentCalendar = Calendar.getInstance();
+        int month = currentCalendar.get(Calendar.MONTH);
+        int year = currentCalendar.get(Calendar.YEAR);
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.setTime(date);
+        int targetMonth = targetCalendar.get(Calendar.MONTH);
+        int targetYear = targetCalendar.get(Calendar.YEAR);
+        return month == targetMonth && year == targetYear;
     }
 
     public MedicalStaff getCurrentMedicalStaff() {
@@ -342,6 +455,38 @@ public class BookingManagedBean implements Serializable {
 
     public HashMap<Long, String> getFormTemplateHm() {
         return formTemplateHm;
+    }
+
+    public String getServicemanEmailToCreate() {
+        return servicemanEmailToCreate;
+    }
+
+    public void setServicemanEmailToCreate(String servicemanEmailToCreate) {
+        this.servicemanEmailToCreate = servicemanEmailToCreate;
+    }
+
+    public Integer getFilterOption() {
+        return filterOption;
+    }
+
+    public void setFilterOption(Integer filterOption) {
+        this.filterOption = filterOption;
+    }
+
+    public List<BookingSlot> getFilteredBookingSlots() {
+        return filteredBookingSlots;
+    }
+
+    public void setFilteredBookingSlots(List<BookingSlot> filteredBookingSlots) {
+        this.filteredBookingSlots = filteredBookingSlots;
+    }
+
+    public BookingSlot getBookingSlotToAttachForms() {
+        return bookingSlotToAttachForms;
+    }
+
+    public void setBookingSlotToAttachForms(BookingSlot bookingSlotToAttachForms) {
+        this.bookingSlotToAttachForms = bookingSlotToAttachForms;
     }
 
 }

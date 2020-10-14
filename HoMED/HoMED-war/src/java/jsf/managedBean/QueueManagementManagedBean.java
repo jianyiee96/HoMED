@@ -4,13 +4,13 @@
  */
 package jsf.managedBean;
 
-import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
+import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Consultation;
 import entity.Employee;
 import entity.MedicalCentre;
 import entity.MedicalOfficer;
-import entity.MedicalStaff;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,21 +19,23 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import javax.faces.event.ActionEvent;
-import util.exceptions.MarkBookingAttendanceException;
+import util.exceptions.StartConsultationException;
 
 @Named(value = "queueManagementManagedBean")
 @ViewScoped
 public class QueueManagementManagedBean implements Serializable {
 
-    @EJB
-    private BookingSessionBeanLocal bookingSessionBeanLocal;
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
+
+    @EJB
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     private List<Consultation> waitingConsultations;
 
@@ -51,31 +53,18 @@ public class QueueManagementManagedBean implements Serializable {
     public void postConstruct() {
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
-            currentMedicalOfficer = (MedicalOfficer) currentEmployee;
+            currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
             currentMedicalCentre = currentMedicalOfficer.getMedicalCentre();
         }
+
         refreshConsultations();
-
-        // Custom mark attendance
-        try {
-            bookingSessionBeanLocal.markBookingAttendance(38l);
-        } catch (MarkBookingAttendanceException ex) {
-            System.out.println("Test mark attandance error: " + ex.getMessage());
-        }
-
-        try {
-            bookingSessionBeanLocal.markBookingAttendance(39l);
-        } catch (MarkBookingAttendanceException ex) {
-            System.out.println("Test mark attandance error: " + ex.getMessage());
-        }
 
     }
 
     private void refreshConsultations() {
 
-        if (currentMedicalCentre != null) {
+        if (currentMedicalCentre != null && currentMedicalOfficer != null) {
 
-            bookingSessionBeanLocal.retrieveAllBookings();
             this.waitingConsultations = consultationSessionBeanLocal.retrieveWaitingConsultationsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
 
             if (this.waitingConsultations.size() > 0) {
@@ -85,9 +74,21 @@ public class QueueManagementManagedBean implements Serializable {
         }
 
     }
-    
-    public void startSelectedConsultation(){
-        System.out.println("Starting current consultation!");
+
+    public void startSelectedConsultation() {
+
+        try {
+            consultationSessionBeanLocal.startConsultation(this.selectedConsultation.getConsultationId(), this.currentMedicalOfficer.getEmployeeId());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started consultation!", "You will be redirected to current consultation page"));
+
+            FacesContext.getCurrentInstance().getExternalContext().redirect("current-consultation.xhtml");
+
+        } catch (StartConsultationException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start consultation!", ex.getMessage()));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+
+        }
     }
 
     public void selectConsultation(ActionEvent event) {
