@@ -20,6 +20,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
+import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.CreateConsultationException;
@@ -164,7 +165,38 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) {
+    public Booking attachFormInstancesByClerk(Long bookingSlotId, List<Long> additionalFormTemplateIds) throws AttachFormInstancesException {
+
+        BookingSlot bookingSlot = slotSessionBeanLocal.retrieveBookingSlotById(bookingSlotId);
+
+        if (bookingSlot == null) {
+            throw new AttachFormInstancesException("Booking Slot Id not valid");
+        } else if (additionalFormTemplateIds.isEmpty()) {
+            throw new AttachFormInstancesException("No form templates selected");
+        }
+
+        Booking booking = bookingSlot.getBooking();
+
+        for (Long ftId : additionalFormTemplateIds) {
+            try {
+                Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(booking.getServiceman().getServicemanId(), ftId);
+                FormInstance fi = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
+                booking.getFormInstances().add(fi);
+                fi.setBooking(booking);
+
+            } catch (GenerateFormInstanceException ex) {
+                System.out.println("> " + ex.getMessage());
+            }
+        }
+
+        // Notification module can fire here
+        return booking;
+    }
+
+    @Override
+    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId,
+            Long bookingSlotId
+    ) {
 
         try {
             Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);
@@ -188,7 +220,8 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public List<Booking> retrieveServicemanBookings(Long servicemanId) {
+    public List<Booking> retrieveServicemanBookings(Long servicemanId
+    ) {
         Query query = em.createQuery("SELECT b FROM Booking b WHERE b.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
         return query.getResultList();
@@ -238,7 +271,8 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking retrieveBookingById(Long bookingId) {
+    public Booking retrieveBookingById(Long bookingId
+    ) {
         Booking booking = em.find(Booking.class, bookingId);
         return booking;
     }
