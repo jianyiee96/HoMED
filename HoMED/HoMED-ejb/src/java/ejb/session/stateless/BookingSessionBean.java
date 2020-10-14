@@ -138,7 +138,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                     fi.setBooking(newBooking);
 
                 } catch (GenerateFormInstanceException ex) {
-                    continue;
+                    System.out.println("> " + ex.getMessage());
                 }
             }
 
@@ -150,7 +150,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                     fi.setBooking(newBooking);
 
                 } catch (GenerateFormInstanceException ex) {
-                    continue;
+                    System.out.println("> " + ex.getMessage());
                 }
             }
 
@@ -220,7 +220,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         }
 
-        if (formInstanceNames.equals("")) {
+        if (true || formInstanceNames.equals("")) {
 
             try {
 

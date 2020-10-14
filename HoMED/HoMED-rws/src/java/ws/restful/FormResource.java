@@ -83,7 +83,7 @@ public class FormResource {
         }
 
         try {
-            List<FormTemplate> formTemplates = formTemplateSessionBeanLocal.retrieveAllPublishedFormTemplates();
+            List<FormTemplate> formTemplates = formTemplateSessionBeanLocal.retrieveAllPublishedPublicFormTemplates();
             for (FormTemplate ft : formTemplates) {
                 ft.setConsultationPurposes(null);
                 ft.setFormInstances(null);

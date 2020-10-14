@@ -57,7 +57,13 @@ public class QueueManagementManagedBean implements Serializable {
         refreshConsultations();
         
         try {
-            bookingSessionBeanLocal.markBookingAttendance(25l);
+            bookingSessionBeanLocal.markBookingAttendance(38l);
+        } catch (MarkBookingAttendanceException ex) {
+            System.out.println("Test mark attandance error: " + ex.getMessage());
+        }
+        
+        try {
+            bookingSessionBeanLocal.markBookingAttendance(39l);
         } catch (MarkBookingAttendanceException ex) {
             System.out.println("Test mark attandance error: " + ex.getMessage());
         }
