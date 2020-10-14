@@ -13,23 +13,13 @@
     display: block;
 }
 
-/*.new-booking-slot {
-    background: #4EA279;
-    border: 1px solid #4EA279;
-    color: #ffffff;
-}*/
-
-.booking-slot, .medical-board-slot {
-    font-family: "Courier New" !important;
-}
-
 .new-booking-slot, .new-medical-board-slot {
     background: #A24E77 !important;
     border: 1px solid #A24E77 !important;
     font-family: "Courier New" !important;
 }
 
-.available-booking-slot {
+.available-booking-slot, .available-medical-board-slot {
     background: #4ea279 !important;
     border: 1px solid #4ea279 !important;
     font-family: "Courier New" !important;
@@ -55,8 +45,8 @@
 }
 
 .selected-booking-slot, .selected-medical-board-slot {
-    background: #32a8a8 !important;
-    border: 1px solid #32a8a8 !important;
+    background: #03a1fc !important;
+    border: 1px solid #03a1fc !important;
     font-family: "Courier New" !important;
 }
 

@@ -78,7 +78,7 @@
                             <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlots.size() != 0}"
                                       value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlots}" var="medicalBoardSlot">
                                 <div style="position: relative; margin-bottom: 1rem;">
-                                    <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -10px; margin-top:-10px; position: absolute;" 
+                                    <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -7.5px; margin-top:-10px; position: absolute;" 
                                                    value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsMapping.get(medicalBoardSlot) + 1}" />
 
                                     <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
@@ -123,11 +123,11 @@
 
                                             <div class="p-col-3" style="padding-top: 0; text-align: right;">
                                                 <div class="p-col">
-                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
+                                                    <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlot.startDateTime)}"
+                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"
-                                                                     styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash" 
-                                                                     style="height: 25px; width: 25px;" />
-
+                                                                     styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" />
+                                                                    
                                                     <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlot)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()"
                                                                      styleClass="rounded-button text-button" title="Close" icon="pi pi-times"
