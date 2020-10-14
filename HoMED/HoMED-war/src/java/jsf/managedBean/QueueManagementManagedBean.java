@@ -39,7 +39,7 @@ public class QueueManagementManagedBean implements Serializable {
 
     private Consultation selectedConsultation;
 
-    private MedicalStaff currentMedicalOfficer;
+    private MedicalOfficer currentMedicalOfficer;
 
     private MedicalCentre currentMedicalCentre;
 
@@ -55,13 +55,14 @@ public class QueueManagementManagedBean implements Serializable {
             currentMedicalCentre = currentMedicalOfficer.getMedicalCentre();
         }
         refreshConsultations();
-        
+
+        // Custom mark attendance
         try {
             bookingSessionBeanLocal.markBookingAttendance(38l);
         } catch (MarkBookingAttendanceException ex) {
             System.out.println("Test mark attandance error: " + ex.getMessage());
         }
-        
+
         try {
             bookingSessionBeanLocal.markBookingAttendance(39l);
         } catch (MarkBookingAttendanceException ex) {
@@ -77,8 +78,16 @@ public class QueueManagementManagedBean implements Serializable {
             bookingSessionBeanLocal.retrieveAllBookings();
             this.waitingConsultations = consultationSessionBeanLocal.retrieveWaitingConsultationsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
 
+            if (this.waitingConsultations.size() > 0) {
+                this.selectedConsultation = this.waitingConsultations.get(0);
+            }
+
         }
 
+    }
+    
+    public void startSelectedConsultation(){
+        System.out.println("Starting current consultation!");
     }
 
     public void selectConsultation(ActionEvent event) {
@@ -91,6 +100,27 @@ public class QueueManagementManagedBean implements Serializable {
 
     public void setWaitingConsultations(List<Consultation> waitingConsultations) {
         this.waitingConsultations = waitingConsultations;
+    }
+
+    public Consultation getSelectedConsultation() {
+        return selectedConsultation;
+    }
+
+    public void setSelectedConsultation(Consultation selectedConsultation) {
+        this.selectedConsultation = selectedConsultation;
+    }
+
+    public MedicalOfficer getCurrentMedicalOfficer() {
+        return currentMedicalOfficer;
+    }
+
+    public void setCurrentMedicalOfficer(MedicalOfficer currentMedicalOfficer) {
+        this.currentMedicalOfficer = currentMedicalOfficer;
+    }
+
+    public String renderDate(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        return dateFormat.format(date);
     }
 
     public String renderTime(Date date) {
