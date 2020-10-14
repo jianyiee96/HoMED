@@ -37,9 +37,7 @@
 
                                 </p:schedule>
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="p-col-4">
@@ -80,7 +78,7 @@
                                     <p:commandButton update="formSchedule:rightPanel" actionListener="#{bookingSlotManagementManagedBean.deleteAllSelectedBookingSlots}"
                                                      disabled="#{bookingSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('bookingSlots').update()"
                                                      style="margin-bottom: 15px; float: right"
-                                                     styleClass="danger-button" title="Close" icon="pi pi-trash">
+                                                     styleClass="danger-button" title="Delete All Selected Booking Slots" icon="pi pi-trash">
                                     </p:commandButton>
                                 </h:panelGrid>
 
