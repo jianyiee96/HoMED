@@ -99,6 +99,11 @@ public class DataInitializationSessionBean {
             Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
             employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
             Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId2, mcId1);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
+
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
@@ -168,6 +173,7 @@ public class DataInitializationSessionBean {
 
     private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         FormTemplate formTemplate = new FormTemplate("Form Template Demo 1");
+        formTemplate.setIsPublic(Boolean.TRUE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);

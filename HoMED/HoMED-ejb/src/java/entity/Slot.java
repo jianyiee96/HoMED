@@ -31,7 +31,7 @@ public abstract class Slot implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date startDateTime;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
@@ -52,23 +52,31 @@ public abstract class Slot implements Serializable {
     public void setStartDateTime(Date startDateTime) {
         this.startDateTime = startDateTime;
     }
-    
+
     public Date getEndDateTime() {
         return endDateTime;
     }
 
-    public int getStartHour(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(this.startDateTime);
-        return calendar.get(Calendar.HOUR_OF_DAY);
+    public int getStartHour() {
+        if (this.startDateTime != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(this.startDateTime);
+            return calendar.get(Calendar.HOUR_OF_DAY);
+        } else {
+            return 0;
+        }
     }
-    
-    public int getEndHour(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(this.endDateTime);
-        return calendar.get(Calendar.HOUR_OF_DAY);
+
+    public int getEndHour() {
+        if (this.endDateTime != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(this.endDateTime);
+            return calendar.get(Calendar.HOUR_OF_DAY);
+        } else {
+            return 0;
+        }
     }
-    
+
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }
@@ -97,5 +105,5 @@ public abstract class Slot implements Serializable {
     public String toString() {
         return "entity.Slot[ id=" + slotId + " ]";
     }
-    
+
 }

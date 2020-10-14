@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="template/template.xhtml">
 
-    <ui:define name="title">Scheduler Management</ui:define>
+    <ui:define name="title">Booking Slot Management</ui:define>
 
     <ui:define name="content">
 
@@ -120,7 +120,7 @@
                                         </p:outputPanel>
 
                                         <p:commandButton update="formSchedule:rightPanel" value="Delete Booking Slot" actionListener="#{bookingSlotManagementManagedBean.deleteBookingSlot}"
-                                                         disabled="#{bookingSlotManagementManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null}" oncomplete="PF('bookingSlots').update()"
+                                                         disabled="#{bookingSlotManagementManagedBean.isScheduleState}" rendered="#{bookingSlot.booking == null and !bookingSlotManagementManagedBean.beforeNow(bookingSlot.startDateTime)}" oncomplete="PF('bookingSlots').update()"
                                                          styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash">
                                             <f:attribute name="bookingSlot" value="#{bookingSlot}" />
                                         </p:commandButton>

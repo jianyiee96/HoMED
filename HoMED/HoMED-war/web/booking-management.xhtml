@@ -16,29 +16,30 @@
         <ezcomp:manageServiceman id="ccManageServiceman">
         </ezcomp:manageServiceman>
         <h:form id="formAllBookings">
+            <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre == null}">
+                <h1>You are currently not assigned to any medical centre!</h1>
+            </ui:fragment>
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
-            <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre == null}">
-                <h1>You are currently not assigned to any medical centre!</h1>
-            </ui:fragment>
             <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre != null}">
 
                 <div class="p-grid crud-table">
                     <div class="p-col-12">
                         <div class="card">
-                            <p:growl id="growl-message" for="growl-message" showDetail="true" />
+                            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                                <p:autoUpdate/>
+                            </p:growl>
 
                             <div class="buttonbar">
-                                <!--oncomplete="PF('dialogManageMedicalCentre').show()"-->
-                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
-                                                 process="@this" >
-                                    <p:resetInput target="ccManageMedicalCentre:formManageMedicalCentre:panelManageMedicalCentre" />
+                                <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" process="@this" oncomplete="PF('dialogCreateBooking').show()" 
+                                                 update="panelCreateBooking" actionListener="#{bookingManagedBean.initCreate}">
+                                    <p:resetInput target="panelCreateBooking" />
                                 </p:commandButton>
                             </div>
 
-                            <p:dataTable id="dataTableBookings" widgetVar="dataTableBookings" var="slot" value="#{bookingManagedBean.bookingSlots}" sortBy="#{slot.slotId}"
+                            <p:dataTable id="dataTableBookings" widgetVar="dataTableBookings" var="slot" value="#{bookingManagedBean.bookingSlots}" sortBy="#{slot}" sortFunction="#{bookingManagedBean.sortByCustom}"
                                          styleClass="crud-management-table" rowKey="#{slot.slotId}" paginator="true" rows="10" paginatorPosition="bottom">
 
                                 <f:facet name="header">
@@ -86,13 +87,13 @@
                                 </p:column>
 
                                 <p:column headerText="Action" width="7%">
-                                    <!--update="ccManageMedicalCentre:formManageMedicalCentre"--> 
-                                    <!--actionListener=""--> 
                                     <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
                                                      process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
                                         <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{slot.booking.serviceman}" />
                                     </p:commandButton>
-                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete" actionListener="#{bookingManagedBean.deleteBooking}">
+                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete"
+                                                     actionListener="#{bookingManagedBean.deleteBooking(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
+                                                     update="dataTableBookings">
                                         <p:confirm header="Delete Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </p:column>
@@ -102,6 +103,182 @@
                     </div>
                 </div>
             </ui:fragment>
+
+            <p:dialog id="dialogCreateBooking" widgetVar="dialogCreateBooking" header="Create Booking" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogCreateBooking').initPosition()"
+                      minWidth="500" width="700">
+                <p:outputPanel id="panelCreateBooking">
+                    <div class="p-col-12 p-mb-5">
+                        <div class="p-grid p-justify-center">
+                            <p:steps activeIndex="#{bookingManagedBean.createBookingIdx}" style="width: 100%">
+                                <p:menuitem value="Select Serviceman" disabled="true"/>
+                                <p:menuitem value="Booking Slot"/>
+                                <p:menuitem value="Attach Forms"/>
+                            </p:steps>
+                        </div>
+                    </div>
+                    <h:panelGroup id="panelServiceman" rendered="#{bookingManagedBean.createBookingIdx == 0}">
+                        <div class="p-grid">
+                            <div class="p-col-12">
+                                <div class="p-field ui-fluid">
+                                    <i class="fa fa-envelope-o p-mx-2"/>
+                                    <p:outputLabel for="view-email" value="Email Address" indicateRequired="false"/>
+                                    <p:autoComplete id="view-email" value="#{bookingManagedBean.servicemanToCreateBooking.email}" completeMethod="#{bookingManagedBean.completeEmail}" var="email" itemLabel="#{email}" itemValue="#{email}">
+                                        <p:ajax event="keyup" update="grp-particulars grp-contact grp-others panelButtons" listener="#{bookingManagedBean.retrieveServiceman()}" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                        <p:ajax event="itemSelect" update="grp-particulars grp-contact grp-others panelButtons" listener="#{bookingManagedBean.retrieveServiceman()}" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                    </p:autoComplete>
+                                    <p:message class="error-message" for="view-email" />
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <h:panelGroup id="grp-particulars">
+                                    <div class="card ui-fluid">
+                                        <h5>Personal Particulars</h5>
+                                        <div class="p-field">
+                                            <i class="pi pi-user p-mr-2 p-ml-2"/>
+                                            <p:outputLabel for="view-name" value="Name"/>
+                                            <h:outputText id="view-name" value="#{bookingManagedBean.servicemanToCreateBooking.name}" class="view-text" />
+                                        </div>
+
+                                        <div class="p-field">
+                                            <i class="fa fa-venus-mars p-mr-2 p-ml-2"/>
+                                            <p:outputLabel for="view-gender" value="Gender"/>
+                                            <h:outputText id="view-gender" value="#{bookingManagedBean.servicemanToCreateBooking.gender}" class="view-text" />
+                                        </div> 
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="p-col-12 p-lg-6 p-md-6 p-sm-12">
+                                <h:panelGroup id="grp-contact">
+                                    <div class="card ui-fluid">
+                                        <h5>Contact Details</h5> 
+                                        <div class="p-field">
+                                            <i class="fa fa-phone p-mr-2 p-ml-2"/>
+                                            <p:outputLabel for="view-phoneNumber" value="Phone Number"/>
+                                            <h:outputText  id="view-phoneNumber" value="#{bookingManagedBean.servicemanToCreateBooking.phoneNumber}" class="view-text" />
+                                        </div>                               
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="p-col-12">
+                                <h:panelGroup id="grp-others">
+                                    <div class="card ui-fluid">
+                                        <h5>Other Information</h5>
+                                        <div class="p-formgrid p-grid">
+                                            <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                <i class="fa fa-tint p-mr-2 p-ml-2"/>
+                                                <p:outputLabel value="Blood Type" />
+                                                <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.bloodType}" class="view-text" />
+                                            </div>
+                                            <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                <i class="fa fa-calendar p-mr-2 p-ml-2"/>
+                                                <p:outputLabel value="ROD" />
+                                                <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.rod}" class="view-text" >
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="panelBooking" rendered="#{bookingManagedBean.createBookingIdx == 1}">
+                        <div class="p-grid p-formgrid ui-fluid">
+
+                            <div class="p-field  p-col-12">
+                                <i class="pi pi-calendar p-mx-2"/>
+                                <p:outputLabel for="view-date" value="Select Desired Booking Date:" class="p-mr-2"/>
+                                <p:datePicker id="view-date" value="#{bookingManagedBean.dateToCreateBooking}" pattern="dd/MM/yyyy" mindate="#{bookingManagedBean.currentDate}">
+                                    <p:ajax event="dateSelect" listener="#{bookingManagedBean.retrieveMedicalCentreBookingSlots()}" update="panelBooking" process="@this"/>
+                                </p:datePicker>
+                                <p:message class="error-message" for="view-date" />
+                            </div>
+                            <div class="p-field  p-col-12">
+                                <i class="pi pi-calendar p-mx-2"/>
+                                <p:outputLabel for="view-bookingSlot" value="Select Booking Slot:"  class="p-mr-2"/>
+                                <p:selectOneMenu id="view-bookingSlot" value="#{bookingManagedBean.bookingSlotToCreateId}" required="true">
+                                    <f:selectItems value="#{bookingManagedBean.bookingSlotsToCreate}" var="bookingSlot" itemLabel="#{bookingManagedBean.timeFormat.format(bookingSlot.startDateTime)}" itemValue="#{bookingSlot.slotId}" >
+                                    </f:selectItems>
+                                    <f:facet name="footer">
+                                        <p:separator />
+                                        <h:outputText value="#{bookingManagedBean.bookingSlotsToCreate.size()} available slots" style="font-weight:bold;"/>
+                                    </f:facet>
+                                </p:selectOneMenu>
+                                <p:message class="error-message" for="view-bookingSlot" />
+                            </div>
+
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="panelForms" rendered="#{bookingManagedBean.createBookingIdx == 2}">
+                        <div class="p-grid p-formgrid ui-fluid">
+                            <div class="p-field  p-col-12">
+                                <i class="pi pi-list p-mx-2"/>
+                                <p:outputLabel for="view-consultationPurpose" value="Select Consultation Purpose:"  class="p-mr-2"/>
+                                <p:selectOneMenu id="view-consultationPurpose" value="#{bookingManagedBean.consultationPurposeToCreateId}" required="true">
+                                    <f:selectItem value="#{null}" itemLabel="Select a consultation purpose"/>
+                                    <f:selectItems value="#{bookingManagedBean.consultationPurposes}" var="cp" itemLabel="#{cp.consultationPurposeName}" itemValue="#{cp.consultationPurposeId}" />
+                                    <p:ajax event="valueChange" listener="#{bookingManagedBean.selectConsultationPurpose}"  update="panelLinkedForms select-formTemplates" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                </p:selectOneMenu>
+                                <p:message class="error-message" for="view-consultationPurpose" />
+                            </div>
+                            <div class="p-field  p-col-12">
+                                <h:panelGroup id="panelLinkedForms">
+                                    <p:outputLabel value="Currently Linked Forms" style="font-weight: bold"/><br/>
+                                    <h:outputText rendered="#{bookingManagedBean.consultationPurposeToCreateId eq null}" value="Please select a consultation purpose first"/>
+                                    <h:outputText rendered="#{bookingManagedBean.consultationPurposeToCreateId ne null and bookingManagedBean.alreadyLinkedFormTemplates eq null}" value="Please select a consultation purpose first"/>
+                                    <ul>
+                                        <ui:repeat rendered="#{bookingManagedBean.consultationPurposeToCreateId ne null and bookingManagedBean.alreadyLinkedFormTemplates ne null}" value="#{bookingManagedBean.alreadyLinkedFormTemplates}" var="ft">
+                                            <li><h:outputText value="#{ft.formTemplateName}" class="p-mt-1"/></li>
+                                        </ui:repeat>
+                                    </ul>
+                                </h:panelGroup>
+                            </div>
+                            <div class="p-field  p-col-12">
+                                <p:outputLabel for="select-formTemplates" value="Attach Additional Form Templates" style="font-weight: bold"/>
+                                <p:selectManyMenu id="select-formTemplates" value="#{bookingManagedBean.selectedAdditionalFormTemplatesToCreate}"
+                                                  var="ft" showCheckbox="true">
+                                    <f:selectItems value="#{bookingManagedBean.additionalFormTemplates}" var="aFt" itemLabel="#{aFt.formTemplateName}" itemValue="#{aFt.formTemplateId}" />
+                                    <p:column>
+                                        <h:outputText value="[#{ft}] #{bookingManagedBean.formTemplateHm.get(ft)}" />
+                                    </p:column>
+                                </p:selectManyMenu>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="p-col-12">
+                        <p:messages globalOnly="true" class="error-message">
+                            <p:autoUpdate/>
+                        </p:messages>
+                    </div>
+
+                    <h:panelGroup id="panelButtons">
+                        <div class="p-col-12">
+                            <div class="p-grid p-justify-between p-align-center vertical-container">
+                                <p:commandButton update="panelCreateBooking" icon="pi pi-angle-left" styleClass="rounded-button outlined-button p-mr-2 p-mb-2"
+                                                 disabled="#{bookingManagedBean.createBookingIdx == 0}" process="@this"
+                                                 oncomplete="PF('dialogCreateBooking').initPosition()">
+                                    <f:setPropertyActionListener target="#{bookingManagedBean.createBookingIdx}" value="#{bookingManagedBean.createBookingIdx - 1}"/>
+                                </p:commandButton>
+                                <p:commandButton value="Create Booking" icon="pi pi-calendar-plus" styleClass="p-mr-2 p-mb-2"  update="panelCreateBooking growl-message dataTableBookings" process="panelCreateBooking"
+                                                 rendered="#{bookingManagedBean.createBookingIdx == 2}" actionListener="#{bookingManagedBean.createBooking()}" >
+                                    <p:confirm header="Create Booking" escape="false" message="Confirm create booking?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton update="panelCreateBooking" icon="pi pi-angle-right" styleClass="rounded-button outlined-button p-mr-2 p-mb-2" process="panelCreateBooking"
+                                                 disabled="#{bookingManagedBean.createBookingIdx == 2 or bookingManagedBean.servicemanToCreateBooking.servicemanId eq null}"
+                                                 oncomplete="PF('dialogCreateBooking').initPosition()">
+                                    <f:setPropertyActionListener target="#{bookingManagedBean.createBookingIdx}" value="#{bookingManagedBean.createBookingIdx + 1}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </p:outputPanel>
+            </p:dialog>
         </h:form>
     </ui:define>
 </ui:composition>
