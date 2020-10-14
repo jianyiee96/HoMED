@@ -95,10 +95,15 @@ public class DataInitializationSessionBean {
             Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
             Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
             Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
             Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
             Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+
             employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId2, mcId1);
             employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
+            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
+
             System.out.println("EMPLOYEE INFO [INIT]");
             System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
             System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
@@ -145,6 +150,7 @@ public class DataInitializationSessionBean {
             initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
 
             slotSessionBeanLocal.createBookingSlotsDataInit(mcId1, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+            slotSessionBeanLocal.createMedicalBoardSlotsDataInit(new Date());
 
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException

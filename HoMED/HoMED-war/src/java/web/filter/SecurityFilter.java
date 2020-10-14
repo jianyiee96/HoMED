@@ -74,12 +74,12 @@ public class SecurityFilter implements Filter {
             "/form-util.xhtml", // 7
             "/consultation-util.xhtml", // 8
             "/medical-centre-staff-management.xhtml", // 9
-            "/scheduler-management.xhtml", // 10
-            "/booking-management.xhtml", //11
+            "/booking-slot-management.xhtml", // 10
+            "/medical-board-slot-management.xhtml", // 11
             "/booking-management.xhtml", //12
             "/queue-management.xhtml", //13
             "/consultation-management.xhtml", //14
-            "/current-consultation.xhtml", //15
+            "/current-consultation.xhtml" //15
         };
 
         // Pages that all logged in users can enter
@@ -91,14 +91,12 @@ public class SecurityFilter implements Filter {
         }
 
         if (accessRight == EmployeeRoleEnum.SUPER_USER) {
-
             if (path.equals(pathArr[3])
                     || path.equals(pathArr[5])
                     || path.equals(pathArr[6])
                     || path.equals(pathArr[7])
                     || path.equals(pathArr[8])
-                    || path.equals(pathArr[9])
-                    || path.equals(pathArr[10])) {
+                    || path.equals(pathArr[9])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
@@ -109,10 +107,15 @@ public class SecurityFilter implements Filter {
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
             if (path.equals(pathArr[10])
-                    || path.equals(pathArr[11])) {
+                    || path.equals(pathArr[12])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
+            if (path.equals(pathArr[10])
+                    || path.equals(pathArr[11])
+                    || path.equals(pathArr[12])) {
+                return 1;
+            }
         }
 
         for (String currentPath : pathArr) {

@@ -43,7 +43,6 @@
                         </div>
                     </ui:fragment>
                     <po:menu widgetVar="RomaMenuWidget">
-
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
                         <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
                         <p:submenu rendered="#{currentEmployee.role == 'SUPER_USER'}" label="Users Account Management" icon="fa fa-users">
@@ -54,14 +53,14 @@
                             <p:menuitem value="E-Form Utility" icon="fa fa-file-code-o" outcome="/form-util" />
                             <p:menuitem value="Consultation Utility" icon="fa fa-wrench" outcome="/consultation-util" />
                         </p:submenu>
-                        <p:menuitem value="Scheduler Management" icon="pi pi-calendar" outcome="/scheduler-management" />
+                        <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Scheduler Management" icon="pi pi-calendar" >
+                            <p:menuitem value="Booking Slot Management"  icon="pi pi-calendar" outcome="/booking-slot-management" />
+                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management"  icon="pi pi-calendar" outcome="/medical-board-slot-management" />
+                        </p:submenu>
                         <p:menuitem value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
-
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Consultation Management" icon="fa fa-user-md" outcome="/consultation-management" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
-
-
                     </po:menu>
                 </h:form>
                 <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">

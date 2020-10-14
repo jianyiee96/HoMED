@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.BookingSlot;
 import entity.ConsultationPurpose;
+import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
 import entity.Serviceman;
 import java.util.ArrayList;
@@ -185,6 +186,91 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
+    public void createMedicalBoardSlotsDataInit(Date date) {
+        Calendar rangeStartCalendar = Calendar.getInstance();
+        rangeStartCalendar.setTime(date);
+        rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+        rangeStartCalendar.set(Calendar.MINUTE, 0);
+        rangeStartCalendar.set(Calendar.SECOND, 0);
+        rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+        Calendar rangeEndCalendar = Calendar.getInstance();
+        rangeEndCalendar.setTime(date);
+        rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+        rangeEndCalendar.set(Calendar.MINUTE, 0);
+        rangeEndCalendar.set(Calendar.SECOND, 0);
+        rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+        while (rangeStartCalendar.before(rangeEndCalendar)) {
+            Date currStart = rangeStartCalendar.getTime();
+            rangeStartCalendar.add(Calendar.MINUTE, 30);
+            Date currEnd = rangeStartCalendar.getTime();
+            System.out.println("Medical Board Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
+            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+            em.persist(mbs);
+            em.flush();
+        }
+
+        rangeStartCalendar.add(Calendar.DATE, 1);
+        rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
+        rangeStartCalendar.set(Calendar.MINUTE, 0);
+        rangeStartCalendar.set(Calendar.SECOND, 0);
+        rangeStartCalendar.set(Calendar.MILLISECOND, 0);
+
+        rangeEndCalendar.add(Calendar.DATE, 1);
+        rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
+        rangeEndCalendar.set(Calendar.MINUTE, 0);
+        rangeEndCalendar.set(Calendar.SECOND, 0);
+        rangeEndCalendar.set(Calendar.MILLISECOND, 0);
+
+        while (rangeStartCalendar.before(rangeEndCalendar)) {
+            Date currStart = rangeStartCalendar.getTime();
+            rangeStartCalendar.add(Calendar.MINUTE, 30);
+            Date currEnd = rangeStartCalendar.getTime();
+            System.out.println("Medical Board Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
+            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+            em.persist(mbs);
+            em.flush();
+        }
+    }
+
+    @Override
+    public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
+
+        rangeStart = roundDate30Minute(rangeStart);
+        rangeEnd = roundDate30Minute(rangeEnd);
+
+        if (!rangeStart.before(rangeEnd)) {
+            throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
+        }
+        Calendar rangeStartCalendar = Calendar.getInstance();
+        rangeStartCalendar.setTime(rangeStart);
+        Calendar rangeEndCalendar = Calendar.getInstance();
+        rangeEndCalendar.setTime(rangeEnd);
+
+        List<MedicalBoardSlot> createdMedicalBoardSlots = new ArrayList<>();
+
+        while (rangeStartCalendar.before(rangeEndCalendar)) {
+            Date currStart = rangeStartCalendar.getTime();
+            rangeStartCalendar.add(Calendar.MINUTE, 30);
+            Date currEnd = rangeStartCalendar.getTime();
+
+            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+            em.persist(mbs);
+            em.flush();
+            createdMedicalBoardSlots.add(mbs);
+        }
+
+        return createdMedicalBoardSlots;
+    }
+
+    @Override
+    public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
+        Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb");
+        return query.getResultList();
+    }
+
+    @Override
     public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id ");
         query.setParameter("id", medicalCentreId);
@@ -218,6 +304,18 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
+    public BookingSlot retrieveBookingSlotById(Long id) {
+        BookingSlot bookingSlot = em.find(BookingSlot.class, id);
+        return bookingSlot;
+    }
+
+    @Override
+    public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId) {
+        MedicalBoardSlot medicalBoardSlot = em.find(MedicalBoardSlot.class, medicalBoardSlotId);
+        return medicalBoardSlot;
+    }
+
+    @Override
     public void removeBookingSlot(Long bookingSlotId) throws RemoveSlotException {
         BookingSlot bookingSlot = retrieveBookingSlotById(bookingSlotId);
         if (bookingSlot.getBooking() == null) {
@@ -229,9 +327,14 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
-    public BookingSlot retrieveBookingSlotById(Long id) {
-        BookingSlot bookingSlot = em.find(BookingSlot.class, id);
-        return bookingSlot;
+    public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException {
+        MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
+        // Need to take scheduled medical board into consideration in SR4
+        if (medicalBoardSlot.getMedicalBoard() == null) {
+            em.remove(medicalBoardSlot);
+        } else {
+            throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board exists!");
+        }
     }
 
     // Helper functions.
@@ -253,6 +356,20 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         int minutes = calendar.get(Calendar.MINUTE);
         int mod = (minutes % 15);
         minutes += mod < 8 ? (-mod) : (15 - mod);
+
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    public Date roundDate30Minute(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        int minutes = calendar.get(Calendar.MINUTE);
+        int mod = (minutes % 30);
+        minutes += mod < 15 ? (-mod) : (30 - mod);
 
         calendar.set(Calendar.MINUTE, minutes);
         calendar.set(Calendar.SECOND, 0);
