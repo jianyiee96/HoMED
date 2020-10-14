@@ -272,6 +272,18 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
+    public BookingSlot retrieveBookingSlotById(Long id) {
+        BookingSlot bookingSlot = em.find(BookingSlot.class, id);
+        return bookingSlot;
+    }
+
+    @Override
+    public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId) {
+        MedicalBoardSlot medicalBoardSlot = em.find(MedicalBoardSlot.class, medicalBoardSlotId);
+        return medicalBoardSlot;
+    }
+
+    @Override
     public void removeBookingSlot(Long bookingSlotId) throws RemoveSlotException {
         BookingSlot bookingSlot = retrieveBookingSlotById(bookingSlotId);
         if (bookingSlot.getBooking() == null) {
@@ -283,10 +295,14 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
-    public BookingSlot retrieveBookingSlotById(Long id) {
-        BookingSlot bookingSlot = em.find(BookingSlot.class,
-                id);
-        return bookingSlot;
+    public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException {
+        MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
+        // Need to take scheduled medical board into consideration in SR4
+        if (medicalBoardSlot.getMedicalBoard() == null) {
+            em.remove(medicalBoardSlot);
+        } else {
+            throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board exists!");
+        }
     }
 
     // Helper functions.

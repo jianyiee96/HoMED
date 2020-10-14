@@ -4,19 +4,20 @@
  */
 package jsf.managedBean;
 
-import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
-import entity.BookingSlot;
 import entity.Employee;
 import entity.MedicalBoardAdmin;
 import entity.MedicalBoardSlot;
-import entity.MedicalCentre;
 import entity.MedicalStaff;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 import javax.annotation.PostConstruct;
@@ -25,15 +26,13 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
-import org.primefaces.PrimeFaces;
 import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
-import util.enumeration.BookingStatusEnum;
+import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 
 @Named(value = "medicalBoardSlotManagementManagedBean")
@@ -48,6 +47,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     private List<MedicalBoardSlot> medicalBoardSlots;
 
     private TreeSet<MedicalBoardSlot> selectedMedicalBoardSlots;
+    private HashMap<MedicalBoardSlot, Integer> selectedMedicalBoardSlotsMapping;
 
     private Boolean isScheduleState;
 
@@ -69,6 +69,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         this.selectedMedicalBoardSlots = new TreeSet<>();
+        this.selectedMedicalBoardSlotsMapping = new HashMap<>();
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalBoardAdmin) {
             currentMedicalBoardAdmin = (MedicalBoardAdmin) currentEmployee;
@@ -92,10 +93,21 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             startHour = Math.min(startHour, mbs.getStartHour());
             endHour = Math.max(endHour, mbs.getEndHour());
 
-            // Need to handle for Medical Board Status
+            boolean selected = false;
+            int idx = -1;
+            for (MedicalBoardSlot selectedMbs : selectedMedicalBoardSlots) {
+                idx++;
+                if (selectedMbs.equals(mbs)) {
+                    selected = true;
+                    selectedMedicalBoardSlotsMapping.put(mbs, idx);
+                    break;
+                }
+            }
+
+            // Need to handle for Medical Board Status in SR4
             if (mbs.getMedicalBoard() != null) {
                 existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                        .title("Upcoming")
+                        .title(selected ? "Upcoming [" + ++idx + "]" : "Upcoming")
                         .startDate(mbs
                                 .getStartDateTime()
                                 .toInstant()
@@ -110,14 +122,14 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                         )
                         .overlapAllowed(false)
                         .editable(false)
-                        .styleClass("booked-booking-slot")
+                        .styleClass(selected ? "selected-medical-board-slot" : "booked-medical-board-slot")
                         .data(mbs)
                         .build()
                 );
             } else {
                 if (mbs.getEndDateTime().after(now)) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title("Available")
+                            .title(selected ? "Available [" + ++idx + "]" : "Available")
                             .startDate(mbs
                                     .getStartDateTime()
                                     .toInstant()
@@ -130,12 +142,12 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                                     .toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass("booking-slot")
+                            .styleClass(selected ? "selected-medical-board-slot" : "medical-board-slot")
                             .data(mbs)
                             .build());
                 } else {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title("Expired")
+                            .title(selected ? "Expired [" + ++idx + "]" : "Expired")
                             .startDate(mbs
                                     .getStartDateTime()
                                     .toInstant()
@@ -148,7 +160,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                                     .toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass("expired-booking-slot")
+                            .styleClass(selected ? "selected-medical-board-slot" : "expired-medical-board-slot")
                             .data(mbs)
                             .build());
                 }
@@ -173,27 +185,33 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
-        System.out.println("onEventSelect");
-        event = selectEvent.getObject();
+        if (selectedMedicalBoardSlotsMapping.size() >= 10) {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Medical Slots Selected", "Maximum of 10 medical slots are selectable in one shot!"));
+        } else {
+            event = selectEvent.getObject();
 
-        if (event.getData() != null) {
-            MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
-            if (!this.selectedMedicalBoardSlots.contains(mbs)) {
-                this.selectedMedicalBoardSlots.add(mbs);
+            if (event.getData() != null) {
+                MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
+
+                if (!this.selectedMedicalBoardSlots.contains(mbs)) {
+                    this.selectedMedicalBoardSlots.add(mbs);
+
+                    refreshBookingSlots();
+                }
             }
         }
+
     }
 
     public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
-        System.out.println("onDateSelect");
         if (isScheduleState && event.getId() == null) {
             if (selectEvent.getObject().isAfter(LocalDateTime.now())) {
                 event = DefaultScheduleEvent.builder()
-                        .title("New Medical Board Slots")
+                        .title("New")
                         .startDate(selectEvent.getObject())
                         .endDate(selectEvent.getObject().plusMinutes(30))
                         .overlapAllowed(false)
-                        .styleClass("new-booking-slot")
+                        .styleClass("new-medical-board-slot")
                         .build();
 
                 existingEventModel.addEvent(event);
@@ -241,7 +259,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                     addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
                 }
             });
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slots Created", "Medical Board slots for consultations have been created successfully!"));
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slots Created", "Medical Board slots for medical board reviews have been created successfully!"));
         }
 
         refreshBookingSlots();
@@ -249,6 +267,47 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public void reset() {
+        refreshBookingSlots();
+    }
+
+    public String renderDate(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        return dateFormat.format(date);
+    }
+
+    public void closeSelectedMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        this.selectedMedicalBoardSlots.remove(medicalBoardSlot);
+        refreshBookingSlots();
+    }
+
+    public void deleteSelectedMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        this.selectedMedicalBoardSlots.remove(medicalBoardSlot);
+        try {
+            slotSessionBeanLocal.removeMedicalBoardSlot(medicalBoardSlot.getSlotId());
+            refreshBookingSlots();
+        } catch (RemoveSlotException ex) {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Medical Board Slot", ex.getMessage()));
+        }
+    }
+
+    public void deleteAllSelectedBookingSlots() {
+        List<MedicalBoardSlot> mbsToBeRemoved = new ArrayList<>();
+
+        this.selectedMedicalBoardSlots.forEach(mbs -> {
+            if (mbs.getMedicalBoard() == null) {
+                try {
+                    slotSessionBeanLocal.removeMedicalBoardSlot(mbs.getSlotId());
+                    mbsToBeRemoved.add(mbs);
+                } catch (RemoveSlotException ex) {
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Medical Board Slot", ex.getMessage()));
+                }
+            }
+        });
+
+        mbsToBeRemoved.forEach(mbs -> {
+            this.selectedMedicalBoardSlots.remove(mbs);
+        });
+
         refreshBookingSlots();
     }
 
@@ -278,6 +337,14 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
     public void setSelectedMedicalBoardSlots(TreeSet<MedicalBoardSlot> selectedMedicalBoardSlots) {
         this.selectedMedicalBoardSlots = selectedMedicalBoardSlots;
+    }
+
+    public HashMap<MedicalBoardSlot, Integer> getSelectedMedicalBoardSlotsMapping() {
+        return selectedMedicalBoardSlotsMapping;
+    }
+
+    public void setSelectedMedicalBoardSlotsMapping(HashMap<MedicalBoardSlot, Integer> selectedMedicalBoardSlotsMapping) {
+        this.selectedMedicalBoardSlotsMapping = selectedMedicalBoardSlotsMapping;
     }
 
     public Boolean getIsScheduleState() {
@@ -321,7 +388,11 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public String getMinTime() {
-        return minTime;
+        if (isScheduleState) {
+            return "00:00:00";
+        } else {
+            return minTime;
+        }
     }
 
     public void setMinTime(String minTime) {
@@ -329,7 +400,11 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public String getMaxTime() {
-        return maxTime;
+        if (isScheduleState) {
+            return "24:00:00";
+        } else {
+            return maxTime;
+        }
     }
 
     public void setMaxTime(String maxTime) {

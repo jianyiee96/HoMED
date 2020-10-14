@@ -279,7 +279,6 @@ public class BookingSlotManagementManagedBean implements Serializable {
         } catch (RemoveSlotException ex) {
             System.out.println("Unable to remove booking slot: " + ex.getMessage());
         }
-
     }
 
     public void deleteAllSelectedBookingSlots() {

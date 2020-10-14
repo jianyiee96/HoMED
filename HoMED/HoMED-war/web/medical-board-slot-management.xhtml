@@ -24,7 +24,7 @@
                                         draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
 
                                 <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />
-                                <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message'  />
+                                <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message rightPanel'  />
                                 <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
                                 <p:ajax event="eventResize" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
 
@@ -37,44 +37,110 @@
 
                 <div class="p-col-4">
                     <div class="card">
-
                         <h2>Control Panel</h2>
 
-                        <h:panelGrid width="100%" columns="1" id='rightPanel'>
-
+                        <h:panelGroup id='rightPanel'>
                             <h:panelGrid columns="4">
-                                <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Medical Board Slots"
-                                                 update="rightPanel @form" process="@this" oncomplete="PF('medicalBoardSlots').update()">
+                                <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Manage" icon="pi pi-calendar-plus" styleClass="primary-button" title="Manage Medical Board Slots"
+                                                 update="rightPanel" process="@this" oncomplete="PF('medicalBoardSlots').update()">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
 
-                                <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Save" icon="pi pi-save" styleClass="success-button" title="Schedule Medical Board Slots"
-                                                 update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-save" styleClass="success-button" title="Schedule Medical Board Slots"
+                                                 update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                  actionListener="#{medicalBoardSlotManagementManagedBean.saveSchedule}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
                                 </p:commandButton>
 
                                 <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
-                                                  update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                   actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
 
                                 <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
-                                                  update='rightPanel @form growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                   actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
                                 </p:commandButton>
-
                             </h:panelGrid>
 
-                        </h:panelGrid>
+                            <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlots.size() != 0}" columns="2">
+                                <h2>Selected Medical Board Slots</h2>
 
+                                <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.deleteAllSelectedBookingSlots}"
+                                                 disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('medicalBoardSlots').update()"
+                                                 style="margin-bottom: 15px; float: right"
+                                                 styleClass="danger-button" title="Close" icon="pi pi-trash">
+                                </p:commandButton>
+                            </h:panelGrid>
 
+                            <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlots.size() != 0}"
+                                      value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlots}" var="medicalBoardSlot">
+                                <div style="position: relative; margin-bottom: 1rem;">
+                                    <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -10px; margin-top:-10px; position: absolute;" 
+                                                   value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsMapping.get(medicalBoardSlot) + 1}" />
+
+                                    <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
+                                        <div class="p-grid">
+                                            <div class="p-col-9" style="padding-bottom: 0">
+                                                <div class="p-grid">
+                                                    <div class="p-col-3">
+                                                        <h:outputText value="Start Time:" />
+                                                    </div>
+                                                    <div class="p-col-9">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-3">
+                                                        <h:outputText value="End Time:" />
+                                                    </div>
+                                                    <div class="p-col-9">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.endDateTime)}" />                                      
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-3">
+                                                        <h:outputText value="Board Type:" />
+                                                    </div>
+                                                    <div class="p-col-9">
+                                                        <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />                                          
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-3">
+                                                        <h:outputText value="Board Status:" />
+                                                    </div>
+                                                    <div class="p-col-9">
+                                                        <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="p-col-3" style="padding-top: 0; text-align: right;">
+                                                <div class="p-col">
+                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
+                                                                     disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"
+                                                                     styleClass="rounded-button text-button danger-button" title="Close" icon="pi pi-trash" 
+                                                                     style="height: 25px; width: 25px;" />
+
+                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlot)}"
+                                                                     oncomplete="PF('medicalBoardSlots').update()"
+                                                                     styleClass="rounded-button text-button" title="Close" icon="pi pi-times"
+                                                                     style="height: 25px; width: 25px;" />           
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:repeat>
+                        </h:panelGroup>
                     </div>
-
                 </div>
-
             </div>
         </h:form>
 

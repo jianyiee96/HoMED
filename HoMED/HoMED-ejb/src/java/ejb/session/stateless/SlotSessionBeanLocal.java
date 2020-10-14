@@ -34,5 +34,9 @@ public interface SlotSessionBeanLocal {
     public void createMedicalBoardSlotsDataInit(Date date);
 
     public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException;
+
+    public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId);
+
+    public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException;
     
 }

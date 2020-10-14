@@ -5,7 +5,6 @@
     font-weight: 700;
     font-size: 12px;
     letter-spacing: .3px;
-
 }
 
 .operating-hours-badge {
@@ -51,6 +50,11 @@
 
 .consultation-badge {
     background: #406E7E;
+    color: #FFFFFF;
+}
+
+.slot-badge {
+    background: #32a8a8;
     color: #FFFFFF;
 }
 
