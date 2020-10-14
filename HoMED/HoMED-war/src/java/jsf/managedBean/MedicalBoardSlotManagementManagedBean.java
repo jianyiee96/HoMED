@@ -108,38 +108,19 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             if (mbs.getMedicalBoard() != null) {
                 existingEventModel.addEvent(DefaultScheduleEvent.builder()
                         .title(selected ? "Upcoming [" + ++idx + "]" : "Upcoming")
-                        .startDate(mbs
-                                .getStartDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime()
-                        )
-                        .endDate(mbs
-                                .getEndDateTime()
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDateTime()
-                        )
+                        .startDate(mbs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                        .endDate(mbs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                         .overlapAllowed(false)
                         .editable(false)
                         .styleClass(selected ? "selected-medical-board-slot" : "booked-medical-board-slot")
                         .data(mbs)
-                        .build()
-                );
+                        .build());
             } else {
                 if (mbs.getEndDateTime().after(now)) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
                             .title(selected ? "Available [" + ++idx + "]" : "Available")
-                            .startDate(mbs
-                                    .getStartDateTime()
-                                    .toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime())
-                            .endDate(mbs
-                                    .getEndDateTime()
-                                    .toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime())
+                            .startDate(mbs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                            .endDate(mbs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
                             .styleClass(selected ? "selected-medical-board-slot" : "medical-board-slot")
@@ -148,16 +129,8 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                 } else {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
                             .title(selected ? "Expired [" + ++idx + "]" : "Expired")
-                            .startDate(mbs
-                                    .getStartDateTime()
-                                    .toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime())
-                            .endDate(mbs
-                                    .getEndDateTime()
-                                    .toInstant()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDateTime())
+                            .startDate(mbs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                            .endDate(mbs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
                             .styleClass(selected ? "selected-medical-board-slot" : "expired-medical-board-slot")
@@ -195,9 +168,11 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
                 if (!this.selectedMedicalBoardSlots.contains(mbs)) {
                     this.selectedMedicalBoardSlots.add(mbs);
-
-                    refreshBookingSlots();
+                } else {
+                    this.selectedMedicalBoardSlots.remove(mbs);
                 }
+                
+                refreshBookingSlots();
             }
         }
 
@@ -246,14 +221,8 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         if (!newEventModel.getEvents().isEmpty()) {
             newEventModel.getEvents().forEach(e -> {
                 try {
-                    Date rangeStart = Date
-                            .from(e.getStartDate()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toInstant());
-                    Date rangeEnd = Date
-                            .from(e.getEndDate()
-                                    .atZone(ZoneId.systemDefault())
-                                    .toInstant());
+                    Date rangeStart = Date.from(e.getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+                    Date rangeEnd = Date.from(e.getEndDate().atZone(ZoneId.systemDefault()).toInstant());
                     slotSessionBeanLocal.createMedicalBoardSlots(rangeStart, rangeEnd);
                 } catch (ScheduleBookingSlotException ex) {
                     addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Scheduler", ex.getMessage()));
