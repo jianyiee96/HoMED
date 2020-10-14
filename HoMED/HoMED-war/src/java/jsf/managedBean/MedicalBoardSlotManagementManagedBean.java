@@ -156,24 +156,22 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
-        if (selectedMedicalBoardSlotsMapping.size() >= 10) {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Medical Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
-        } else {
-            event = selectEvent.getObject();
+        event = selectEvent.getObject();
 
-            if (event.getData() != null) {
-                MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
-
-                if (!this.selectedMedicalBoardSlots.contains(mbs)) {
-                    this.selectedMedicalBoardSlots.add(mbs);
+        if (event.getData() != null) {
+            MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
+            if (!this.selectedMedicalBoardSlots.contains(mbs)) {
+                if (selectedMedicalBoardSlotsMapping.size() >= 10) {
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Booking Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
                 } else {
-                    this.selectedMedicalBoardSlots.remove(mbs);
+                    this.selectedMedicalBoardSlots.add(mbs);
+                    refreshBookingSlots();
                 }
-
+            } else {
+                this.selectedMedicalBoardSlots.remove(mbs);
                 refreshBookingSlots();
             }
         }
-
     }
 
     public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
@@ -215,7 +213,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     }
 
     public void saveSchedule() {
-
         if (!newEventModel.getEvents().isEmpty()) {
             newEventModel.getEvents().forEach(e -> {
                 try {
@@ -230,7 +227,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         }
 
         refreshBookingSlots();
-
     }
 
     public void reset() {
@@ -260,7 +256,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
     public void deleteAllSelectedBookingSlots() {
         List<MedicalBoardSlot> mbsToBeRemoved = new ArrayList<>();
 
-        this.selectedMedicalBoardSlots.forEach(mbs -> {            
+        this.selectedMedicalBoardSlots.forEach(mbs -> {
             if (mbs.getMedicalBoard() == null && !beforeNow(mbs.getStartDateTime())) {
                 try {
                     slotSessionBeanLocal.removeMedicalBoardSlot(mbs.getSlotId());
