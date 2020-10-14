@@ -49,6 +49,7 @@
                             <h:panelGroup id='rightPanel'>
                                 <h:panelGrid columns="4">
                                     <p:commandButton rendered="#{not bookingSlotManagementManagedBean.isScheduleState}" value="Manage" icon="pi pi-calendar-plus" styleClass="primary-button" title="Manage Booking Slots"
+                                                     disabled="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet.size() != 0}"
                                                      update="rightPanel" process="@this" oncomplete="PF('bookingSlots').update()">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
                                     </p:commandButton>
@@ -73,7 +74,7 @@
 
                                 </h:panelGrid>
 
-                                <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{bookingSlotManagementManagedBean.selectedBookingSlots.size() != 0}" columns="2">
+                                <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet.size() != 0}" columns="2">
                                     <h2>Selected Booking Slots</h2>
 
                                     <p:commandButton update="formSchedule:rightPanel" actionListener="#{bookingSlotManagementManagedBean.deleteAllSelectedBookingSlots}"
@@ -83,12 +84,12 @@
                                     </p:commandButton>
                                 </h:panelGrid>
 
-                                <p:repeat rendered="#{bookingSlotManagementManagedBean.selectedBookingSlots.size() != 0}"
-                                          value="#{bookingSlotManagementManagedBean.selectedBookingSlots}" var="bookingSlot">
+                                <p:repeat rendered="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet.size() != 0}"
+                                          value="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet}" var="bookingSlot">
 
                                     <div style="position: relative; margin-bottom: 1rem;">
                                         <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -7.5px; margin-top:-10px; position: absolute;" 
-                                                       value="#{bookingSlotManagementManagedBean.selectedBookingSlotsMapping.get(bookingSlot) + 1}" />
+                                                       value="#{bookingSlotManagementManagedBean.selectedBookingSlotsMapping.get(bookingSlot)}" />
 
                                         <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
                                             <div class="p-grid">

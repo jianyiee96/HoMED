@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -45,7 +48,8 @@ public class BookingSlotManagementManagedBean implements Serializable {
 
     private List<BookingSlot> bookingSlots;
 
-    private TreeSet<BookingSlot> selectedBookingSlots;
+    private Map<BookingSlot, ScheduleEvent> selectedBookingSlotsTreeMap;
+    private Set<BookingSlot> selectedBookingSlotsTreeSet;
     private HashMap<BookingSlot, Integer> selectedBookingSlotsMapping;
 
     private Boolean isScheduleState;
@@ -67,7 +71,7 @@ public class BookingSlotManagementManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        this.selectedBookingSlots = new TreeSet<>();
+        this.selectedBookingSlotsTreeMap = new TreeMap<>();
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalStaff) {
             currentMedicalStaff = (MedicalStaff) currentEmployee;
@@ -92,71 +96,59 @@ public class BookingSlotManagementManagedBean implements Serializable {
                 startHour = Math.min(startHour, bs.getStartHour());
                 endHour = Math.max(endHour, bs.getEndHour());
 
-                boolean selected = false;
-                int idx = -1;
-                for (BookingSlot selectedBs : selectedBookingSlots) {
-                    idx++;
-                    if (selectedBs.equals(bs)) {
-                        selected = true;
-                        selectedBookingSlotsMapping.put(bs, idx);
-                        break;
-                    }
-                }
-
                 if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title(selected ? "Upcoming [" + ++idx + "]" : "Upcoming")
+                            .title("Upcoming")
                             .startDate(bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .endDate(bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass(selected ? "selected-booking-slot" : "booked-booking-slot")
+                            .styleClass("booked-booking-slot")
                             .data(bs)
                             .build());
                 } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.ABSENT) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title(selected ? "Absent [" + ++idx + "]" : "Absent")
+                            .title("Absent")
                             .startDate(bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .endDate(bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass(selected ? "selected-booking-slot" : "absent-booking-slot")
+                            .styleClass("absent-booking-slot")
                             .data(bs)
                             .build());
                 } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.PAST) {
                     existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                            .title(selected ? "Past Booking [" + ++idx + "]" : "Past Booking")
+                            .title("Past Booking")
                             .startDate(bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .endDate(bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                             .overlapAllowed(false)
                             .editable(false)
-                            .styleClass(selected ? "selected-booking-slot" : "past-booking-slot")
+                            .styleClass("past-booking-slot")
                             .data(bs)
                             .build());
                 } else if (bs.getBooking() == null) {
 
                     if (bs.getStartDateTime().after(new Date())) {
                         existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                                .title(selected ? "Available [" + ++idx + "]" : "Available")
+                                .title("Available")
                                 .startDate(bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                                 .endDate(bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                                 .overlapAllowed(false)
                                 .editable(false)
-                                .styleClass(selected ? "selected-booking-slot" : "available-booking-slot")
+                                .styleClass("available-booking-slot")
                                 .data(bs)
                                 .build());
                     } else {
                         existingEventModel.addEvent(DefaultScheduleEvent.builder()
-                                .title(selected ? "Expired [" + ++idx + "]" : "Expired")
+                                .title("Expired")
                                 .startDate(bs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                                 .endDate(bs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                                 .overlapAllowed(false)
                                 .editable(false)
-                                .styleClass(selected ? "selected-booking-slot" : "expired-booking-slot")
+                                .styleClass("expired-booking-slot")
                                 .data(bs)
                                 .build());
                     }
-
                 }
             }
 
@@ -182,23 +174,98 @@ public class BookingSlotManagementManagedBean implements Serializable {
         }
     }
 
-    public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
-        event = selectEvent.getObject();
-        if (event.getData() != null) {
+    private void updateSelectedBookingSlotsView(BookingSlot bookingSlotToRemove) {
+        int idx = 0;
+        for (Map.Entry<BookingSlot, ScheduleEvent> entrySet : selectedBookingSlotsTreeMap.entrySet()) {
+            BookingSlot bs = entrySet.getKey();
+            ScheduleEvent event = entrySet.getValue();
 
-            BookingSlot bs = (BookingSlot) event.getData();
-            if (!this.selectedBookingSlots.contains(bs)) {
-                if (selectedBookingSlotsMapping.size() >= 10) {
-                    addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Booking Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
-                } else {
-                    this.selectedBookingSlots.add(bs);
-                    refreshBookingSlots();
-                }
-            } else {
-                this.selectedBookingSlots.remove(bs);
-                refreshBookingSlots();
+            idx++;
+            String title = "";
+            String styleClass = "selected-booking-slot";
+            boolean isSameBookingSlot = bs.equals(bookingSlotToRemove);
+            if (isSameBookingSlot) {
+                idx--;
             }
+
+            if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+                title = "Upcoming";
+                if (isSameBookingSlot) {
+                    styleClass = "booked-booking-slot";
+                } else {
+                    title += "[" + idx + "]";
+                }
+            } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.ABSENT) {
+                title = "Absent";
+                if (isSameBookingSlot) {
+                    styleClass = "absent-booking-slot";
+                } else {
+                    title += "[" + idx + "]";
+                }
+            } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() == BookingStatusEnum.PAST) {
+                title = "Past Booking";
+                if (isSameBookingSlot) {
+                    styleClass = "past-booking-slot";
+                } else {
+                    title += "[" + idx + "]";
+                }
+            } else if (bs.getBooking() == null) {
+                if (bs.getStartDateTime().after(new Date())) {
+                    title = "Available";
+                    if (isSameBookingSlot) {
+                        styleClass = "available-booking-slot";
+                    } else {
+                        title += "[" + idx + "]";
+                    }
+                } else {
+                    title = "Expired";
+                    if (isSameBookingSlot) {
+                        styleClass = "expired-booking-slot";
+                    } else {
+                        title += "[" + idx + "]";
+                    }
+                }
+            }
+
+            selectedBookingSlotsMapping.put(bs, idx);
+
+            existingEventModel.updateEvent(DefaultScheduleEvent.builder()
+                    .id(event.getId())
+                    .title(title)
+                    .startDate(event.getStartDate())
+                    .endDate(event.getEndDate())
+                    .overlapAllowed(event.isOverlapAllowed())
+                    .editable(event.isEditable())
+                    .styleClass(styleClass)
+                    .data(bs)
+                    .build());
         }
+    }
+
+    public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
+        if (!isScheduleState) {
+            event = selectEvent.getObject();
+
+            if (event.getData() != null) {
+                BookingSlot bs = (BookingSlot) event.getData();
+
+                if (!this.selectedBookingSlotsTreeMap.containsKey(bs)) {
+                    if (this.selectedBookingSlotsTreeMap.size() >= 10) {
+                        addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Booking Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
+                    } else {
+                        this.selectedBookingSlotsTreeMap.put(bs, event);
+                        updateSelectedBookingSlotsView(null);
+                    }
+                } else {
+                    updateSelectedBookingSlotsView(bs);
+                    this.selectedBookingSlotsTreeMap.remove(bs);
+                }
+            }
+        } else {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slot Selection Not Allowed", "You are not allowed to select booking slots while "));
+        }
+
+        event = new DefaultScheduleEvent();
     }
 
     public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
@@ -218,6 +285,8 @@ public class BookingSlotManagementManagedBean implements Serializable {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Booking Slots Selected", "Schedules cannot be made on past dates! Please select future dates for scheduling booking slots!"));
             }
         }
+
+        event = new DefaultScheduleEvent();
     }
 
     public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -264,15 +333,19 @@ public class BookingSlotManagementManagedBean implements Serializable {
     }
 
     public void closeBookingSlot(BookingSlot bookingSlot) {
-        this.selectedBookingSlots.remove(bookingSlot);
-        refreshBookingSlots();
+        updateSelectedBookingSlotsView(bookingSlot);
+        this.selectedBookingSlotsTreeMap.remove(bookingSlot);
     }
 
     public void deleteBookingSlot(BookingSlot bookingSlot) {
-        this.selectedBookingSlots.remove(bookingSlot);
         try {
             slotSessionBeanLocal.removeBookingSlot(bookingSlot.getSlotId());
-            refreshBookingSlots();
+
+            updateSelectedBookingSlotsView(bookingSlot);
+            this.existingEventModel.deleteEvent(this.selectedBookingSlotsTreeMap.get(bookingSlot));
+
+            this.selectedBookingSlotsTreeMap.remove(bookingSlot);
+            this.selectedBookingSlotsTreeSet.remove(bookingSlot);
         } catch (RemoveSlotException ex) {
             addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Booking Slot", ex.getMessage()));
         }
@@ -281,11 +354,12 @@ public class BookingSlotManagementManagedBean implements Serializable {
     public void deleteAllSelectedBookingSlots() {
         List<BookingSlot> bsToBeRemoved = new ArrayList<>();
 
-        this.selectedBookingSlots.forEach(bs -> {
+        this.selectedBookingSlotsTreeSet.forEach(bs -> {
             if (bs.getBooking() == null && !beforeNow(bs.getStartDateTime())) {
                 try {
                     slotSessionBeanLocal.removeBookingSlot(bs.getSlotId());
                     bsToBeRemoved.add(bs);
+
                 } catch (RemoveSlotException ex) {
                     addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Booking Slot", ex.getMessage()));
                 }
@@ -293,10 +367,12 @@ public class BookingSlotManagementManagedBean implements Serializable {
         });
 
         bsToBeRemoved.forEach(bs -> {
-            this.selectedBookingSlots.remove(bs);
-        });
+            updateSelectedBookingSlotsView(bs);
+            this.existingEventModel.deleteEvent(this.selectedBookingSlotsTreeMap.get(bs));
 
-        refreshBookingSlots();
+            this.selectedBookingSlotsTreeMap.remove(bs);
+            this.selectedBookingSlotsTreeSet.remove(bs);
+        });
     }
 
     public boolean beforeNow(Date date) {
@@ -339,12 +415,18 @@ public class BookingSlotManagementManagedBean implements Serializable {
         this.bookingSlots = bookingSlots;
     }
 
-    public TreeSet<BookingSlot> getSelectedBookingSlots() {
-        return selectedBookingSlots;
+    public Set<BookingSlot> getSelectedBookingSlotsTreeSet() {
+        selectedBookingSlotsTreeSet = new TreeSet<>();
+
+        selectedBookingSlotsTreeMap.entrySet().forEach(entrySet -> {
+            selectedBookingSlotsTreeSet.add(entrySet.getKey());
+        });
+
+        return selectedBookingSlotsTreeSet;
     }
 
-    public void setSelectedBookingSlots(TreeSet<BookingSlot> selectedBookingSlots) {
-        this.selectedBookingSlots = selectedBookingSlots;
+    public Map<BookingSlot, ScheduleEvent> getSelectedBookingSlotsTreeMap() {
+        return selectedBookingSlotsTreeMap;
     }
 
     public HashMap<BookingSlot, Integer> getSelectedBookingSlotsMapping() {
