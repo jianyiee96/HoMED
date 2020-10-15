@@ -4,33 +4,30 @@
  */
 package jsf.managedBean;
 
-import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Consultation;
 import entity.Employee;
 import entity.MedicalOfficer;
-import entity.Serviceman;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import org.primefaces.event.SelectEvent;
 import util.exceptions.EndConsultationException;
-import util.exceptions.MarkBookingAttendanceException;
 
 @Named(value = "currentConsultationManagedBean")
 @ViewScoped
 public class CurrentConsultationManagedBean implements Serializable {
+
+    @Inject
+    private ManageFormInstanceManagedBean manageFormInstanceManagedBean;
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
@@ -70,8 +67,8 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     }
 
-    public void selectConsultation(ActionEvent event) {
-        this.selectedConsultation = (Consultation) event.getComponent().getAttributes().get("selectedConsultation");
+    public void onRowSelect(SelectEvent<Consultation> event) {
+        selectedConsultation = (Consultation) event.getObject();
     }
 
     public void endCurrentConsultation() {
@@ -83,6 +80,10 @@ public class CurrentConsultationManagedBean implements Serializable {
         } catch (EndConsultationException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));
         }
+    }
+
+    public Boolean getIsCurrentConsultation() {
+        return selectedConsultation.equals(currentMedicalOfficer.getCurrentConsultation());
     }
 
     public List<Consultation> getServicemanConsultations() {
@@ -109,14 +110,8 @@ public class CurrentConsultationManagedBean implements Serializable {
         this.selectedConsultation = selectedConsultation;
     }
 
-    public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-        return dateFormat.format(date);
-    }
-
-    public String renderTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss");
-        return dateFormat.format(date);
+    public ManageFormInstanceManagedBean getManageFormInstanceManagedBean() {
+        return manageFormInstanceManagedBean;
     }
 
 }
