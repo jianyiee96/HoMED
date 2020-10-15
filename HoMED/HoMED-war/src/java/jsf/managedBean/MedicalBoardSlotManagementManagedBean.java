@@ -220,7 +220,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                 }
             }
         } else {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slot Selection Not Allowed", "You are not allowed to select booking slots while "));
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Existing Medical Board Slot Selection Not Allowed", "You are not allowed to select existing medical board slots while scheduling new medical board slots!"));
         }
 
         event = new DefaultScheduleEvent();
