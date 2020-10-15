@@ -31,12 +31,14 @@ public class ManageFormInstanceManagedBean implements Serializable {
     }
 
     public void initView() {
+        isManageState = false;
         isViewState = true;
         System.out.println("INIT VIEW");
     }
 
     public void initManage() {
         isManageState = true;
+        isViewState = false;
         System.out.println("INIT MANAGE");
     }
 
