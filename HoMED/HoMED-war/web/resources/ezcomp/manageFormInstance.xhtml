@@ -59,23 +59,23 @@
                                         <!--formField.inputType == 'IMAGE_UPLOAD'-->
                                         <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType == 'TEXT'}">
                                             <div class="p-col-12 ui-fluid">
-                                                <p:inputTextarea value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TEXT'}" placeholder="Insert Text" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
+                                                <p:inputTextarea value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TEXT'}" placeholder="Insert Text" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
                                             </div>
                                         </ui:fragment>
                                         <!--and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'-->
                                         <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType != 'TEXT'}">
                                             <div class="p-col-6 ui-fluid">
-                                                <p:inputNumber value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'NUMBER'}" placeholder="Insert Number" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
-                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'DATE'}" pattern="dd/MM/yyyy" placeholder="Insert Date (DD/MM/YYYY)" disabled="#{manageFormInstanceManagedBean.isViewState}" />
-                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TIME'}" timeOnly="true" pattern="HH:mm" placeholder="Insert Time (HH:MM)" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
-                                                <p:selectOneRadio value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'RADIO_BUTTON'}" disabled="#{manageFormInstanceManagedBean.isViewState}"
+                                                <p:inputNumber value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'NUMBER'}" placeholder="Insert Number" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
+                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'DATE'}" pattern="dd/MM/yyyy" placeholder="Insert Date (DD/MM/YYYY)" disabled="#{manageFormInstanceManagedBean.isViewState}" />
+                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TIME'}" timeOnly="true" pattern="HH:mm" placeholder="Insert Time (HH:MM)" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
+                                                <p:selectOneRadio value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'RADIO_BUTTON'}" disabled="#{manageFormInstanceManagedBean.isViewState}"
                                                                   layout="responsive" columns="1">
                                                     <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
                                                 </p:selectOneRadio>
                                                 <p:selectManyCheckbox value="#{formInstanceField.formInstanceFieldValues}" rendered="#{formInstanceField.formFieldMapping.inputType == 'CHECK_BOX'}" layout="responsive" columns="1" disabled="#{manageFormInstanceManagedBean.isViewState}">
                                                     <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
                                                 </p:selectManyCheckbox>
-                                                <p:selectOneMenu value="#{formInstanceField.formInstanceFieldValues[0]}" rendered="#{formInstanceField.formFieldMapping.inputType == 'SINGLE_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState}">
+                                                <p:selectOneMenu value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'SINGLE_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState}">
                                                     <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
                                                 </p:selectOneMenu>
                                                 <p:selectManyMenu value="#{formInstanceField.formInstanceFieldValues}" rendered="#{formInstanceField.formFieldMapping.inputType == 'MULTI_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState}">

@@ -17,6 +17,9 @@ import entity.ConsultationPurpose;
 import entity.Employee;
 import entity.FormField;
 import entity.FormFieldOption;
+import entity.FormInstance;
+import entity.FormInstanceField;
+import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
 import entity.MedicalBoardAdmin;
 import entity.MedicalCentre;
@@ -54,6 +57,7 @@ import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
 @Singleton
@@ -101,13 +105,15 @@ public class DataInitializationSessionBean {
 
             List<Serviceman> servicemen = initializeServiceman();
 
-            List<ConsultationPurpose> consultationPurposes = initializeConsultaitonPurposes();
+            List<ConsultationPurpose> consultationPurposes = initializeConsultationPurposes();
 
             List<BookingSlot> bookingSlots = initializeBookingSlots(medicalCentres);
-            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen);
-//            slotSessionBeanLocal.createBookingSlotsDataInit(mcId1, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.2);
+
+            //@WK could you look to implement this the same way as bookings ^
             slotSessionBeanLocal.createMedicalBoardSlotsDataInit(new Date());
 
+            fillForms(bookings, 0.5);
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
@@ -119,12 +125,58 @@ public class DataInitializationSessionBean {
         }
     }
 
-    private List<Booking> initializeBookings(List<BookingSlot> bookingSlots, List<ConsultationPurpose> consultationPurposes, List<Serviceman> servicemen) throws CreateBookingException {
+    private void fillForms(List<Booking> bookings, double rate) {
+        rate = Math.min(rate, 1);
+        rate = Math.max(0, rate);
+        for (Booking booking : bookings) {
+            for (FormInstance fi : booking.getFormInstances()) {
+                if (Math.random() <= rate) {
+                    fillForm(fi);
+                }
+            }
+        }
+    }
+
+    private void fillForm(FormInstance fi) {
+        try {
+            for (FormInstanceField fif : fi.getFormInstanceFields()) {
+                if (fif.getFormFieldMapping().getIsRequired()) {
+                    InputTypeEnum inputType = fif.getFormFieldMapping().getInputType();
+                    if (inputType == InputTypeEnum.CHECK_BOX
+                            || inputType == InputTypeEnum.MULTI_DROPDOWN) {
+                        int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                    } else if (inputType == InputTypeEnum.RADIO_BUTTON
+                            || inputType == InputTypeEnum.SINGLE_DROPDOWN) {
+                        int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                    } else if (inputType == InputTypeEnum.TEXT) {
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
+                    } else if (inputType == InputTypeEnum.NUMBER) {
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(String.valueOf((int)(Math.random() * 100))));
+                    } else if (inputType == InputTypeEnum.DATE
+                            || inputType == InputTypeEnum.TIME) {
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(new Date().toString()));
+                    }
+                }
+            }
+
+            formInstanceSessionBeanLocal.updateFormInstanceFieldValues(fi);
+            formInstanceSessionBeanLocal.submitFormInstance(fi.getFormInstanceId());
+        } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
+            System.out.println("Failed to fill up form instance: " + ex.getMessage());
+        }
+    }
+
+    private List<Booking> initializeBookings(List<BookingSlot> bookingSlots, List<ConsultationPurpose> consultationPurposes, List<Serviceman> servicemen, double rate) throws CreateBookingException {
         List<Booking> bookings = new ArrayList<>();
+        rate = Math.min(rate, 1);
+        rate = Math.max(0, rate);
+
         for (BookingSlot bs : bookingSlots) {
             int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
-            if (Math.random() < 0.2) {
+            if (Math.random() <= rate) {
                 Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
                 bookings.add(booking);
                 System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
@@ -194,7 +246,7 @@ public class DataInitializationSessionBean {
         return DayOfWeekEnum.MONDAY;
     }
 
-    private List<ConsultationPurpose> initializeConsultaitonPurposes() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
+    private List<ConsultationPurpose> initializeConsultationPurposes() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         List<ConsultationPurpose> consultationPurposes = new ArrayList<>();
 
         ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
@@ -208,14 +260,6 @@ public class DataInitializationSessionBean {
         consultationPurposes.add(consultationPurpose);
         consultationPurposes.add(vaccinationConsultationPurpose);
         return consultationPurposes;
-    }
-
-    private void initializeFormInstance(Long servicemanId, Long formTemplateId) throws GenerateFormInstanceException, UpdateFormInstanceException {
-//        Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(servicemanId, formTemplateId);
-//        FormInstance formInstance = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-//        em.detach(formInstance);
-
-//        formInstanceSessionBeanLocal.updateFormInstanceFieldValues(formInstance);
     }
 
     private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
