@@ -15,12 +15,12 @@
     letter-spacing: .3px;
 }
 
-.status-published, .status-valid {
+.status-published, .status-valid, .status-ONGOING {
     background: #C8E6C9;
     color: #256029;
 }
 
-.status-draft, .status-create {
+.status-draft, .status-create, .status-COMPLETED {
     background: #B3E5FC;
     color: #23547B;
 }
