@@ -11,9 +11,6 @@
     <ui:define name="content">
 
         <style type="text/css">
-            body .ui-dialog .ui-dialog-content {
-                padding-top: 0 !important
-            }
             .row-UPCOMING {
                 background: #E0FAE0 !important
             }
@@ -111,11 +108,11 @@
                                 </p:column>
 
                                 <p:column headerText="Action" width="15%">
-                                    <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-search" title="View"
+                                    <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-user" title="View Serviceman Info"
                                                      process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
                                         <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{slot.booking.serviceman}" />
                                     </p:commandButton>
-                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Cancel"
+                                    <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-times" title="Cancel Booking"
                                                      actionListener="#{bookingManagedBean.deleteBooking(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
                                                      update="dataTableBookings">
                                         <p:confirm header="Cancel Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
