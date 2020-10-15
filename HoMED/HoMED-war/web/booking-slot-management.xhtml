@@ -3,6 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp"
                 template="template/template.xhtml">
 
     <ui:define name="title">Booking Slot Management</ui:define>
@@ -17,13 +18,24 @@
 
         <ui:fragment rendered='#{bookingSlotManagementManagedBean.selectedMedicalCentre ne null}'>
 
+            <ezcomp:manageMedicalCentre id="ccManageMedicalCentre" />
+
             <h:form id="formSchedule">
                 <div class="p-grid">
                     <div class="p-col-8">
                         <div class="card">
 
-                            <div class='buttonbar'>
-                                <h2>#{bookingSlotManagementManagedBean.selectedMedicalCentre.name}</h2>
+                            <div class="buttonbar">
+
+                                <h2 style="display: inline">#{bookingSlotManagementManagedBean.selectedMedicalCentre.name}</h2>
+                                <p:commandButton styleClass="info-button rounded-button text-button p-mr-2 p-mb-2" style="margin-left: 3px;"
+                                                 icon="pi pi-window-maximize" title="View"
+                                                 process="@this" update="ccManageMedicalCentre:formManageMedicalCentre:panelManageMedicalCentre" oncomplete="PF('dialogManageMedicalCentre').show()">
+                                    <f:setPropertyActionListener target="#{manageMedicalCentreManagedBean.medicalCentreToView}" value="#{bookingSlotManagementManagedBean.selectedMedicalCentre}" />
+                                </p:commandButton>
+
+                            </div>
+                            <div>
 
                                 <p:schedule id="bookingSlots" widgetVar="bookingSlots" value="#{bookingSlotManagementManagedBean.existingEventModel}" 
                                             timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{bookingSlotManagementManagedBean.slotLabelInterval}"
