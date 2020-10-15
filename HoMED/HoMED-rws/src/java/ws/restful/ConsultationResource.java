@@ -12,13 +12,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.RetrieveAllConsultationPurposesRsp;
-
 
 @Path("Consultation")
 public class ConsultationResource {
@@ -71,4 +72,21 @@ public class ConsultationResource {
         }
 
     }
+
+    @Path("retrieveConsultationPosition")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveConsultationPosition(@Context HttpHeaders headers, @QueryParam("consultationId") String consultationId) {
+        ErrorRsp errorRsp = new ErrorRsp("Not implemented");
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+    }
+
+    @Path("retrieveServicemanConsultations")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveServicemanConsultation(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
+        ErrorRsp errorRsp = new ErrorRsp("Not implemented");
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+    }
+
 }
