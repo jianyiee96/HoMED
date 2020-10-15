@@ -77,6 +77,21 @@ public class ConsultationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveConsultationPosition(@Context HttpHeaders headers, @QueryParam("consultationId") String consultationId) {
+
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
         ErrorRsp errorRsp = new ErrorRsp("Not implemented");
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
     }
@@ -84,7 +99,22 @@ public class ConsultationResource {
     @Path("retrieveServicemanConsultations")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response retrieveServicemanConsultation(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
+    public Response retrieveServicemanConsultations(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
+
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
         ErrorRsp errorRsp = new ErrorRsp("Not implemented");
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
     }
