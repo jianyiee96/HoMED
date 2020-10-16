@@ -153,7 +153,7 @@ public class DataInitializationSessionBean {
                     } else if (inputType == InputTypeEnum.TEXT) {
                         fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
                     } else if (inputType == InputTypeEnum.NUMBER) {
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(String.valueOf((int)(Math.random() * 100))));
+                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE
                             || inputType == InputTypeEnum.TIME) {
                         fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(new Date().toString()));
@@ -177,6 +177,7 @@ public class DataInitializationSessionBean {
             int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
             if (Math.random() <= rate) {
+                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
                 Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
                 bookings.add(booking);
                 System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
@@ -213,11 +214,15 @@ public class DataInitializationSessionBean {
                 Calendar end = new GregorianCalendar();
                 start.setTime(date.getTime());
                 end.setTime(date.getTime());
-
+                
                 start.set(Calendar.HOUR_OF_DAY, daysOh.getOpeningHours().getHour());
                 start.set(Calendar.MINUTE, daysOh.getOpeningHours().getMinute());
                 end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                 end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
+                
+                if (start.getTime().before(new Date())) {
+                    start.setTime(new Date());
+                }
 
                 bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
             }
