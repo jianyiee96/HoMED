@@ -27,13 +27,17 @@ import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.MedicalStaff;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -140,23 +144,32 @@ public class DataInitializationSessionBean {
     private void fillForm(FormInstance fi) {
         try {
             for (FormInstanceField fif : fi.getFormInstanceFields()) {
-                if (fif.getFormFieldMapping().getIsRequired()) {
+                if (fif.getFormFieldMapping().getIsRequired() && fif.getFormFieldMapping().getIsServicemanEditable()) {
                     InputTypeEnum inputType = fif.getFormFieldMapping().getInputType();
                     if (inputType == InputTypeEnum.CHECK_BOX
                             || inputType == InputTypeEnum.MULTI_DROPDOWN) {
-                        int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                        int randOption = ThreadLocalRandom.current().nextInt(1, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        List<FormFieldOption> options = fif.getFormFieldMapping().getFormFieldOptions().stream().collect(Collectors.toList());
+                        Collections.shuffle(options);
+                        fif.setFormInstanceFieldValues(new ArrayList<>());
+                        IntStream.range(0, randOption)
+                                .forEach(x -> fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(options.get(x).getFormFieldOptionValue())));
                     } else if (inputType == InputTypeEnum.RADIO_BUTTON
                             || inputType == InputTypeEnum.SINGLE_DROPDOWN) {
                         int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
                     } else if (inputType == InputTypeEnum.TEXT) {
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
                     } else if (inputType == InputTypeEnum.NUMBER) {
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
-                    } else if (inputType == InputTypeEnum.DATE
-                            || inputType == InputTypeEnum.TIME) {
-                        fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(new Date().toString()));
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
+                    } else if (inputType == InputTypeEnum.DATE) {
+                        Date date = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
+                    } else if (inputType == InputTypeEnum.TIME) {
+                        Date date = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
                     }
                 }
             }
@@ -214,12 +227,12 @@ public class DataInitializationSessionBean {
                 Calendar end = new GregorianCalendar();
                 start.setTime(date.getTime());
                 end.setTime(date.getTime());
-                
+
                 start.set(Calendar.HOUR_OF_DAY, daysOh.getOpeningHours().getHour());
                 start.set(Calendar.MINUTE, daysOh.getOpeningHours().getMinute());
                 end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                 end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
-                
+
                 if (start.getTime().before(new Date())) {
                     start.setTime(new Date());
                 }

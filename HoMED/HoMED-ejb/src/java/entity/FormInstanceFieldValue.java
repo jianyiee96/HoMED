@@ -49,7 +49,6 @@ public class FormInstanceFieldValue implements Serializable {
     public void setInputValue(String inputValue) {
         this.inputValue = inputValue;
     }
-    
 
     @Override
     public int hashCode() {
@@ -65,15 +64,19 @@ public class FormInstanceFieldValue implements Serializable {
             return false;
         }
         FormInstanceFieldValue other = (FormInstanceFieldValue) object;
-        if ((this.formInstanceFieldValueId == null && other.formInstanceFieldValueId != null) || (this.formInstanceFieldValueId != null && !this.formInstanceFieldValueId.equals(other.formInstanceFieldValueId))) {
-            return false;
+//        if ((this.formInstanceFieldValueId == null && other.formInstanceFieldValueId != null) || (this.formInstanceFieldValueId != null && !this.formInstanceFieldValueId.equals(other.formInstanceFieldValueId))) {
+//            return false;
+//        }
+        if (this.inputValue.equals(other.inputValue)) {
+            return true;
         }
-        return true;
+        return false;
+//        return true;
     }
 
     @Override
     public String toString() {
         return "entity.FormInstanceValueInput[ id=" + formInstanceFieldValueId + " ]";
     }
-    
+
 }

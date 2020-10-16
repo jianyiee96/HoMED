@@ -8,6 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <cc:interface>
+        <cc:clientBehavior name="dialogCloseEvent" targets="formManageFormInstance:dlgManageFormInstance" event="close" rendered="#{manageFormInstanceManagedBean.isManageState}"/> 
     </cc:interface>
 
     <cc:implementation>
@@ -18,98 +19,128 @@
             body .ui-state-disabled {
                 opacity: 1 !important
             }
+            body .ui-dialog .ui-dialog-footer {
+                padding-left: 2rem !important;
+                padding-right: 2rem !important;
+            }
         </style>
         <h:form id="formManageFormInstance">
-            <p:dialog id="dlgManageFormInstance" widgetVar="dlgManageFormInstance" header="#{manageFormInstanceManagedBean.isViewState ? 'View' : 'Edit'} Form Instance" showEffect="fade"
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+            <p:dialog id="dlgManageFormInstance" widgetVar="dlgManageFormInstance" showEffect="fade" focus="dataListFields"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgManageFormInstance').initPosition()"
-                      minWidth="500" width="700">
-
-                <p:dataList rendered="#{not empty manageFormInstanceManagedBean.formInstanceToView}" type="definition"
-                            value="#{manageFormInstanceManagedBean.formInstanceToView.formInstanceFields}"  var="formInstanceField">
+                      minWidth="500" width="700" closable="false">
+                <f:facet name="header">
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                        <h:outputText value="#{manageFormInstanceManagedBean.isViewState ? 'View' : 'Edit'} Form Instance"/>
+                        <p:commandButton icon="pi pi-times" styleClass="rounded-button text-button" style="float:right" oncomplete="PF('dlgManageFormInstance').hide()">
+                            <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Close Current Instance" message="Closing this instance will not save the current changes. Are you sure?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:dataList id="dataListFields" rendered="#{not empty manageFormInstanceManagedBean.formInstanceToView}" type="definition"
+                            value="#{manageFormInstanceManagedBean.formInstanceFieldWrappers}"  var="formInstanceFieldWrapper" >
 
                     <f:facet name="header">
                         <p:outputLabel value="#{manageFormInstanceManagedBean.formInstanceToView.formTemplateMapping.formTemplateName}" style="font-size: 25px;"/>
+                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}"/>
+                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" resetValues="formManageFormInstance">
+                            <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Refresh Form Instance" message="Refreshing will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
                     </f:facet>
+                    <h:panelGroup id="panelGroupItem">
+                        <div class="card" style="margin-bottom: 5px">
+                            <div class="p-grid">
+                                <div class="p-col-12" style="padding-left: 2rem">
 
-                    <div class="card" style="margin-bottom: 5px">
-                        <div class="p-grid">
-                            <div class="p-col-12" style="padding-left: 2rem">
-
-                                <div class="p-grid">
-                                    <div class="p-col-12">
-                                        <p:outputLabel style="margin-left: -35px;" class="form-status-badge consultation-badge" value="#{formInstanceField.formFieldMapping.position}"/>
-                                        <p:outputLabel rendered="#{not formInstanceField.formFieldMapping.isServicemanEditable and formInstanceField.formFieldMapping.inputType != 'HEADER'}"
-                                                       class="form-status-badge privacy-private" value="Doctor"/>
-                                    </div>
-                                    <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType == 'HEADER'}">
-                                        <div class="p-col-12" style="margin: 0em">
-                                            <p:outputLabel value="#{formInstanceField.formFieldMapping.question}"
-                                                           style="font-size: 20px; font-weight: bold"/>
+                                    <div class="p-grid">
+                                        <div class="p-col-12">
+                                            <p:outputLabel style="margin-left: -35px;" class="form-status-badge consultation-badge" value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.position}"/>
+                                            <p:outputLabel rendered="#{not formInstanceFieldWrapper.formInstanceField.formFieldMapping.isServicemanEditable and formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType != 'HEADER'}"
+                                                           class="form-status-badge privacy-private" value="Doctor"/>
+                                            <p:commandButton styleClass="rounded-button outlined-button p-mr-2 p-mb-2" icon="pi pi-#{formInstanceFieldWrapper.isEditable ? 'unlock' : 'lock'}" style="float: right;" process="@this" update="panelGroupItem"
+                                                             title="#{formInstanceFieldWrapper.isEditable ? 'Lock' : 'Unlock'}" rendered ="#{not manageFormInstanceManagedBean.isViewState and formInstanceFieldWrapper.formInstanceField.formFieldMapping.isServicemanEditable}">
+                                                <p:confirm disabled="#{not formInstanceFieldWrapper.isEditable}" header="Lock Field" message="Locking this field will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                <f:setPropertyActionListener target="#{formInstanceFieldWrapper.isEditable}" value="#{not formInstanceFieldWrapper.isEditable}"/>
+                                            </p:commandButton>
                                         </div>
-                                    </ui:fragment>
-                                    <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType != 'HEADER'}">
-                                        <div class="p-col-12 ui-fluid">
-                                            <p:outputLabel value="#{formInstanceField.formFieldMapping.question}" indicateRequired="false"
-                                                           style="font-size: 20px"/><h:outputText value="#{formInstanceField.formFieldMapping.isRequired ? ' *' : ''}" style="font-size: 20px; color: red;" />
-                                        </div>
-                                        <!--or formField.inputType == 'FILE_UPLOAD' or formField.inputType == 'IMAGE_UPLOAD'-->
-                                        <!--<p:fileUpload rendered="" />-->
-                                        <!--formField.inputType == 'FILE_UPLOAD'-->
-                                        <!--<p:fileUpload rendered="" />-->
-                                        <!--formField.inputType == 'IMAGE_UPLOAD'-->
-                                        <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType == 'TEXT'}">
+                                        <ui:fragment rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'HEADER'}">
+                                            <div class="p-col-12" style="margin: 0em">
+                                                <p:outputLabel value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.question}"
+                                                               style="font-size: 20px; font-weight: bold"/>
+                                            </div>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType != 'HEADER'}">
                                             <div class="p-col-12 ui-fluid">
-                                                <p:inputTextarea value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TEXT'}" placeholder="Insert Text" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
+                                                <p:outputLabel value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.question}" indicateRequired="false"
+                                                               style="font-size: 20px"/><h:outputText value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.isRequired ? ' *' : ''}" style="font-size: 20px; color: red;" />
                                             </div>
-                                        </ui:fragment>
-                                        <!--and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'-->
-                                        <ui:fragment rendered="#{formInstanceField.formFieldMapping.inputType != 'TEXT'}">
-                                            <div class="p-col-6 ui-fluid">
-                                                <p:inputNumber value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'NUMBER'}" placeholder="Insert Number" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
-                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'DATE'}" pattern="dd/MM/yyyy" placeholder="Insert Date (DD/MM/YYYY)" disabled="#{manageFormInstanceManagedBean.isViewState}" />
-                                                <p:datePicker value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'TIME'}" timeOnly="true" pattern="HH:mm" placeholder="Insert Time (HH:MM)" disabled="#{manageFormInstanceManagedBean.isViewState}"/>
-                                                <p:selectOneRadio value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'RADIO_BUTTON'}" disabled="#{manageFormInstanceManagedBean.isViewState}"
-                                                                  layout="responsive" columns="1">
-                                                    <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
-                                                </p:selectOneRadio>
-                                                <p:selectManyCheckbox value="#{formInstanceField.formInstanceFieldValues}" rendered="#{formInstanceField.formFieldMapping.inputType == 'CHECK_BOX'}" layout="responsive" columns="1" disabled="#{manageFormInstanceManagedBean.isViewState}">
-                                                    <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
-                                                </p:selectManyCheckbox>
-                                                <p:selectOneMenu value="#{formInstanceField.formInstanceFieldValues[0].inputValue}" rendered="#{formInstanceField.formFieldMapping.inputType == 'SINGLE_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState}">
-                                                    <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
-                                                </p:selectOneMenu>
-                                                <p:selectManyMenu value="#{formInstanceField.formInstanceFieldValues}" rendered="#{formInstanceField.formFieldMapping.inputType == 'MULTI_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState}">
-                                                    <f:selectItems value="#{formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemLabel="#{opt.formFieldOptionValue}" itemValue="#{opt.formFieldOptionValue}"/>
-                                                </p:selectManyMenu>
-                                            </div>
-                                        </ui:fragment>
-                                    </ui:fragment>
-                                </div>
+                                            <!--or formField.inputType == 'FILE_UPLOAD' or formField.inputType == 'IMAGE_UPLOAD'-->
+                                            <!--<p:fileUpload rendered="" />-->
+                                            <!--formField.inputType == 'FILE_UPLOAD'-->
+                                            <!--<p:fileUpload rendered="" />-->
+                                            <!--formField.inputType == 'IMAGE_UPLOAD'-->
+                                            <ui:fragment rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'TEXT'}">
+                                                <div class="p-col-12 ui-fluid">
+                                                    <p:inputTextarea value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Text"
+                                                                     rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'TEXT'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
+                                                </div>
+                                            </ui:fragment>
+                                            <!--and formField.inputType != 'FILE_UPLOAD' and formField.inputType != 'IMAGE_UPLOAD'-->
+                                            <ui:fragment rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType != 'TEXT'}">
+                                                <div class="p-col-6 ui-fluid">
+                                                    <p:inputNumber value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Number" 
+                                                                   rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'NUMBER'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
 
+
+                                                    <p:datePicker value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Date (DD/MM/YYYY)"  pattern="dd/MM/yyyy" 
+                                                                  rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'DATE'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
+                                                    <p:datePicker value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Time (HH:MM)" timeOnly="true" pattern="HH:mm" 
+                                                                  rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'TIME'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
+
+
+                                                    <p:selectOneRadio value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" layout="responsive" columns="1"
+                                                                      rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'RADIO_BUTTON'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
+                                                        <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}" />
+                                                    </p:selectOneRadio>
+                                                    <p:selectOneMenu value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}"
+                                                                     rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'SINGLE_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
+                                                        <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}"/>
+                                                    </p:selectOneMenu>
+
+
+                                                    <p:selectManyCheckbox value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues}" converter="formInstanceFieldValueConverter" layout="responsive" columns="1" 
+                                                                          rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'CHECK_BOX'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
+                                                        <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}"/>
+                                                    </p:selectManyCheckbox>
+                                                    <p:selectManyMenu value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues}" converter="formInstanceFieldValueConverter"
+                                                                      rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'MULTI_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
+                                                        <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}"/>
+                                                    </p:selectManyMenu>
+                                                </div>
+                                            </ui:fragment>
+                                        </ui:fragment>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    </h:panelGroup>
+                    <f:facet name="footer">
+                        <p:focus id="errorMessageFocus" rendered="#{not empty facesContext.messageList}"/>
+                        <p:messages id="messages" globalOnly="true" class="error-message" showDetail="true" showIcon="false" style="text-align:left"/>
+                    </f:facet>
                 </p:dataList>
-
-<!--                <p:panel rendered="#{not empty formTemplatePreviewManagedBean.formTemplateToView and not empty formTemplatePreviewManagedBean.formTemplateToView.declaration}">
-                    <div class="p-grid">
-                        <div class="p-col-12">
-                            <h:outputText value="Declaration" style="font-size: 20px"/>
+                <f:facet name="footer">
+                    <ui:fragment rendered="#{not empty manageFormInstanceManagedBean.formInstanceToView and manageFormInstanceManagedBean.isManageState}">
+                        <div style="display: flex; justify-content: center; flex-direction: column">
+                            <p:commandButton value="Submit" icon="pi pi-upload" update="dataListFields"
+                                             oncomplete="PF('dlgManageFormInstance').initPosition()" actionListener="#{manageFormInstanceManagedBean.submitFormInstance}"/>
                         </div>
-                        <div class="p-col-12">
-                            <h:outputText value="#{formTemplatePreviewManagedBean.formTemplateToView.declaration}" style="word-wrap: break-word"/>
-                        </div>
-                        <div class="p-col-12">
-                            <div style="float: right">
-                                <div class="p-field-checkbox">
-                                    <p:selectBooleanCheckbox id="declarationCheckbox"/>
-                                    <p:outputLabel for="declarationCheckbox" value="I AGREE"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </p:panel>-->
+                    </ui:fragment>
+                </f:facet>
 
             </p:dialog>
         </h:form>
