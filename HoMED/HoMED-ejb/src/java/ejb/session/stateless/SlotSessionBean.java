@@ -87,6 +87,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
+    // @JY CAN LOOOK TO DELETE THIS, IM HANDLING AT DATAINIT FROM BRYAN
     public void createBookingSlotsDataInit(Long medicalCentreId, Date date, Long servicemanId, Long consultationPurposeId) throws ScheduleBookingSlotException {
 
         try {

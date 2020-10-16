@@ -27,15 +27,20 @@ public class ManageFormInstanceManagedBean implements Serializable {
     }
 
     public void init() {
-
+        isManageState = false;
+        isViewState = false;
     }
 
     public void initView() {
+        init();
         isViewState = true;
         System.out.println("INIT VIEW");
+        formInstanceToView.getFormInstanceFields().stream()
+                .forEach(x -> x.getFormInstanceFieldValues().stream().forEach(y-> System.out.print(y.getInputValue())));
     }
 
     public void initManage() {
+        init();
         isManageState = true;
         System.out.println("INIT MANAGE");
     }
