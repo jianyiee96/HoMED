@@ -18,6 +18,8 @@ import javax.persistence.Query;
 import util.enumeration.ConsultationStatusEnum;
 import util.exceptions.CreateConsultationException;
 import util.exceptions.EndConsultationException;
+import util.exceptions.InvalidateConsultationException;
+import util.exceptions.RetrieveConsultationQueuePositionException;
 import util.exceptions.StartConsultationException;
 
 @Stateless
@@ -94,7 +96,6 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 //                throw new EndConsultationException("Unable to end Consultation: All form instances are required to be signed by attending medical officer");
 //            }
 //        }
-        
         try {
             consultation.setEndDateTime(new Date());
             consultation.setConsultationStatusEnum(ConsultationStatusEnum.COMPLETED);
@@ -105,7 +106,12 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } catch (Exception ex) {
             throw new EndConsultationException("Unknown exception: " + ex.getMessage());
         }
-        
+
+    }
+
+    @Override
+    public void invalidateConsultation(Long consultationId) throws InvalidateConsultationException {
+
     }
 
     @Override
@@ -132,6 +138,37 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         query.setParameter("status", ConsultationStatusEnum.WAITING);
 
         return query.getResultList();
+    }
+
+    @Override
+    public List<Consultation> retrieveAllServicemanConsultations(Long servicemanId) {
+        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.serviceman.servicemanId = :id");
+        query.setParameter("id", servicemanId);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public int retrieveConsultationQueuePosition(Long consultationId) throws RetrieveConsultationQueuePositionException {
+
+        Consultation c = retrieveConsultationById(consultationId);
+
+        if (c == null) {
+            throw new RetrieveConsultationQueuePositionException("Invalid Consultation Id");
+        } else if (c.getConsultationStatusEnum() != ConsultationStatusEnum.WAITING) {
+            throw new RetrieveConsultationQueuePositionException("Consultation is not in any queue");
+        } 
+        
+        List<Consultation> consultationInQueue = retrieveWaitingConsultationsByMedicalCentre(c.getBooking().getBookingSlot().getMedicalCentre().getMedicalCentreId());
+
+        int position = consultationInQueue.indexOf(c);
+        
+        if(position < 0) {
+            throw new RetrieveConsultationQueuePositionException("Unable to find Consultation in medical centre's queue");
+        } else {
+            return position+1;
+        }
+        
     }
 
 }
