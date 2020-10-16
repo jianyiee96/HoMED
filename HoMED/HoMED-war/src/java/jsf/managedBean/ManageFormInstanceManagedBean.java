@@ -2,6 +2,7 @@ package jsf.managedBean;
 
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import entity.FormInstance;
+import entity.FormInstanceFieldValue;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
