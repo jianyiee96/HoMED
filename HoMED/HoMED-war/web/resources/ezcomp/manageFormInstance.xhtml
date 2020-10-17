@@ -95,10 +95,11 @@
                                                                    rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'NUMBER'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
 
 
-                                                    <p:datePicker value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Date (DD/MM/YYYY)"  pattern="dd/MM/yyyy" 
+                                                    <p:datePicker id="field-date" value="#{formInstanceFieldWrapper.dateTime}" placeholder="Insert Date (DD/MM/YYYY)"  pattern="dd/MM/yyyy" 
                                                                   rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'DATE'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
-                                                    <p:datePicker value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" placeholder="Insert Time (HH:MM)" timeOnly="true" pattern="HH:mm" 
+                                                    <p:datePicker id="field-time" value="#{formInstanceFieldWrapper.dateTime}" placeholder="Insert Time (HH:MM)" timeOnly="true" pattern="HH:mm" 
                                                                   rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'TIME'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}"/>
+                                                    <p:message class="error-message" for="field-date" />
 
 
                                                     <p:selectOneRadio value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" layout="responsive" columns="1"

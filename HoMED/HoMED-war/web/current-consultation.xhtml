@@ -144,11 +144,11 @@
 
                                         <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
                                             <h:column>
-                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation or instance.signedBy ne null}" oncomplete="PF('dlgManageFormInstance').show()"
                                                                update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
                                                 </p:commandLink>
-                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation and instance.signedBy eq null}" oncomplete="PF('dlgManageFormInstance').show()"
                                                                update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}" resetValues="ccManageFormInstance:formManageFormInstance">
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.medicalOfficer}" value="#{currentConsultationManagedBean.currentMedicalOfficer}"/>
