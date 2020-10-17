@@ -24,8 +24,10 @@
             </p:growl>
             <p:panel id="countdownPanel" rendered="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation == null}">
                 <h3>Currently No Ongoing Consultation</h3>
-                <h5 style="display: inline-block">You will be redirected in #{currentConsultationManagedBean.countdownValue}</h5>
-                <p:poll interval="1" listener="#{currentConsultationManagedBean.decreaseCountdown}" update="countdownPanel" rendered="#{currentConsultationManagedBean.countdownRemainingSeconds != 0}"/>
+                <h:outputText id="countdownValue" style="font-size: 20px" value="You will be redirected in #{currentConsultationManagedBean.countdownValue}"/>
+                <br/>
+                <p:button outcome="/queue-management.xhtml" value="Queue Management Page" class="p-mt-4" icon="fa fa-rocket"/>
+                <p:poll interval="1" listener="#{currentConsultationManagedBean.decreaseCountdown}" update="countdownValue" rendered="#{currentConsultationManagedBean.countdownRemainingSeconds != 0}"/>
             </p:panel>
             <p:growl id="growl" globalOnly="true" showDetail="true" />
             <div class="p-grid">
@@ -142,11 +144,11 @@
 
                                         <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
                                             <h:column>
-                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation or instance.signedBy ne null}" oncomplete="PF('dlgManageFormInstance').show()"
                                                                update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
                                                 </p:commandLink>
-                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation and instance.signedBy eq null}" oncomplete="PF('dlgManageFormInstance').show()"
                                                                update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}" resetValues="ccManageFormInstance:formManageFormInstance">
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
                                                     <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.medicalOfficer}" value="#{currentConsultationManagedBean.currentMedicalOfficer}"/>
