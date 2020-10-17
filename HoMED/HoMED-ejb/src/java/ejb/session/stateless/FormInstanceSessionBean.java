@@ -10,6 +10,7 @@ import entity.FormInstance;
 import entity.FormInstanceField;
 import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
+import entity.MedicalOfficer;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,9 @@ import util.exceptions.UpdateFormInstanceException;
  */
 @Stateless
 public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
+
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     @EJB
     FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
@@ -82,8 +86,13 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             formTemplate.getFormInstances().add(formInstance);
 
             for (FormField ff : formTemplate.getFormFields()) {
+                // @JY - REFER HERE (tbc - will this cause issues?)
+//                FormInstanceFieldValue fifv = new FormInstanceFieldValue();
+//                em.persist(fifv);
 
                 FormInstanceField fif = new FormInstanceField();
+                // @JY
+//                fif.getFormInstanceFieldValues().add(fifv);
                 fif.setFormFieldMapping(ff);
                 em.persist(fif);
                 formInstance.getFormInstanceFields().add(fif);
@@ -131,13 +140,12 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             formInstance.getFormTemplateMapping().getFormInstances().remove(formInstance);
 
             if (formInstance.getBooking() != null) {
-                
+
                 formInstance.getBooking().getFormInstances().remove(formInstance);
                 formInstance.setBooking(null);
-                
+
             }
-            
-            
+
             em.remove(formInstance);
             em.flush();
 
@@ -159,6 +167,11 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         try {
 
             FormInstance fiPersisted = retrieveFormInstance(formInstance.getFormInstanceId());
+
+            if (formInstance.getSignedBy() != null) {
+                MedicalOfficer mo = employeeSessionBeanLocal.retrieveMedicalOfficerById(formInstance.getSignedBy().getEmployeeId());
+                fiPersisted.setSignedBy(mo);
+            }
 
             if (formInstance == null) {
                 throw new UpdateFormInstanceException("Please supply an existing formInstanceId");
@@ -240,6 +253,49 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
         formInstance.setDateSubmitted(new Date());
+    }
+
+    @Override
+    public void submitFormInstanceByDoctor(Long formInstanceId) throws SubmitFormInstanceException {
+        FormInstance formInstance = retrieveFormInstance(formInstanceId);
+//        Not required for doctor
+//        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+//            throw new SubmitFormInstanceException("Invalid Form Instance status: Status of form instance must be DRAFT");
+//        } else 
+        if (formInstance == null) {
+            throw new SubmitFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        }
+
+        // server-side validation
+        String validationMessage = "Form Instance Validation Error:";
+        boolean validationSuccess = true;
+
+        for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
+
+            if (fif.getFormFieldMapping().getIsRequired()
+                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER) { // not header, is required
+                boolean hasContent = false;
+                for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+                    if (fifv.getInputValue() != null && !fifv.getInputValue().equals("")) {
+                        hasContent = true;
+                    }
+                }
+
+                if (!hasContent) {
+                    validationMessage = validationMessage + "\nQuestion: " + fif.getFormFieldMapping().getQuestion() + " is required";
+                    validationSuccess = false;
+                }
+
+            }
+
+        }
+
+        if (!validationSuccess) {
+            throw new SubmitFormInstanceException(validationMessage);
+        }
+
+//        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
+//        formInstance.setDateSubmitted(new Date());
     }
 
     @Override

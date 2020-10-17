@@ -262,7 +262,7 @@ public class BookingSlotManagementManagedBean implements Serializable {
                 }
             }
         } else {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Booking Slot Selection Not Allowed", "You are not allowed to select booking slots while "));
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Existing Booking Slot Selection Not Allowed", "You are not allowed to select existing booking slots while scheduling new booking slots!"));
         }
 
         event = new DefaultScheduleEvent();

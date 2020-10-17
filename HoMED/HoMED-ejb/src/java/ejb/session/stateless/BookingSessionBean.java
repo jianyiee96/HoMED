@@ -253,7 +253,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         }
 
-        if (true || formInstanceNames.equals("")) { // Added true for testing - Remove when stable. (true bypasses the check for non submitted form instances)
+        if (formInstanceNames.equals("")) {
 
             try {
 

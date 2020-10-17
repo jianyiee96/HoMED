@@ -58,13 +58,13 @@
 
                             <h:panelGroup id='rightPanel'>
                                 <h:panelGrid columns="4">
-                                    <p:commandButton rendered="#{not bookingSlotManagementManagedBean.isScheduleState}" value="Manage" icon="pi pi-calendar-plus" styleClass="primary-button" title="Manage Booking Slots"
+                                    <p:commandButton rendered="#{not bookingSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
                                                      disabled="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet.size() != 0}"
                                                      update="rightPanel" process="@this" oncomplete="PF('bookingSlots').update()">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
                                     </p:commandButton>
 
-                                    <p:commandButton rendered="#{bookingSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-save" styleClass="success-button" title="Schedule Booking Slots"
+                                    <p:commandButton rendered="#{bookingSlotManagementManagedBean.isScheduleState}" value="Create" icon="pi pi-save" styleClass="success-button" title="Create Booking Slots"
                                                      update='rightPanel growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
                                                      actionListener="#{bookingSlotManagementManagedBean.saveSchedule}">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="false" />
@@ -91,6 +91,7 @@
                                                      disabled="#{bookingSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('bookingSlots').update()"
                                                      style="margin-bottom: 15px; float: right"
                                                      styleClass="danger-button" title="Delete All Selected Booking Slots" icon="pi pi-trash">
+                                        <p:confirm header="Delete Booking Slot" message="Confirm delete booking slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </h:panelGrid>
 
@@ -146,7 +147,9 @@
                                                         <p:commandButton update="formSchedule:rightPanel" rendered="#{bookingSlot.booking == null and !bookingSlotManagementManagedBean.beforeNow(bookingSlot.startDateTime)}" 
                                                                          actionListener="#{bookingSlotManagementManagedBean.deleteBookingSlot(bookingSlot)}"
                                                                          disabled="#{bookingSlotManagementManagedBean.isScheduleState}" oncomplete="PF('bookingSlots').update()"
-                                                                         styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" />
+                                                                         styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash">
+                                                            <p:confirm header="Delete Booking Slot" message="Confirm delete booking slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
+                                                        </p:commandButton>
 
 
                                                         <p:commandButton update="formSchedule:rightPanel" actionListener="#{bookingSlotManagementManagedBean.closeBookingSlot(bookingSlot)}"
@@ -162,6 +165,11 @@
                         </div>
                     </div>
                 </div>
+
+                <p:confirmDialog global="true">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                </p:confirmDialog>
             </h:form>
 
         </ui:fragment>
