@@ -30,6 +30,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
     private Boolean isManageState;
 
     private Boolean isSuccessfulSubmit;
+    private Boolean isSuccessfulSave;
     private Boolean isReloadMainPage;
 
     private FormInstance formInstanceToView;
@@ -54,6 +55,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
 
         isReloadMainPage = false;
         isSuccessfulSubmit = false;
+        isSuccessfulSave = false;
     }
 
     public void initView() {
@@ -93,9 +95,11 @@ public class ManageFormInstanceManagedBean implements Serializable {
             });
 
             formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Successfully saved form instance"));
+            PrimeFaces.current().executeScript("PF('dlgClose').hide()");
+            PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
             refreshFormInstance();
             isReloadMainPage = true;
+            isSuccessfulSave = true;
         } catch (UpdateFormInstanceException ex) {
             formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareLoad());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
@@ -179,6 +183,10 @@ public class ManageFormInstanceManagedBean implements Serializable {
 
     public Boolean getIsReloadMainPage() {
         return isReloadMainPage;
+    }
+
+    public Boolean getIsSuccessfulSave() {
+        return isSuccessfulSave;
     }
 
 }

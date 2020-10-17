@@ -201,8 +201,11 @@
                                     </li>
                                     <li>
                                         <div style="display: flex; justify-content: center">
-                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="END CONSULTATION">
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="End Consultation" icon="pi pi-check-square">
                                                 <p:confirm header="Consultation" message="Confirm End Consultation? You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
+                                            </p:commandButton>
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.marknoShowCurrentConsultation()}" value="Mark No Show" class="danger-button p-ml-2" icon="pi pi-exclamation-circle">
+                                                <p:confirm header="No Show" escape="false" message="Confirm mark current serviceman as no show, you cannot revert your actions? &lt;br/&gt;&lt;br/&gt; You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
                                         </div>
                                     </li>
@@ -216,7 +219,7 @@
 
             </div>        
 
-            <p:confirmDialog global="true">
+            <p:confirmDialog global="true" width="500" >
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>

@@ -58,15 +58,24 @@
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
+            <p:confirmDialog id="dlgClose" widgetVar="dlgClose" global="false" closable="false" responsive="true"
+                             header="Close Current Form Instance" width="400">
+                <f:facet name="message">
+                    Closing this instance will not save the current changes. Are you sure?
+                </f:facet>
+                <p:messages id="dlgMessages"/>
+                <p:commandButton value='Save and Exit' styleClass="ui-confirmdialog-yes" icon="pi pi-save" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}" update="dlgMessages"/>
+                <p:commandButton value="Exit w/o Saving" onclick="PF('dlgClose').hide()" oncomplete="PF('dlgManageFormInstance').hide()" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                <p:commandButton value="Stay" onclick="PF('dlgClose').hide()" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
             <p:dialog id="dlgManageFormInstance" widgetVar="dlgManageFormInstance" showEffect="fade" focus="dataListFields"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgManageFormInstance').initPosition()"
                       minWidth="500" width="700" closable="false">
                 <f:facet name="header">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                         <h:outputText value="#{manageFormInstanceManagedBean.isViewState ? 'View' : 'Edit'} Form Instance"/>
-                        <p:commandButton icon="pi pi-times" styleClass="rounded-button text-button" style="float:right" oncomplete="PF('dlgManageFormInstance').hide()">
-                            <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Close Current Instance" message="Closing this instance will not save the current changes. Are you sure?" icon="pi pi-exclamation-triangle" />
-                        </p:commandButton>
+                        <p:commandButton icon="pi pi-times" styleClass="rounded-button text-button" style="float:right" rendered="#{not manageFormInstanceManagedBean.isManageState}" oncomplete="PF('dlgManageFormInstance').hide()" />
+                        <p:commandButton icon="pi pi-times" styleClass="rounded-button text-button" style="float:right" rendered="#{manageFormInstanceManagedBean.isManageState}" oncomplete="PF('dlgClose').show()" />
                     </div>
                 </f:facet>
                 <p:dataList id="dataListFields" rendered="#{not empty manageFormInstanceManagedBean.formInstanceToView}" type="definition"
@@ -74,13 +83,6 @@
 
                     <f:facet name="header">
                         <p:outputLabel value="#{manageFormInstanceManagedBean.formInstanceToView.formTemplateMapping.formTemplateName}" style="font-size: 25px;"/>
-                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
-                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}"/>
-                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
-                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" 
-                                         resetValues="formManageFormInstance">
-                            <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Refresh Form Instance" message="Refreshing will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
-                        </p:commandButton>
                         <p:messages globalOnly="true" class="error-message p-mt-4" showDetail="true" showIcon="false" style="text-align:left"/>
                     </f:facet>
                     <h:panelGroup id="panelGroupItem">

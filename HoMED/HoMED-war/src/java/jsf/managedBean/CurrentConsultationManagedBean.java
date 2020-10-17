@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import util.exceptions.EndConsultationException;
+import util.exceptions.InvalidateConsultationException;
 
 @Named(value = "currentConsultationManagedBean")
 @ViewScoped
@@ -86,6 +87,9 @@ public class CurrentConsultationManagedBean implements Serializable {
         if (manageFormInstanceManagedBean.getIsSuccessfulSubmit()) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
         }
+        if (manageFormInstanceManagedBean.getIsSuccessfulSave()) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Saved", "Successfully saved form instance" + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+        }
     }
 
     public void endCurrentConsultation() {
@@ -104,6 +108,19 @@ public class CurrentConsultationManagedBean implements Serializable {
             }
         } catch (EndConsultationException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));
+        }
+    }
+
+    public void marknoShowCurrentConsultation() {
+        try {
+            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId());
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
+            } catch (IOException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            }
+        } catch (InvalidateConsultationException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark No Show Error", ex.getMessage()));
         }
     }
 
