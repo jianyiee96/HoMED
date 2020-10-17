@@ -68,6 +68,8 @@ public class FormInstanceFieldWrapper {
             } else if (formInstanceField.getFormFieldMapping().getInputType() == InputTypeEnum.TIME) {
                 formInstanceField.getFormInstanceFieldValues().get(0).setInputValue(sdfTime.format(dateTime));
             }
+        } else {
+            formInstanceField.getFormInstanceFieldValues().get(0).setInputValue("");
         }
         this.dateTime = dateTime;
     }
