@@ -188,15 +188,17 @@
                                     <li>
                                         <h5>Consultation Notes</h5>
                                         <div style="padding: 5px">
-                                            <p:inputTextarea style="width: 100%" value="#{currentConsultationManagedBean.selectedConsultation.remarks}"/>
-
+                                            <p:inputTextarea style="width: 100%" value="#{currentConsultationManagedBean.consultationNotes}">
+                                                <p:ajax event="keyup" process="@this"/>
+                                            </p:inputTextarea>
                                         </div>
                                     </li>
                                     <li>
                                         <h5>Remarks for Serviceman</h5>
                                         <div style="padding: 5px">
-                                            <p:inputTextarea style="width: 100%" value="#{currentConsultationManagedBean.selectedConsultation.remarksForServiceman}"/>
-
+                                            <p:inputTextarea style="width: 100%" value="#{currentConsultationManagedBean.remarksForServiceman}" >
+                                                <p:ajax event="keyup" process="@this"/>
+                                            </p:inputTextarea>
                                         </div>
                                     </li>
                                     <li>

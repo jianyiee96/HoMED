@@ -46,6 +46,10 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     private int countdownRemainingSeconds;
 
+    private String consultationNotes;
+
+    private String remarksForServiceman;
+
     public CurrentConsultationManagedBean() {
         this.servicemanConsultations = new ArrayList<>();
     }
@@ -53,6 +57,8 @@ public class CurrentConsultationManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         countdownRemainingSeconds = 5;
+        consultationNotes = "";
+        remarksForServiceman = "";
 
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
@@ -99,7 +105,9 @@ public class CurrentConsultationManagedBean implements Serializable {
             if (unsignedForms) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Form Instance Unsigned", "Please make sure all forms have been signed"));
             } else {
-                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), selectedConsultation.getRemarks(), selectedConsultation.getRemarksForServiceman());
+                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), this.consultationNotes, this.remarksForServiceman);
+                this.consultationNotes = "";
+                this.remarksForServiceman = "";
                 try {
                     FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
                 } catch (IOException ex) {
@@ -175,6 +183,22 @@ public class CurrentConsultationManagedBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
             }
         }
+    }
+
+    public String getConsultationNotes() {
+        return consultationNotes;
+    }
+
+    public void setConsultationNotes(String consultationNotes) {
+        this.consultationNotes = consultationNotes;
+    }
+
+    public String getRemarksForServiceman() {
+        return remarksForServiceman;
+    }
+
+    public void setRemarksForServiceman(String remarksForServiceman) {
+        this.remarksForServiceman = remarksForServiceman;
     }
 
 }
