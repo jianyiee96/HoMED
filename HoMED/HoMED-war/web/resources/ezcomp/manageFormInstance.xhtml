@@ -74,8 +74,11 @@
 
                     <f:facet name="header">
                         <p:outputLabel value="#{manageFormInstanceManagedBean.formInstanceToView.formTemplateMapping.formTemplateName}" style="font-size: 25px;"/>
-                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" update="dataListFields" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}" rendered="#{manageFormInstanceManagedBean.isManageState}"/>
-                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" resetValues="formManageFormInstance">
+                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
+                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}"/>
+                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
+                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" 
+                                         resetValues="formManageFormInstance">
                             <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Refresh Form Instance" message="Refreshing will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         <p:messages globalOnly="true" class="error-message p-mt-4" showDetail="true" showIcon="false" style="text-align:left"/>
