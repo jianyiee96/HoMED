@@ -69,6 +69,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
             formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Successfully saved form instance"));
             refreshFormInstance();
+            isSuccessfulSubmit = true;
         } catch (UpdateFormInstanceException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
         }

@@ -236,8 +236,9 @@ public class DataInitializationSessionBean {
                 if (start.getTime().before(new Date())) {
                     start.setTime(new Date());
                 }
-
-                bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
+                if (start.getTime().before(end.getTime())) {
+                    bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
+                }
             }
         }
         System.out.println("Successfully created Booking Slots");
