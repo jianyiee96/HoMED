@@ -194,10 +194,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    // @JY LOOK TO DELETE THIS METHOD
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId,
-            Long bookingSlotId
-    ) {
+    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) {
 
         try {
             Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);

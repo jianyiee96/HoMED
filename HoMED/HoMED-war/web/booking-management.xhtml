@@ -117,7 +117,7 @@
                                                      update="dataTableBookings">
                                         <p:confirm header="Cancel Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
-                                    <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-copy" title="Attach Additional Forms"
+                                    <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-copy" title="Forms"
                                                      actionListener="#{bookingManagedBean.doAttachFormInstances(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
                                                      oncomplete="PF('dialogAttachAdditionalForms').show()" update="formAllBookings:panelAttachForms"/>
                                     <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-check-square" title="Mark Attendance"
@@ -133,7 +133,7 @@
                 </div>
             </ui:fragment>
 
-            <p:dialog id="dialogAttachAdditionalForms" widgetVar="dialogAttachAdditionalForms" header="Attach Additional Forms" showEffect="fade"
+            <p:dialog id="dialogAttachAdditionalForms" widgetVar="dialogAttachAdditionalForms" header="Forms" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAttachAdditionalForms').initPosition()"
                       minWidth="500" width="500">
                 <p:outputPanel id="panelAttachForms">
@@ -174,8 +174,11 @@
                                 <p:outputLabel value="Currently Linked Forms" style="font-weight: bold"/><br/>
                                 <h:outputText rendered="#{empty bookingManagedBean.alreadyLinkedFormTemplates}" value="No forms currently linked"/>
                                 <ul>
-                                    <ui:repeat rendered="#{not empty bookingManagedBean.alreadyLinkedFormTemplates}" value="#{bookingManagedBean.alreadyLinkedFormTemplates}" var="ft">
-                                        <li><h:outputText value="#{ft.formTemplateName}" class="p-mt-1"/></li>
+                                    <ui:repeat rendered="#{not empty bookingManagedBean.bookingSlotToAttachForms.booking.formInstances}" value="#{bookingManagedBean.bookingSlotToAttachForms.booking.formInstances}" var="fi">
+                                        <li class="p-mt-3">
+                                            <h:outputText value="#{fi.formTemplateMapping.formTemplateName}"/>
+                                            <span class="p-ml-2 form-status-badge #{bookingManagedBean.checkCompleted(fi) ? 'status-published' : 'status-deleted'}">#{bookingManagedBean.checkCompleted(fi) ? 'Completed' : 'Uncompleted'}</span>
+                                        </li>
                                     </ui:repeat>
                                 </ul>
                             </h:panelGroup>

@@ -78,6 +78,9 @@ public class FormInstanceFieldWrapper {
 
     public Date getDateTime() {
         try {
+            if (formInstanceField.getFormInstanceFieldValues().isEmpty()) {
+                return null;
+            }
             if (formInstanceField.getFormFieldMapping().getInputType() == InputTypeEnum.DATE) {
                 dateTime = sdfDate.parse(formInstanceField.getFormInstanceFieldValues().get(0).getInputValue());
             } else if (formInstanceField.getFormFieldMapping().getInputType() == InputTypeEnum.TIME) {
