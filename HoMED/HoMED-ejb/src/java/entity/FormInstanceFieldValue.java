@@ -67,6 +67,9 @@ public class FormInstanceFieldValue implements Serializable {
 //        if ((this.formInstanceFieldValueId == null && other.formInstanceFieldValueId != null) || (this.formInstanceFieldValueId != null && !this.formInstanceFieldValueId.equals(other.formInstanceFieldValueId))) {
 //            return false;
 //        }
+        if (this.inputValue == null || other.inputValue == null) {
+            return false;
+        }
         if (this.inputValue.equals(other.inputValue)) {
             return true;
         }

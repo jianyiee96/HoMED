@@ -76,22 +76,29 @@ public class CurrentConsultationManagedBean implements Serializable {
     public void onRowSelect(SelectEvent<Consultation> event) {
         selectedConsultation = (Consultation) event.getObject();
     }
-    
+
     public void dialogActionListener() {
         this.selectedConsultation = consultationSessionBeanLocal.retrieveConsultationById(selectedConsultation.getConsultationId());
-        PrimeFaces.current().ajax().update("consultationForm:panelCurrentConsultation");
-        // @BRYAN
-        System.out.println("DETECTED CLOSE ON MANAGE");
+        refreshServicemanConsultations();
+        if (manageFormInstanceManagedBean.getIsSuccessfulSubmit()) {
+            PrimeFaces.current().ajax().update("consultationForm:panelGroupForms");
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+        }
     }
 
     public void endCurrentConsultation() {
 
         try {
-            consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), selectedConsultation.getRemarks(), selectedConsultation.getRemarksForServiceman());
-            try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
-            } catch (IOException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            Boolean unsignedForms = selectedConsultation.getBooking().getFormInstances().stream().anyMatch(fi -> fi.getSignedBy() == null);
+            if (unsignedForms) {
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Form Instance Unsigned", "Please make sure all forms have been signed"));
+            } else {
+                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), selectedConsultation.getRemarks(), selectedConsultation.getRemarksForServiceman());
+                try {
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
+                } catch (IOException ex) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+                }
             }
         } catch (EndConsultationException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));

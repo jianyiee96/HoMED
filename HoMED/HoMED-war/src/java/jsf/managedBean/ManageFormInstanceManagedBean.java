@@ -2,6 +2,7 @@ package jsf.managedBean;
 
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import entity.FormInstance;
+import entity.MedicalOfficer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import jsf.classes.FormInstanceFieldWrapper;
 import org.primefaces.PrimeFaces;
+import util.exceptions.SubmitFormInstanceException;
+import util.exceptions.UpdateFormInstanceException;
 
 @Named(value = "manageFormInstanceManagedBean")
 @ViewScoped
@@ -26,9 +29,13 @@ public class ManageFormInstanceManagedBean implements Serializable {
     private Boolean isViewState;
     private Boolean isManageState;
 
+    private Boolean isSuccessfulSubmit;
+
     private FormInstance formInstanceToView;
 
     private List<FormInstanceFieldWrapper> formInstanceFieldWrappers;
+
+    private MedicalOfficer medicalOfficer;
 
     public ManageFormInstanceManagedBean() {
         this.formInstanceToView = new FormInstance();
@@ -43,6 +50,8 @@ public class ManageFormInstanceManagedBean implements Serializable {
         refreshFormInstance();
         isManageState = false;
         isViewState = false;
+
+        isSuccessfulSubmit = false;
     }
 
     public void initView() {
@@ -56,7 +65,13 @@ public class ManageFormInstanceManagedBean implements Serializable {
     }
 
     public void saveFormInstance() {
-
+        try {
+            formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Successfully saved form instance"));
+            refreshFormInstance();
+        } catch (UpdateFormInstanceException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
+        }
     }
 
     public void refreshFormInstance() {
@@ -64,6 +79,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
         formInstanceFieldWrappers = formInstanceToView.getFormInstanceFields().stream()
                 .map(fif -> new FormInstanceFieldWrapper(fif))
                 .collect(Collectors.toList());
+//        formInstanceFieldWrappers.forEach(wrapper -> System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size()));
     }
 
     public void submitFormInstance() {
@@ -82,16 +98,15 @@ public class ManageFormInstanceManagedBean implements Serializable {
                 .anyMatch(wrapper -> wrapper.getErrorMessage() != null);
 
         if (!errorPresent) {
-//            try {
-//                CALL SESSION BEAN
-            System.out.println("NO ERROR PRESENT");
-            PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
-//            } catch () {
-//                
-//            }
-        } else {
-            System.out.println("ERROR PRESENT");
-
+            try {
+                formInstanceToView.setSignedBy(medicalOfficer);
+                formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
+                formInstanceSessionBean.submitFormInstanceByDoctor(formInstanceToView.getFormInstanceId());
+                isSuccessfulSubmit = true;
+                PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
+            } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
+            }
         }
     }
 
@@ -118,6 +133,18 @@ public class ManageFormInstanceManagedBean implements Serializable {
 
     public void setFormInstanceFieldWrappers(List<FormInstanceFieldWrapper> formInstanceFieldWrappers) {
         this.formInstanceFieldWrappers = formInstanceFieldWrappers;
+    }
+
+    public Boolean getIsSuccessfulSubmit() {
+        return isSuccessfulSubmit;
+    }
+
+    public MedicalOfficer getMedicalOfficer() {
+        return medicalOfficer;
+    }
+
+    public void setMedicalOfficer(MedicalOfficer medicalOfficer) {
+        this.medicalOfficer = medicalOfficer;
     }
 
 }

@@ -19,6 +19,9 @@
         </ezcomp:manageFormInstance>
 
         <h:form id="consultationForm">
+            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                <p:autoUpdate/>
+            </p:growl>
             <p:panel id="countdownPanel" rendered="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation == null}">
                 <h3>Currently No Ongoing Consultation</h3>
                 <h5 style="display: inline-block">You will be redirected in #{currentConsultationManagedBean.countdownValue}</h5>
@@ -134,29 +137,32 @@
                                 </li>
 
                                 <li>
-                                    <h5>Forms #{currentConsultationManagedBean.isCurrentConsultation ? '' : '(view only)'}</h5>
+                                    <h:panelGroup id="panelGroupForms">
+                                        <h5>Forms #{currentConsultationManagedBean.isCurrentConsultation ? '' : '(view only)'}</h5>
 
-                                    <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
-                                        <h:column>
-                                            <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
-                                                           update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
-                                                <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
-                                            </p:commandLink>
-                                            <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
-                                                           update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}" resetValues="ccManageFormInstance:formManageFormInstance">
-                                                <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
-                                            </p:commandLink>
-                                        </h:column>
-                                        <h:column rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
-                                            <p:outputLabel class="form-status-badge status-valid" rendered="#{instance.signedBy != null}" value="SIGNED"/>
-                                            <p:outputLabel class="form-status-badge status-deleted" rendered="#{instance.signedBy == null}" value="NOT-SIGNED"/>
-                                        </h:column>
-                                    </h:dataTable>
+                                        <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
+                                            <h:column>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                </p:commandLink>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.medicalOfficer}" value="#{currentConsultationManagedBean.currentMedicalOfficer}"/>
+                                                </p:commandLink>
+                                            </h:column>
+                                            <h:column rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
+                                                <p:outputLabel class="form-status-badge status-valid" rendered="#{instance.signedBy != null}" value="SIGNED"/>
+                                                <p:outputLabel class="form-status-badge status-deleted" rendered="#{instance.signedBy == null}" value="NOT-SIGNED"/>
+                                            </h:column>
+                                        </h:dataTable>
 
 
-                                    <h:panelGrid rendered="#{empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" columns="1" cellpadding="5">
-                                        <p:outputLabel value="No forms" />
-                                    </h:panelGrid>
+                                        <h:panelGrid rendered="#{empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" columns="1" cellpadding="5">
+                                            <p:outputLabel value="No forms" />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
                                 </li>
 
                                 <h:panelGroup rendered="#{not currentConsultationManagedBean.isCurrentConsultation}">
