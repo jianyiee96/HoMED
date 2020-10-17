@@ -29,7 +29,7 @@
                                 <p:ajax event="eventResize" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
 
                             </p:schedule>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -40,13 +40,13 @@
 
                         <h:panelGroup id='rightPanel'>
                             <h:panelGrid columns="4">
-                                <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Manage" icon="pi pi-calendar-plus" styleClass="primary-button" title="Manage Medical Board Slots"
+                                <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Medical Board Slots"
                                                  disabled="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet.size() != 0}"
                                                  update="rightPanel" process="@this" oncomplete="PF('medicalBoardSlots').update()">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
 
-                                <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-save" styleClass="success-button" title="Schedule Medical Board Slots"
+                                <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Create" icon="pi pi-save" styleClass="success-button" title="Create Medical Board Slots"
                                                  update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                  actionListener="#{medicalBoardSlotManagementManagedBean.saveSchedule}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
@@ -72,6 +72,7 @@
                                                  disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('medicalBoardSlots').update()"
                                                  style="margin-bottom: 15px; float: right"
                                                  styleClass="danger-button" title="Delete All Selected Medical Board Slots" icon="pi pi-trash">
+                                    <p:confirm header="Delete Medical Board Slot" message="Confirm delete medical board slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </h:panelGrid>
 
@@ -126,7 +127,9 @@
                                                     <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlot.startDateTime)}"
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"
-                                                                     styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" />
+                                                                     styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" >
+                                                        <p:confirm header="Delete Medical Board Slot" message="Confirm delete medical board slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
+                                                    </p:commandButton>
 
                                                     <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlot)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" styleClass="rounded-button text-button" title="Close" icon="pi pi-times" />           
@@ -140,6 +143,11 @@
                     </div>
                 </div>
             </div>
+
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
         </h:form>
 
     </ui:define>
