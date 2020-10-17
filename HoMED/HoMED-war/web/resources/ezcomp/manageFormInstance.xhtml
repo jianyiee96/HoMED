@@ -23,6 +23,20 @@
                 padding-left: 2rem !important;
                 padding-right: 2rem !important;
             }
+
+            body.ui-input-filled .editable-radio-button .ui-radiobutton .ui-radiobutton-box.ui-state-active {
+                border-color: greenyellow;
+                background: greenyellow;
+            }
+            
+            body.ui-input-filled .editable-radio-button .ui-radiobutton .ui-radiobutton-box.ui-state-hover {
+                border-color: greenyellow;
+            }
+            
+            body.ui-input-filled .editable-radio-button .ui-radiobutton .ui-radiobutton-box.ui-state-active.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #E0FAE0;
+                
+            }
         </style>
         <h:form id="formManageFormInstance">
             <p:confirmDialog global="true">
@@ -102,10 +116,11 @@
                                                     <p:message class="error-message" for="field-date" />
 
 
-                                                    <p:selectOneRadio value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" layout="responsive" columns="1"
+                                                    <p:selectOneRadio value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}" layout="responsive" columns="1" styleClass="#{formInstanceFieldWrapper.isEditable ? 'editable-radio-button' : ''}"
                                                                       rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'RADIO_BUTTON'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
                                                         <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}" />
                                                     </p:selectOneRadio>
+
                                                     <p:selectOneMenu value="#{formInstanceFieldWrapper.formInstanceField.formInstanceFieldValues[0].inputValue}"
                                                                      rendered="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType == 'SINGLE_DROPDOWN'}" disabled="#{manageFormInstanceManagedBean.isViewState or not formInstanceFieldWrapper.isEditable}">
                                                         <f:selectItems value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldOptions}" var="opt" itemValue="#{opt.formFieldOptionValue}" itemLabel="#{opt.formFieldOptionValue}"/>
