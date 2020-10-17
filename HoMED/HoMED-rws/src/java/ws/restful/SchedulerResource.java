@@ -10,7 +10,6 @@ import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Booking;
 import entity.BookingSlot;
 import entity.FormInstance;
-import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -25,8 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
-import util.exceptions.RetrieveBookingSlotsException;
-import util.exceptions.ScheduleBookingSlotException;
 import ws.datamodel.CancelBookingReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.QueryBookingSlotsReq;
@@ -88,7 +85,7 @@ public class SchedulerResource {
                 b.getBooking().setConsultation(null);
             }
         }
-        return Response.status(Response.Status.ACCEPTED).entity(new QueryBookingSlotsRsp(bookingSlots)).build();
+        return Response.status(Response.Status.OK).entity(new QueryBookingSlotsRsp(bookingSlots)).build();
 
     }
 
@@ -186,14 +183,21 @@ public class SchedulerResource {
             b.getBookingSlot().getMedicalCentre().setMedicalStaffList(null);
             b.getBookingSlot().getMedicalCentre().setBookingSlots(null);
             for (FormInstance fi : b.getFormInstances()) {
+                if (fi.getSignedBy() != null) {
+                    fi.getSignedBy().setSignedFormInstances(null);
+                    fi.getSignedBy().setCurrentConsultation(null);
+                    fi.getSignedBy().setCompletedConsultations(null);
+                    fi.getSignedBy().setMedicalCentreToNull();
+                }
                 fi.setServiceman(null);
                 fi.setBooking(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
             }
+            b.setConsultation(null);
         }
 
-        return Response.status(Response.Status.ACCEPTED).entity(new RetrieveBookingsRsp(bookings)).build();
+        return Response.status(Response.Status.OK).entity(new RetrieveBookingsRsp(bookings)).build();
 
     }
 

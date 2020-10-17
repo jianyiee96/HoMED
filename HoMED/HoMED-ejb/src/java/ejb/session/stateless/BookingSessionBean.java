@@ -221,8 +221,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public List<Booking> retrieveServicemanBookings(Long servicemanId
-    ) {
+    public List<Booking> retrieveServicemanBookings(Long servicemanId) {
         Query query = em.createQuery("SELECT b FROM Booking b WHERE b.serviceman.servicemanId = :id ");
         query.setParameter("id", servicemanId);
         return query.getResultList();

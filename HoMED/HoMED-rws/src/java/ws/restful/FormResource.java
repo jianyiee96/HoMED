@@ -115,7 +115,7 @@ public class FormResource {
             ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
-
+        
         try {
             List<FormInstance> formInstances = formInstanceSessionBeanLocal.retrieveServicemanFormInstances(Long.parseLong(servicemanId));
             for (FormInstance fi : formInstances) {
@@ -133,10 +133,18 @@ public class FormResource {
                 fi.setServiceman(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
-                
+
+                if (fi.getSignedBy() != null) {
+                    fi.getSignedBy().setSignedFormInstances(null);
+                    fi.getSignedBy().setCurrentConsultation(null);
+                    fi.getSignedBy().setCompletedConsultations(null);
+                    fi.getSignedBy().setMedicalCentre(null);
+                }
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanFormInstancesRsp(formInstances)).build();
         } catch (Exception ex) {
+            ex.printStackTrace();
+
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
