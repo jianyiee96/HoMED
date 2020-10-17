@@ -30,6 +30,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
     private Boolean isManageState;
 
     private Boolean isSuccessfulSubmit;
+    private Boolean isReloadMainPage;
 
     private FormInstance formInstanceToView;
 
@@ -51,6 +52,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
         isManageState = false;
         isViewState = false;
 
+        isReloadMainPage = false;
         isSuccessfulSubmit = false;
     }
 
@@ -64,37 +66,59 @@ public class ManageFormInstanceManagedBean implements Serializable {
         isManageState = true;
     }
 
-    public void saveFormInstance() {
-        try {
-            formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Successfully saved form instance"));
-            refreshFormInstance();
-            isSuccessfulSubmit = true;
-        } catch (UpdateFormInstanceException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
-        }
-    }
-
     public void refreshFormInstance() {
         formInstanceToView = formInstanceSessionBean.retrieveFormInstance(formInstanceToView.getFormInstanceId());
         formInstanceFieldWrappers = formInstanceToView.getFormInstanceFields().stream()
                 .map(fif -> new FormInstanceFieldWrapper(fif))
                 .collect(Collectors.toList());
-//        formInstanceFieldWrappers.forEach(wrapper -> System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size()));
+        System.out.println("RETRIEVING FORM INSTANCE:");
+        formInstanceFieldWrappers.forEach(wrapper -> {
+            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+                System.out.println("\t- " + y.getInputValue());
+            });
+        });
+    }
+
+    public void saveFormInstance() {
+        try {
+            formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareSubmission(false));
+
+            System.out.println("SAVING FORM INSTANCE:");
+            formInstanceFieldWrappers.forEach(wrapper -> {
+                System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+                wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+                    System.out.println("\t- " + y.getInputValue());
+                });
+            });
+
+            formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "Successfully saved form instance"));
+            refreshFormInstance();
+            isReloadMainPage = true;
+        } catch (UpdateFormInstanceException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
+        }
     }
 
     public void submitFormInstance() {
+        formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareSubmission(true));
+
+        System.out.println("SAVING FORM INSTANCE:");
+        formInstanceFieldWrappers.forEach(wrapper -> {
+            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+                System.out.println("\t- " + y.getInputValue());
+            });
+        });
+
         formInstanceFieldWrappers.stream()
-                .filter(wrapper -> wrapper.getFormInstanceField().getFormFieldMapping().getIsRequired())
                 .forEach(wrapper -> {
-                    if (wrapper.getFormInstanceField().getFormInstanceFieldValues().isEmpty() || wrapper.getFormInstanceField().getFormInstanceFieldValues().get(0).getInputValue() == null
-                            || wrapper.getFormInstanceField().getFormInstanceFieldValues().get(0).getInputValue().equals("")) {
-                        wrapper.setErrorMessage("Question " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + " cannot be left empty");
+                    if (wrapper.getErrorMessage() != null) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, wrapper.getErrorMessage()));
-                    } else {
-                        wrapper.setErrorMessage(null);
                     }
                 });
+
         Boolean errorPresent = formInstanceFieldWrappers.stream()
                 .anyMatch(wrapper -> wrapper.getErrorMessage() != null);
 
@@ -103,6 +127,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
                 formInstanceToView.setSignedBy(medicalOfficer);
                 formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
                 formInstanceSessionBean.submitFormInstanceByDoctor(formInstanceToView.getFormInstanceId());
+                isReloadMainPage = true;
                 isSuccessfulSubmit = true;
                 PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
             } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
@@ -146,6 +171,10 @@ public class ManageFormInstanceManagedBean implements Serializable {
 
     public void setMedicalOfficer(MedicalOfficer medicalOfficer) {
         this.medicalOfficer = medicalOfficer;
+    }
+
+    public Boolean getIsReloadMainPage() {
+        return isReloadMainPage;
     }
 
 }

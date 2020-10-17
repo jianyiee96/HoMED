@@ -1,9 +1,13 @@
 package jsf.classes;
 
 import entity.FormInstanceField;
+import entity.FormInstanceFieldValue;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.stream.Collectors;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import util.enumeration.InputTypeEnum;
 
 public class FormInstanceFieldWrapper {
@@ -21,7 +25,27 @@ public class FormInstanceFieldWrapper {
 
     public FormInstanceFieldWrapper(FormInstanceField formInstanceField) {
         this.formInstanceField = formInstanceField;
+        if (formInstanceField.getFormInstanceFieldValues().isEmpty()) {
+            formInstanceField.getFormInstanceFieldValues().add(new FormInstanceFieldValue());
+        }
         this.isEditable = !formInstanceField.getFormFieldMapping().getIsServicemanEditable();
+    }
+
+    public void prepareSubmission(Boolean checkError) {
+
+        this.formInstanceField.setFormInstanceFieldValues(this.formInstanceField.getFormInstanceFieldValues().stream()
+                .filter(fifv -> fifv.getInputValue() != null && !fifv.getInputValue().equals(""))
+                .collect(Collectors.toList()));
+
+        if (checkError) {
+            if (this.getFormInstanceField().getFormFieldMapping().getIsRequired()) {
+                if (this.getFormInstanceField().getFormInstanceFieldValues().isEmpty()) {
+                    this.setErrorMessage("Question " + this.getFormInstanceField().getFormFieldMapping().getPosition() + " cannot be left empty");
+                } else {
+                    this.setErrorMessage(null);
+                }
+            }
+        }
     }
 
     public FormInstanceField getFormInstanceField() {

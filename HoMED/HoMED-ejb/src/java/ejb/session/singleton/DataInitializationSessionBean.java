@@ -157,19 +157,19 @@ public class DataInitializationSessionBean {
                     } else if (inputType == InputTypeEnum.RADIO_BUTTON
                             || inputType == InputTypeEnum.SINGLE_DROPDOWN) {
                         int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
-                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
                     } else if (inputType == InputTypeEnum.TEXT) {
-                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
                     } else if (inputType == InputTypeEnum.NUMBER) {
-                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE) {
                         Date date = new Date();
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
                     } else if (inputType == InputTypeEnum.TIME) {
                         Date date = new Date();
                         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
                     }
                 }
             }
