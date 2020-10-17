@@ -26,7 +26,7 @@
             .display-text {
                 font-weight: bold;
             }
-            
+
             body.ui-input-filled .edit-mode .ui-radiobutton .ui-radiobutton-box.ui-state-active {
                 background: #7F32DA !important;
                 border-color: #7F32DA !important;
@@ -37,7 +37,7 @@
             body.ui-input-filled .edit-mode .ui-radiobutton .ui-radiobutton-box.ui-state-active.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #7F86FC;
             }
-            
+
             body .edit-mode .ui-chkbox .ui-chkbox-box.ui-state-active {
                 background: #7F32DA !important;
                 border-color: #7F32DA !important;
@@ -48,7 +48,7 @@
             body .edit-mode .ui-chkbox .ui-chkbox-box.ui-state-active.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #7F86FC;
             }
-            
+
             body .edit-mode.ui-selectmanymenu .ui-selectlistbox-listcontainer .ui-selectlistbox-list .ui-selectlistbox-item.ui-state-highlight {
                 background: #7F32DA !important;
             }
@@ -74,8 +74,11 @@
 
                     <f:facet name="header">
                         <p:outputLabel value="#{manageFormInstanceManagedBean.formInstanceToView.formTemplateMapping.formTemplateName}" style="font-size: 25px;"/>
-                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" update="dataListFields" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}"/>
-                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" resetValues="formManageFormInstance">
+                        <p:commandButton icon="pi pi-save" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
+                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.saveFormInstance}"/>
+                        <p:commandButton icon="pi pi-refresh" styleClass="rounded-button text-button" style="float:right" update="dataListFields" 
+                                         rendered="#{manageFormInstanceManagedBean.isManageState}" actionListener="#{manageFormInstanceManagedBean.refreshFormInstance}" 
+                                         resetValues="formManageFormInstance">
                             <p:confirm disabled="#{not manageFormInstanceManagedBean.isManageState}" header="Refresh Form Instance" message="Refreshing will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </f:facet>
