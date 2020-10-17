@@ -1,5 +1,6 @@
 package ejb.session.singleton;
 
+import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
@@ -8,22 +9,35 @@ import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Address;
+import entity.Booking;
+import entity.BookingSlot;
 import entity.SuperUser;
 import entity.Clerk;
 import entity.ConsultationPurpose;
 import entity.Employee;
 import entity.FormField;
 import entity.FormFieldOption;
+import entity.FormInstance;
+import entity.FormInstanceField;
+import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
 import entity.MedicalBoardAdmin;
 import entity.MedicalCentre;
 import entity.OperatingHours;
 import entity.MedicalOfficer;
+import entity.MedicalStaff;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -37,6 +51,7 @@ import util.enumeration.GenderEnum;
 import util.enumeration.InputTypeEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.AssignMedicalStaffToMedicalCentreException;
+import util.exceptions.CreateBookingException;
 import util.exceptions.CreateConsultationPurposeException;
 import util.exceptions.CreateEmployeeException;
 import util.exceptions.CreateFormTemplateException;
@@ -46,6 +61,7 @@ import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
 @Singleton
@@ -68,6 +84,8 @@ public class DataInitializationSessionBean {
     private FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
     @EJB
     private FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
+    @EJB(name = "BookingSessionBeanLocal")
+    private BookingSessionBeanLocal bookingSessionBeanLocal;
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
@@ -85,90 +103,181 @@ public class DataInitializationSessionBean {
         try {
             System.out.println("====================== Start of DATA INIT ======================");
 
-            Long mcId1 = initializeMedicalCentres();
+            List<MedicalCentre> medicalCentres = initializeMedicalCentres();
+            List<Employee> employees = initializeEmployees();
+            initializeLinkEmployeesMedicalCentres(employees, medicalCentres);
 
-            Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
-            Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
-            Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
-            Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
-            Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
-            Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
-            Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
-            Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
-            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
-            Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
-            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
-            Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+            List<Serviceman> servicemen = initializeServiceman();
 
-            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId2, mcId1);
-            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId3, mcId1);
-            employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(empId4, mcId1);
+            List<ConsultationPurpose> consultationPurposes = initializeConsultationPurposes();
 
-            System.out.println("EMPLOYEE INFO [INIT]");
-            System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
-            System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
-            System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
-            System.out.println("Email: " + emp4.getEmail() + "\tPhone: " + emp4.getPhoneNumber());
-            System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
-            System.out.println("Successfully created employees by init\n");
+            List<BookingSlot> bookingSlots = initializeBookingSlots(medicalCentres);
+            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.2);
 
-            Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
-            Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
-            Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
-            String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
-            String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
-            String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
-
-            System.out.println("EMPLOYEE INFO [OTP]");
-            System.out.println("Email: " + emp1Otp.getEmail() + "\tPhone: " + emp1Otp.getPhoneNumber() + "\tOTP: " + empOtp1);
-            System.out.println("Email: " + emp2Otp.getEmail() + "\tPhone: " + emp2Otp.getPhoneNumber() + "\tOTP: " + empOtp2);
-            System.out.println("Email: " + emp3Otp.getEmail() + "\tPhone: " + emp3Otp.getPhoneNumber() + "\tOTP: " + empOtp3);
-            System.out.println("Successfully created employees with OTP\n");
-
-            Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-            String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
-            String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
-            String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
-            String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
-
-            System.out.println("Serviceman INFO [OTP]");
-            System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
-            System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
-            System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
-            System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
-            System.out.println("Successfully created servicemen with OTP\n");
-
-            ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
-            consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
-            ConsultationPurpose vaccinationConsultationPurpose = new ConsultationPurpose("Vaccination");
-            consultationPurposeSessionBeanLocal.createConsultationPurpose(vaccinationConsultationPurpose);
-            Long formTemplateId = initializeForm(consultationPurpose);
-            Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
-            initializeFormInstance(serviceman1.getServicemanId(), formTemplateId);
-
-            slotSessionBeanLocal.createBookingSlotsDataInit(mcId1, new Date(), serviceman3.getServicemanId(), consultationPurpose.getConsultationPurposeId());
+            //@WK could you look to implement this the same way as bookings ^
             slotSessionBeanLocal.createMedicalBoardSlotsDataInit(new Date());
 
+            fillForms(bookings, 0.5);
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
-                | CreateFormTemplateException | GenerateFormInstanceException
-                | RelinkFormTemplatesException | UpdateFormInstanceException
+                | CreateFormTemplateException | EmployeeNotFoundException
+                | RelinkFormTemplatesException | CreateBookingException
                 | ScheduleBookingSlotException ex) {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
     }
 
-    private void initializeFormInstance(Long servicemanId, Long formTemplateId) throws GenerateFormInstanceException, UpdateFormInstanceException {
-//        Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(servicemanId, formTemplateId);
-//        FormInstance formInstance = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-//        em.detach(formInstance);
+    private void fillForms(List<Booking> bookings, double rate) {
+        rate = Math.min(rate, 1);
+        rate = Math.max(0, rate);
+        for (Booking booking : bookings) {
+            for (FormInstance fi : booking.getFormInstances()) {
+                if (Math.random() <= rate) {
+                    fillForm(fi);
+                }
+            }
+        }
+    }
 
-//        formInstanceSessionBeanLocal.updateFormInstanceFieldValues(formInstance);
+    private void fillForm(FormInstance fi) {
+        try {
+            for (FormInstanceField fif : fi.getFormInstanceFields()) {
+                if (fif.getFormFieldMapping().getIsRequired() && fif.getFormFieldMapping().getIsServicemanEditable()) {
+                    InputTypeEnum inputType = fif.getFormFieldMapping().getInputType();
+                    if (inputType == InputTypeEnum.CHECK_BOX
+                            || inputType == InputTypeEnum.MULTI_DROPDOWN) {
+                        int randOption = ThreadLocalRandom.current().nextInt(1, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        List<FormFieldOption> options = fif.getFormFieldMapping().getFormFieldOptions().stream().collect(Collectors.toList());
+                        Collections.shuffle(options);
+                        fif.setFormInstanceFieldValues(new ArrayList<>());
+                        IntStream.range(0, randOption)
+                                .forEach(x -> fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(options.get(x).getFormFieldOptionValue())));
+                    } else if (inputType == InputTypeEnum.RADIO_BUTTON
+                            || inputType == InputTypeEnum.SINGLE_DROPDOWN) {
+                        int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
+                    } else if (inputType == InputTypeEnum.TEXT) {
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
+                    } else if (inputType == InputTypeEnum.NUMBER) {
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
+                    } else if (inputType == InputTypeEnum.DATE) {
+                        Date date = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
+                    } else if (inputType == InputTypeEnum.TIME) {
+                        Date date = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                        fif.getFormInstanceFieldValues().set(0, new FormInstanceFieldValue(sdf.format(date)));
+                    }
+                }
+            }
+
+            formInstanceSessionBeanLocal.updateFormInstanceFieldValues(fi);
+            formInstanceSessionBeanLocal.submitFormInstance(fi.getFormInstanceId());
+        } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
+            System.out.println("Failed to fill up form instance: " + ex.getMessage());
+        }
+    }
+
+    private List<Booking> initializeBookings(List<BookingSlot> bookingSlots, List<ConsultationPurpose> consultationPurposes, List<Serviceman> servicemen, double rate) throws CreateBookingException {
+        List<Booking> bookings = new ArrayList<>();
+        rate = Math.min(rate, 1);
+        rate = Math.max(0, rate);
+
+        for (BookingSlot bs : bookingSlots) {
+            int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
+            int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
+            if (Math.random() <= rate) {
+                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
+                Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
+                bookings.add(booking);
+                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
+            }
+        }
+
+        return bookings;
+    }
+
+    private List<BookingSlot> initializeBookingSlots(List<MedicalCentre> medicalCentres) throws ScheduleBookingSlotException {
+        List<BookingSlot> bookingSlots = new ArrayList<>();
+        int numOfDaysToCreate = 5;
+
+        for (MedicalCentre mc : medicalCentres) {
+            List<OperatingHours> operatingHours = mc.getOperatingHours();
+            for (int day = 0; day < numOfDaysToCreate; day++) {
+                Calendar date = Calendar.getInstance();
+                date.add(Calendar.DATE, day);
+                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
+                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
+                date.set(Calendar.SECOND, 0);
+                date.set(Calendar.MILLISECOND, 0);
+
+                OperatingHours daysOh = operatingHours.stream()
+                        .filter(oh -> oh.getDayOfWeek() == dayOfWeekEnum)
+                        .findFirst()
+                        .orElse(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+
+                if (!daysOh.getIsOpen()) {
+                    continue;
+                }
+
+                Calendar start = new GregorianCalendar();
+                Calendar end = new GregorianCalendar();
+                start.setTime(date.getTime());
+                end.setTime(date.getTime());
+
+                start.set(Calendar.HOUR_OF_DAY, daysOh.getOpeningHours().getHour());
+                start.set(Calendar.MINUTE, daysOh.getOpeningHours().getMinute());
+                end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
+                end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
+
+                if (start.getTime().before(new Date())) {
+                    start.setTime(new Date());
+                }
+
+                bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
+            }
+        }
+        System.out.println("Successfully created Booking Slots");
+        return bookingSlots;
+    }
+
+    private DayOfWeekEnum getDayOfWeekEnum(int day) {
+        switch (day) {
+            case 1:
+                return DayOfWeekEnum.SUNDAY;
+            case 2:
+                return DayOfWeekEnum.MONDAY;
+            case 3:
+                return DayOfWeekEnum.TUESDAY;
+            case 4:
+                return DayOfWeekEnum.WEDNESDAY;
+            case 5:
+                return DayOfWeekEnum.THURSDAY;
+            case 6:
+                return DayOfWeekEnum.FRIDAY;
+            case 7:
+                return DayOfWeekEnum.SATURDAY;
+        }
+        return DayOfWeekEnum.MONDAY;
+    }
+
+    private List<ConsultationPurpose> initializeConsultationPurposes() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
+        List<ConsultationPurpose> consultationPurposes = new ArrayList<>();
+
+        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
+        ConsultationPurpose vaccinationConsultationPurpose = new ConsultationPurpose("Vaccination");
+        Long consultationPurposeId = consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
+        Long vaccinationId = consultationPurposeSessionBeanLocal.createConsultationPurpose(vaccinationConsultationPurpose);
+
+        Long formTemplateId = initializeForm(consultationPurpose);
+        Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
+
+        consultationPurposes.add(consultationPurpose);
+        consultationPurposes.add(vaccinationConsultationPurpose);
+        return consultationPurposes;
     }
 
     private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
@@ -290,7 +399,97 @@ public class DataInitializationSessionBean {
         return formTemplate.getFormTemplateId();
     }
 
-    private Long initializeMedicalCentres() throws CreateMedicalCentreException {
+    private List<Serviceman> initializeServiceman() throws CreateServicemanException {
+        List<Serviceman> servicemen = new ArrayList<>();
+        Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
+        String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
+        String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
+        String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
+
+        System.out.println("Serviceman INFO [OTP]");
+        System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
+        System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
+        System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
+        System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
+        System.out.println("Successfully created servicemen with OTP\n");
+
+        servicemen.add(serviceman1);
+        servicemen.add(serviceman2);
+        servicemen.add(serviceman3);
+        servicemen.add(serviceman4);
+        return servicemen;
+    }
+
+    private void initializeLinkEmployeesMedicalCentres(List<Employee> employees, List<MedicalCentre> medicalCentres) throws AssignMedicalStaffToMedicalCentreException {
+        for (Employee employee : employees) {
+            if (employee instanceof MedicalStaff) {
+                employeeSessionBeanLocal.assignMedicalStaffToMedicalCentre(employee.getEmployeeId(), medicalCentres.get(0).getMedicalCentreId());
+            }
+        }
+    }
+
+    private List<Employee> initializeEmployees() throws CreateEmployeeException, EmployeeNotFoundException {
+        List<Employee> employees = new ArrayList<>();
+
+        Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
+        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
+        Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
+        Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
+        Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
+        Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
+        Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
+        Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
+        Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
+        Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+        emp1 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp1.getEmail());
+        emp2 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp2.getEmail());
+        emp3 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp3.getEmail());
+        emp4 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp4.getEmail());
+        emp5 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp5.getEmail());
+
+        System.out.println("EMPLOYEE INFO [INIT]");
+        System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
+        System.out.println("Email: " + emp2.getEmail() + "\tPhone: " + emp2.getPhoneNumber());
+        System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
+        System.out.println("Email: " + emp4.getEmail() + "\tPhone: " + emp4.getPhoneNumber());
+        System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
+        System.out.println("Successfully created employees by init\n");
+
+        Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
+        Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
+        Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
+        String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
+        String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
+        String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
+        emp1Otp = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp1Otp.getEmail());
+        emp2Otp = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp2Otp.getEmail());
+        emp3Otp = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp3Otp.getEmail());
+
+        System.out.println("EMPLOYEE INFO [OTP]");
+        System.out.println("Email: " + emp1Otp.getEmail() + "\tPhone: " + emp1Otp.getPhoneNumber() + "\tOTP: " + empOtp1);
+        System.out.println("Email: " + emp2Otp.getEmail() + "\tPhone: " + emp2Otp.getPhoneNumber() + "\tOTP: " + empOtp2);
+        System.out.println("Email: " + emp3Otp.getEmail() + "\tPhone: " + emp3Otp.getPhoneNumber() + "\tOTP: " + empOtp3);
+        System.out.println("Successfully created employees with OTP\n");
+
+        employees.add(emp1);
+        employees.add(emp2);
+        employees.add(emp3);
+        employees.add(emp4);
+        employees.add(emp5);
+
+        employees.add(emp1Otp);
+        employees.add(emp2Otp);
+        employees.add(emp3Otp);
+        return employees;
+    }
+
+    private List<MedicalCentre> initializeMedicalCentres() throws CreateMedicalCentreException {
+        List<MedicalCentre> medicalCentres = new ArrayList<>();
+
         MedicalCentre newMedicalCentre = new MedicalCentre();
         newMedicalCentre.setName("HOME TEAM ACADEMY MEDICAL CENTRE");
         newMedicalCentre.setPhone("64653921");
@@ -310,6 +509,8 @@ public class DataInitializationSessionBean {
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
         System.out.println("Successfully created medical centres\n");
-        return medicalCentreId1;
+
+        medicalCentres.add(newMedicalCentre);
+        return medicalCentres;
     }
 }

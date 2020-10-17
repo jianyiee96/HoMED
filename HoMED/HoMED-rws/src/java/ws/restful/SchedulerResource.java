@@ -51,8 +51,8 @@ public class SchedulerResource {
     public SchedulerResource() {
         this.sessionBeanLookup = new SessionBeanLookup();
         this.servicemanSessionBeanLocal = this.sessionBeanLookup.lookupServicemanSessionBeanLocal();
-        this.slotSessionBeanLocal = this.sessionBeanLookup.lookupSlotPurposeSessionBeanLocal();
-        this.bookingSessionBeanLocal = this.sessionBeanLookup.lookupBookingPurposeSessionBeanLocal();
+        this.slotSessionBeanLocal = this.sessionBeanLookup.lookupSlotSessionBeanLocal();
+        this.bookingSessionBeanLocal = this.sessionBeanLookup.lookupBookingSessionBeanLocal();
     }
 
     @Path("queryBookingSlots")

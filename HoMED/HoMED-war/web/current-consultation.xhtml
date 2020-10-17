@@ -15,68 +15,78 @@
             }
         </style>
         <ezcomp:manageFormInstance id="ccManageFormInstance">
+            <f:ajax event="dialogCloseEvent" listener="#{currentConsultationManagedBean.dialogActionListener}"/>
         </ezcomp:manageFormInstance>
+
         <h:form id="consultationForm">
+            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                <p:autoUpdate/>
+            </p:growl>
+            <p:panel id="countdownPanel" rendered="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation == null}">
+                <h3>Currently No Ongoing Consultation</h3>
+                <h5 style="display: inline-block">You will be redirected in #{currentConsultationManagedBean.countdownValue}</h5>
+                <p:poll interval="1" listener="#{currentConsultationManagedBean.decreaseCountdown}" update="countdownPanel" rendered="#{currentConsultationManagedBean.countdownRemainingSeconds != 0}"/>
+            </p:panel>
             <p:growl id="growl" globalOnly="true" showDetail="true" />
             <div class="p-grid">
+                <ui:fragment rendered="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation != null}">
+                    <div class="p-col-12 p-md-12 p-lg-6">
+                        <p:panel id="basic">
+                            <h2>Serviceman Information</h2>
 
-                <div class="p-col-12 p-md-12 p-lg-6">
-                    <p:panel id="basic">
-                        <h2>Serviceman Information</h2>
+                            <h:panelGrid columns="2" cellpadding="5">
+                                <p:outputLabel value="Name: " />
+                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.name}" class="display-text"/>                                
 
-                        <h:panelGrid columns="2" cellpadding="5">
-                            <p:outputLabel value="Name: " />
-                            <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.name}" class="display-text"/>                                
+                                <p:outputLabel value="Email " />
+                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.email}" class="display-text"/>
 
-                            <p:outputLabel value="Email " />
-                            <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.email}" class="display-text"/>
+                                <p:outputLabel value="Gender: " />
+                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.gender}" class="display-text"/>
 
-                            <p:outputLabel value="Gender: " />
-                            <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.gender}" class="display-text"/>
+                                <p:outputLabel value="Blood type: " />
+                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
 
-                            <p:outputLabel value="Blood type: " />
-                            <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
-
-                            <p:outputLabel value="ROD date: " />
-                            <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.rod}" class="display-text">
-                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
-                            </p:outputLabel>
-                        </h:panelGrid>
-                        <p:separator />
-
-                        <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{currentConsultationManagedBean.servicemanConsultations}"
-                                     rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{currentConsultationManagedBean.selectedConsultation}"
-                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
-                            <p:ajax event="rowSelect" update="consultationForm" process="@this"/>
-                            <f:facet id="dataViewListHeader" name="header">
-                                <div style="display: flex; align-items: center; justify-content: space-between">
-                                    <h:outputText value="SERVICEMAN'S CONSULTATION HISTORY"></h:outputText>
-                                    <p:commandButton update="consultationForm" value="Current Consultation">
-                                        <f:setPropertyActionListener target="#{currentConsultationManagedBean.selectedConsultation}" value="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation}"/>
-                                    </p:commandButton>
-                                </div>
-                            </f:facet>
-                            <p:column headerText="Serviceman Name">
-                                <h:outputText value="#{consultation.booking.serviceman.name}" />
-                            </p:column>
-                            <p:column headerText="Consultation Date">
-                                <h:outputText value="#{consultation.startDateTime}">
+                                <p:outputLabel value="ROD date: " />
+                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.rod}" class="display-text">
                                     <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="Consultation Purpose">
-                                <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
-                            </p:column>
-                            <p:column headerText="Attending Doctor">
-                                <h:outputText value="#{consultation.medicalOfficer.name}" />
-                            </p:column>
-                            <p:column headerText="Status">
-                                <h:outputText value="#{consultation.consultationStatusEnum}" styleClass="form-status-badge status-#{consultation.consultationStatusEnum}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>
-                </div>
+                                </p:outputLabel>
+                            </h:panelGrid>
+                            <p:separator />
 
+                            <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{currentConsultationManagedBean.servicemanConsultations}"
+                                         rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{currentConsultationManagedBean.selectedConsultation}"
+                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
+                                <p:ajax event="rowSelect" update="consultationForm" process="@this"/>
+                                <f:facet id="dataViewListHeader" name="header">
+                                    <div style="display: flex; align-items: center; justify-content: space-between">
+                                        <h:outputText value="SERVICEMAN'S CONSULTATION HISTORY"></h:outputText>
+                                        <p:commandButton update="consultationForm" value="Current Consultation">
+                                            <f:setPropertyActionListener target="#{currentConsultationManagedBean.selectedConsultation}" value="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation}"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="Serviceman Name">
+                                    <h:outputText value="#{consultation.booking.serviceman.name}" />
+                                </p:column>
+                                <p:column headerText="Consultation Date">
+                                    <h:outputText value="#{consultation.startDateTime}">
+                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Consultation Purpose">
+                                    <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                </p:column>
+                                <p:column headerText="Attending Doctor">
+                                    <h:outputText value="#{consultation.medicalOfficer.name}" />
+                                </p:column>
+                                <p:column headerText="Status">
+                                    <h:outputText value="#{consultation.consultationStatusEnum}" styleClass="form-status-badge status-#{consultation.consultationStatusEnum}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
+                </ui:fragment>
                 <ui:fragment rendered="#{currentConsultationManagedBean.selectedConsultation != null}">
 
                     <div class="p-col-12 p-md-12 p-lg-6">
@@ -85,7 +95,7 @@
                             <h2>#{currentConsultationManagedBean.isCurrentConsultation ? 'Current Consultation' : 'Past Consultation'}</h2>
                             <ul>
                                 <li>
-                                    <p:panelGrid columns="2" layout="flex">
+                                    <p:panelGrid id="panelCurrentConsultation" columns="2" layout="flex">
                                         <h:panelGroup>
                                             <h5>Consultation Information</h5>
                                             <h:panelGrid columns="2" cellpadding="5">
@@ -127,31 +137,32 @@
                                 </li>
 
                                 <li>
-                                    <h5>Forms #{currentConsultationManagedBean.isCurrentConsultation ? '' : '(view only)'}</h5>
+                                    <h:panelGroup id="panelGroupForms">
+                                        <h5>Forms #{currentConsultationManagedBean.isCurrentConsultation ? '' : '(view only)'}</h5>
 
-                                    <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
-                                        <h:column>
-                                            <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
-                                                           update="ccManageFormInstance:formManageFormInstance">
-                                                <p:ajax event="click" listener="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}"/>
-                                                <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
-                                            </p:commandLink>
-                                            <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
-                                                           update="ccManageFormInstance:formManageFormInstance">
-                                                <p:ajax event="click" listener="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}"/>
-                                                <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
-                                            </p:commandLink>
-                                        </h:column>
-                                        <h:column rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
-                                            <p:outputLabel class="form-status-badge status-valid" rendered="#{instance.signedBy != null}" value="SIGNED"/>
-                                            <p:outputLabel class="form-status-badge status-deleted" rendered="#{instance.signedBy == null}" value="NOT-SIGNED"/>
-                                        </h:column>
-                                    </h:dataTable>
+                                        <h:dataTable cellpadding="5" rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" value="#{currentConsultationManagedBean.selectedConsultation.booking.formInstances}" var="instance">
+                                            <h:column>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{not currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                </p:commandLink>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" rendered="#{currentConsultationManagedBean.isCurrentConsultation}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{currentConsultationManagedBean.manageFormInstanceManagedBean.initManage}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                    <f:setPropertyActionListener target="#{currentConsultationManagedBean.manageFormInstanceManagedBean.medicalOfficer}" value="#{currentConsultationManagedBean.currentMedicalOfficer}"/>
+                                                </p:commandLink>
+                                            </h:column>
+                                            <h:column rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
+                                                <p:outputLabel class="form-status-badge status-valid" rendered="#{instance.signedBy != null}" value="SIGNED"/>
+                                                <p:outputLabel class="form-status-badge status-deleted" rendered="#{instance.signedBy == null}" value="NOT-SIGNED"/>
+                                            </h:column>
+                                        </h:dataTable>
 
 
-                                    <h:panelGrid rendered="#{empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" columns="1" cellpadding="5">
-                                        <p:outputLabel value="No forms" />
-                                    </h:panelGrid>
+                                        <h:panelGrid rendered="#{empty currentConsultationManagedBean.selectedConsultation.booking.formInstances}" columns="1" cellpadding="5">
+                                            <p:outputLabel value="No forms" />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
                                 </li>
 
                                 <h:panelGroup rendered="#{not currentConsultationManagedBean.isCurrentConsultation}">
@@ -188,8 +199,8 @@
                                     </li>
                                     <li>
                                         <div style="display: flex; justify-content: center">
-                                            <p:commandButton update="growl" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="END CONSULTATION">
-                                                <p:confirm header="Consultation" message="Confirm End Consultation?" icon="pi pi-exclamation-triangle" />
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="END CONSULTATION">
+                                                <p:confirm header="Consultation" message="Confirm End Consultation? You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
                                         </div>
                                     </li>
