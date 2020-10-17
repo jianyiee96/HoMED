@@ -97,6 +97,7 @@ public class ManageFormInstanceManagedBean implements Serializable {
             refreshFormInstance();
             isReloadMainPage = true;
         } catch (UpdateFormInstanceException ex) {
+            formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareLoad());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
         }
     }
@@ -131,8 +132,11 @@ public class ManageFormInstanceManagedBean implements Serializable {
                 isSuccessfulSubmit = true;
                 PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
             } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
+                formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareLoad());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
             }
+        } else {
+            formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareLoad());
         }
     }
 

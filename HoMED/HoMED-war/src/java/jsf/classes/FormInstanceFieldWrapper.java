@@ -25,10 +25,14 @@ public class FormInstanceFieldWrapper {
 
     public FormInstanceFieldWrapper(FormInstanceField formInstanceField) {
         this.formInstanceField = formInstanceField;
-        if (formInstanceField.getFormInstanceFieldValues().isEmpty()) {
-            formInstanceField.getFormInstanceFieldValues().add(new FormInstanceFieldValue());
-        }
+        prepareLoad();
         this.isEditable = !formInstanceField.getFormFieldMapping().getIsServicemanEditable();
+    }
+
+    public void prepareLoad() {
+        if (this.formInstanceField.getFormInstanceFieldValues().isEmpty()) {
+            this.formInstanceField.getFormInstanceFieldValues().add(new FormInstanceFieldValue());
+        }
     }
 
     public void prepareSubmission(Boolean checkError) {
@@ -40,7 +44,7 @@ public class FormInstanceFieldWrapper {
         if (checkError) {
             if (this.getFormInstanceField().getFormFieldMapping().getIsRequired()) {
                 if (this.getFormInstanceField().getFormInstanceFieldValues().isEmpty()) {
-                    this.setErrorMessage("Question " + this.getFormInstanceField().getFormFieldMapping().getPosition() + " cannot be left empty");
+                    this.setErrorMessage("Question " + this.getFormInstanceField().getFormFieldMapping().getPosition() + " is required");
                 } else {
                     this.setErrorMessage(null);
                 }

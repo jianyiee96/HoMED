@@ -169,7 +169,7 @@
 
                                 <h:panelGroup rendered="#{not currentConsultationManagedBean.isCurrentConsultation}">
                                     <li>
-                                        <h5>Remarks</h5>
+                                        <h5>Consultation Notes</h5>
                                         <h:panelGrid columns="1" cellpadding="5">
                                             <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.remarks != null}" value="#{currentConsultationManagedBean.selectedConsultation.remarks}" />
                                             <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.remarks == null}" value="No remarks" />
@@ -186,7 +186,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
                                     <li>
-                                        <h5>Remarks</h5>
+                                        <h5>Consultation Notes</h5>
                                         <div style="padding: 5px">
                                             <p:inputTextarea style="width: 100%" value="#{currentConsultationManagedBean.selectedConsultation.remarks}"/>
 
