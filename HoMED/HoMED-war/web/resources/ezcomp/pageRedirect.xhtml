@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui">
+
+    <cc:interface>
+        <cc:attribute name="header" required="true"/>
+        <cc:attribute name="btnOutcome" default="/homepage.xhtml"/>
+        <cc:attribute name="btnValue" default="Homepage"/>
+        <cc:attribute name="btnIcon" default="pi pi-home"/>
+    </cc:interface>
+
+    <cc:implementation>
+        <h:form id="formPageRedirect">
+            <p:panel id="countdownPanel">
+                <h3>#{cc.attrs.header}</h3>
+                <h:outputText id="countdownValue" style="font-size: 20px" value="You will be redirected in #{pageRedirectManagedBean.countdownValue}"/>
+                <br/>
+                <p:button id="btn-redirect" outcome="#{cc.attrs.btnOutcome}" value="#{cc.attrs.btnValue}" icon="#{cc.attrs.btnIcon}" class="p-mt-4"/>
+                <p:poll interval="1" listener="#{pageRedirectManagedBean.decreaseCountdown(cc.attrs.btnOutcome)}" update="countdownValue" rendered="#{pageRedirectManagedBean.countdownRemainingSeconds != 0}"/>
+            </p:panel>
+        </h:form>
+    </cc:implementation>
+</html>
+

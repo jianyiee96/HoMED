@@ -27,10 +27,11 @@
         <h:outputStylesheet name="crud-tables.css" library="css" />
         <ezcomp:manageServiceman id="ccManageServiceman">
         </ezcomp:manageServiceman>
+        
+        <ezcomp:pageRedirect rendered="#{bookingManagedBean.currentMedicalCentre == null}"
+                             header="Currently Not Assigned to Any Medical Centre"/>
+        
         <h:form id="formAllBookings">
-            <ui:fragment rendered="#{bookingManagedBean.currentMedicalCentre == null}">
-                <h1>You are currently not assigned to any medical centre!</h1>
-            </ui:fragment>
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />

@@ -10,9 +10,8 @@
 
     <ui:define name="content">
 
-        <ui:fragment rendered="#{bookingSlotManagementManagedBean.selectedMedicalCentre eq null}">
-            <h1>You are currently not assigned to any medical centre. Please contact system administrator for assistance!</h1>
-        </ui:fragment>
+        <ezcomp:pageRedirect rendered="#{bookingSlotManagementManagedBean.selectedMedicalCentre eq null}"
+                             header="Currently Not Assigned to Any Medical Centre"/>
 
         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 

@@ -168,10 +168,12 @@ public class BookingSlotManagementManagedBean implements Serializable {
             this.minTime = startHour + ":00:00";
             this.maxTime = endHour + ":00:00";
 
-        } else {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not Link to Medical Centre", "You are currently not assigned to any medical centre. Please contact system administrator for assistance!"));
-            PrimeFaces.current().ajax().update(":growl-message");
         }
+//        @WK
+//        else {
+//            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not Link to Medical Centre", "You are currently not assigned to any medical centre. Please contact system administrator for assistance!"));
+//            PrimeFaces.current().ajax().update(":growl-message");
+//        }
     }
 
     private void updateSelectedBookingSlotsView(BookingSlot bookingSlotToRemove) {
