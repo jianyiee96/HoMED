@@ -16,41 +16,41 @@ import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 
-@Named(value = "pastConsultationsManagedBean")
+@Named(value = "servicemanConsultationRecordsManagedBean")
 @ViewScoped
-public class PastConsultationsManagedBean implements Serializable {
+public class ServicemanConsultationRecordsManagedBean implements Serializable {
 
     @EJB(name = "ServicemanSessionBeanLocal")
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
     @EJB(name = "ConsultationSessionBeanLocal")
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
-    private List<Serviceman> servicemenWithPastConsultations;
+    private List<Serviceman> servicemen;
     private Serviceman selectedServiceman;
 
     private List<Consultation> pastConsultationsForSelectedServiceman;
     private Consultation selectedPastConsultation;
 
-    public PastConsultationsManagedBean() {
-        this.servicemenWithPastConsultations = new ArrayList<>();
+    public ServicemanConsultationRecordsManagedBean() {
+        this.servicemen = new ArrayList<>();
         this.pastConsultationsForSelectedServiceman = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
-        this.servicemenWithPastConsultations = servicemanSessionBeanLocal.retrieveAllServicemenWithPastConsultations();
+        this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
     }
 
     public void onSelectServiceman() {
         this.pastConsultationsForSelectedServiceman = consultationSessionBeanLocal.retrieveCompletedConsultationsByServicemanId(this.selectedServiceman.getServicemanId());
     }
 
-    public List<Serviceman> getServicemenWithPastConsultations() {
-        return servicemenWithPastConsultations;
+    public List<Serviceman> getServicemen() {
+        return servicemen;
     }
 
-    public void setServicemenWithPastConsultations(List<Serviceman> servicemenWithPastConsultations) {
-        this.servicemenWithPastConsultations = servicemenWithPastConsultations;
+    public void setServicemen(List<Serviceman> servicemen) {
+        this.servicemen = servicemen;
     }
 
     public Serviceman getSelectedServiceman() {

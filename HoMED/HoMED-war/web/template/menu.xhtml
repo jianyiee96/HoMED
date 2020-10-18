@@ -55,11 +55,15 @@
                         </p:submenu>
                         <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Scheduler Management" icon="pi pi-calendar" >
                             <p:menuitem value="Booking Slot Management"  icon="pi pi-calendar" outcome="/booking-slot-management" />
-                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management"  icon="pi pi-calendar" outcome="/medical-board-slot-management" />
+                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management" icon="pi pi-calendar" outcome="/medical-board-slot-management" />
                         </p:submenu>
                         <p:menuitem value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />
-                        <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
+                        <p:submenu rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" label="Consultation History" icon="fa fa-history" >
+                            <p:menuitem value="My Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
+                            <p:menuitem value="Serviceman Consultation Records" icon="fa fa-users" outcome="/serviceman-consultation-records" />
+                        </p:submenu>
+
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
                     </po:menu>
                 </h:form>

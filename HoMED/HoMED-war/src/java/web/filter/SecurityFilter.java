@@ -79,7 +79,8 @@ public class SecurityFilter implements Filter {
             "/booking-management.xhtml", //12
             "/queue-management.xhtml", //13
             "/past-consultations.xhtml", //14
-            "/current-consultation.xhtml" //15
+            "/serviceman-consultation-records.xhtml", //15
+            "/current-consultation.xhtml" //16
         };
 
         // Pages that all logged in users can enter
@@ -102,7 +103,8 @@ public class SecurityFilter implements Filter {
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
             if (path.equals(pathArr[13])
                     || path.equals(pathArr[14])
-                    || path.equals(pathArr[15])) {
+                    || path.equals(pathArr[15])
+                    || path.equals(pathArr[16])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
