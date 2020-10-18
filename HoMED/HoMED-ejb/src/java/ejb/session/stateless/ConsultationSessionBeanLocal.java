@@ -38,4 +38,8 @@ public interface ConsultationSessionBeanLocal {
 
     public int retrieveConsultationQueuePosition(Long consultationId) throws RetrieveConsultationQueuePositionException;
 
+    public List<Consultation> retrieveCompletedConsultationsByServicemanId(Long servicemanId);
+
+    public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId);
+
 }

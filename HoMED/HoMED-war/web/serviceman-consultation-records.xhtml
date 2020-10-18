@@ -1,0 +1,258 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Serviceman Consultation Records</ui:define>
+
+    <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .display-text {
+                font-weight: bold;
+            }
+        </style>
+
+        <ezcomp:manageFormInstance id="ccManageFormInstance" />
+        <ezcomp:manageServiceman id="ccManageServiceman" />
+
+        <h:form>
+            <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedServiceman == null}">
+                <div class="p-grid crud-table">
+                    <div class="p-col-12">
+                        <div class="card ui-fluid">
+                            <h2>Serviceman Consultation Records</h2>
+
+                            <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"
+                                         var="serviceman" value="#{servicemanConsultationRecordsManagedBean.servicemen}" 
+                                         sortBy="#{serviceman.servicemanId}" rowKey="#{serviceman.servicemanId}" 
+                                         selectionMode="single" selection="#{servicemanConsultationRecordsManagedBean.selectedServiceman}"
+                                         styleClass="crud-management-table" paginator="true" rows="10" paginatorPosition="bottom">
+                                <p:ajax event="rowSelect" update="@form" process="@this" listener="#{servicemanConsultationRecordsManagedBean.onSelectServiceman}"/>
+
+                                <f:facet name="header">
+                                    <div class="crud-table-header">
+                                        <span style="font-weight: bold">SERVICEMEN</span>
+
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableServicemen').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="ID" width="2.5%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.servicemanId}" />
+                                </p:column>
+
+                                <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.name}" />
+                                </p:column>
+
+                                <p:column headerText="Role" width="5%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.role}" />
+                                </p:column>
+
+                                <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.email}" />
+                                </p:column>
+
+                                <p:column headerText="Gender" width="5%" sortBy="#{serviceman.gender}" filterBy="#{serviceman.gender}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.gender}" />
+                                </p:column>
+
+                                <p:column headerText="Phone Number" width="5%" sortBy="#{serviceman.phoneNumber}" filterBy="#{serviceman.phoneNumber}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.phoneNumber}" />
+                                </p:column>
+
+                                <p:column headerText="Action" width="2.5%">
+                                    <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-user" title="View Serviceman Info"
+                                                     process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
+                                        <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{serviceman}" />
+                                    </p:commandButton>
+                                </p:column>
+
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+
+                <p:dialog id="dlgNoConsultationRecords" widgetVar="dlgNoConsultationRecords" closable="false" responsive="true" modal="true" draggable="false"
+                          header="No Consultation Records" width="400">
+                    <p:outputLabel value='The selected serviceman has no consultation records to display.' />
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Dismiss" styleClass="ui-confirmdialog-yes" icon="pi pi-check" onclick="PF('dlgNoConsultationRecords').hide()" />
+                    </f:facet>
+                </p:dialog>
+            </ui:fragment>
+
+            <div class="p-grid crud-table">
+                <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedServiceman != null}">
+                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                        <p:panel id="basic">
+                            <div class="p-grid">
+                                <div class="p-col-9">
+                                    <h2>Serviceman Information</h2>
+                                </div>
+                                <div class="p-col-3" style="text-align: right;">
+                                    <p:commandButton icon="pi pi-arrow-circle-left" value="Back" update="@form">
+                                        <f:setPropertyActionListener value="#{null}" target="#{servicemanConsultationRecordsManagedBean.selectedServiceman}" />
+                                        <f:setPropertyActionListener value="#{null}" target="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation}" />
+                                    </p:commandButton>
+                                </div>
+                            </div>
+
+                            <h:panelGrid columns="2" cellpadding="5">
+                                <p:outputLabel value="Name: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.name}" class="display-text"/>                                
+
+                                <p:outputLabel value="Email " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.email}" class="display-text"/>
+
+                                <p:outputLabel value="Role " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.role}" class="display-text"/>
+
+                                <p:outputLabel value="Gender: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.gender}" class="display-text"/>
+
+                                <p:outputLabel value="Blood type: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.bloodType.bloodTypeString}" class="display-text"/>
+
+                                <p:outputLabel value="ROD date: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.rod}" class="display-text">
+                                    <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                </p:outputLabel>
+                            </h:panelGrid>
+
+                            <p:separator />
+
+                            <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{servicemanConsultationRecordsManagedBean.pastConsultationsForSelectedServiceman}"
+                                         rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation}"
+                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
+                                <p:ajax event="rowSelect" update="@form" process="@this"/>
+
+                                <f:facet id="dataViewListHeader" name="header">
+                                    <div style="display: flex; align-items: center; justify-content: space-between">
+                                        <h:outputText value="SERVICEMAN'S CONSULTATION HISTORY"></h:outputText>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Serviceman Name">
+                                    <h:outputText value="#{consultation.booking.serviceman.name}" />
+                                </p:column>
+
+                                <p:column headerText="Consultation Date">
+                                    <h:outputText value="#{consultation.startDateTime}">
+                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Consultation Purpose">
+                                    <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                </p:column>
+
+                                <p:column headerText="Attending Doctor">
+                                    <h:outputText value="#{consultation.medicalOfficer.name}" />
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:panel>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation != null}">
+                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                        <div class="timeline card card-w-title">
+                            <h2>Past Consultation</h2>
+                            <ul>
+                                <li>
+                                    <p:panelGrid id="panelCurrentConsultation" columns="2" layout="flex">
+                                        <h:panelGroup>
+                                            <h5>Consultation Information</h5>
+                                            <h:panelGrid columns="2" cellpadding="5">
+                                                <p:outputLabel value="Consultation Id: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.consultationId}" class="display-text" />                                
+
+                                                <p:outputLabel value="Medical Centre: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingSlot.medicalCentre.name}" class="display-text" /> 
+
+                                                <p:outputLabel value="Purpose: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
+
+                                                <p:outputLabel value="Started at: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
+                                                    <f:convertDateTime pattern="HH:mm"/>
+                                                </p:outputLabel>                                
+
+                                                <p:outputLabel value="Ended at: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.endDateTime}" class="display-text">
+                                                    <f:convertDateTime pattern="HH:mm"/>
+                                                </p:outputLabel>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <h5>Attending Doctor Information</h5>
+                                            <h:panelGrid columns="2" cellpadding="5">
+                                                <p:outputLabel value="Name: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalOfficer.name}" class="display-text" />                                
+
+                                                <p:outputLabel value="Email: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalOfficer.email}" class="display-text" />                                
+
+                                                <p:outputLabel value="Phone Number: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalOfficer.phoneNumber}" class="display-text" />
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </li>
+
+                                <li>
+                                    <h:panelGroup id="panelGroupForms">
+                                        <h5>Forms (view only)</h5>
+
+                                        <h:dataTable cellpadding="5" rendered="#{not empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.formInstances}" value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.formInstances}" var="instance">
+                                            <h:column>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                </p:commandLink>
+                                            </h:column>
+                                        </h:dataTable>
+
+                                        <h:panelGrid rendered="#{empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.formInstances}" columns="1" cellpadding="5">
+                                            <p:outputLabel value="No forms" />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                </li>
+
+                                <li>
+                                    <h5>Consultation Notes</h5>
+                                    <h:panelGrid columns="1" cellpadding="5">
+                                        <h:outputText rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarks != null}" value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarks}" />
+                                        <h:outputText rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarks == null}" value="No remarks" />
+                                    </h:panelGrid>
+
+                                </li>
+                                <li>
+                                    <h5>Remarks for Serviceman</h5>
+                                    <h:panelGrid columns="1" cellpadding="5">
+                                        <h:outputText rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarksForServiceman != null}" value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarksForServiceman}" />
+                                        <h:outputText rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarksForServiceman == null}" value="No remarks" />
+                                    </h:panelGrid>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </ui:fragment>
+            </div>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

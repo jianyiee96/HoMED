@@ -16,108 +16,173 @@
                 font-weight: bold;
             }
         </style>
-        <ezcomp:manageFormInstance id="ccManageFormInstance">
-            <f:ajax event="dialogCloseEvent" listener="#{currentConsultationManagedBean.dialogActionListener}"/>
-        </ezcomp:manageFormInstance>
 
-        <h:form id="consultationForm">
-            <p:growl id="growl-message" for="growl-message" showDetail="true">
-                <p:autoUpdate />
-            </p:growl>
-            <p:growl id="growl" globalOnly="true" showDetail="true" />
-            <!--            <div class="p-grid">
-                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
-                                <div class="card ui-fluid">
-                                    abc
-                                </div>
-                                <div class="card ui-fluid">
-                                    cde
-                                </div>
-                            </div>
-            
-                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
-                                <div class="card ui-fluid">
-                                    whatever
-                                </div>
-                            </div>
-                        </div>-->
-            <h:form id="formAllServicemenWithPastConsultations">
+        <ezcomp:manageFormInstance id="ccManageFormInstance" />
+
+        <ui:fragment rendered="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer.size() == 0}">
+            <h3>Currently No Past Consultations</h3>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer.size() != 0}">
+            <h:form>
                 <div class="p-grid crud-table">
                     <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
-                        <div class="card ui-fluid">
-                            <h2>Past Consultations</h2>
-
-                            <p:dataTable id="dataTableServicemenWithPastConsultations" widgetVar="dataTableServicemenWithPastConsultations" var="serviceman" value="#{pastConsultationsManagedBean.servicemenWithPastConsultations}" sortBy="#{serviceman.servicemanId}"
-                                         styleClass="crud-management-table" rowKey="#{serviceman.servicemanId}" paginator="true" rows="10" paginatorPosition="bottom">
+                        <p:panel id="basic">
+                            <h2>My Past Consultations</h2>
+                            <p:dataTable id="dataTablePastConsultations" widgetVar="dataTablePastConsultations" var="consultation" value="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer}"
+                                         rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{pastConsultationsManagedBean.selectedPastConsultation}"
+                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
+                                <p:ajax event="rowSelect" update="@form" process="@this"/>
 
                                 <f:facet name="header">
                                     <div class="crud-table-header">
-                                        <span style="font-weight: bold">SERVICEMEN WITH COMPLETED CONSULTATIONS</span>
+                                        <span style="font-weight: bold">SERVICEMAN'S CONSULTATION HISTORY</span>
 
                                         <span class="filter-container ui-input-icon-left">
                                             <i class="pi pi-search" />
-                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableServicemenWithPastConsultations').filter()" placeholder="Search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTablePastConsultations').filter()" placeholder="Search" />
                                         </span>
                                     </div>
                                 </f:facet>
 
-                                <p:column headerText="ID" width="3%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.servicemanId}" />
+                                <p:column headerText="Serviceman Name" sortBy="#{consultation.booking.serviceman.name}" filterBy="#{consultation.booking.serviceman.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{consultation.booking.serviceman.name}" />
                                 </p:column>
 
-                                <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.name}" />
+                                <p:column headerText="Serviceman Role" sortBy="#{consultation.booking.serviceman.role}" filterBy="#{consultation.booking.serviceman.role}" filterMatchMode="contains">
+                                    <h:outputText value="#{consultation.booking.serviceman.role}" />
                                 </p:column>
 
-                                <p:column headerText="Role" width="7%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.role}" />
+                                <p:column headerText="Serviceman Gender" sortBy="#{consultation.booking.serviceman.gender}" filterBy="#{consultation.booking.serviceman.gender}" filterMatchMode="contains">
+                                    <h:outputText value="#{consultation.booking.serviceman.gender}" />
                                 </p:column>
 
-                                <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.email}" />
+                                <p:column headerText="Consultation Date" sortBy="#{consultation.startDateTime}" filterBy="#{consultation.startDateTime}" filterMatchMode="contains">
+                                    <h:outputText value="#{consultation.startDateTime}">
+                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                    </h:outputText>
                                 </p:column>
 
-                                <p:column headerText="Gender" width="5%" sortBy="#{serviceman.gender}" filterBy="#{serviceman.gender}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.gender}" />
+                                <p:column headerText="Consultation Purpose" sortBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
+                                    <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
-
-                                <p:column headerText="Phone Number" width="7%" sortBy="#{serviceman.phoneNumber}" filterBy="#{serviceman.phoneNumber}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.phoneNumber}" />
-                                </p:column>
-
                             </p:dataTable>
-
-
-
-
-                        </div>
+                        </p:panel>
                     </div>
+
+
+                    <ui:fragment rendered="#{pastConsultationsManagedBean.selectedPastConsultation != null}">
+                        <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                            <div class="timeline card card-w-title">
+                                <h2>Past Consultation</h2>
+                                <ul>
+                                    <li>
+                                        <h5>Serviceman Information</h5>
+                                        <h:panelGrid columns="2" cellpadding="5">
+                                            <p:outputLabel value="Name: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.name}" class="display-text"/>                                
+
+                                            <p:outputLabel value="Email " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.email}" class="display-text"/>
+
+                                            <p:outputLabel value="Role " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.role}" class="display-text"/>
+
+                                            <p:outputLabel value="Gender: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.gender}" class="display-text"/>
+
+                                            <p:outputLabel value="Blood type: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
+
+                                            <p:outputLabel value="ROD date: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.rod}" class="display-text">
+                                                <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                            </p:outputLabel>
+                                        </h:panelGrid>
+                                    </li>
+
+                                    <li>
+                                        <p:panelGrid id="panelCurrentConsultation" columns="2" layout="flex">
+                                            <h:panelGroup>
+                                                <h5>Consultation Information</h5>
+                                                <h:panelGrid columns="2" cellpadding="5">
+                                                    <p:outputLabel value="Consultation Id: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.consultationId}" class="display-text" />                                
+
+                                                    <p:outputLabel value="Medical Centre: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingSlot.medicalCentre.name}" class="display-text" /> 
+
+                                                    <p:outputLabel value="Purpose: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
+
+                                                    <p:outputLabel value="Started at: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
+                                                        <f:convertDateTime pattern="HH:mm"/>
+                                                    </p:outputLabel>                                
+
+                                                    <p:outputLabel value="Ended at: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.endDateTime}" rendered="#{pastConsultationsManagedBean.selectedPastConsultation.endDateTime ne null}" class="display-text">
+                                                        <f:convertDateTime pattern="HH:mm"/>
+                                                    </p:outputLabel>
+                                                    <p:outputLabel value="N.A." rendered="#{pastConsultationsManagedBean.selectedPastConsultation.endDateTime eq null}" class="display-text"/>
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <h5>Attending Doctor Information</h5>
+                                                <h:panelGrid columns="2" cellpadding="5">
+                                                    <p:outputLabel value="Name: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.medicalOfficer.name}" class="display-text" />                                
+
+                                                    <p:outputLabel value="Email: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.medicalOfficer.email}" class="display-text" />                                
+
+                                                    <p:outputLabel value="Phone Number: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.medicalOfficer.phoneNumber}" class="display-text" />
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+                                    </li>
+
+                                    <li>
+                                        <h:panelGroup id="panelGroupForms">
+                                            <h5>Forms (view only)</h5>
+
+                                            <h:dataTable cellpadding="5" rendered="#{not empty pastConsultationsManagedBean.selectedPastConsultation.booking.formInstances}" value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.formInstances}" var="instance">
+                                                <h:column>
+                                                    <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                                   update="ccManageFormInstance:formManageFormInstance" action="#{manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                        <f:setPropertyActionListener target="#{manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                    </p:commandLink>
+                                                </h:column>
+                                            </h:dataTable>
+
+                                            <h:panelGrid rendered="#{empty pastConsultationsManagedBean.selectedPastConsultation.booking.formInstances}" columns="1" cellpadding="5">
+                                                <p:outputLabel value="No forms" />
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </li>
+
+                                    <li>
+                                        <h5>Consultation Notes</h5>
+                                        <h:panelGrid columns="1" cellpadding="5">
+                                            <h:outputText rendered="#{pastConsultationsManagedBean.selectedPastConsultation.remarks != null}" value="#{pastConsultationsManagedBean.selectedPastConsultation.remarks}" />
+                                            <h:outputText rendered="#{pastConsultationsManagedBean.selectedPastConsultation.remarks == null}" value="No remarks" />
+                                        </h:panelGrid>
+
+                                    </li>
+                                    <li>
+                                        <h5>Remarks for Serviceman</h5>
+                                        <h:panelGrid columns="1" cellpadding="5">
+                                            <h:outputText rendered="#{pastConsultationsManagedBean.selectedPastConsultation.remarksForServiceman != null}" value="#{pastConsultationsManagedBean.selectedPastConsultation.remarksForServiceman}" />
+                                            <h:outputText rendered="#{pastConsultationsManagedBean.selectedPastConsultation.remarksForServiceman == null}" value="No remarks" />
+                                        </h:panelGrid>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </ui:fragment>
                 </div>
             </h:form>
-
-            <!--            <div class="p-grid">
-                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
-                                <div class="card ui-fluid">
-            
-                                </div>
-                            </div>
-                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
-                                <div class="card ui-fluid">
-            
-                                </div>
-                            </div>
-                        </div>-->
-
-
-
-
-            <p:confirmDialog global="true" width="500" >
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-            </p:confirmDialog>
-        </h:form>
-
-
+        </ui:fragment>
     </ui:define>
-
 </ui:composition>

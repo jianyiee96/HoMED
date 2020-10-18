@@ -4,12 +4,17 @@
  */
 package jsf.managedBean;
 
-import ejb.session.stateless.ServicemanSessionBeanLocal;
-import entity.Serviceman;
+import ejb.session.stateless.ConsultationSessionBeanLocal;
+import ejb.session.stateless.EmployeeSessionBeanLocal;
+import entity.Consultation;
+import entity.Employee;
+import entity.MedicalOfficer;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 
@@ -17,25 +22,52 @@ import javax.faces.view.ViewScoped;
 @ViewScoped
 public class PastConsultationsManagedBean implements Serializable {
 
-    @EJB(name = "ServicemanSessionBeanLocal")
-    private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    @EJB(name = "ConsultationSessionBeanLocal")
+    private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
-    private List<Serviceman> servicemenWithPastConsultations;
+    private MedicalOfficer currentMedicalOfficer;
+    private List<Consultation> pastConsultationsForCurrentMedicalOfficer;
+    private Consultation selectedPastConsultation;
 
     public PastConsultationsManagedBean() {
+        this.pastConsultationsForCurrentMedicalOfficer = new ArrayList<>();
+
     }
 
     @PostConstruct
     public void postConstruct() {
-        this.servicemenWithPastConsultations = servicemanSessionBeanLocal.retrieveAllServicemenWithPastConsultations();
+        Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
+        if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
+            currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
+        }
+
+        this.pastConsultationsForCurrentMedicalOfficer = consultationSessionBeanLocal.retrieveCompletedConsultationsByMedicalOfficerId(currentMedicalOfficer.getEmployeeId());
     }
 
-    public List<Serviceman> getServicemenWithPastConsultations() {
-        return servicemenWithPastConsultations;
+    public MedicalOfficer getCurrentMedicalOfficer() {
+        return currentMedicalOfficer;
     }
 
-    public void setServicemenWithPastConsultations(List<Serviceman> servicemenWithPastConsultations) {
-        this.servicemenWithPastConsultations = servicemenWithPastConsultations;
+    public void setCurrentMedicalOfficer(MedicalOfficer currentMedicalOfficer) {
+        this.currentMedicalOfficer = currentMedicalOfficer;
+    }
+
+    public List<Consultation> getPastConsultationsForCurrentMedicalOfficer() {
+        return pastConsultationsForCurrentMedicalOfficer;
+    }
+
+    public void setPastConsultationsForCurrentMedicalOfficer(List<Consultation> pastConsultationsForCurrentMedicalOfficer) {
+        this.pastConsultationsForCurrentMedicalOfficer = pastConsultationsForCurrentMedicalOfficer;
+    }
+
+    public Consultation getSelectedPastConsultation() {
+        return selectedPastConsultation;
+    }
+
+    public void setSelectedPastConsultation(Consultation selectedPastConsultation) {
+        this.selectedPastConsultation = selectedPastConsultation;
     }
 
 }
