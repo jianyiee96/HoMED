@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-war
- */
 package jsf.managedBean;
 
 import ejb.session.stateless.ConsultationSessionBeanLocal;
@@ -29,7 +25,6 @@ import util.exceptions.StartConsultationException;
 @Named(value = "queueManagementManagedBean")
 @ViewScoped
 public class QueueManagementManagedBean implements Serializable {
-
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
@@ -59,20 +54,15 @@ public class QueueManagementManagedBean implements Serializable {
 
         refreshConsultations();
 
+        if (this.waitingConsultations.size() > 0) {
+            this.selectedConsultation = this.waitingConsultations.get(0);
+        }
     }
 
-    private void refreshConsultations() {
-
+    public void refreshConsultations() {
         if (currentMedicalCentre != null && currentMedicalOfficer != null) {
-
             this.waitingConsultations = consultationSessionBeanLocal.retrieveWaitingConsultationsByMedicalCentre(currentMedicalCentre.getMedicalCentreId());
-
-            if (this.waitingConsultations.size() > 0) {
-                this.selectedConsultation = this.waitingConsultations.get(0);
-            }
-
         }
-
     }
 
     public void startSelectedConsultation() {
@@ -117,16 +107,6 @@ public class QueueManagementManagedBean implements Serializable {
 
     public void setCurrentMedicalOfficer(MedicalOfficer currentMedicalOfficer) {
         this.currentMedicalOfficer = currentMedicalOfficer;
-    }
-
-    public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-        return dateFormat.format(date);
-    }
-
-    public String renderTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss");
-        return dateFormat.format(date);
     }
 
 }

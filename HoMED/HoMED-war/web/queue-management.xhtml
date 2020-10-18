@@ -10,44 +10,53 @@
 
 
     <ui:define name="content">
-
-        <h:form id="queueForm">
+        <ezcomp:pageRedirect rendered="#{queueManagementManagedBean.currentMedicalOfficer == null}"
+                             header="Currently Not Assigned to Any Medical Centre"/>
+        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null}">
             <p:growl id="growl" globalOnly="true" showDetail="true" />
 
             <div class="p-grid">
 
-                <div class="p-col-12 p-md-12 p-lg-7">
+                <div class="p-col-12 p-md-12 p-lg-6">
                     <div class="card">
 
-                        <h2>Queue Management</h2>
-
-                        <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{queueManagementManagedBean.waitingConsultations}"
-                                     rowKey="#{consultation.consultationId}"
-                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines">
+                        <div class="p-col-12">
+                            <div class="p-grid p-justify-between">
+                                <h2 style="display: inline-block; margin: 0">Queue Management</h2>
+                                <p:button outcome="current-consultation.xhtml" icon="fa fa-stethoscope"
+                                          value="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation == null ? 'No' : 'Go to'} Ongoing Consultation" 
+                                          class="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation == null ? 'warning-button' : 'sucess-button'}"
+                                          disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation == null}" />
+                            </div>
+                        </div>
+                        <p:poll interval="10" listener="#{queueManagementManagedBean.refreshConsultations}" update="queueDT"/>
+                        <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{queueManagementManagedBean.waitingConsultations}" rowIndexVar="index"
+                                     rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{queueManagementManagedBean.selectedConsultation}"
+                                     styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.joinQueueDateTime}"
+                                     scrollable="true" scrollHeight="300">
+                            <p:ajax event="rowSelect" update="queueForm" process="@this"/>
 
                             <f:facet id="dataViewListHeader" name="header">
                                 <span style="font-weight: bold">SERVICEMAN IN QUEUE</span>
                             </f:facet>
+                            <p:column headerText="Position" width="50">
+                                <h:outputText value="#{index + 1}"/>
+                            </p:column>
                             <p:column headerText="Serviceman Name">
                                 <h:outputText value="#{consultation.booking.serviceman.name}" />
                             </p:column>
                             <p:column headerText="Queueing Since">
-                                <h:outputText value="#{queueManagementManagedBean.renderTime(consultation.joinQueueDateTime)}" />
+                                <h:outputText value="#{consultation.joinQueueDateTime}" >
+                                    <f:convertDateTime pattern="HH:mm"/>
+                                </h:outputText>
                             </p:column>
                             <p:column headerText="Appointment Time">
-                                <h:outputText value="#{queueManagementManagedBean.renderTime(consultation.booking.bookingSlot.startDateTime)}" />
+                                <h:outputText value="#{consultation.booking.bookingSlot.startDateTime}" >
+                                    <f:convertDateTime pattern="HH:mm"/>
+                                </h:outputText>
                             </p:column>
                             <p:column headerText="Consultation Purpose">
                                 <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
-                            </p:column>
-
-                            <p:column style="text-align: center" exportable="false">
-                                <p:commandButton rendered="#{consultation.equals(queueManagementManagedBean.selectedConsultation)}" class="rounded-button success-button" style="margin: 3px" icon="pi pi-caret-right" title="Select" update="queueForm" actionListener="#{queueManagementManagedBean.selectConsultation}">
-                                    <f:attribute name="selectedConsultation" value="#{consultation}" />
-                                </p:commandButton> 
-                                <p:commandButton rendered="#{!consultation.equals(queueManagementManagedBean.selectedConsultation)}" class="rounded-button info-button" style="margin: 3px" icon="pi pi-caret-right" title="Select" update="queueForm" actionListener="#{queueManagementManagedBean.selectConsultation}">
-                                    <f:attribute name="selectedConsultation" value="#{consultation}" />
-                                </p:commandButton> 
                             </p:column>
                         </p:dataTable>
 
@@ -58,7 +67,7 @@
 
                 <ui:fragment rendered="#{queueManagementManagedBean.selectedConsultation ne null}">
 
-                    <div class="p-col-12 p-md-12 p-lg-5">
+                    <div class="p-col-12 p-md-12 p-lg-6">
 
                         <div class="timeline card card-w-title">
                             <h2>Next Consultation</h2>
@@ -73,13 +82,17 @@
                                         <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}"/>
 
                                         <p:outputLabel value="Arrived at: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.joinQueueDateTime)}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.joinQueueDateTime}">
+                                            <f:convertDateTime pattern="HH:mm"/>
+                                        </p:outputLabel>
 
                                         <p:outputLabel value="Appointment Id: " />
                                         <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingId}"/>
 
                                         <p:outputLabel value="Appointment Time: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime)}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}">
+                                            <f:convertDateTime pattern="HH:mm"/>
+                                        </p:outputLabel>
                                     </h:panelGrid>
                                 </li>
                                 <li>
@@ -98,7 +111,9 @@
                                         <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}"/>
 
                                         <p:outputLabel value="ROD date: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.rod}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </p:outputLabel>
                                     </h:panelGrid>
                                 </li>
                                 <li>
@@ -117,9 +132,11 @@
 
                                 </li>
                                 <li>
-                                    <p:commandButton update="growl" disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation != null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION">
-                                        <p:confirm header="Consultation" message="Confirm Start Consultation?" icon="pi pi-exclamation-triangle" />
-                                    </p:commandButton>
+                                    <div style="display: flex; justify-content: center">
+                                        <p:commandButton update="growl" disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation != null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION">
+                                            <p:confirm header="Consultation" message="Confirm Start Consultation?" icon="pi pi-exclamation-triangle" />
+                                        </p:commandButton>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
