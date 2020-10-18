@@ -22,7 +22,6 @@ import util.exceptions.CreateConsultationException;
 import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
-import util.exceptions.MarkBookingAbsentException;
 import util.exceptions.RetrieveConsultationQueuePositionException;
 import util.exceptions.StartConsultationException;
 
@@ -182,6 +181,15 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     public List<Consultation> retrieveCompletedConsultationsByServicemanId(Long servicemanId) {
         Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.serviceman.servicemanId = :inServicemanId AND c.consultationStatusEnum = :consultationStatus");
         query.setParameter("inServicemanId", servicemanId);
+        query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId) {
+        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.medicalOfficer.employeeId = :inMedicalOfficerId AND c.consultationStatusEnum = :consultationStatus");
+        query.setParameter("inMedicalOfficerId", medicalOfficerId);
         query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
 
         return query.getResultList();

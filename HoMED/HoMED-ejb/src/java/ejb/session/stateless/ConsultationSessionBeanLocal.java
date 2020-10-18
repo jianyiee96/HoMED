@@ -40,4 +40,6 @@ public interface ConsultationSessionBeanLocal {
 
     public List<Consultation> retrieveCompletedConsultationsByServicemanId(Long servicemanId);
 
+    public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId);
+
 }

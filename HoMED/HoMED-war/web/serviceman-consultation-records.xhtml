@@ -31,7 +31,7 @@
                                          var="serviceman" value="#{servicemanConsultationRecordsManagedBean.servicemen}" 
                                          sortBy="#{serviceman.servicemanId}" rowKey="#{serviceman.servicemanId}" 
                                          selectionMode="single" selection="#{servicemanConsultationRecordsManagedBean.selectedServiceman}"
-                                         styleClass="crud-management-table"  paginator="true" rows="10" paginatorPosition="bottom">
+                                         styleClass="crud-management-table" paginator="true" rows="10" paginatorPosition="bottom">
                                 <p:ajax event="rowSelect" update="@form" process="@this" listener="#{servicemanConsultationRecordsManagedBean.onSelectServiceman}"/>
 
                                 <f:facet name="header">
