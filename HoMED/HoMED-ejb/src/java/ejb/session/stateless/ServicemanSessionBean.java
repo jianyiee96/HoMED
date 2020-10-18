@@ -2,16 +2,12 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Serviceman;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -63,7 +59,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
 
     @Override
     public List<Serviceman> retrieveAllServicemenWithPastConsultations() {
-        Query query = em.createQuery("SELECT s FROM Serviceman s JOIN s.bookings b JOIN b.consultation c WHERE c.consultationStatusEnum = :consultationStatus ORDER BY s.servicemanId");
+        Query query = em.createQuery("SELECT DISTINCT s FROM Serviceman s JOIN s.bookings b JOIN b.consultation c WHERE c.consultationStatusEnum = :consultationStatus ORDER BY s.servicemanId");
         query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
         
         return query.getResultList();

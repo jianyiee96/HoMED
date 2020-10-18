@@ -179,6 +179,15 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     }
 
     @Override
+    public List<Consultation> retrieveCompletedConsultationsByServicemanId(Long servicemanId) {
+        Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.serviceman.servicemanId = :inServicemanId AND c.consultationStatusEnum = :consultationStatus");
+        query.setParameter("inServicemanId", servicemanId);
+        query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
+
+        return query.getResultList();
+    }
+
+    @Override
     public List<Consultation> retrieveAllServicemanConsultations(Long servicemanId) {
         Query query = em.createQuery("SELECT c FROM Consultation c WHERE c.booking.serviceman.servicemanId = :id");
         query.setParameter("id", servicemanId);
