@@ -6,6 +6,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public abstract class Slot implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date startDateTime;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     @NotNull
@@ -54,6 +55,26 @@ public abstract class Slot implements Serializable {
 
     public Date getEndDateTime() {
         return endDateTime;
+    }
+
+    public int getStartHour() {
+        if (this.startDateTime != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(this.startDateTime);
+            return calendar.get(Calendar.HOUR_OF_DAY);
+        } else {
+            return 0;
+        }
+    }
+
+    public int getEndHour() {
+        if (this.endDateTime != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(this.endDateTime);
+            return calendar.get(Calendar.HOUR_OF_DAY);
+        } else {
+            return 0;
+        }
     }
 
     public void setEndDateTime(Date endDateTime) {
@@ -84,5 +105,5 @@ public abstract class Slot implements Serializable {
     public String toString() {
         return "entity.Slot[ id=" + slotId + " ]";
     }
-    
+
 }

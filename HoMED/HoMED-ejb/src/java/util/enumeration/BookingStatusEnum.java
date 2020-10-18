@@ -5,9 +5,8 @@
 package util.enumeration;
 
 public enum BookingStatusEnum {
-    PAST,
     UPCOMING,
-    PRESENT,
     CANCELLED,
-    PAST_ABSENT
+    ABSENT,
+    PAST,
 }

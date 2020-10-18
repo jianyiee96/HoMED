@@ -10,7 +10,6 @@ import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Booking;
 import entity.BookingSlot;
 import entity.FormInstance;
-import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,9 +22,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
-import util.exceptions.RetrieveBookingSlotsException;
-import util.exceptions.ScheduleBookingSlotException;
 import ws.datamodel.CancelBookingReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.QueryBookingSlotsReq;
@@ -50,8 +48,8 @@ public class SchedulerResource {
     public SchedulerResource() {
         this.sessionBeanLookup = new SessionBeanLookup();
         this.servicemanSessionBeanLocal = this.sessionBeanLookup.lookupServicemanSessionBeanLocal();
-        this.slotSessionBeanLocal = this.sessionBeanLookup.lookupSlotPurposeSessionBeanLocal();
-        this.bookingSessionBeanLocal = this.sessionBeanLookup.lookupBookingPurposeSessionBeanLocal();
+        this.slotSessionBeanLocal = this.sessionBeanLookup.lookupSlotSessionBeanLocal();
+        this.bookingSessionBeanLocal = this.sessionBeanLookup.lookupBookingSessionBeanLocal();
     }
 
     @Path("queryBookingSlots")
@@ -59,9 +57,9 @@ public class SchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response queryBookingSlots(@Context HttpHeaders headers, QueryBookingSlotsReq queryBookingSlotsReq) {
-        
+
         System.out.println("Query Date: " + queryBookingSlotsReq.getQueryDate());
-        
+
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);
@@ -87,7 +85,7 @@ public class SchedulerResource {
                 b.getBooking().setConsultation(null);
             }
         }
-        return Response.status(Response.Status.ACCEPTED).entity(new QueryBookingSlotsRsp(bookingSlots)).build();
+        return Response.status(Response.Status.OK).entity(new QueryBookingSlotsRsp(bookingSlots)).build();
 
     }
 
@@ -96,7 +94,7 @@ public class SchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response scheduleBooking(@Context HttpHeaders headers, ScheduleBookingReq scheduleBookingReq) {
-            
+
         try {
             String token = headers.getRequestHeader("Token").get(0);
             String id = headers.getRequestHeader("Id").get(0);
@@ -131,22 +129,28 @@ public class SchedulerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelBooking(@Context HttpHeaders headers, CancelBookingReq cancelBookingReq) {
 
-//        try {
-//            String token = headers.getRequestHeader("Token").get(0);
-//            String id = headers.getRequestHeader("Id").get(0);
-//
-//            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
-//                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
-//                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
-//            }
-//
-//        } catch (Exception ex) {
-//            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
-//            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
-//        }
-        ErrorRsp errorRsp = new ErrorRsp("Not implemented");
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
 
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+        try {
+            bookingSessionBeanLocal.cancelBooking(cancelBookingReq.getBookingId());
+            return Response.status(Response.Status.OK).build();
+
+        } catch (CancelBookingException ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
 
     }
 
@@ -178,15 +182,22 @@ public class SchedulerResource {
             b.getBookingSlot().setBooking(null);
             b.getBookingSlot().getMedicalCentre().setMedicalStaffList(null);
             b.getBookingSlot().getMedicalCentre().setBookingSlots(null);
-            for(FormInstance fi : b.getFormInstances()) {
+            for (FormInstance fi : b.getFormInstances()) {
+                if (fi.getSignedBy() != null) {
+                    fi.getSignedBy().setSignedFormInstances(null);
+                    fi.getSignedBy().setCurrentConsultation(null);
+                    fi.getSignedBy().setCompletedConsultations(null);
+                    fi.getSignedBy().setMedicalCentreToNull();
+                }
                 fi.setServiceman(null);
                 fi.setBooking(null);
                 fi.getFormTemplateMapping().setFormInstances(null);
                 fi.getFormTemplateMapping().setConsultationPurposes(null);
             }
+            b.setConsultation(null);
         }
 
-        return Response.status(Response.Status.ACCEPTED).entity(new RetrieveBookingsRsp(bookings)).build();
+        return Response.status(Response.Status.OK).entity(new RetrieveBookingsRsp(bookings)).build();
 
     }
 

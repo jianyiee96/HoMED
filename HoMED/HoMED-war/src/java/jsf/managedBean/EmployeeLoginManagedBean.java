@@ -2,6 +2,7 @@ package jsf.managedBean;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
+import entity.MedicalStaff;
 import java.io.IOException;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
@@ -61,7 +62,12 @@ public class EmployeeLoginManagedBean implements Serializable {
             if (currentEmployee.getIsActivated()) {
                 FacesContext.getCurrentInstance().getExternalContext().getSession(true);
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentEmployee", currentEmployee);
-
+                if (currentEmployee instanceof MedicalStaff) {
+                    MedicalStaff ms = (MedicalStaff) currentEmployee;
+                    if (ms.getMedicalCentre() != null) {
+                        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("currentMedicalCentre", ms.getMedicalCentre());
+                    }
+                }
                 setRoleTheme(currentEmployee.getRole());
 
                 FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");

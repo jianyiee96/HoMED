@@ -12,10 +12,25 @@
                     <ui:fragment>
                         <div class="layout-profile">
                             <a class="layout-profile-button" href="#">
-                                <p:graphicImage name="images/avatar/avatar.png" library="roma-layout" />
+                                <!--<p:graphicImage name="images/avatar/avatar.png" library="roma-layout" />-->
+                                <div style="display: flex; justify-content: center" class="p-mb-2">
+                                    <div style="width:80px;height:80px;border-radius: 50%;background: grey; border:3px solid white;">
+                                        <div style="display: flex;align-content: center;align-items: center;justify-content: center; height: 100%">
+                                            <h:outputText rendered="#{currentEmployee.role == 'SUPER_USER'}" class="fa fa-user-secret" style="color: white;font-size: 70px; margin-left: 6px"/>
+                                            <h:outputText rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" class="fa fa-user-md" style="color: white;font-size: 70px; margin-left: 1px"/>
+                                            <h:outputText rendered="#{currentEmployee.role == 'MB_ADMIN'}" class="fa fa-user" style="color: white;font-size: 70px; margin-left: 1px"/>
+                                            <h:outputText rendered="#{currentEmployee.role == 'CLERK'}" class="fa fa-user" style="color: white;font-size: 70px; margin-left: 1px"/>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="layout-profile-userinfo">
                                     <span class="layout-profile-name">#{sessionScope.currentEmployee.name}</span>
                                     <span class="layout-profile-role">#{sessionScope.currentEmployee.role.stringVal}</span>
+                                    <h:panelGroup rendered="#{sessionScope.currentMedicalCentre ne null}" >
+                                        <div class="p-mt-3" style="padding:15px; display: flex; align-items: center; justify-content: center">
+                                            <h:outputText class="layout-profile-role" style="word-wrap: break-word; max-width: 280px" value="#{sessionScope.currentMedicalCentre.name}"/>
+                                        </div>
+                                    </h:panelGroup>
                                 </div>
                             </a>
                             <ul class="layout-profile-menu">
@@ -43,7 +58,6 @@
                         </div>
                     </ui:fragment>
                     <po:menu widgetVar="RomaMenuWidget">
-
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
                         <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
                         <p:submenu rendered="#{currentEmployee.role == 'SUPER_USER'}" label="Users Account Management" icon="fa fa-users">
@@ -54,6 +68,18 @@
                             <p:menuitem value="E-Form Utility" icon="fa fa-file-code-o" outcome="/form-util" />
                             <p:menuitem value="Consultation Utility" icon="fa fa-wrench" outcome="/consultation-util" />
                         </p:submenu>
+                        <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Scheduler Management" icon="pi pi-calendar-plus" >
+                            <p:menuitem value="Booking Slot Management"  icon="fa fa-calendar" outcome="/booking-slot-management" />
+                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management" icon="fa fa-calendar-o" outcome="/medical-board-slot-management" />
+                        </p:submenu>
+                        <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
+                        <p:submenu rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" label="Consultation History" icon="fa fa-history" >
+                            <p:menuitem value="My Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
+                            <p:menuitem value="Serviceman Consultation Records" icon="fa fa-users" outcome="/serviceman-consultation-records" />
+                        </p:submenu>
+                        <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />
+
+                        <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
                     </po:menu>
                 </h:form>
                 <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">

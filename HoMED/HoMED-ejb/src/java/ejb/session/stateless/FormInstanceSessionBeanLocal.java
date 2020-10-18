@@ -22,7 +22,7 @@ public interface FormInstanceSessionBeanLocal {
     
     public Long generateFormInstance(Long servicemanId, Long formTemplateId) throws GenerateFormInstanceException;
 
-    public void deleteFormInstance(Long formInstanceId) throws DeleteFormInstanceException;
+    public void deleteFormInstance(Long formInstanceId, Boolean systemCall) throws DeleteFormInstanceException;
     
     public void updateFormInstanceFieldValues(FormInstance formInstance) throws UpdateFormInstanceException;
     
@@ -33,5 +33,7 @@ public interface FormInstanceSessionBeanLocal {
     public List<FormInstance> retrieveServicemanFormInstances(Long servicemanId);
     
     public FormInstance retrieveFormInstance(Long id);
+
+    public void submitFormInstanceByDoctor(FormInstance forminstanceToUpdate, Long medicalOfficerId) throws SubmitFormInstanceException;
     
 }

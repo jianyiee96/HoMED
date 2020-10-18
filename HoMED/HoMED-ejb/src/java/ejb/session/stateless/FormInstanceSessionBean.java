@@ -10,6 +10,7 @@ import entity.FormInstance;
 import entity.FormInstanceField;
 import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
+import entity.MedicalOfficer;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +26,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.BookingStatusEnum;
+import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
@@ -39,6 +42,9 @@ import util.exceptions.UpdateFormInstanceException;
  */
 @Stateless
 public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
+
+    @EJB(name = "EmployeeSessionBeanLocal")
+    private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     @EJB
     FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
@@ -106,7 +112,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     }
 
     @Override
-    public void deleteFormInstance(Long formInstanceId) throws DeleteFormInstanceException {
+    public void deleteFormInstance(Long formInstanceId, Boolean systemCall) throws DeleteFormInstanceException {
         String errorMessage = "Failed to delete Form Instance: ";
 
         try {
@@ -115,8 +121,10 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             if (formInstance == null) {
                 throw new DeleteFormInstanceException("Please supply an existing formInstanceId");
-            } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
+            } else if (!systemCall && formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
                 throw new DeleteFormInstanceException("Unable to delete submitted form instances");
+            } else if (!systemCall && formInstance.getBooking() != null) {
+                throw new DeleteFormInstanceException("Unable to delete form instance with link to booking");
             }
 
             for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
@@ -127,6 +135,20 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             formInstance.getServiceman().getFormInstances().remove(formInstance);
 
             formInstance.getFormTemplateMapping().getFormInstances().remove(formInstance);
+
+            if (formInstance.getBooking() != null) {
+
+                formInstance.getBooking().getFormInstances().remove(formInstance);
+                formInstance.setBooking(null);
+
+            }
+
+            if (formInstance.getSignedBy() != null) {
+
+                formInstance.getSignedBy().getSignedFormInstances().remove(formInstance);
+                formInstance.setSignedBy(null);
+
+            }
 
             em.remove(formInstance);
             em.flush();
@@ -233,13 +255,69 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     }
 
     @Override
+    public void submitFormInstanceByDoctor(FormInstance forminstanceToUpdate, Long medicalOfficerId) throws SubmitFormInstanceException {
+        if (medicalOfficerId == null) {
+            throw new SubmitFormInstanceException("Failed to sign form instance: Unable to retrieve doctor information");
+        }
+
+        MedicalOfficer mo = employeeSessionBeanLocal.retrieveMedicalOfficerById(medicalOfficerId);
+
+        if (mo == null) {
+            throw new SubmitFormInstanceException("Failed to sign form instance: Unable to retrieve doctor information");
+        }
+
+        try {
+            updateFormInstanceFieldValues(forminstanceToUpdate);
+        } catch (UpdateFormInstanceException ex) {
+            throw new SubmitFormInstanceException(ex.getMessage());
+        }
+        FormInstance formInstance = retrieveFormInstance(forminstanceToUpdate.getFormInstanceId());
+        formInstance.setSignedBy(mo);
+        mo.getSignedFormInstances().add(formInstance);
+
+        // server-side validation
+        String validationMessage = "Form Instance Validation Error:";
+        boolean validationSuccess = true;
+
+        for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
+
+            if (fif.getFormFieldMapping().getIsRequired()
+                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER) { // not header, is required
+                boolean hasContent = false;
+                for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
+                    if (fifv.getInputValue() != null && !fifv.getInputValue().equals("")) {
+                        hasContent = true;
+                    }
+                }
+
+                if (!hasContent) {
+                    validationMessage = validationMessage + "\nQuestion: " + fif.getFormFieldMapping().getQuestion() + " is required";
+                    validationSuccess = false;
+                }
+
+            }
+
+        }
+
+        if (!validationSuccess) {
+            throw new SubmitFormInstanceException(validationMessage);
+        }
+        
+    }
+
+    @Override
     public void archiveFormInstance(Long formInstanceId) throws ArchiveFormInstanceException {
         FormInstance formInstance = retrieveFormInstance(formInstanceId);
 
-        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
-            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
-        } else if (formInstance == null) {
+        if (formInstance == null) {
             throw new ArchiveFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
+        } else if (formInstance.getBooking() != null && formInstance.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to an upcoming cooking.");
+        } else if (formInstance.getBooking() != null && formInstance.getBooking().getConsultation() != null && formInstance.getBooking().getConsultation().getConsultationStatusEnum() != ConsultationStatusEnum.COMPLETED) {
+            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to a present consultation.");
+
         }
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.ARCHIVED);
