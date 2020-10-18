@@ -1,7 +1,3 @@
-/*
- * Project Title: Home Team Medical Board
- * Project Application: HoMED-war
- */
 package jsf.managedBean;
 
 import ejb.session.stateless.ConsultationSessionBeanLocal;
@@ -44,8 +40,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     private Consultation selectedConsultation;
 
-    private int countdownRemainingSeconds;
-
     private String consultationNotes;
 
     private String remarksForServiceman;
@@ -56,7 +50,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        countdownRemainingSeconds = 5;
         consultationNotes = "";
         remarksForServiceman = "";
 
@@ -162,27 +155,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public ManageFormInstanceManagedBean getManageFormInstanceManagedBean() {
         return manageFormInstanceManagedBean;
-    }
-
-    public int getCountdownRemainingSeconds() {
-        return countdownRemainingSeconds;
-    }
-
-    public String getCountdownValue() {
-        int mins = countdownRemainingSeconds / 60;
-        int remainder = countdownRemainingSeconds - (mins * 60);
-        return String.format("%02d:%02d", mins, remainder);
-    }
-
-    public void decreaseCountdown() {
-        this.countdownRemainingSeconds -= 1;
-        if (this.countdownRemainingSeconds == 0) {
-            try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
-            } catch (IOException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
-            }
-        }
     }
 
     public String getConsultationNotes() {

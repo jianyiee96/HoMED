@@ -441,16 +441,27 @@ public class DataInitializationSessionBean {
         Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
         Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
         Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
+        
+        // NO Medical Centre Staff
+        Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
+        Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
+        Employee emp8 = new MedicalBoardAdmin("MedicalBoardAdmin No MC", "password", "dummyemailx8@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91637494", GenderEnum.MALE);
         Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
         Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
         Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
         Long empId4 = employeeSessionBeanLocal.createEmployeeByInit(emp4);
         Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
+        Long empId6 = employeeSessionBeanLocal.createEmployeeByInit(emp6);
+        Long empId7 = employeeSessionBeanLocal.createEmployeeByInit(emp7);
+        Long empId8 = employeeSessionBeanLocal.createEmployeeByInit(emp8);
         emp1 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp1.getEmail());
         emp2 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp2.getEmail());
         emp3 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp3.getEmail());
         emp4 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp4.getEmail());
         emp5 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp5.getEmail());
+        emp6 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp6.getEmail());
+        emp7 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp7.getEmail());
+        emp8 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp8.getEmail());
 
         System.out.println("EMPLOYEE INFO [INIT]");
         System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
@@ -458,6 +469,9 @@ public class DataInitializationSessionBean {
         System.out.println("Email: " + emp3.getEmail() + "\tPhone: " + emp3.getPhoneNumber());
         System.out.println("Email: " + emp4.getEmail() + "\tPhone: " + emp4.getPhoneNumber());
         System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
+        System.out.println("Email: " + emp6.getEmail() + "\tPhone: " + emp6.getPhoneNumber());
+        System.out.println("Email: " + emp7.getEmail() + "\tPhone: " + emp7.getPhoneNumber());
+        System.out.println("Email: " + emp8.getEmail() + "\tPhone: " + emp8.getPhoneNumber());
         System.out.println("Successfully created employees by init\n");
 
         Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
