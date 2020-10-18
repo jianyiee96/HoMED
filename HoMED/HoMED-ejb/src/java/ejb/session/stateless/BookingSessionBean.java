@@ -106,60 +106,17 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException {
 
         try {
+            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId);
 
-            Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);
-            ConsultationPurpose consultationPurpose = consultationPurposeSessionBeanLocal.retrieveConsultationPurpose(consultationPurposeId);
-            BookingSlot bookingSlot = slotSessionBeanLocal.retrieveBookingSlotById(bookingSlotId);
-
-            if (consultationPurpose == null) {
-                throw new CreateBookingException("Consultation Purpose Id not valid");
-            } else if (bookingSlot == null) {
-                throw new CreateBookingException("Booking Slot Id not valid");
-            } else if (bookingSlot.getBooking() != null) {
-                throw new CreateBookingException("Booking Slot not valid: Has existing booking");
-            } else if (bookingSlot.getStartDateTime().before(new Date())) {
-                throw new CreateBookingException("Booking Slot not valid: Invalid Start Date");
-            }
-
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
-
-            bookingSlot.setBooking(newBooking);
-            serviceman.getBookings().add(newBooking);
-            consultationPurpose.getBookings().add(newBooking);
-
-            em.persist(newBooking);
-            em.flush();
-
-            // Generate and form templates that are linked to cosultation purpose
-            for (FormTemplate ft : consultationPurpose.getFormTemplates()) {
-                try {
-                    Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(serviceman.getServicemanId(), ft.getFormTemplateId());
-                    FormInstance fi = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-                    newBooking.getFormInstances().add(fi);
-                    fi.setBooking(newBooking);
-
-                } catch (GenerateFormInstanceException ex) {
-                    System.out.println("> " + ex.getMessage());
-                }
-            }
-
-            for (Long ftId : additionalFormTemplateIds) {
-                try {
-                    Long formInstanceId = formInstanceSessionBeanLocal.generateFormInstance(serviceman.getServicemanId(), ftId);
-                    FormInstance fi = formInstanceSessionBeanLocal.retrieveFormInstance(formInstanceId);
-                    newBooking.getFormInstances().add(fi);
-                    fi.setBooking(newBooking);
-
-                } catch (GenerateFormInstanceException ex) {
-                    System.out.println("> " + ex.getMessage());
-                }
+            if (!additionalFormTemplateIds.isEmpty()) {
+                attachFormInstancesByClerk(newBooking.getBookingSlot().getSlotId(), additionalFormTemplateIds);
             }
 
             // Notification module can fire here
             return newBooking;
 
-        } catch (ServicemanNotFoundException ex) {
-            throw new CreateBookingException("Serviceman Id not valid");
+        } catch (CreateBookingException | AttachFormInstancesException ex) {
+            throw new CreateBookingException("Failed to create booking: " + ex.getMessage());
         }
 
     }
@@ -191,30 +148,6 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         // Notification module can fire here
         return booking;
-    }
-
-    @Override
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) {
-
-        try {
-            Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);
-            ConsultationPurpose consultationPurpose = consultationPurposeSessionBeanLocal.retrieveConsultationPurpose(consultationPurposeId);
-            BookingSlot bookingSlot = slotSessionBeanLocal.retrieveBookingSlotById(bookingSlotId);
-
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
-
-            bookingSlot.setBooking(newBooking);
-            serviceman.getBookings().add(newBooking);
-            consultationPurpose.getBookings().add(newBooking);
-
-            em.persist(newBooking);
-            em.flush();
-
-            return newBooking;
-        } catch (ServicemanNotFoundException ex) {
-            return null;
-        }
-
     }
 
     @Override

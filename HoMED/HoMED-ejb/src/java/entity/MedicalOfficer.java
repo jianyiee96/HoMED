@@ -23,6 +23,7 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
 
     public MedicalOfficer() {
         this.completedConsultations = new ArrayList<>();
+        this.signedFormInstances = new ArrayList<>();
     }
 
     public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {

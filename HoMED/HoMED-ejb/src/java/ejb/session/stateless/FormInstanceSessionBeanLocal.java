@@ -34,6 +34,6 @@ public interface FormInstanceSessionBeanLocal {
     
     public FormInstance retrieveFormInstance(Long id);
 
-    public void submitFormInstanceByDoctor(Long formInstanceId) throws SubmitFormInstanceException;
+    public void submitFormInstanceByDoctor(FormInstance forminstanceToUpdate, Long medicalOfficerId) throws SubmitFormInstanceException;
     
 }

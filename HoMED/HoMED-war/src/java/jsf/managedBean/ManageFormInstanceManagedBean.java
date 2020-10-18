@@ -129,13 +129,11 @@ public class ManageFormInstanceManagedBean implements Serializable {
 
         if (!errorPresent) {
             try {
-                formInstanceToView.setSignedBy(medicalOfficer);
-                formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
-                formInstanceSessionBean.submitFormInstanceByDoctor(formInstanceToView.getFormInstanceId());
+                formInstanceSessionBean.submitFormInstanceByDoctor(formInstanceToView, medicalOfficer.getEmployeeId());
                 isReloadMainPage = true;
                 isSuccessfulSubmit = true;
                 PrimeFaces.current().executeScript("PF('dlgManageFormInstance').hide()");
-            } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
+            } catch (SubmitFormInstanceException ex) {
                 formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareLoad());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, null, ex.getMessage()));
             }

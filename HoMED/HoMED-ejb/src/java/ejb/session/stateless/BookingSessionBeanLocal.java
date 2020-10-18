@@ -17,8 +17,6 @@ import util.exceptions.MarkBookingAttendanceException;
 public interface BookingSessionBeanLocal {
 
     public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) throws CreateBookingException;
-
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId);
     
     public void cancelBooking(Long bookingId) throws CancelBookingException;
 

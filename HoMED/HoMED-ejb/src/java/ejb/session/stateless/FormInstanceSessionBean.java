@@ -143,6 +143,13 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
             }
 
+            if (formInstance.getSignedBy() != null) {
+
+                formInstance.getSignedBy().getSignedFormInstances().remove(formInstance);
+                formInstance.setSignedBy(null);
+
+            }
+
             em.remove(formInstance);
             em.flush();
 
@@ -164,11 +171,6 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         try {
 
             FormInstance fiPersisted = retrieveFormInstance(formInstance.getFormInstanceId());
-
-            if (formInstance.getSignedBy() != null) {
-                MedicalOfficer mo = employeeSessionBeanLocal.retrieveMedicalOfficerById(formInstance.getSignedBy().getEmployeeId());
-                fiPersisted.setSignedBy(mo);
-            }
 
             if (formInstance == null) {
                 throw new UpdateFormInstanceException("Please supply an existing formInstanceId");
@@ -253,15 +255,25 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     }
 
     @Override
-    public void submitFormInstanceByDoctor(Long formInstanceId) throws SubmitFormInstanceException {
-        FormInstance formInstance = retrieveFormInstance(formInstanceId);
-//        Not required for doctor
-//        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.DRAFT) {
-//            throw new SubmitFormInstanceException("Invalid Form Instance status: Status of form instance must be DRAFT");
-//        } else 
-        if (formInstance == null) {
-            throw new SubmitFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+    public void submitFormInstanceByDoctor(FormInstance forminstanceToUpdate, Long medicalOfficerId) throws SubmitFormInstanceException {
+        if (medicalOfficerId == null) {
+            throw new SubmitFormInstanceException("Failed to sign form instance: Unable to retrieve doctor information");
         }
+
+        MedicalOfficer mo = employeeSessionBeanLocal.retrieveMedicalOfficerById(medicalOfficerId);
+
+        if (mo == null) {
+            throw new SubmitFormInstanceException("Failed to sign form instance: Unable to retrieve doctor information");
+        }
+
+        try {
+            updateFormInstanceFieldValues(forminstanceToUpdate);
+        } catch (UpdateFormInstanceException ex) {
+            throw new SubmitFormInstanceException(ex.getMessage());
+        }
+        FormInstance formInstance = retrieveFormInstance(forminstanceToUpdate.getFormInstanceId());
+        formInstance.setSignedBy(mo);
+        mo.getSignedFormInstances().add(formInstance);
 
         // server-side validation
         String validationMessage = "Form Instance Validation Error:";
@@ -290,9 +302,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         if (!validationSuccess) {
             throw new SubmitFormInstanceException(validationMessage);
         }
-
-//        formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
-//        formInstance.setDateSubmitted(new Date());
+        
     }
 
     @Override
