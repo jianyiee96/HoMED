@@ -25,8 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
-import util.exceptions.RetrieveBookingSlotsException;
-import util.exceptions.ScheduleBookingSlotException;
 import ws.datamodel.CancelBookingReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.QueryBookingSlotsReq;
