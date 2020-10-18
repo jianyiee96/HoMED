@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.PrimeFaces;
 
 @Named(value = "servicemanConsultationRecordsManagedBean")
 @ViewScoped
@@ -43,6 +44,11 @@ public class ServicemanConsultationRecordsManagedBean implements Serializable {
 
     public void onSelectServiceman() {
         this.pastConsultationsForSelectedServiceman = consultationSessionBeanLocal.retrieveCompletedConsultationsByServicemanId(this.selectedServiceman.getServicemanId());
+        
+        if (this.pastConsultationsForSelectedServiceman.isEmpty()) {
+            this.selectedServiceman = null;
+            PrimeFaces.current().executeScript("PF('dlgNoConsultationRecords').show();");
+        }
     }
 
     public List<Serviceman> getServicemen() {

@@ -80,6 +80,15 @@
                         </div>
                     </div>
                 </div>
+
+                <p:dialog id="dlgNoConsultationRecords" widgetVar="dlgNoConsultationRecords" closable="false" responsive="true" modal="true" draggable="false"
+                          header="No Consultation Records" width="400">
+                    <p:outputLabel value='The selected serviceman has no consultation records to display.' />
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Dismiss" styleClass="ui-confirmdialog-yes" icon="pi pi-check" onclick="PF('dlgNoConsultationRecords').hide()" />
+                    </f:facet>
+                </p:dialog>
             </ui:fragment>
 
             <div class="p-grid crud-table">
