@@ -98,7 +98,9 @@
                                         <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}"/>
 
                                         <p:outputLabel value="ROD date: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.renderDate(queueManagementManagedBean.selectedConsultation.booking.serviceman.rod)}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.rod}">
+                                            <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                        </p:outputLabel>
                                     </h:panelGrid>
                                 </li>
                                 <li>
