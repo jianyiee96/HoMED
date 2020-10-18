@@ -19,9 +19,8 @@
 
         <ezcomp:manageFormInstance id="ccManageFormInstance" />
 
-        <ui:fragment rendered="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer.size() == 0}">
-            <h3>Currently No Past Consultations</h3>
-        </ui:fragment>
+        <ezcomp:pageRedirect rendered="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer.size() == 0}"
+                             header="Currently No Past Consultations"/>
 
         <ui:fragment rendered="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer.size() != 0}">
             <h:form>

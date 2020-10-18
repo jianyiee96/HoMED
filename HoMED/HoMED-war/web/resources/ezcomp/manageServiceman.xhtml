@@ -42,6 +42,10 @@
                 background: #DDA0DD;
                 color: #832f83;
             }
+
+            body .ui-dialog .ui-dialog-content {
+                padding-top: 0 !important
+            }
         </style>
 
         <h:form id="formManageServiceman">
@@ -55,7 +59,7 @@
                                 <div style="width: 130px; margin-left: 15px"></div>
                                 <div>
                                     <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
-                                        <span class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
+                                        <span style="display: inline-block" class="p-mt-3 role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
                                         <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
                                             <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                         </ui:fragment>

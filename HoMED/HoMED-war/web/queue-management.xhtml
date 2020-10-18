@@ -10,17 +10,24 @@
 
 
     <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .display-text {
+                font-weight: bold;
+            }
+        </style>
+        <ezcomp:manageFormInstance id="ccManageFormInstance" />
         <ezcomp:pageRedirect rendered="#{queueManagementManagedBean.currentMedicalOfficer == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
         <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null}">
             <p:growl id="growl" globalOnly="true" showDetail="true" />
 
-            <div class="p-grid">
-
+            <div class="p-grid crud-table">
                 <div class="p-col-12 p-md-12 p-lg-6">
-                    <div class="card">
+                    <p:panel id="basic">
 
-                        <div class="p-col-12">
+                        <div class="p-col-12"  style="padding-bottom: 0">
                             <div class="p-grid p-justify-between">
                                 <h2 style="display: inline-block; margin: 0">Queue Management</h2>
                                 <p:button outcome="current-consultation.xhtml" icon="fa fa-stethoscope"
@@ -36,31 +43,38 @@
                                      scrollable="true" scrollHeight="300">
                             <p:ajax event="rowSelect" update="queueForm" process="@this"/>
 
-                            <f:facet id="dataViewListHeader" name="header">
-                                <span style="font-weight: bold">SERVICEMAN IN QUEUE</span>
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold">SERVICEMEN IN QUEUE</span>
+
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('queueDT').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
                             </f:facet>
-                            <p:column headerText="Position" width="50">
+
+                            <p:column headerText="Position" width="70" filterBy="#{index}" filterMatchMode="contains">
                                 <h:outputText value="#{index + 1}"/>
                             </p:column>
-                            <p:column headerText="Serviceman Name">
+                            <p:column headerText="Serviceman Name" filterBy="#{consultation.booking.serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.serviceman.name}" />
                             </p:column>
-                            <p:column headerText="Queueing Since">
+                            <p:column headerText="Queueing Since" filterBy="#{consultation.joinQueueDateTime}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.joinQueueDateTime}" >
                                     <f:convertDateTime pattern="HH:mm"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="Appointment Time">
+                            <p:column headerText="Booking Time" filterBy="#{consultation.booking.bookingSlot.startDateTime}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.bookingSlot.startDateTime}" >
                                     <f:convertDateTime pattern="HH:mm"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="Consultation Purpose">
+                            <p:column headerText="Consultation Purpose" filterBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
                             </p:column>
                         </p:dataTable>
-
-                    </div>
+                    </p:panel>
 
                 </div>
 
@@ -68,79 +82,90 @@
                 <ui:fragment rendered="#{queueManagementManagedBean.selectedConsultation ne null}">
 
                     <div class="p-col-12 p-md-12 p-lg-6">
-
                         <div class="timeline card card-w-title">
-                            <h2>Next Consultation</h2>
+                            <h2>Information</h2>
                             <ul>
                                 <li>
-                                    <h5>Appointment</h5>
-                                    <h:panelGrid columns="2" cellpadding="5">
-                                        <p:outputLabel value="Consultation Id: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.consultationId}"/>                                
+                                    <p:panelGrid id="panelCurrentConsultation" columns="2" layout="flex">
+                                        <h:panelGroup>
+                                            <h5>Consultation Information</h5>
+                                            <h:panelGrid columns="2" cellpadding="5">
+                                                <p:outputLabel value="Consultation Id: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.consultationId}" class="display-text" />                                
 
-                                        <p:outputLabel value="Purpose: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}"/>
+                                                <p:outputLabel value="Purpose: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
-                                        <p:outputLabel value="Arrived at: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.joinQueueDateTime}">
-                                            <f:convertDateTime pattern="HH:mm"/>
-                                        </p:outputLabel>
+                                                <p:outputLabel value="Queueing Since: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.joinQueueDateTime}" class="display-text">
+                                                    <f:convertDateTime pattern="HH:mm"/>
+                                                </p:outputLabel>                                
 
-                                        <p:outputLabel value="Appointment Id: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingId}"/>
+                                                <p:outputLabel value="Booking Id: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingId}" class="display-text"/>
 
-                                        <p:outputLabel value="Appointment Time: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}">
-                                            <f:convertDateTime pattern="HH:mm"/>
-                                        </p:outputLabel>
-                                    </h:panelGrid>
+                                                <p:outputLabel value="Booking Time: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}" class="display-text">
+                                                    <f:convertDateTime pattern="HH:mm"/>
+                                                </p:outputLabel>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
                                 </li>
+
                                 <li>
                                     <h5>Serviceman Information</h5>
                                     <h:panelGrid columns="2" cellpadding="5">
                                         <p:outputLabel value="Name: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.name}"/>                                
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.name}" class="display-text"/>                                
 
                                         <p:outputLabel value="Email " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.email}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.email}" class="display-text"/>
+
+                                        <p:outputLabel value="Role " />
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.role}" class="display-text"/>
 
                                         <p:outputLabel value="Gender: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.gender}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.gender}" class="display-text"/>
 
                                         <p:outputLabel value="Blood type: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
 
                                         <p:outputLabel value="ROD date: " />
-                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.rod}">
-                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.rod}" class="display-text">
+                                            <f:convertDateTime pattern="yyyy/MM/dd"/>
                                         </p:outputLabel>
                                     </h:panelGrid>
                                 </li>
+
                                 <li>
-                                    <h5>Forms</h5>
+                                    <h:panelGroup id="panelGroupForms">
+                                        <h5>Forms (view only)</h5>
 
-                                    <h:dataTable cellpadding="5" rendered="#{queueManagementManagedBean.selectedConsultation.booking.formInstances.size() != 0}" value="#{queueManagementManagedBean.selectedConsultation.booking.formInstances}" var="instance">
-                                        <h:column>
-                                            <p:outputLabel value="#{instance.formTemplateMapping.formTemplateName}"/>
-                                        </h:column>
-                                    </h:dataTable>
+                                        <h:dataTable cellpadding="5" rendered="#{not empty queueManagementManagedBean.selectedConsultation.booking.formInstances}" value="#{queueManagementManagedBean.selectedConsultation.booking.formInstances}" var="instance">
+                                            <h:column>
+                                                <p:commandLink value="#{instance.formTemplateMapping.formTemplateName}" oncomplete="PF('dlgManageFormInstance').show()"
+                                                               update="ccManageFormInstance:formManageFormInstance" action="#{manageFormInstanceManagedBean.initView}" resetValues="ccManageFormInstance:formManageFormInstance">
+                                                    <f:setPropertyActionListener target="#{manageFormInstanceManagedBean.formInstanceToView}" value="#{instance}"/>
+                                                </p:commandLink>
+                                            </h:column>
+                                        </h:dataTable>
 
-
-                                    <h:panelGrid rendered="#{queueManagementManagedBean.selectedConsultation.booking.formInstances.size() == 0}" columns="1" cellpadding="5">
-                                        <p:outputLabel value="No forms" />
-                                    </h:panelGrid>
-
+                                        <h:panelGrid rendered="#{empty queueManagementManagedBean.selectedConsultation.booking.formInstances}" columns="1" cellpadding="5">
+                                            <p:outputLabel value="No forms" />
+                                        </h:panelGrid>
+                                    </h:panelGroup>
                                 </li>
+
                                 <li>
                                     <div style="display: flex; justify-content: center">
-                                        <p:commandButton update="growl" disabled="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation != null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION">
+                                        <p:commandButton update="growl" rendered="#{queueManagementManagedBean.currentMedicalOfficer.currentConsultation == null}" actionListener="#{queueManagementManagedBean.startSelectedConsultation}" value="START CONSULTATION">
                                             <p:confirm header="Consultation" message="Confirm Start Consultation?" icon="pi pi-exclamation-triangle" />
                                         </p:commandButton>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-
                     </div>
                 </ui:fragment>
 
