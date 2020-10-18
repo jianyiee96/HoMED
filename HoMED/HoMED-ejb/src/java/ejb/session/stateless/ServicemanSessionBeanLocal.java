@@ -52,4 +52,6 @@ public interface ServicemanSessionBeanLocal {
     
     public Boolean verifyToken(Long id, String token);
 
+    public List<Serviceman> retrieveAllServicemenWithPastConsultations();
+
 }

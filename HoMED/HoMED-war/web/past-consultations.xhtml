@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Past Consultations</ui:define>
+
+    <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .display-text {
+                font-weight: bold;
+            }
+        </style>
+        <ezcomp:manageFormInstance id="ccManageFormInstance">
+            <f:ajax event="dialogCloseEvent" listener="#{currentConsultationManagedBean.dialogActionListener}"/>
+        </ezcomp:manageFormInstance>
+
+        <h:form id="consultationForm">
+            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                <p:autoUpdate />
+            </p:growl>
+            <p:growl id="growl" globalOnly="true" showDetail="true" />
+            <!--            <div class="p-grid">
+                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                                <div class="card ui-fluid">
+                                    abc
+                                </div>
+                                <div class="card ui-fluid">
+                                    cde
+                                </div>
+                            </div>
+            
+                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                                <div class="card ui-fluid">
+                                    whatever
+                                </div>
+                            </div>
+                        </div>-->
+            <h:form id="formAllServicemenWithPastConsultations">
+                <div class="p-grid crud-table">
+                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                        <div class="card ui-fluid">
+                            <h2>Past Consultations</h2>
+
+                            <p:dataTable id="dataTableServicemenWithPastConsultations" widgetVar="dataTableServicemenWithPastConsultations" var="serviceman" value="#{pastConsultationsManagedBean.servicemenWithPastConsultations}" sortBy="#{serviceman.servicemanId}"
+                                         styleClass="crud-management-table" rowKey="#{serviceman.servicemanId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                                <f:facet name="header">
+                                    <div class="crud-table-header">
+                                        <span style="font-weight: bold">SERVICEMEN WITH COMPLETED CONSULTATIONS</span>
+
+                                        <span class="filter-container ui-input-icon-left">
+                                            <i class="pi pi-search" />
+                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableServicemenWithPastConsultations').filter()" placeholder="Search" />
+                                        </span>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="ID" width="3%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.servicemanId}" />
+                                </p:column>
+
+                                <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.name}" />
+                                </p:column>
+
+                                <p:column headerText="Role" width="7%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.role}" />
+                                </p:column>
+
+                                <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.email}" />
+                                </p:column>
+
+                                <p:column headerText="Gender" width="5%" sortBy="#{serviceman.gender}" filterBy="#{serviceman.gender}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.gender}" />
+                                </p:column>
+
+                                <p:column headerText="Phone Number" width="7%" sortBy="#{serviceman.phoneNumber}" filterBy="#{serviceman.phoneNumber}" filterMatchMode="contains">
+                                    <h:outputText value="#{serviceman.phoneNumber}" />
+                                </p:column>
+
+                            </p:dataTable>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+
+            <!--            <div class="p-grid">
+                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                                <div class="card ui-fluid">
+            
+                                </div>
+                            </div>
+                            <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
+                                <div class="card ui-fluid">
+            
+                                </div>
+                            </div>
+                        </div>-->
+
+
+
+
+            <p:confirmDialog global="true" width="500" >
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

@@ -78,7 +78,7 @@ public class SecurityFilter implements Filter {
             "/medical-board-slot-management.xhtml", // 11
             "/booking-management.xhtml", //12
             "/queue-management.xhtml", //13
-            "/consultation-management.xhtml", //14
+            "/past-consultations.xhtml", //14
             "/current-consultation.xhtml" //15
         };
 
