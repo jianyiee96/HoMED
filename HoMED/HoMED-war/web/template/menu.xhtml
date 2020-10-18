@@ -59,7 +59,7 @@
                         </p:submenu>
                         <p:menuitem value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />
-                        <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Consultation Management" icon="fa fa-user-md" outcome="/consultation-management" />
+                        <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
                     </po:menu>
                 </h:form>

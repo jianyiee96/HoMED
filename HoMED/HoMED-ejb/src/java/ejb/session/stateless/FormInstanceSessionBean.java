@@ -88,13 +88,8 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             formTemplate.getFormInstances().add(formInstance);
 
             for (FormField ff : formTemplate.getFormFields()) {
-                // @JY - REFER HERE (tbc - will this cause issues?)
-//                FormInstanceFieldValue fifv = new FormInstanceFieldValue();
-//                em.persist(fifv);
 
                 FormInstanceField fif = new FormInstanceField();
-                // @JY
-//                fif.getFormInstanceFieldValues().add(fifv);
                 fif.setFormFieldMapping(ff);
                 em.persist(fif);
                 formInstance.getFormInstanceFields().add(fif);

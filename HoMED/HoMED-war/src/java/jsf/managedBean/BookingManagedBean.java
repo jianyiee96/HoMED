@@ -10,6 +10,7 @@ import entity.Booking;
 import entity.BookingSlot;
 import entity.ConsultationPurpose;
 import entity.Employee;
+import entity.FormInstance;
 import entity.FormTemplate;
 import entity.MedicalCentre;
 import entity.MedicalStaff;
@@ -331,6 +332,17 @@ public class BookingManagedBean implements Serializable {
         int targetMonth = targetCalendar.get(Calendar.MONTH);
         int targetYear = targetCalendar.get(Calendar.YEAR);
         return month == targetMonth && year == targetYear;
+    }
+
+    public boolean checkCompleted(FormInstance fi) {
+        return !fi.getFormInstanceFields().stream()
+                .anyMatch(fif -> {
+                    if (fif.getFormFieldMapping().getIsServicemanEditable() && fif.getFormFieldMapping().getIsRequired()) {
+                        return fif.getFormInstanceFieldValues().isEmpty() || fif.getFormInstanceFieldValues().get(0).getInputValue() == null
+                                || fif.getFormInstanceFieldValues().get(0).getInputValue().equals("");
+                    }
+                    return false;
+                });
     }
 
     public MedicalStaff getCurrentMedicalStaff() {
