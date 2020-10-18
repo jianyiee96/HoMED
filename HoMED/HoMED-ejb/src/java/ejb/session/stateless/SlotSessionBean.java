@@ -5,10 +5,8 @@
 package ejb.session.stateless;
 
 import entity.BookingSlot;
-import entity.ConsultationPurpose;
 import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
-import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -19,33 +17,21 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import util.exceptions.CreateBookingException;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
-import util.exceptions.ServicemanNotFoundException;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
 
-    @EJB(name = "BookingSessionBeanLocal")
-    private BookingSessionBeanLocal bookingSessionBeanLocal;
-
-    @EJB(name = "ConsultationPurposeSessionBeanLocal")
-    private ConsultationPurposeSessionBeanLocal consultationPurposeSessionBeanLocal;
-
-    @EJB(name = "ServicemanSessionBeanLocal")
-    private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
-
     @EJB
-    MedicalCentreSessionBeanLocal medicalCentreSessionbeanLocal;
+    private MedicalCentreSessionBeanLocal medicalCentreSessionbeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
     @Override
     public List<BookingSlot> createBookingSlots(Long medicalCentreId, Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
-
         try {
             MedicalCentre mc = medicalCentreSessionbeanLocal.retrieveMedicalCentreById(medicalCentreId);
 
@@ -77,67 +63,16 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 createdBookingSlots.add(bs);
             }
 
-            System.out.println("Created " + createdBookingSlots.size());
+            System.out.println("Created " + createdBookingSlots.size() + " Booking Slots");
             return createdBookingSlots;
 
         } catch (MedicalCentreNotFoundException ex) {
             throw new ScheduleBookingSlotException("Invalid Medical Centre Id");
         }
-
-    }
-
-    @Override
-    public void createMedicalBoardSlotsDataInit(Date date) {
-        Calendar rangeStartCalendar = Calendar.getInstance();
-        rangeStartCalendar.setTime(date);
-        rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
-        rangeStartCalendar.set(Calendar.MINUTE, 0);
-        rangeStartCalendar.set(Calendar.SECOND, 0);
-        rangeStartCalendar.set(Calendar.MILLISECOND, 0);
-
-        Calendar rangeEndCalendar = Calendar.getInstance();
-        rangeEndCalendar.setTime(date);
-        rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
-        rangeEndCalendar.set(Calendar.MINUTE, 0);
-        rangeEndCalendar.set(Calendar.SECOND, 0);
-        rangeEndCalendar.set(Calendar.MILLISECOND, 0);
-
-        while (rangeStartCalendar.before(rangeEndCalendar)) {
-            Date currStart = rangeStartCalendar.getTime();
-            rangeStartCalendar.add(Calendar.MINUTE, 30);
-            Date currEnd = rangeStartCalendar.getTime();
-            System.out.println("Medical Board Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
-            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
-            em.persist(mbs);
-            em.flush();
-        }
-
-        rangeStartCalendar.add(Calendar.DATE, 1);
-        rangeStartCalendar.set(Calendar.HOUR_OF_DAY, 8);
-        rangeStartCalendar.set(Calendar.MINUTE, 0);
-        rangeStartCalendar.set(Calendar.SECOND, 0);
-        rangeStartCalendar.set(Calendar.MILLISECOND, 0);
-
-        rangeEndCalendar.add(Calendar.DATE, 1);
-        rangeEndCalendar.set(Calendar.HOUR_OF_DAY, 18);
-        rangeEndCalendar.set(Calendar.MINUTE, 0);
-        rangeEndCalendar.set(Calendar.SECOND, 0);
-        rangeEndCalendar.set(Calendar.MILLISECOND, 0);
-
-        while (rangeStartCalendar.before(rangeEndCalendar)) {
-            Date currStart = rangeStartCalendar.getTime();
-            rangeStartCalendar.add(Calendar.MINUTE, 30);
-            Date currEnd = rangeStartCalendar.getTime();
-            System.out.println("Medical Board Slot Created: Start[" + currStart + "+] End[" + currEnd + "]");
-            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
-            em.persist(mbs);
-            em.flush();
-        }
     }
 
     @Override
     public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
-
         rangeStart = roundDate30Minute(rangeStart);
         rangeEnd = roundDate30Minute(rangeEnd);
 
@@ -162,6 +97,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             createdMedicalBoardSlots.add(mbs);
         }
 
+        System.out.println("Created " + createdMedicalBoardSlots.size() + " Medical Board Slots");
         return createdMedicalBoardSlots;
     }
 
