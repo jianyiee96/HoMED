@@ -8,6 +8,7 @@ import entity.Consultation;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.CreateConsultationException;
+import util.exceptions.DeferConsultationException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
 import util.exceptions.RetrieveConsultationQueuePositionException;
@@ -41,5 +42,7 @@ public interface ConsultationSessionBeanLocal {
     public List<Consultation> retrieveCompletedConsultationsByServicemanId(Long servicemanId);
 
     public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId);
+
+    public void deferConsultation(Long consultationId, String remarks, String remarksForServiceman) throws DeferConsultationException;
 
 }

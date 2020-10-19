@@ -51,7 +51,7 @@
 
                                 <p:outputLabel value="ROD date: " />
                                 <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.serviceman.rod}" class="display-text">
-                                    <f:convertDateTime pattern="yyyy/MM/dd" />
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
                                 </p:outputLabel>
                             </h:panelGrid>
                             <p:separator />
@@ -73,7 +73,7 @@
                                 </p:column>
                                 <p:column headerText="Consultation Date">
                                     <h:outputText value="#{consultation.startDateTime}">
-                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="Consultation Purpose">
@@ -203,11 +203,14 @@
                                     </li>
                                     <li>
                                         <div style="display: flex; justify-content: center">
-                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="End Consultation" icon="pi pi-check-square">
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="End Consultation" class="success-button p-ml-2" icon="pi pi-check-square">
                                                 <p:confirm header="Consultation" message="Confirm End Consultation? You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
-                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.marknoShowCurrentConsultation()}" value="Mark No Show" class="danger-button p-ml-2" icon="pi pi-exclamation-circle">
-                                                <p:confirm header="No Show" escape="false" message="Confirm mark current serviceman as no show, you cannot revert your actions? &lt;br/&gt;&lt;br/&gt; You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.deferCurrentConsultation()}" value="Place Back in Queue" class="p-ml-2" icon="fa fa-rocket">
+                                                <p:confirm header="Consultation" message="Confirm put serviceman back in queue? &lt;br/&gt;&lt;br/&gt;Current instance of consultation will be saved and you will be redirected to Queue Management page." escape="false" icon="pi pi-exclamation-triangle" />
+                                            </p:commandButton>
+                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.marknoShowCurrentConsultation()}" value="Mark Absent" class="danger-button p-ml-2" icon="pi pi-exclamation-circle">
+                                                <p:confirm header="Mark Absent" escape="false" message="Confirm mark current serviceman as absent, you cannot revert your actions? &lt;br/&gt;&lt;br/&gt; You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
                                         </div>
                                     </li>

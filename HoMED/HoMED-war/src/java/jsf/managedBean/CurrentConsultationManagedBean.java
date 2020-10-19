@@ -18,6 +18,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
+import util.exceptions.DeferConsultationException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
 
@@ -50,14 +51,15 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        consultationNotes = "";
-        remarksForServiceman = "";
 
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
             selectedConsultation = currentMedicalOfficer.getCurrentConsultation();
         }
+
+        consultationNotes = selectedConsultation.getRemarks();
+        remarksForServiceman = selectedConsultation.getRemarksForServiceman();
 
         refreshServicemanConsultations();
 
@@ -112,6 +114,26 @@ public class CurrentConsultationManagedBean implements Serializable {
         }
     }
 
+    public void deferCurrentConsultation() {
+
+        try {
+            System.out.println("ID: " + selectedConsultation);
+            System.out.println("notes: " + this.consultationNotes);
+            System.out.println("remarks: " + this.remarksForServiceman);
+            consultationSessionBeanLocal.deferConsultation(selectedConsultation.getConsultationId(), this.consultationNotes, this.remarksForServiceman);
+            this.consultationNotes = "";
+            this.remarksForServiceman = "";
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
+            } catch (IOException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            }
+
+        } catch (DeferConsultationException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));
+        }
+    }
+
     public void marknoShowCurrentConsultation() {
         try {
             consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId());
@@ -121,7 +143,7 @@ public class CurrentConsultationManagedBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
             }
         } catch (InvalidateConsultationException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark No Show Error", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Absent Error", ex.getMessage()));
         }
     }
 
