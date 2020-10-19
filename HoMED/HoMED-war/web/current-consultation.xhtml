@@ -213,8 +213,10 @@
                                             <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.deferCurrentConsultation()}" value="Place Back in Queue" class="p-ml-2" icon="fa fa-rocket">
                                                 <p:confirm header="Consultation" message="Confirm put serviceman back in queue? &lt;br/&gt;&lt;br/&gt;Current instance of consultation will be saved and you will be redirected to Queue Management page." escape="false" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
-                                            <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.marknoShowCurrentConsultation()}" value="Mark Absent" class="danger-button p-ml-2" icon="pi pi-exclamation-circle">
-                                                <p:confirm header="Mark Absent" escape="false" message="Confirm mark current serviceman as absent, you cannot revert your actions? &lt;br/&gt;&lt;br/&gt; You will be redirected to Queue Management page." icon="pi pi-exclamation-triangle" />
+                                            <p:commandButton value="Mark Absent" class="danger-button p-ml-2" icon="pi pi-exclamation-circle"
+                                                             oncomplete="PF('dlgCancelBooking').show()" update="consultationForm:panelGroupCancelBooking"
+                                                             resetValues="consultationForm:panelGroupCancelBooking">
+                                                <f:setPropertyActionListener target="#{currentConsultationManagedBean.cancelBookingComments}" value="#{''}"/>
                                             </p:commandButton>
                                         </div>
                                     </li>
@@ -226,7 +228,18 @@
                     </div>
                 </ui:fragment>
 
-            </div>        
+            </div>
+            <p:dialog id="dlgCancelBooking" widgetVar="dlgCancelBooking" header="Cancel Current Consultation" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgCancelBooking').initPosition()"
+                      minWidth="500" width="400">
+                <h:panelGroup id="panelGroupCancelBooking">
+                    <div class="p-grid p-justify-center p-mt-3">
+                        <p:inputTextarea class="p-col-12" placeholder="Insert comments for cancelling consultation" value="#{currentConsultationManagedBean.cancelBookingComments}"></p:inputTextarea>
+                        <p:messages id="dlgMessages" class="p-col-12"/>
+                        <p:commandButton value='Confirm Cancel' styleClass="ui-confirmdialog-yes" icon="pi pi-times" actionListener="#{currentConsultationManagedBean.marknoShowCurrentConsultation()}"  update="panelGroupCancelBooking" process="panelGroupCancelBooking"/>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
 
             <p:confirmDialog global="true" width="500" >
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />

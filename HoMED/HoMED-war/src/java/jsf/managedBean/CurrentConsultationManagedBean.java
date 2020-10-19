@@ -41,6 +41,8 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     private Consultation selectedConsultation;
 
+    private String cancelBookingComments;
+
     public CurrentConsultationManagedBean() {
         this.servicemanConsultations = new ArrayList<>();
     }
@@ -122,14 +124,14 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public void marknoShowCurrentConsultation() {
         try {
-            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId(), "TODO Implement @Bryan");
+            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId(), cancelBookingComments);
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
             } catch (IOException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
             }
         } catch (InvalidateConsultationException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Absent Error", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Absent Error: " + ex.getMessage(), null));
         }
     }
 
@@ -163,6 +165,14 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public ManageFormInstanceManagedBean getManageFormInstanceManagedBean() {
         return manageFormInstanceManagedBean;
+    }
+
+    public String getCancelBookingComments() {
+        return cancelBookingComments;
+    }
+
+    public void setCancelBookingComments(String cancelBookingComments) {
+        this.cancelBookingComments = cancelBookingComments;
     }
 
 }

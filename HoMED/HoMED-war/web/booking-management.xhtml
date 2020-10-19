@@ -114,9 +114,10 @@
                                         <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{slot.booking.serviceman}" />
                                     </p:commandButton>
                                     <p:commandButton styleClass="danger-button rounded-button p-mr-2 p-mb-2" icon="pi pi-times" title="Cancel Booking"
-                                                     actionListener="#{bookingManagedBean.deleteBooking(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
-                                                     update="dataTableBookings">
-                                        <p:confirm header="Cancel Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
+                                                     rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}" oncomplete="PF('dlgCancelBooking').show()" update="formAllBookings:panelGroupCancelBooking"
+                                                     resetValues="formAllBookings:panelGroupCancelBooking">
+                                        <f:setPropertyActionListener target="#{bookingManagedBean.cancelBookingComments}" value="#{''}"/>
+                                        <f:setPropertyActionListener target="#{bookingManagedBean.bookingSlotToCancel}" value="#{slot}"/>
                                     </p:commandButton>
                                     <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-cog" title="Booking Information"
                                                      actionListener="#{bookingManagedBean.doUpdateBookingDetails(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
@@ -126,6 +127,11 @@
                                                      update="dataTableBookings">
                                         <p:confirm header="Mark Attendance" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
+                                    <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-info" title="Cancellation Comments"
+                                                     rendered="#{slot.booking.bookingStatusEnum == 'CANCELLED'}"  disabled="#{slot.booking.cancellationComment eq null}"
+                                                     oncomplete="PF('dlgCancelBookingComments').show()" update="formAllBookings:panelGroupCancelBookingComments">
+                                        <f:setPropertyActionListener target="#{bookingManagedBean.cancelBookingComments}" value="#{slot.booking.cancellationComment}"/>
+                                    </p:commandButton>
                                 </p:column>
 
                             </p:dataTable>
@@ -133,6 +139,28 @@
                     </div>
                 </div>
             </ui:fragment>
+
+            <p:dialog id="dlgCancelBooking" widgetVar="dlgCancelBooking" header="Cancel Current Booking Slot" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgCancelBooking').initPosition()"
+                      minWidth="500" width="400">
+                <h:panelGroup id="panelGroupCancelBooking">
+                    <div class="p-grid p-justify-center p-mt-3">
+                        <p:inputTextarea class="p-col-12" placeholder="Insert comments for cancelling booking" value="#{bookingManagedBean.cancelBookingComments}"></p:inputTextarea>
+                        <p:messages id="dlgMessages" class="p-col-12"/>
+                        <p:commandButton value='Confirm Cancel' styleClass="ui-confirmdialog-yes" icon="pi pi-times" actionListener="#{bookingManagedBean.deleteBooking()}"  update="panelGroupCancelBooking" process="panelGroupCancelBooking"/>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
+            
+            <p:dialog id="dlgCancelBookingComments" widgetVar="dlgCancelBookingComments" header="Cancellation Comments" showEffect="fade"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgCancelBookingComments').initPosition()"
+                      minWidth="500" width="400">
+                <h:panelGroup id="panelGroupCancelBookingComments">
+                    <div class="p-grid p-mt-2 p-ml-2">
+                        <h:outputText value="#{bookingManagedBean.cancelBookingComments ne null ? bookingManagedBean.cancelBookingComments : 'Non-provided'}"/>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
 
             <p:dialog id="dialogAttachAdditionalForms" widgetVar="dialogAttachAdditionalForms" header="Booking Infomation" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAttachAdditionalForms').initPosition()"

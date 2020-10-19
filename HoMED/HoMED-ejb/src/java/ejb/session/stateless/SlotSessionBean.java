@@ -18,6 +18,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.BookingStatusEnum;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
@@ -58,13 +59,13 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
             List<BookingSlot> bookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
             for (BookingSlot bs : bookingSlots) {
-                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime())) {
+                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime()) && (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED)) {
                     Date now = new Date();
                     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                     throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
                 }
             }
-            
+
 //            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 

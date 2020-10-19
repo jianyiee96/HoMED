@@ -102,6 +102,10 @@ public class BookingManagedBean implements Serializable {
 
     private Integer filterOption;
 
+    private String cancelBookingComments;
+
+    private BookingSlot bookingSlotToCancel;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
     private Date dateToCreateBooking;
@@ -163,13 +167,15 @@ public class BookingManagedBean implements Serializable {
         bookingComment = null;
     }
 
-    public void deleteBooking(BookingSlot slot) {
+    public void deleteBooking() {
         try {
-            bookingSessionBean.cancelBookingByClerk(slot.getBooking().getBookingId(), "TODO implement @Bryan");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + slot.getBooking()));
+            bookingSessionBean.cancelBookingByClerk(bookingSlotToCancel.getBooking().getBookingId(), cancelBookingComments);
+            cancelBookingComments = "";
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + bookingSlotToCancel.getBooking()));
             initBookingSlots();
+            PrimeFaces.current().executeScript("PF('dlgCancelBooking').hide()");
         } catch (CancelBookingException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking: " + ex.getMessage(), null));
         }
     }
 
@@ -516,6 +522,22 @@ public class BookingManagedBean implements Serializable {
 
     public void setBookingComment(String bookingComment) {
         this.bookingComment = bookingComment;
+    }
+
+    public String getCancelBookingComments() {
+        return cancelBookingComments;
+    }
+
+    public void setCancelBookingComments(String cancelBookingComments) {
+        this.cancelBookingComments = cancelBookingComments;
+    }
+
+    public BookingSlot getBookingSlotToCancel() {
+        return bookingSlotToCancel;
+    }
+
+    public void setBookingSlotToCancel(BookingSlot bookingSlotToCancel) {
+        this.bookingSlotToCancel = bookingSlotToCancel;
     }
 
 }
