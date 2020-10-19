@@ -91,6 +91,8 @@ public class DataInitializationSessionBean {
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
+    final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
     @PostConstruct
     public void postConstruct() {
         try {
@@ -165,12 +167,10 @@ public class DataInitializationSessionBean {
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     } else if (inputType == InputTypeEnum.TIME) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     }
                 }
             }
@@ -183,19 +183,26 @@ public class DataInitializationSessionBean {
     }
 
     private List<BookingSlot> initializeBookingSlots(List<MedicalCentre> medicalCentres) throws ScheduleBookingSlotException {
-        System.out.println("Creating Booking Slots...");
         List<BookingSlot> bookingSlots = new ArrayList<>();
-        int numOfDaysToCreate = 5;
+        int numOfDaysToCreate = 28;
 
         for (MedicalCentre mc : medicalCentres) {
+            System.out.println("Creating Booking Slots for " + mc.getName() + "...");
             List<OperatingHours> operatingHours = mc.getOperatingHours();
+
             for (int day = 0; day < numOfDaysToCreate; day++) {
                 Calendar date = Calendar.getInstance();
-                date.add(Calendar.DATE, day);
-                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
-                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
                 date.set(Calendar.SECOND, 0);
                 date.set(Calendar.MILLISECOND, 0);
+
+                while (date.get(Calendar.DAY_OF_WEEK) != 1) {
+                    date.add(Calendar.DATE, -1);
+                }
+
+                date.add(Calendar.DATE, day);
+
+                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
+                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
 
                 OperatingHours daysOh = operatingHours.stream()
                         .filter(oh -> oh.getDayOfWeek() == dayOfWeekEnum)
@@ -216,15 +223,14 @@ public class DataInitializationSessionBean {
                 end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                 end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
 
-                if (start.getTime().before(new Date())) {
-                    start.setTime(new Date());
-                }
                 if (start.getTime().before(end.getTime())) {
                     bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
                 }
             }
+
+            System.out.println("Successfully created Booking Slots for " + mc.getName() + "...");
+
         }
-        System.out.println("Successfully created Booking Slots");
         return bookingSlots;
     }
 

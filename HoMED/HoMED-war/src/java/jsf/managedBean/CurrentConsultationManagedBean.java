@@ -41,10 +41,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     private Consultation selectedConsultation;
 
-    private String consultationNotes;
-
-    private String remarksForServiceman;
-
     public CurrentConsultationManagedBean() {
         this.servicemanConsultations = new ArrayList<>();
     }
@@ -57,9 +53,6 @@ public class CurrentConsultationManagedBean implements Serializable {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
             selectedConsultation = currentMedicalOfficer.getCurrentConsultation();
         }
-
-        consultationNotes = selectedConsultation.getRemarks();
-        remarksForServiceman = selectedConsultation.getRemarksForServiceman();
 
         refreshServicemanConsultations();
 
@@ -100,9 +93,7 @@ public class CurrentConsultationManagedBean implements Serializable {
             if (unsignedForms) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Form Instance Unsigned", "Please make sure all forms have been signed"));
             } else {
-                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), this.consultationNotes, this.remarksForServiceman);
-                this.consultationNotes = "";
-                this.remarksForServiceman = "";
+                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
                 try {
                     FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
                 } catch (IOException ex) {
@@ -117,12 +108,7 @@ public class CurrentConsultationManagedBean implements Serializable {
     public void deferCurrentConsultation() {
 
         try {
-            System.out.println("ID: " + selectedConsultation);
-            System.out.println("notes: " + this.consultationNotes);
-            System.out.println("remarks: " + this.remarksForServiceman);
-            consultationSessionBeanLocal.deferConsultation(selectedConsultation.getConsultationId(), this.consultationNotes, this.remarksForServiceman);
-            this.consultationNotes = "";
-            this.remarksForServiceman = "";
+            consultationSessionBeanLocal.deferConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
             } catch (IOException ex) {
@@ -177,22 +163,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public ManageFormInstanceManagedBean getManageFormInstanceManagedBean() {
         return manageFormInstanceManagedBean;
-    }
-
-    public String getConsultationNotes() {
-        return consultationNotes;
-    }
-
-    public void setConsultationNotes(String consultationNotes) {
-        this.consultationNotes = consultationNotes;
-    }
-
-    public String getRemarksForServiceman() {
-        return remarksForServiceman;
-    }
-
-    public void setRemarksForServiceman(String remarksForServiceman) {
-        this.remarksForServiceman = remarksForServiceman;
     }
 
 }

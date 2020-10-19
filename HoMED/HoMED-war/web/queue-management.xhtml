@@ -20,7 +20,7 @@
         <ezcomp:manageFormInstance id="ccManageFormInstance" />
         <ezcomp:pageRedirect rendered="#{queueManagementManagedBean.currentMedicalOfficer.medicalCentre == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
-        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null}">
+        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null and queueManagementManagedBean.currentMedicalOfficer.medicalCentre != null}">
             <p:growl id="growl" globalOnly="true" showDetail="true" />
 
             <div class="p-grid crud-table">
