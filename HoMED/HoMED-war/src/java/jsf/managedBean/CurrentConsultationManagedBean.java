@@ -122,7 +122,7 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public void marknoShowCurrentConsultation() {
         try {
-            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId());
+            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId(), "TODO Implement @Bryan");
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
             } catch (IOException ex) {

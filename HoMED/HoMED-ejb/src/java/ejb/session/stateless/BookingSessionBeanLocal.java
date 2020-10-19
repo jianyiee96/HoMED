@@ -19,7 +19,7 @@ public interface BookingSessionBeanLocal {
 
     public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException;
     
-    public void cancelBooking(Long bookingId) throws CancelBookingException;
+    public void cancelBooking(Long bookingId, String cancellationComment) throws CancelBookingException;
 
     public void markBookingAbsent(Long bookingId) throws MarkBookingAbsentException;
     
@@ -37,7 +37,7 @@ public interface BookingSessionBeanLocal {
 
     public Booking attachFormInstancesByClerk(Long bookingSlotId, List<Long> additionalFormTemplateIds) throws AttachFormInstancesException;
 
-    public void cancelBookingByClerk(Long bookingId) throws CancelBookingException;
+    public void cancelBookingByClerk(Long bookingId, String cancellationComment) throws CancelBookingException;
     
     public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException;
     

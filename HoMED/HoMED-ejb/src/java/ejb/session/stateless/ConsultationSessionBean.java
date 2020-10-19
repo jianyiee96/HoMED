@@ -141,7 +141,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     }
 
     @Override
-    public void invalidateConsultation(Long consultationId) throws InvalidateConsultationException {
+    public void invalidateConsultation(Long consultationId, String cancellationComment) throws InvalidateConsultationException {
         Consultation consultation = retrieveConsultationById(consultationId);
         if (consultation == null) {
             throw new InvalidateConsultationException("Invalid Consultation Id");
@@ -154,6 +154,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             Booking booking = consultation.getBooking();
 
             booking.setBookingStatusEnum(BookingStatusEnum.ABSENT);
+            booking.setCancellationComment(cancellationComment);
 
             List<Long> formInstanceIds = new ArrayList<>();
 
