@@ -124,7 +124,7 @@
                                     <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-check-square" title="Mark Attendance"
                                                      actionListener="#{bookingManagedBean.markAttendance(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
                                                      update="dataTableBookings">
-                                        <p:confirm header="Mark Attendance" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
+                                        <p:confirm header="Mark Attendance" escape="false" message="#{bookingManagedBean.initMarkAttendance(slot)}" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </p:column>
 
