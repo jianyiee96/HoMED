@@ -114,6 +114,10 @@
                                                     <p:outputLabel value="Purpose: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
+                                                    <p:outputLabel value="Booking Comment: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment != null}" class="display-text" />                                
+                                                    <p:outputLabel value="N.A." rendered="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment == null}" class="display-text" />                                
+                                                    
                                                     <p:outputLabel value="Started at: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
                                                         <f:convertDateTime pattern="HH:mm"/>

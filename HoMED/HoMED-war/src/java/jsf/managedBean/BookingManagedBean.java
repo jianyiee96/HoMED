@@ -42,6 +42,7 @@ import util.exceptions.CreateBookingException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.UpdateBookingCommentException;
 
 @Named(value = "bookingManagedBean")
 @ViewScoped
@@ -95,7 +96,9 @@ public class BookingManagedBean implements Serializable {
 
     private HashMap<Long, String> formTemplateHm;
 
-    private BookingSlot bookingSlotToAttachForms;
+    private BookingSlot bookingSlotToUpdateDetails;
+
+    private String bookingComment;
 
     private Integer filterOption;
 
@@ -157,6 +160,7 @@ public class BookingManagedBean implements Serializable {
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
         alreadyLinkedFormTemplates = new ArrayList<>();
         additionalFormTemplates = new ArrayList<>();
+        bookingComment = null;
     }
 
     public void deleteBooking(BookingSlot slot) {
@@ -169,14 +173,17 @@ public class BookingManagedBean implements Serializable {
         }
     }
 
-    public void doAttachFormInstances(BookingSlot slot) {
-        bookingSlotToAttachForms = slot;
+    public void doUpdateBookingDetails(BookingSlot slot) {
+        bookingSlotToUpdateDetails = slotSessionBean.retrieveBookingSlotById(slot.getSlotId());
+        if(bookingSlotToUpdateDetails.getBooking().getBookingComment() == null) {
+            bookingSlotToUpdateDetails.getBooking().setBookingComment("");
+        }
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
         formTemplateHm = new HashMap<>();
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
 
-        alreadyLinkedFormTemplates = bookingSlotToAttachForms.getBooking().getFormInstances().stream()
+        alreadyLinkedFormTemplates = bookingSlotToUpdateDetails.getBooking().getFormInstances().stream()
                 .map(fi -> fi.getFormTemplateMapping())
                 .collect(Collectors.toList());
 
@@ -185,14 +192,16 @@ public class BookingManagedBean implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public void attachFormInstances() {
+    public void updateBooking() {
+
         try {
-            bookingSessionBean.attachFormInstancesByClerk(bookingSlotToAttachForms.getSlotId(), selectedAdditionalFormTemplatesToCreate);
+            bookingSessionBean.updateBookingComment(bookingSlotToUpdateDetails.getBooking().getBookingId(), bookingSlotToUpdateDetails.getBooking().getBookingComment());
+            bookingSessionBean.attachFormInstancesByClerk(bookingSlotToUpdateDetails.getSlotId(), selectedAdditionalFormTemplatesToCreate);
             PrimeFaces.current().executeScript("PF('dialogAttachAdditionalForms').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Attach Additional Forms", "Successfully attached additional forms for booking " + bookingSlotToAttachForms.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Booking Details", "Successfully updated and attached any additional forms for booking " + bookingSlotToUpdateDetails.getBooking()));
             initBookingSlots();
-        } catch (AttachFormInstancesException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Attach Additional Forms", ex.getMessage()));
+        } catch (AttachFormInstancesException | UpdateBookingCommentException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Booking Details", ex.getMessage()));
         }
     }
 
@@ -208,7 +217,7 @@ public class BookingManagedBean implements Serializable {
 
     public void createBooking() {
         try {
-            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate);
+            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created booking " + booking));
             initBookingSlots();
@@ -493,12 +502,20 @@ public class BookingManagedBean implements Serializable {
         this.filteredBookingSlots = filteredBookingSlots;
     }
 
-    public BookingSlot getBookingSlotToAttachForms() {
-        return bookingSlotToAttachForms;
+    public BookingSlot getBookingSlotToUpdateDetails() {
+        return bookingSlotToUpdateDetails;
     }
 
-    public void setBookingSlotToAttachForms(BookingSlot bookingSlotToAttachForms) {
-        this.bookingSlotToAttachForms = bookingSlotToAttachForms;
+    public void setBookingSlotToUpdateDetails(BookingSlot bookingSlotToUpdateDetails) {
+        this.bookingSlotToUpdateDetails = bookingSlotToUpdateDetails;
+    }
+
+    public String getBookingComment() {
+        return bookingComment;
+    }
+
+    public void setBookingComment(String bookingComment) {
+        this.bookingComment = bookingComment;
     }
 
 }
