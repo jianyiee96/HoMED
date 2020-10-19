@@ -91,6 +91,8 @@ public class DataInitializationSessionBean {
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
+    final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
     @PostConstruct
     public void postConstruct() {
         try {
@@ -165,12 +167,10 @@ public class DataInitializationSessionBean {
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     } else if (inputType == InputTypeEnum.TIME) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     }
                 }
             }
