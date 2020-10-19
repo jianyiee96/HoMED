@@ -183,19 +183,26 @@ public class DataInitializationSessionBean {
     }
 
     private List<BookingSlot> initializeBookingSlots(List<MedicalCentre> medicalCentres) throws ScheduleBookingSlotException {
-        System.out.println("Creating Booking Slots...");
         List<BookingSlot> bookingSlots = new ArrayList<>();
-        int numOfDaysToCreate = 5;
+        int numOfDaysToCreate = 28;
 
         for (MedicalCentre mc : medicalCentres) {
+            System.out.println("Creating Booking Slots for " + mc.getName() + "...");
             List<OperatingHours> operatingHours = mc.getOperatingHours();
+
             for (int day = 0; day < numOfDaysToCreate; day++) {
                 Calendar date = Calendar.getInstance();
-                date.add(Calendar.DATE, day);
-                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
-                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
                 date.set(Calendar.SECOND, 0);
                 date.set(Calendar.MILLISECOND, 0);
+
+                while (date.get(Calendar.DAY_OF_WEEK) != 1) {
+                    date.add(Calendar.DATE, -1);
+                }
+
+                date.add(Calendar.DATE, day);
+
+                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
+                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
 
                 OperatingHours daysOh = operatingHours.stream()
                         .filter(oh -> oh.getDayOfWeek() == dayOfWeekEnum)
@@ -216,15 +223,14 @@ public class DataInitializationSessionBean {
                 end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                 end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
 
-                if (start.getTime().before(new Date())) {
-                    start.setTime(new Date());
-                }
                 if (start.getTime().before(end.getTime())) {
                     bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
                 }
             }
+
+            System.out.println("Successfully created Booking Slots for " + mc.getName() + "...");
+
         }
-        System.out.println("Successfully created Booking Slots");
         return bookingSlots;
     }
 
