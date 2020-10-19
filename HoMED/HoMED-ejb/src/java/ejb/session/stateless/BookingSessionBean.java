@@ -262,6 +262,51 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
+    public void cancelBookingByClerk(Long bookingId) throws CancelBookingException {
+
+        if (bookingId == null) {
+            throw new CancelBookingException("Please supply a valid Booking Id");
+        }
+
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking != null) {
+
+            if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+                try {
+                    booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+
+                    List<Long> formInstanceIds = new ArrayList<>();
+
+                    for (FormInstance fi : booking.getFormInstances()) {
+                        formInstanceIds.add(fi.getFormInstanceId());
+                    }
+
+                    for (Long fiId : formInstanceIds) {
+                        formInstanceSessionBeanLocal.deleteFormInstance(fiId, Boolean.TRUE);
+                    }
+
+                    slotSessionBeanLocal.createBookingSlots(
+                            booking.getBookingSlot().getMedicalCentre().getMedicalCentreId(),
+                            booking.getBookingSlot().getStartDateTime(),
+                            booking.getBookingSlot().getEndDateTime());
+
+                } catch (ScheduleBookingSlotException | DeleteFormInstanceException ex) {
+                    throw new CancelBookingException("Unable to create replacement booking slot: " + ex.getMessage());
+
+                }
+
+            } else {
+                throw new CancelBookingException("Invalid Booking Status: You can only cancel bookings with upcoming");
+            }
+
+        } else {
+            throw new CancelBookingException("Invalid Booking Id");
+        }
+
+    }
+
+    @Override
     public void markBookingAbsent(Long bookingId) throws MarkBookingAbsentException {
 
         Booking booking = retrieveBookingById(bookingId);

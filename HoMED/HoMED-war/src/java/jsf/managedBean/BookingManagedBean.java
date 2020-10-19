@@ -161,7 +161,7 @@ public class BookingManagedBean implements Serializable {
 
     public void deleteBooking(BookingSlot slot) {
         try {
-            bookingSessionBean.cancelBooking(slot.getBooking().getBookingId());
+            bookingSessionBean.cancelBookingByClerk(slot.getBooking().getBookingId());
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + slot.getBooking()));
             initBookingSlots();
         } catch (CancelBookingException ex) {
