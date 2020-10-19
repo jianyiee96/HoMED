@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.BookingSlot;
 import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -48,6 +49,22 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             Calendar rangeEndCalendar = Calendar.getInstance();
             rangeEndCalendar.setTime(rangeEnd);
 
+            // To check for existing booking slots.
+            Calendar slotStart = Calendar.getInstance();
+            slotStart.setTime(rangeStart);
+            Calendar slotEnd = Calendar.getInstance();
+            slotEnd.setTime(rangeStart);
+            slotEnd.add(Calendar.MINUTE, 15);
+
+            List<BookingSlot> bookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
+            for (BookingSlot bs : bookingSlots) {
+                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime())) {
+                    Date now = new Date();
+                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
+                }
+            }
+            
 //            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 
