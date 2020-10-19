@@ -249,13 +249,13 @@ public class DataInitializationSessionBean {
 
         for (BookingSlot bs : bookingSlots) {
             cal2.setTime(bs.getStartDateTime());
-            boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+            boolean isAfterToday = cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
                     && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
 
             int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
 
-            if (Math.random() <= rate && !sameDay) {
+            if (Math.random() <= rate && isAfterToday) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
                 Booking booking = bookingSessionBeanLocal.createBooking(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
                 bookings.add(booking);
