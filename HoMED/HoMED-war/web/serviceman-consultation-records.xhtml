@@ -155,7 +155,7 @@
                                 <p:column headerText="Consultation Purpose">
                                     <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
-
+                                
                                 <p:column headerText="Attending Doctor">
                                     <h:outputText value="#{consultation.medicalOfficer.name}" />
                                 </p:column>
@@ -184,6 +184,10 @@
                                                 <p:outputLabel value="Purpose: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
+                                                <p:outputLabel value="Booking Comment: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment != null}" class="display-text" />                                
+                                                <p:outputLabel value="N.A." rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment == null}" class="display-text" />                                
+                                                
                                                 <p:outputLabel value="Started at: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>

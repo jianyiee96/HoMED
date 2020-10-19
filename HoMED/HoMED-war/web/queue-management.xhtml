@@ -20,7 +20,7 @@
         <ezcomp:manageFormInstance id="ccManageFormInstance" />
         <ezcomp:pageRedirect rendered="#{queueManagementManagedBean.currentMedicalOfficer.medicalCentre == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
-        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null}">
+        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null and queueManagementManagedBean.currentMedicalOfficer.medicalCentre != null}">
             <p:growl id="growl" globalOnly="true" showDetail="true" />
 
             <div class="p-grid crud-table">
@@ -108,6 +108,10 @@
                                                 <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>
                                                 </p:outputLabel>
+
+                                                <p:outputLabel value="Booking Comment " />
+                                                <p:outputLabel value="N.A." rendered="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment == null}" class="display-text"/>
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment}" rendered="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment != null}" class="display-text"/>
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>
