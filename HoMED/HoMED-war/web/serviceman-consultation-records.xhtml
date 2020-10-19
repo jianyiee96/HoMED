@@ -125,7 +125,7 @@
 
                                 <p:outputLabel value="ROD date: " />
                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.rod}" class="display-text">
-                                    <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
                                 </p:outputLabel>
                             </h:panelGrid>
 
@@ -148,7 +148,7 @@
 
                                 <p:column headerText="Consultation Date">
                                     <h:outputText value="#{consultation.startDateTime}">
-                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
                                     </h:outputText>
                                 </p:column>
 

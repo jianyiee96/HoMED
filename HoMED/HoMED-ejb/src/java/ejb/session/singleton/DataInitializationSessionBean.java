@@ -35,6 +35,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -232,17 +234,46 @@ public class DataInitializationSessionBean {
         rate = Math.min(rate, 1);
         rate = Math.max(0, rate);
 
+        HashMap<Serviceman, Integer> bookingHm = new HashMap<>();
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        HashMap<String, Integer> datesHm = new HashMap<>();
+
         for (BookingSlot bs : bookingSlots) {
+            cal2.setTime(bs.getStartDateTime());
+            boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+                    && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+
             int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
-            if (Math.random() <= rate) {
-                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
-                Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
+            if (Math.random() <= rate && !sameDay) {
+                Serviceman serviceman = servicemen.get(randServicemanIdx);
+                Booking booking = bookingSessionBeanLocal.createBooking(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
                 bookings.add(booking);
-                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
+//                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
+//                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
+
+                int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
+                bookingHm.put(serviceman, count + 1);
+
+                String dateStr = df.format(booking.getBookingSlot().getStartDateTime());
+                int countDate = datesHm.containsKey(dateStr) ? datesHm.get(dateStr) : 0;
+                datesHm.put(dateStr, countDate + 1);
             }
         }
-
+        System.out.println("Bookings Summary:");
+        System.out.println("By Serviceman:");
+        for (Serviceman serviceman : bookingHm.keySet()) {
+            System.out.println("\t" + serviceman.getName() + ": " + bookingHm.get(serviceman) + " bookings created");
+        }
+        System.out.println("");
+        System.out.println("By Date:");
+        for (String dateStr : datesHm.keySet()) {
+            System.out.println("\t" + dateStr + ": " + datesHm.get(dateStr) + " bookings created");
+        }
+        System.out.println("Successfully created Bookings");
         return bookings;
     }
 
@@ -475,7 +506,7 @@ public class DataInitializationSessionBean {
         Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
         Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
         Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
-        
+
         // NO Medical Centre Staff
         Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
         Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);

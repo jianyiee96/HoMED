@@ -11,6 +11,7 @@ import entity.FormInstance;
 import entity.FormTemplate;
 import entity.Serviceman;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -219,7 +220,14 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         if (booking != null) {
 
             if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
-
+                Calendar cal1 = Calendar.getInstance();
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(booking.getBookingSlot().getStartDateTime());
+                boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+                        && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+                if (sameDay) {
+                    throw new CancelBookingException("Unable to cancel booking scheduled for today");
+                }
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
 

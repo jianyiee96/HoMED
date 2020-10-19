@@ -36,7 +36,7 @@ public class BookingExpiryManager {
         startBookingExpiryManager();
     }
 
-    @Schedule(hour = "*", minute = "*/1", info = "startBookingExpiryManager")
+    @Schedule(hour = "0", info = "startBookingExpiryManager")
     public void startBookingExpiryManager() {
         Date now = new Date();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -47,14 +47,18 @@ public class BookingExpiryManager {
 
         Calendar c = Calendar.getInstance();
         c.setTime(now);
-        c.add(Calendar.HOUR, -1);
-        Date oneHourBefore = c.getTime();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        Date floorToday = c.getTime();
+
+        System.out.println("- ExpiryManager: Marking bookings absent if start time is before " + df.format(floorToday));
 
         List<Booking> upcomingBookings = bookingSessionBeanLocal.retrieveAllUpcomingBookings();
 
         for (Booking b : upcomingBookings) {
 
-            if (b.getBookingSlot().getStartDateTime().before(oneHourBefore)) {
+            if (b.getBookingSlot().getStartDateTime().before(floorToday)) {
 
                 try {
                     System.out.println("Booking has Expired -> Marking Absent! id: " + b.getBookingId() + " (" + df.format(b.getBookingSlot().getStartDateTime()) + ")");
@@ -63,8 +67,6 @@ public class BookingExpiryManager {
                     System.out.println("Unable to mark booking (" + b.getBookingId() + ") as absent: " + ex.getMessage());
                 }
 
-            } else {
-//                System.out.println("Booking not expired. id: " + b.getBookingId() + " (" + df.format(b.getBookingSlot().getStartDateTime()) + ")");
             }
 
         }

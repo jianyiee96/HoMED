@@ -27,7 +27,7 @@
                 <div class="p-grid crud-table">
                     <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
                         <p:panel id="basic">
-                            <h2>My Past Consultations</h2>
+                            <h2>Past Consultations</h2>
                             <p:dataTable id="dataTablePastConsultations" widgetVar="dataTablePastConsultations" var="consultation" value="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer}"
                                          rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{pastConsultationsManagedBean.selectedPastConsultation}"
                                          styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
@@ -58,7 +58,7 @@
 
                                 <p:column headerText="Consultation Date" sortBy="#{consultation.startDateTime}" filterBy="#{consultation.startDateTime}" filterMatchMode="contains">
                                     <h:outputText value="#{consultation.startDateTime}">
-                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm"/>
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
                                     </h:outputText>
                                 </p:column>
 
@@ -95,7 +95,7 @@
 
                                             <p:outputLabel value="ROD date: " />
                                             <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.rod}" class="display-text">
-                                                <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
                                             </p:outputLabel>
                                         </h:panelGrid>
                                     </li>
