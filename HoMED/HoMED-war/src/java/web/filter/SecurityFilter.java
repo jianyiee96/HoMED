@@ -87,13 +87,13 @@ public class SecurityFilter implements Filter {
         if (path.equals(pathArr[0])
                 || path.equals(pathArr[1])
                 || path.equals(pathArr[2])
+                || path.equals(pathArr[3])
                 || path.equals(pathArr[4])) {
             return 1;
         }
 
         if (accessRight == EmployeeRoleEnum.SUPER_USER) {
-            if (path.equals(pathArr[3])
-                    || path.equals(pathArr[5])
+            if (path.equals(pathArr[5])
                     || path.equals(pathArr[6])
                     || path.equals(pathArr[7])
                     || path.equals(pathArr[8])

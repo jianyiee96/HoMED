@@ -59,7 +59,7 @@
                     </ui:fragment>
                     <po:menu widgetVar="RomaMenuWidget">
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
-                        <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
+                        <p:menuitem value="#{currentEmployee.role == 'SUPER_USER' ? 'Medical Centre Management' : 'View All Medical Centres'}" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
                         <p:submenu rendered="#{currentEmployee.role == 'SUPER_USER'}" label="Users Account Management" icon="fa fa-users">
                             <p:menuitem value="Employee Account" icon="fa fa-user-md" outcome="/employee-management" />
                             <p:menuitem value="Serviceman Account" icon="fa fa-user" outcome="/serviceman-management" />
