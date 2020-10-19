@@ -27,10 +27,10 @@
         <h:outputStylesheet name="crud-tables.css" library="css" />
         <ezcomp:manageServiceman id="ccManageServiceman">
         </ezcomp:manageServiceman>
-        
+
         <ezcomp:pageRedirect rendered="#{bookingManagedBean.currentMedicalCentre == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
-        
+
         <h:form id="formAllBookings">
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
@@ -118,8 +118,8 @@
                                                      update="dataTableBookings">
                                         <p:confirm header="Cancel Booking" escape="false" message="You will not be allowed to revert your actions" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
-                                    <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-copy" title="Forms"
-                                                     actionListener="#{bookingManagedBean.doAttachFormInstances(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
+                                    <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-cog" title="Booking Information"
+                                                     actionListener="#{bookingManagedBean.doUpdateBookingDetails(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
                                                      oncomplete="PF('dialogAttachAdditionalForms').show()" update="formAllBookings:panelAttachForms"/>
                                     <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-check-square" title="Mark Attendance"
                                                      actionListener="#{bookingManagedBean.markAttendance(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
@@ -134,7 +134,7 @@
                 </div>
             </ui:fragment>
 
-            <p:dialog id="dialogAttachAdditionalForms" widgetVar="dialogAttachAdditionalForms" header="Forms" showEffect="fade"
+            <p:dialog id="dialogAttachAdditionalForms" widgetVar="dialogAttachAdditionalForms" header="Booking Infomation" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAttachAdditionalForms').initPosition()"
                       minWidth="500" width="500">
                 <p:outputPanel id="panelAttachForms">
@@ -144,38 +144,45 @@
                                 <i class="pi pi-id-card p-mx-2"/>
                                 <p:outputLabel value="Booking Id:"  class="p-mr-2"/>
                             </h:panelGroup>
-                            <h:outputText value="#{bookingManagedBean.bookingSlotToAttachForms.booking.bookingId}" style="font-weight: bold"/>
+                            <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingId}" style="font-weight: bold"/>
                             <h:panelGroup>
                                 <i class="pi pi-user p-mx-2"/>
                                 <p:outputLabel value="Serviceman Name:"  class="p-mr-2"/>
                             </h:panelGroup>
-                            <h:outputText value="#{bookingManagedBean.bookingSlotToAttachForms.booking.serviceman.name}" style="font-weight: bold"/>
+                            <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.serviceman.name}" style="font-weight: bold"/>
                             <h:panelGroup>
                                 <i class="pi pi-calendar p-mx-2"/>
                                 <p:outputLabel value="Appointment Date:"  class="p-mr-2"/>
                             </h:panelGroup>
-                            <h:outputText value="#{bookingManagedBean.bookingSlotToAttachForms.startDateTime}" style="font-weight: bold">
+                            <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.startDateTime}" style="font-weight: bold">
                                 <f:convertDateTime pattern="dd/MM/yyyy"/>
                             </h:outputText>
                             <h:panelGroup>
                                 <i class="fa fa-clock-o p-mx-2"/>
                                 <p:outputLabel value="Appointment Time:"  class="p-mr-2"/>
                             </h:panelGroup>
-                            <h:outputText value="#{bookingManagedBean.bookingSlotToAttachForms.startDateTime}" style="font-weight: bold">
+                            <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.startDateTime}" style="font-weight: bold">
                                 <f:convertDateTime pattern="HH:mm"/>
                             </h:outputText>
                             <h:panelGroup>
                                 <i class="pi pi-list p-mx-2"/>
                                 <p:outputLabel value="Consultation Purpose:"  class="p-mr-2"/>
                             </h:panelGroup>
-                            <h:outputText value="#{bookingManagedBean.bookingSlotToAttachForms.booking.consultationPurpose.consultationPurposeName}" style="font-weight: bold"/>
+                            <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.consultationPurpose.consultationPurposeName}" style="font-weight: bold"/>
                         </h:panelGrid>
+                        <div class="p-field  p-col-12">
+                            <h:panelGroup id="panelBookingComment">
+                                <p:outputLabel value="Booking Comment" style="font-weight: bold"/><br/>
+                                <p:inputText style="margin-top: 10px" rendered="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment != null}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
+
+                            </h:panelGroup>
+                        </div>
                         <div class="p-field  p-col-12">
                             <h:panelGroup id="panelAttachFormsLinkedForms">
                                 <p:outputLabel value="Currently Linked Forms" style="font-weight: bold"/><br/>
                                 <h:outputText rendered="#{empty bookingManagedBean.alreadyLinkedFormTemplates}" value="No forms currently linked"/>
                                 <ul>
-                                    <ui:repeat rendered="#{not empty bookingManagedBean.bookingSlotToAttachForms.booking.formInstances}" value="#{bookingManagedBean.bookingSlotToAttachForms.booking.formInstances}" var="fi">
+                                    <ui:repeat rendered="#{not empty bookingManagedBean.bookingSlotToUpdateDetails.booking.formInstances}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.formInstances}" var="fi">
                                         <li class="p-mt-3">
                                             <h:outputText value="#{fi.formTemplateMapping.formTemplateName}"/>
                                             <span class="p-ml-2 form-status-badge #{bookingManagedBean.checkCompleted(fi) ? 'status-published' : 'status-deleted'}">#{bookingManagedBean.checkCompleted(fi) ? 'Completed' : 'Uncompleted'}</span>
@@ -204,9 +211,9 @@
 
                     <div class="p-col-12">
                         <div class="p-grid p-justify-center p-align-center vertical-container">
-                            <p:commandButton value="Attach Forms" icon="pi pi-copy" styleClass="p-mr-2 p-my-2"  update="panelAttachForms growl-message dataTableBookings" process="panelAttachForms"
-                                             actionListener="#{bookingManagedBean.attachFormInstances()}" disabled="#{empty bookingManagedBean.additionalFormTemplates}">
-                                <p:confirm header="Attach Additional Forms" escape="false" message="Confirm attach additional forms?" icon="pi pi-exclamation-triangle" />
+                            <p:commandButton value="Update" icon="pi pi-save" styleClass="p-mr-2 p-my-2"  update="panelAttachForms growl-message dataTableBookings" process="panelAttachForms"
+                                             actionListener="#{bookingManagedBean.updateBooking()}">
+                                <p:confirm header="Update Booking Information" escape="false" message="Confirm update booking and attach any additional forms?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
                     </div>
@@ -222,7 +229,7 @@
                             <p:steps activeIndex="#{bookingManagedBean.createBookingIdx}" style="width: 100%">
                                 <p:menuitem value="Select Serviceman" disabled="true"/>
                                 <p:menuitem value="Booking Slot"/>
-                                <p:menuitem value="Attach Forms"/>
+                                <p:menuitem value="Consultation Details"/>
                             </p:steps>
                         </div>
                     </div>
@@ -368,6 +375,12 @@
                                         </p:column>
                                     </p:selectManyMenu>
                                 </h:panelGroup>
+                            </div>
+                            <div class="p-field  p-col-12">
+
+                                <p:outputLabel for="input-comment" value="Booking Comments" style="font-weight: bold"/>
+                                <p:inputText id="input-comment" disabled="#{bookingManagedBean.consultationPurposeToCreateId eq null}" value="#{bookingManagedBean.bookingComment}"></p:inputText>
+
                             </div>
                         </div>
                     </h:panelGroup>

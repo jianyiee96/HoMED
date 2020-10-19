@@ -237,7 +237,7 @@ public class DataInitializationSessionBean {
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
             if (Math.random() <= rate) {
                 System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
-                Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
+                Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
                 bookings.add(booking);
                 System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
             }

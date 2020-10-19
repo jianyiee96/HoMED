@@ -30,6 +30,7 @@ import util.exceptions.MarkBookingAbsentException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.UpdateBookingCommentException;
 
 @Stateless
 public class BookingSessionBean implements BookingSessionBeanLocal {
@@ -53,7 +54,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     private EntityManager em;
 
     @Override
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) throws CreateBookingException {
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException {
 
         try {
 
@@ -71,7 +72,11 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 throw new CreateBookingException("Booking Slot not valid: Invalid Start Date");
             }
 
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
+            if (bookingComment == null) {
+                bookingComment = "";
+            }
+
+            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment);
 
             bookingSlot.setBooking(newBooking);
             serviceman.getBookings().add(newBooking);
@@ -103,11 +108,10 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException {
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment) throws CreateBookingException {
 
         try {
-            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId);
-
+            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment);
             if (!additionalFormTemplateIds.isEmpty()) {
                 attachFormInstancesByClerk(newBooking.getBookingSlot().getSlotId(), additionalFormTemplateIds);
             }
@@ -128,8 +132,6 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         if (bookingSlot == null) {
             throw new AttachFormInstancesException("Booking Slot Id not valid");
-        } else if (additionalFormTemplateIds.isEmpty()) {
-            throw new AttachFormInstancesException("No form templates selected");
         }
 
         Booking booking = bookingSlot.getBooking();
@@ -297,6 +299,19 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         Query query = em.createQuery("SELECT b FROM Booking b WHERE b.bookingStatusEnum = :status ");
         query.setParameter("status", BookingStatusEnum.UPCOMING);
         return query.getResultList();
+    }
+
+    @Override
+    public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException {
+
+        Booking booking = retrieveBookingById(bookingId);
+        
+        if(booking == null) {
+            throw new UpdateBookingCommentException("Invalid booking id");
+        }
+        
+        booking.setBookingComment(bookingComment);
+        
     }
 
 }

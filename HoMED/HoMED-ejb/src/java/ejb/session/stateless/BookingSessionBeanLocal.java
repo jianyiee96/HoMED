@@ -12,11 +12,12 @@ import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.MarkBookingAbsentException;
 import util.exceptions.MarkBookingAttendanceException;
+import util.exceptions.UpdateBookingCommentException;
 
 @Local
 public interface BookingSessionBeanLocal {
 
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) throws CreateBookingException;
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException;
     
     public void cancelBooking(Long bookingId) throws CancelBookingException;
 
@@ -32,8 +33,10 @@ public interface BookingSessionBeanLocal {
     
     public List<Booking> retrieveAllUpcomingBookings();
 
-    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException;
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment) throws CreateBookingException;
 
     public Booking attachFormInstancesByClerk(Long bookingSlotId, List<Long> additionalFormTemplateIds) throws AttachFormInstancesException;
+    
+    public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException;
     
 }
