@@ -35,5 +35,7 @@ public interface BookingSessionBeanLocal {
     public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException;
 
     public Booking attachFormInstancesByClerk(Long bookingSlotId, List<Long> additionalFormTemplateIds) throws AttachFormInstancesException;
+
+    public void cancelBookingByClerk(Long bookingId) throws CancelBookingException;
     
 }
