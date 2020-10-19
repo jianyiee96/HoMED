@@ -211,7 +211,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public void cancelBooking(Long bookingId) throws CancelBookingException {
+    public void cancelBooking(Long bookingId, String cancellationComment) throws CancelBookingException {
 
         if (bookingId == null) {
             throw new CancelBookingException("Please supply a valid Booking Id");
@@ -232,6 +232,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+                    booking.setCancellationComment(cancellationComment);
 
                     List<Long> formInstanceIds = new ArrayList<>();
 
@@ -264,7 +265,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public void cancelBookingByClerk(Long bookingId) throws CancelBookingException {
+    public void cancelBookingByClerk(Long bookingId, String cancellationComment) throws CancelBookingException {
 
         if (bookingId == null) {
             throw new CancelBookingException("Please supply a valid Booking Id");
@@ -277,7 +278,8 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
-
+                    booking.setCancellationComment(cancellationComment);
+                    
                     List<Long> formInstanceIds = new ArrayList<>();
 
                     for (FormInstance fi : booking.getFormInstances()) {

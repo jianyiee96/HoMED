@@ -144,7 +144,7 @@ public class SchedulerResource {
         }
 
         try {
-            bookingSessionBeanLocal.cancelBooking(cancelBookingReq.getBookingId());
+            bookingSessionBeanLocal.cancelBooking(cancelBookingReq.getBookingId(), cancelBookingReq.getCancellationComment());
             return Response.status(Response.Status.OK).build();
 
         } catch (CancelBookingException ex) {

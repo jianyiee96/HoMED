@@ -25,7 +25,7 @@ public interface ConsultationSessionBeanLocal {
 
     public void startConsultation(Long consultationId, Long medicalOfficerId) throws StartConsultationException;
 
-    public void invalidateConsultation(Long consultationId) throws InvalidateConsultationException;
+    public void invalidateConsultation(Long consultationId, String cancellationComment) throws InvalidateConsultationException;
 
     public void endConsultation(Long consultationId, String remarks, String remarksForServiceman) throws EndConsultationException;
 
