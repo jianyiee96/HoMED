@@ -17,10 +17,10 @@
         <ezcomp:manageFormInstance id="ccManageFormInstance">
             <f:ajax event="dialogCloseEvent" listener="#{currentConsultationManagedBean.dialogActionListener}"/>
         </ezcomp:manageFormInstance>
-        
+
         <ezcomp:pageRedirect rendered="#{currentConsultationManagedBean.currentMedicalOfficer.medicalCentre == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
-        
+
         <ezcomp:pageRedirect rendered="#{currentConsultationManagedBean.currentMedicalOfficer.medicalCentre != null and currentConsultationManagedBean.currentMedicalOfficer.currentConsultation == null}"
                              header="Currently No Ongoing Consultation" btnIcon="fa fa-rocket" btnOutcome="/queue-management.xhtml" btnValue="Queue Management Page"/>
 
@@ -109,6 +109,10 @@
 
                                                 <p:outputLabel value="Purpose: " />
                                                 <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
+
+                                                <p:outputLabel value="Booking Comment: " />
+                                                <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.booking.bookingComment != null}" value="#{currentConsultationManagedBean.selectedConsultation.booking.bookingComment}" class="display-text" />                                
+                                                <p:outputLabel value="N.A." rendered="#{currentConsultationManagedBean.selectedConsultation.booking.bookingComment eq null}" class="display-text"/>
 
                                                 <p:outputLabel value="Started at: " />
                                                 <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.startDateTime}" class="display-text">

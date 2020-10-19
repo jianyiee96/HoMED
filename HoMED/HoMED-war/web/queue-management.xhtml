@@ -108,6 +108,10 @@
                                                 <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>
                                                 </p:outputLabel>
+
+                                                <p:outputLabel value="Booking Comment " />
+                                                <p:outputLabel value="N.A." rendered="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment == null}" class="display-text"/>
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment}" rendered="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment != null}" class="display-text"/>
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>
