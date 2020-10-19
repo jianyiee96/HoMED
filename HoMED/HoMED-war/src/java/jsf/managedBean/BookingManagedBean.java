@@ -181,7 +181,7 @@ public class BookingManagedBean implements Serializable {
 
     public void doUpdateBookingDetails(BookingSlot slot) {
         bookingSlotToUpdateDetails = slotSessionBean.retrieveBookingSlotById(slot.getSlotId());
-        if(bookingSlotToUpdateDetails.getBooking().getBookingComment() == null) {
+        if (bookingSlotToUpdateDetails.getBooking().getBookingComment() == null) {
             bookingSlotToUpdateDetails.getBooking().setBookingComment("");
         }
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
@@ -209,6 +209,19 @@ public class BookingManagedBean implements Serializable {
         } catch (AttachFormInstancesException | UpdateBookingCommentException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Booking Details", ex.getMessage()));
         }
+    }
+
+    public String initMarkAttendance(BookingSlot slot) {
+        String msg = "You will not be allowed to revert your action.";
+        
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.HOUR, 1);
+        
+        if (slot.getStartDateTime().after(date.getTime())) {
+            return "<p>The booking is more than one hour ahead of the scheduled time. Are you sure you want to mark attendance?</p>" + msg;
+        }
+        
+        return msg;
     }
 
     public void markAttendance(BookingSlot slot) {
