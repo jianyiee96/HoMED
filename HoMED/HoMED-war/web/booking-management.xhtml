@@ -203,9 +203,9 @@
                         <div class="p-field  p-col-12">
                             <p:outputLabel value="Booking Comment" style="font-weight: bold"/><br/>
                             <h:panelGroup id="panelBookingComment" rendered="#{bookingManagedBean.isEditBookingInformation}">
-                                <p:inputText rendered="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment != null}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
+                                <p:inputText rendered="#{not empty bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
                             </h:panelGroup>
-                            <h:outputText rendered="#{not bookingManagedBean.isEditBookingInformation}" class="p-ml-4" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment ne null? bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment : 'Not Provided'}"></h:outputText>
+                            <h:outputText rendered="#{not bookingManagedBean.isEditBookingInformation}" class="p-ml-4" value="#{empty bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment? bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment : 'Not Provided'}"></h:outputText>
                         </div>
                         <div class="p-field  p-col-12">
                             <h:panelGroup id="panelAttachFormsLinkedForms">
