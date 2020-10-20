@@ -59,24 +59,24 @@
                                 <h:panelGrid columns="4">
                                     <p:commandButton rendered="#{not bookingSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Booking Slots"
                                                      disabled="#{bookingSlotManagementManagedBean.selectedBookingSlotsTreeSet.size() != 0}"
-                                                     update="rightPanel" process="@this" oncomplete="PF('bookingSlots').update()">
+                                                     update="rightPanel @form" process="@this" oncomplete="PF('bookingSlots').update()">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
                                     </p:commandButton>
 
                                     <p:commandButton rendered="#{bookingSlotManagementManagedBean.isScheduleState}" value="Create" icon="pi pi-save" styleClass="success-button" title="Create Booking Slots"
-                                                     update='rightPanel growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                     update='rightPanel growl-message @form' process="@this" oncomplete="PF('bookingSlots').update()"
                                                      actionListener="#{bookingSlotManagementManagedBean.saveSchedule}">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="false" />
                                     </p:commandButton>
 
                                     <p:commandButton  rendered="#{bookingSlotManagementManagedBean.isScheduleState}" value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
-                                                      update='rightPanel growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      update='rightPanel growl-message @form' process="@this" oncomplete="PF('bookingSlots').update()"
                                                       actionListener="#{bookingSlotManagementManagedBean.reset}">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="true" />
                                     </p:commandButton>
 
                                     <p:commandButton  rendered="#{bookingSlotManagementManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
-                                                      update='rightPanel growl-message' process="@this" oncomplete="PF('bookingSlots').update()"
+                                                      update='rightPanel growl-message @form' process="@this" oncomplete="PF('bookingSlots').update()"
                                                       actionListener="#{bookingSlotManagementManagedBean.reset}">
                                         <f:setPropertyActionListener target="#{bookingSlotManagementManagedBean.isScheduleState}" value="false" />
                                     </p:commandButton>
