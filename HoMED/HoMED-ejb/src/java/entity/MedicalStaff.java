@@ -69,6 +69,6 @@ public abstract class MedicalStaff extends Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.MedicalStaff[ id=" + super.getEmployeeId() + " ]";
+        return "Medical Staff [ id: " + super.getEmployeeId() + " ]";
     }
 }

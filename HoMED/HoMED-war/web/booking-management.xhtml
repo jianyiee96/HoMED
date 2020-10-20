@@ -130,7 +130,7 @@
                                         <p:confirm header="Mark Attendance" escape="false" message="#{bookingManagedBean.initMarkAttendance(slot)}" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                     <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-info" title="Cancellation Comments"
-                                                     rendered="#{slot.booking.bookingStatusEnum == 'CANCELLED'}"  disabled="#{slot.booking.cancellationComment eq null}"
+                                                     rendered="#{slot.booking.bookingStatusEnum == 'CANCELLED' or slot.booking.bookingStatusEnum == 'ABSENT'}"  disabled="#{slot.booking.cancellationComment eq null}"
                                                      oncomplete="PF('dlgCancelBookingComments').show()" update="formAllBookings:panelGroupCancelBookingComments">
                                         <f:setPropertyActionListener target="#{bookingManagedBean.cancelBookingComments}" value="#{slot.booking.cancellationComment}"/>
                                     </p:commandButton>
@@ -203,9 +203,9 @@
                         <div class="p-field  p-col-12">
                             <p:outputLabel value="Booking Comment" style="font-weight: bold"/><br/>
                             <h:panelGroup id="panelBookingComment" rendered="#{bookingManagedBean.isEditBookingInformation}">
-                                <p:inputText rendered="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment != null}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
+                                <p:inputText rendered="#{not empty bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
                             </h:panelGroup>
-                            <h:outputText rendered="#{not bookingManagedBean.isEditBookingInformation}" class="p-ml-4" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment ne null? bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment : 'Not Provided'}"></h:outputText>
+                            <h:outputText rendered="#{not bookingManagedBean.isEditBookingInformation}" class="p-ml-4" value="#{empty bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment? bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment : 'Not Provided'}"></h:outputText>
                         </div>
                         <div class="p-field  p-col-12">
                             <h:panelGroup id="panelAttachFormsLinkedForms">
@@ -330,7 +330,7 @@
                                                     <div class="p-field p-col-12 p-md-6 p-sm-12">
                                                         <i class="fa fa-tint p-mr-2 p-ml-2"/>
                                                         <p:outputLabel value="Blood Type" />
-                                                        <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.bloodType}" class="view-text" />
+                                                        <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.bloodType.bloodTypeString}" class="view-text" />
                                                     </div>
                                                     <div class="p-field p-col-12 p-md-6 p-sm-12">
                                                         <i class="fa fa-calendar p-mr-2 p-ml-2"/>

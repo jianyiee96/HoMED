@@ -41,7 +41,7 @@ public class Clerk extends MedicalStaff implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Clerk[ id=" + super.getEmployeeId() + " ]";
+        return "Clerk [ id: " + super.getEmployeeId() + " ]";
     }
 
 }

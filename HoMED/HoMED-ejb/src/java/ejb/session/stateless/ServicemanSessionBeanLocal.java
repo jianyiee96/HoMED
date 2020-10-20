@@ -54,4 +54,6 @@ public interface ServicemanSessionBeanLocal {
 
     public List<Serviceman> retrieveAllServicemenWithPastConsultations();
 
+    public Long createServicemanByInit(Serviceman newServiceman) throws CreateServicemanException;
+
 }

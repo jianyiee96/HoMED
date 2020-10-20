@@ -213,7 +213,7 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Employee[ id=" + employeeId + " ]";
+        return "Employee [ id: " + employeeId + " ]";
     }
 
 }

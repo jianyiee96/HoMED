@@ -160,7 +160,7 @@ public class Booking implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Booking[ id=" + bookingId + " ]";
+        return "Booking [ id: " + bookingId + " ]";
     }
 
 }
