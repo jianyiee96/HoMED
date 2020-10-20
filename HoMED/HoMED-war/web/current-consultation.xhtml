@@ -63,7 +63,7 @@
                                 <f:facet id="dataViewListHeader" name="header">
                                     <div style="display: flex; align-items: center; justify-content: space-between; height:16px">
                                         <h:outputText value="SERVICEMAN'S CONSULTATION HISTORY"></h:outputText>
-                                        <p:commandButton update="consultationForm" value="Current Consultation" rendered="#{currentConsultationManagedBean.selectedConsultation ne currentConsultationManagedBean.currentMedicalOfficer.currentConsultation}">
+                                        <p:commandButton update="consultationForm" value="Current Consultation" icon="fa fa-share-square-o" rendered="#{currentConsultationManagedBean.selectedConsultation ne currentConsultationManagedBean.currentMedicalOfficer.currentConsultation}">
                                             <f:setPropertyActionListener target="#{currentConsultationManagedBean.selectedConsultation}" value="#{currentConsultationManagedBean.currentMedicalOfficer.currentConsultation}"/>
                                         </p:commandButton>
                                     </div>
