@@ -30,6 +30,7 @@ import ws.datamodel.QueryBookingSlotsReq;
 import ws.datamodel.QueryBookingSlotsRsp;
 import ws.datamodel.RetrieveBookingsRsp;
 import ws.datamodel.ScheduleBookingReq;
+import ws.datamodel.ScheduleBookingRsp;
 
 @Path("Scheduler")
 public class SchedulerResource {
@@ -111,9 +112,9 @@ public class SchedulerResource {
 
         try {
 
-            bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment());
-
-            return Response.status(Response.Status.OK).build();
+            Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment());
+            Long bookingId = booking.getBookingId();
+            return Response.status(Response.Status.OK).entity(new ScheduleBookingRsp(bookingId)).build();
 
         } catch (CreateBookingException ex) {
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
