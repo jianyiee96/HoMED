@@ -6,6 +6,17 @@
     xmlns:p="http://primefaces.org/ui" 
     xmlns:po="http://primefaces.org/roma">
 
+    <style type="text/css">
+        .topbar-profile-icon-wrapper {
+            display: flex;
+            align-items: center;
+            height: 100;
+            margin-top: 2px;
+        }
+        .topbar-profile-icon-wrapper:hover >  .profile-icon {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+    </style>
     <div class="layout-topbar">
         <!--        <a class="layout-right-panel-button layout-topbar-icon" href="#">
                     <i class="pi pi-ellipsis-v" />
@@ -23,7 +34,18 @@
             <ui:fragment>
                 <li class="user-profile">
                     <a href="#">
-                        <p:graphicImage name="images/avatar/avatar.png" library="roma-layout" />
+                        <div style="display: inline-block;">
+                            <div class="topbar-profile-icon-wrapper">
+                                <div style="width:40px;height:40px;border-radius: 50%;background: grey; border:1px solid white;" class="profile-icon">
+                                    <div style="display: flex;align-content: center;align-items: center;justify-content: center; height: 100%">
+                                        <h:outputText rendered="#{currentEmployee.role == 'SUPER_USER'}" class="fa fa-user-secret" style="color: white;font-size: 35px; margin-left: 2px"/>
+                                        <h:outputText rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" class="fa fa-user-md" style="color: white;font-size: 35px; margin-left: -1px"/>
+                                        <h:outputText rendered="#{currentEmployee.role == 'MB_ADMIN'}" class="fa fa-user" style="color: white;font-size: 35px; margin-left: 0px"/>
+                                        <h:outputText rendered="#{currentEmployee.role == 'CLERK'}" class="fa fa-user" style="color: white;font-size: 35px; margin-left: 0px"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="layout-profile-userinfo">
                             <span class="layout-profile-name">#{sessionScope.currentEmployee.name}</span>
                             <span class="layout-profile-role">#{sessionScope.currentEmployee.role.stringVal}</span>
