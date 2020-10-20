@@ -40,5 +40,7 @@ public interface BookingSessionBeanLocal {
     public void cancelBookingByClerk(Long bookingId, String cancellationComment) throws CancelBookingException;
     
     public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException;
+
+    public List<Booking> retrieveQueueBookingsByMedicalCentre(Long medicalCentreId);
     
 }

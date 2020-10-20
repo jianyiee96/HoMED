@@ -57,6 +57,9 @@
                             <p:column headerText="Position" width="70" filterBy="#{index}" filterMatchMode="contains">
                                 <h:outputText value="#{index + 1}"/>
                             </p:column>
+                            <p:column headerText="Queue Number" filterBy="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" filterMatchMode="contains">
+                                <h:outputText value="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" />
+                            </p:column>
                             <p:column headerText="Serviceman Name" filterBy="#{consultation.booking.serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.serviceman.name}" />
                             </p:column>

@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
@@ -53,6 +54,17 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
+
+    @Override
+    public List<Booking> retrieveQueueBookingsByMedicalCentre(Long medicalCentreId) {
+        Query query = em.createQuery("SELECT b FROM Booking b "
+                + "WHERE b.bookingSlot.medicalCentre.medicalCentreId = :id "
+                + "AND b.consultation IS NOT NULL and b.consultation.consultationStatusEnum != :status "
+                + "ORDER BY b.consultation.joinQueueDateTime ASC");
+        query.setParameter("id", medicalCentreId);
+        query.setParameter("status", ConsultationStatusEnum.COMPLETED);
+        return query.getResultList();
+    }
 
     @Override
     public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException {
@@ -279,7 +291,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
                     booking.setCancellationComment(cancellationComment);
-                    
+
                     List<Long> formInstanceIds = new ArrayList<>();
 
                     for (FormInstance fi : booking.getFormInstances()) {
@@ -361,13 +373,13 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException {
 
         Booking booking = retrieveBookingById(bookingId);
-        
-        if(booking == null) {
+
+        if (booking == null) {
             throw new UpdateBookingCommentException("Invalid booking id");
         }
-        
+
         booking.setBookingComment(bookingComment);
-        
+
     }
 
 }
