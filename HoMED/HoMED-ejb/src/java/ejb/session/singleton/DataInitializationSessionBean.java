@@ -379,9 +379,9 @@ public class DataInitializationSessionBean {
         formFieldOptions = new ArrayList<>();
         formFieldOptions.add(new FormFieldOption("North"));
         formFieldOptions.add(new FormFieldOption("South"));
-        formFieldOptions.add(new FormFieldOption("EAST"));
-        formFieldOptions.add(new FormFieldOption("WEST"));
-        formFieldOptions.add(new FormFieldOption("CENTRAL"));
+        formFieldOptions.add(new FormFieldOption("East"));
+        formFieldOptions.add(new FormFieldOption("West"));
+        formFieldOptions.add(new FormFieldOption("Central"));
         formFields.add(new FormField("What is your preferred location?", 10, InputTypeEnum.CHECK_BOX, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
         formFieldOptions = new ArrayList<>();
         formFieldOptions.add(new FormFieldOption("A+"));
