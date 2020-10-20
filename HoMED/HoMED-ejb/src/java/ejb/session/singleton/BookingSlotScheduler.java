@@ -36,7 +36,7 @@ public class BookingSlotScheduler {
     @Resource
     private TimerService timerService;
 
-//    @Schedule(hour = "*", minute = "*", second = "*/5", info = "Schedule Booking Slots to be triggered during")
+//    @Schedule(hour = "*", minute = "*", second = "*/30", info = "Schedule Booking Slots to be triggered during")
     @Schedule(dayOfWeek = "Mon", hour = "0", minute = "0", second = "0", info = "Schedule Booking Slots every Monday 12 a.m.")
     private void startBookingSlotScheduler() {
         Date now = new Date();
