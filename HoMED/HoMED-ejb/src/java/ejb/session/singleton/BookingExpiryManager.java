@@ -36,6 +36,7 @@ public class BookingExpiryManager {
         startBookingExpiryManager();
     }
 
+//    @Schedule(hour = "*", minute="*", second="*/5", info = "startBookingExpiryManager")
     @Schedule(hour = "0", info = "startBookingExpiryManager")
     public void startBookingExpiryManager() {
         Date now = new Date();
@@ -50,6 +51,7 @@ public class BookingExpiryManager {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
+//        c.add(Calendar.DATE, 1);
         Date floorToday = c.getTime();
 
         System.out.println("- ExpiryManager: Marking bookings absent if start time is before " + df.format(floorToday));
@@ -62,7 +64,8 @@ public class BookingExpiryManager {
 
                 try {
                     System.out.println("Booking has Expired -> Marking Absent! id: " + b.getBookingId() + " (" + df.format(b.getBookingSlot().getStartDateTime()) + ")");
-                    bookingSessionBeanLocal.markBookingAbsent(b.getBookingId());
+                    bookingSessionBeanLocal.markBookingAbsent(b.getBookingId(), "Marked Absent By System");
+                    
                 } catch (MarkBookingAbsentException ex) {
                     System.out.println("Unable to mark booking (" + b.getBookingId() + ") as absent: " + ex.getMessage());
                 }

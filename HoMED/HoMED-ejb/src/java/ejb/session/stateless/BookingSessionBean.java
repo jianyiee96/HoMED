@@ -311,7 +311,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public void markBookingAbsent(Long bookingId) throws MarkBookingAbsentException {
+    public void markBookingAbsent(Long bookingId, String cancellationComment) throws MarkBookingAbsentException {
 
         Booking booking = retrieveBookingById(bookingId);
 
@@ -321,6 +321,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.ABSENT);
+                    booking.setCancellationComment(cancellationComment);
 
                     List<Long> formInstanceIds = new ArrayList<>();
 

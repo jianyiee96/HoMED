@@ -21,7 +21,7 @@ public interface BookingSessionBeanLocal {
     
     public void cancelBooking(Long bookingId, String cancellationComment) throws CancelBookingException;
 
-    public void markBookingAbsent(Long bookingId) throws MarkBookingAbsentException;
+    public void markBookingAbsent(Long bookingId, String cancellationComment) throws MarkBookingAbsentException;
     
     public List<Booking> retrieveServicemanBookings(Long servicemanId);
 
