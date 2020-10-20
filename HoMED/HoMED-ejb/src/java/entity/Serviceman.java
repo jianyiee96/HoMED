@@ -130,7 +130,21 @@ public class Serviceman implements Serializable {
         this.role = another.role;
         this.salt = another.salt;
     }
-
+    
+    public Serviceman(String name, String password, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
+        this();
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.rod = ord;
+        this.gender = gender;
+        this.bloodType = bloodType;
+        this.address = address;
+        setPassword(password);
+    }
+    
     public Serviceman(String name, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;

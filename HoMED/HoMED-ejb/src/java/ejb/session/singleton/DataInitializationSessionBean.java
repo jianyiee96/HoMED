@@ -63,6 +63,7 @@ import util.exceptions.CreateServicemanException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
@@ -129,7 +130,7 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException ex) {
+                | ScheduleBookingSlotException | ServicemanNotFoundException ex) {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
@@ -475,28 +476,44 @@ public class DataInitializationSessionBean {
         return formTemplate.getFormTemplateId();
     }
 
-    private List<Serviceman> initializeServiceman() throws CreateServicemanException {
+    private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
-        String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
-        String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
-        String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
-
+        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Long serviceman1Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman1);
+        Long serviceman2Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman2);
+        Long serviceman3Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman3);
+        Long serviceman4Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman4);
+        serviceman1 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman1Id);
+        serviceman2 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman2Id);
+        serviceman3 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman3Id);
+        serviceman4 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman4Id);
+        
+        System.out.println("Serviceman INFO [INIT]");
+        System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber());
+        System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber());
+        System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber());
+        System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber());
+        System.out.println("Successfully created servicemen by init\n");
+        
+        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        String servicemanOtp1 = servicemanSessionBeanLocal.createServiceman(serviceman1Otp);
+        String servicemanOtp2 = servicemanSessionBeanLocal.createServiceman(serviceman2Otp);
+        
         System.out.println("Serviceman INFO [OTP]");
-        System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
-        System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
-        System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
-        System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
+        System.out.println("Email: " + serviceman1Otp.getEmail() + "\tPhone: " + serviceman1Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp1);
+        System.out.println("Email: " + serviceman2Otp.getEmail() + "\tPhone: " + serviceman2Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp2);
         System.out.println("Successfully created servicemen with OTP\n");
 
         servicemen.add(serviceman1);
         servicemen.add(serviceman2);
         servicemen.add(serviceman3);
         servicemen.add(serviceman4);
+        servicemen.add(serviceman1Otp);
+        servicemen.add(serviceman2Otp);
         return servicemen;
     }
 
