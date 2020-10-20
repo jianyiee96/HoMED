@@ -42,24 +42,24 @@
                             <h:panelGrid columns="4">
                                 <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Medical Board Slots"
                                                  disabled="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet.size() != 0}"
-                                                 update="rightPanel" process="@this" oncomplete="PF('medicalBoardSlots').update()">
+                                                 update="rightPanel @form" process="@this" oncomplete="PF('medicalBoardSlots').update()">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
 
                                 <p:commandButton rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Create" icon="pi pi-save" styleClass="success-button" title="Create Medical Board Slots"
-                                                 update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                 update='rightPanel growl-message @form' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                  actionListener="#{medicalBoardSlotManagementManagedBean.saveSchedule}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
                                 </p:commandButton>
 
                                 <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Reset" icon="pi pi-undo" styleClass="warning-button" title="Reset"
-                                                  update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  update='rightPanel growl-message @form' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                   actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
 
                                 <p:commandButton  rendered="#{medicalBoardSlotManagementManagedBean.isScheduleState}"  value="Cancel" icon="pi pi-times" styleClass="danger-button" title="Cancel"
-                                                  update='rightPanel growl-message' process="@this" oncomplete="PF('medicalBoardSlots').update()"
+                                                  update='rightPanel growl-message @form' process="@this" oncomplete="PF('medicalBoardSlots').update()"
                                                   actionListener="#{medicalBoardSlotManagementManagedBean.reset}">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="false" />
                                 </p:commandButton>
