@@ -106,6 +106,8 @@ public class BookingManagedBean implements Serializable {
 
     private BookingSlot bookingSlotToCancel;
 
+    private Boolean isEditBookingInformation;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
     private Date dateToCreateBooking;
@@ -122,6 +124,7 @@ public class BookingManagedBean implements Serializable {
         filteredBookingSlots = new ArrayList<>();
         servicemanToCreateBooking = new Serviceman();
         formTemplateHm = new HashMap<>();
+        isEditBookingInformation = false;
     }
 
     @PostConstruct
@@ -213,14 +216,14 @@ public class BookingManagedBean implements Serializable {
 
     public String initMarkAttendance(BookingSlot slot) {
         String msg = "You will not be allowed to revert your action.";
-        
+
         Calendar date = Calendar.getInstance();
         date.add(Calendar.HOUR, 1);
-        
+
         if (slot.getStartDateTime().after(date.getTime())) {
             return "<p>The booking is more than one hour ahead of the scheduled time. Are you sure you want to mark attendance?</p>" + msg;
         }
-        
+
         return msg;
     }
 
@@ -551,6 +554,14 @@ public class BookingManagedBean implements Serializable {
 
     public void setBookingSlotToCancel(BookingSlot bookingSlotToCancel) {
         this.bookingSlotToCancel = bookingSlotToCancel;
+    }
+
+    public Boolean getIsEditBookingInformation() {
+        return isEditBookingInformation;
+    }
+
+    public void setIsEditBookingInformation(Boolean isEditBookingInformation) {
+        this.isEditBookingInformation = isEditBookingInformation;
     }
 
 }

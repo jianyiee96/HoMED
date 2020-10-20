@@ -121,7 +121,9 @@
                                     </p:commandButton>
                                     <p:commandButton styleClass="warning-button rounded-button p-mr-2 p-mb-2" icon="pi pi-cog" title="Booking Information"
                                                      actionListener="#{bookingManagedBean.doUpdateBookingDetails(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
-                                                     oncomplete="PF('dialogAttachAdditionalForms').show()" update="formAllBookings:panelAttachForms"/>
+                                                     oncomplete="PF('dialogAttachAdditionalForms').show()" update="formAllBookings:panelAttachForms">
+                                        <f:setPropertyActionListener target="#{bookingManagedBean.isEditBookingInformation}" value="#{false}"/>
+                                    </p:commandButton>
                                     <p:commandButton styleClass="success-button rounded-button p-mr-2 p-mb-2" icon="pi pi-check-square" title="Mark Attendance"
                                                      actionListener="#{bookingManagedBean.markAttendance(slot)}" rendered="#{slot.booking.bookingStatusEnum == 'UPCOMING'}"
                                                      update="dataTableBookings">
@@ -151,7 +153,7 @@
                     </div>
                 </h:panelGroup>
             </p:dialog>
-            
+
             <p:dialog id="dlgCancelBookingComments" widgetVar="dlgCancelBookingComments" header="Cancellation Comments" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dlgCancelBookingComments').initPosition()"
                       minWidth="500" width="400">
@@ -199,11 +201,11 @@
                             <h:outputText value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.consultationPurpose.consultationPurposeName}" style="font-weight: bold"/>
                         </h:panelGrid>
                         <div class="p-field  p-col-12">
-                            <h:panelGroup id="panelBookingComment">
-                                <p:outputLabel value="Booking Comment" style="font-weight: bold"/><br/>
-                                <p:inputText style="margin-top: 10px" rendered="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment != null}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
-
+                            <p:outputLabel value="Booking Comment" style="font-weight: bold"/><br/>
+                            <h:panelGroup id="panelBookingComment" rendered="#{bookingManagedBean.isEditBookingInformation}">
+                                <p:inputText rendered="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment != null}" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment}"></p:inputText>
                             </h:panelGroup>
+                            <h:outputText rendered="#{not bookingManagedBean.isEditBookingInformation}" class="p-ml-4" value="#{bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment ne null? bookingManagedBean.bookingSlotToUpdateDetails.booking.bookingComment : 'Not Provided'}"></h:outputText>
                         </div>
                         <div class="p-field  p-col-12">
                             <h:panelGroup id="panelAttachFormsLinkedForms">
@@ -220,7 +222,7 @@
                             </h:panelGroup>
                         </div>
                         <div class="p-field  p-col-12">
-                            <h:panelGroup id="panelAttachFormsAdditionalForms" rendered="#{not empty bookingManagedBean.additionalFormTemplates}">
+                            <h:panelGroup id="panelAttachFormsAdditionalForms" rendered="#{not empty bookingManagedBean.additionalFormTemplates and bookingManagedBean.isEditBookingInformation}">
                                 <p:outputLabel for="select-formTemplates" value="Attach Additional Form Templates" style="font-weight: bold"/>
                                 <p:selectManyMenu id="select-attachAddtionalformTemplates" value="#{bookingManagedBean.selectedAdditionalFormTemplatesToCreate}"
                                                   var="ft" showCheckbox="true" class="p-mt-2">
@@ -230,7 +232,7 @@
                                     </p:column>
                                 </p:selectManyMenu>
                             </h:panelGroup>
-                            <h:outputText rendered="#{empty bookingManagedBean.additionalFormTemplates}" value="No forms available to link" style="font-weight: bold"/>
+                            <h:outputText rendered="#{empty bookingManagedBean.additionalFormTemplates and bookingManagedBean.isEditBookingInformation}" value="No forms available to link" style="font-weight: bold"/>
                         </div>
                     </div>
                     <p:messages globalOnly="true" showDetail="true" class="error-message">
@@ -239,9 +241,12 @@
 
                     <div class="p-col-12">
                         <div class="p-grid p-justify-center p-align-center vertical-container">
-                            <p:commandButton value="Update" icon="pi pi-save" styleClass="p-mr-2 p-my-2"  update="panelAttachForms growl-message dataTableBookings" process="panelAttachForms"
+                            <p:commandButton rendered="#{bookingManagedBean.isEditBookingInformation}" value="Update" icon="pi pi-save" styleClass="p-mr-2 p-my-2"  update="panelAttachForms growl-message dataTableBookings" process="panelAttachForms"
                                              actionListener="#{bookingManagedBean.updateBooking()}">
                                 <p:confirm header="Update Booking Information" escape="false" message="Confirm update booking and attach any additional forms?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                            <p:commandButton rendered="#{not bookingManagedBean.isEditBookingInformation}" value="Edit" icon="pi pi-pencil" styleClass="primary-button p-mr-2 p-my-2"  update="panelAttachForms" process="@this">
+                                <f:setPropertyActionListener target="#{bookingManagedBean.isEditBookingInformation}" value="#{true}"/>
                             </p:commandButton>
                         </div>
                     </div>
