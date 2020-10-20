@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.ConsultationStatusEnum;
 import util.exceptions.ActivateServicemanException;
 import util.exceptions.ChangeServicemanPasswordException;
 import util.exceptions.CreateServicemanException;
@@ -57,6 +58,14 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     public List<Serviceman> retrieveAllServicemen() {
         Query query = em.createQuery("SELECT s FROM Serviceman s");
 
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Serviceman> retrieveAllServicemenWithPastConsultations() {
+        Query query = em.createQuery("SELECT s FROM Serviceman s JOIN s.bookings b JOIN b.consultation c WHERE c.consultationStatusEnum = :consultationStatus ORDER BY s.servicemanId");
+        query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
+        
         return query.getResultList();
     }
 
@@ -262,7 +271,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
             serviceman.setPassword(password);
             serviceman.setIsActivated(true);
-            
+
             employeeSessionBean.updateEmployeeMatchingAccount(serviceman, null, serviceman.getPassword(), true);
 
         } catch (ActivateServicemanException ex) {
@@ -392,10 +401,8 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
         } catch (Exception ex) {
             return false;
-        } 
+        }
     }
-
-
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Serviceman>> constraintViolations) {
         String msg = "";

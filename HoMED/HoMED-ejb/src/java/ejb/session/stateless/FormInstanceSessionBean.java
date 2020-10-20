@@ -26,6 +26,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.enumeration.BookingStatusEnum;
+import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
@@ -86,13 +88,8 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
             formTemplate.getFormInstances().add(formInstance);
 
             for (FormField ff : formTemplate.getFormFields()) {
-                // @JY - REFER HERE (tbc - will this cause issues?)
-//                FormInstanceFieldValue fifv = new FormInstanceFieldValue();
-//                em.persist(fifv);
 
                 FormInstanceField fif = new FormInstanceField();
-                // @JY
-//                fif.getFormInstanceFieldValues().add(fifv);
                 fif.setFormFieldMapping(ff);
                 em.persist(fif);
                 formInstance.getFormInstanceFields().add(fif);
@@ -302,10 +299,15 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     public void archiveFormInstance(Long formInstanceId) throws ArchiveFormInstanceException {
         FormInstance formInstance = retrieveFormInstance(formInstanceId);
 
-        if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
-            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
-        } else if (formInstance == null) {
+        if (formInstance == null) {
             throw new ArchiveFormInstanceException("Invalid Form Instance: Unable to find form instance in records");
+        } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
+            throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
+        } else if (formInstance.getBooking() != null && formInstance.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to an upcoming cooking.");
+        } else if (formInstance.getBooking() != null && formInstance.getBooking().getConsultation() != null && formInstance.getBooking().getConsultation().getConsultationStatusEnum() != ConsultationStatusEnum.COMPLETED) {
+            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to a present consultation.");
+
         }
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.ARCHIVED);
