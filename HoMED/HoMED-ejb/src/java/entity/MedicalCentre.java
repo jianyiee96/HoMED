@@ -155,7 +155,7 @@ public class MedicalCentre implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.MedicalCentre[ id=" + medicalCentreId + " ]";
+        return "Medical Centre [ id: " + medicalCentreId + " ]";
     }
 
 }

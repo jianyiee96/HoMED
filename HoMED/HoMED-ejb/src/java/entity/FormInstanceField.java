@@ -90,7 +90,7 @@ public class FormInstanceField implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.FormInstanceValue[ id=" + formInstanceFieldId + " ]";
+        return "Form Instance Value [ id: " + formInstanceFieldId + " ]";
     }
 
 }

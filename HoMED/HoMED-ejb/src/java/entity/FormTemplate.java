@@ -186,7 +186,7 @@ public class FormTemplate implements Serializable {
 
     @Override
     public String toString() {
-        return formTemplateName+ " [" + formTemplateId + "]";
+        return formTemplateName+ " [ id: " + formTemplateId + "]";
     }
     
 }

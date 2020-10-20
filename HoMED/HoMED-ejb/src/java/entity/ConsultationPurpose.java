@@ -105,7 +105,7 @@ public class ConsultationPurpose implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.ConsultationPurpose[ id=" + consultationPurposeId + " ]";
+        return "Consultation Purpose [ id: " + consultationPurposeId + " ]";
     }
     
 }

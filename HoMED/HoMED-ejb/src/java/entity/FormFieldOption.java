@@ -77,7 +77,7 @@ public class FormFieldOption implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.FormFieldOption[ id=" + formFieldOptionId + " ]";
+        return "Form Field Option [ id: " + formFieldOptionId + " ]";
     }
     
 }

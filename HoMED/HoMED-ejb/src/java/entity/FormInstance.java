@@ -166,7 +166,7 @@ public class FormInstance implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.FromInstance[ id=" + formInstanceId + " ]";
+        return "Form Instance [ id: " + formInstanceId + " ]";
     }
 
 }

@@ -103,7 +103,7 @@ public abstract class Slot implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Slot[ id=" + slotId + " ]";
+        return "Slot [ id: " + slotId + " ]";
     }
 
 }

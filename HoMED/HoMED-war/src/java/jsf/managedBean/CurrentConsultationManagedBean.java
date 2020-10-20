@@ -81,10 +81,10 @@ public class CurrentConsultationManagedBean implements Serializable {
             PrimeFaces.current().ajax().update("consultationForm:panelGroupForms");
         }
         if (manageFormInstanceManagedBean.getIsSuccessfulSubmit()) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView()));
         }
         if (manageFormInstanceManagedBean.getIsSuccessfulSave()) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Saved", "Successfully saved form instance" + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Saved", "Successfully saved form instance" + manageFormInstanceManagedBean.getFormInstanceToView()));
         }
     }
 

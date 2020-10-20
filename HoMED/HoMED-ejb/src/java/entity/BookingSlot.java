@@ -74,7 +74,7 @@ public class BookingSlot extends Slot implements Serializable, Comparable<Bookin
 
     @Override
     public String toString() {
-        return "entity.BookingSlot[ id=" + this.getSlotId() + " ]";
+        return "Booking Slot [ id: " + this.getSlotId() + " ]";
     }
     
 }

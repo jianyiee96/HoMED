@@ -315,7 +315,7 @@ public class Serviceman implements Serializable {
     
     @Override
     public String toString() {
-        return "entity.Serviceman[ id=" + servicemanId + " ]";
+        return "Serviceman [ id: " + servicemanId + " ]";
     }
 
 }

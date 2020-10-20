@@ -44,7 +44,7 @@ public class MedicalBoardAdmin extends MedicalStaff implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.MedicalBoardAdmin[ id=" + super.getEmployeeId() + " ]";
+        return "Medical Board Admin [ id: " + super.getEmployeeId() + " ]";
     }
 
 }

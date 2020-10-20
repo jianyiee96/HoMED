@@ -66,7 +66,7 @@ public class MedicalBoard implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.MedicalBoard[ id=" + medicalBoardId + " ]";
+        return "Medical Board [ id: " + medicalBoardId + " ]";
     }
 
 }
