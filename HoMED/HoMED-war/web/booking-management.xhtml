@@ -245,7 +245,10 @@
                                              actionListener="#{bookingManagedBean.updateBooking()}">
                                 <p:confirm header="Update Booking Information" escape="false" message="Confirm update booking and attach any additional forms?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
-                            <p:commandButton rendered="#{not bookingManagedBean.isEditBookingInformation}" value="Edit" icon="pi pi-pencil" styleClass="primary-button p-mr-2 p-my-2"  update="panelAttachForms" process="@this">
+                            <p:commandButton rendered="#{bookingManagedBean.isEditBookingInformation}" value="Cancel" icon="pi pi-times" styleClass="danger-button p-mr-2 p-my-2"  update="panelAttachForms" process="@this">
+                                <f:setPropertyActionListener target="#{bookingManagedBean.isEditBookingInformation}" value="#{false}"/>
+                            </p:commandButton>
+                            <p:commandButton rendered="#{not bookingManagedBean.isEditBookingInformation}" value="Edit" icon="pi pi-pencil" styleClass="p-mr-2 p-my-2"  update="panelAttachForms" process="@this">
                                 <f:setPropertyActionListener target="#{bookingManagedBean.isEditBookingInformation}" value="#{true}"/>
                             </p:commandButton>
                         </div>
