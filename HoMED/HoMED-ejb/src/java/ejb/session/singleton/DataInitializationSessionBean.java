@@ -121,7 +121,7 @@ public class DataInitializationSessionBean {
 
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.1);
 
-            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
 
             fillForms(bookings, 0.5);
             System.out.println("====================== End of DATA INIT ======================");
