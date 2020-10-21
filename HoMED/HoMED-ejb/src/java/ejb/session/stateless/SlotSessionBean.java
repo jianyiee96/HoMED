@@ -59,10 +59,20 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
             List<BookingSlot> bookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
             for (BookingSlot bs : bookingSlots) {
-                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime()) && (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED)) {
-                    Date now = new Date();
-                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
+                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime())) {
+                    // If there is no booking attached to the slot, means there is an available slot for booking, and should not create a new slot.
+                    if (bs.getBooking() == null) {
+
+                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
+                        
+                    // If there is a booking attached to the slot but the booking is not cancelled, means the slot is already booked (upcoming/absent) or past, and should not create a new slot.
+                    } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
+
+                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
+
+                    }
                 }
             }
 

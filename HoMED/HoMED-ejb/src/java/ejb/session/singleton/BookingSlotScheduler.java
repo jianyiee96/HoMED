@@ -36,7 +36,7 @@ public class BookingSlotScheduler {
     @Resource
     private TimerService timerService;
 
-//    @Schedule(hour = "*", minute = "*", second = "*/30", info = "Schedule Booking Slots to be triggered during")
+//    @Schedule(hour = "*", minute = "*", second = "*/10", info = "Schedule Booking Slots to be triggered during")
     @Schedule(dayOfWeek = "Mon", hour = "0", minute = "0", second = "0", info = "Schedule Booking Slots every Monday 12 a.m.")
     private void startBookingSlotScheduler() {
         Date now = new Date();
@@ -53,16 +53,16 @@ public class BookingSlotScheduler {
         for (MedicalCentre mc : medicalCentres) {
             System.out.println("Creating Booking Slots for " + mc.getName() + "...");
             List<OperatingHours> operatingHours = mc.getOperatingHours();
-            
+
             try {
                 for (int day = 0; day < numOfDaysToCreate; day++) {
-                    
+
                     Calendar date = Calendar.getInstance();
                     date.add(Calendar.DATE, 28);
                     date.set(Calendar.SECOND, 0);
                     date.set(Calendar.MILLISECOND, 0);
                     date.add(Calendar.DATE, day);
-                    
+
                     int dayIdx = date.get(Calendar.DAY_OF_WEEK);
                     DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
 
@@ -84,14 +84,14 @@ public class BookingSlotScheduler {
                     start.set(Calendar.MINUTE, daysOh.getOpeningHours().getMinute());
                     end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                     end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
-                    
+
                     if (start.getTime().before(end.getTime())) {
                         slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime());
                     }
                 }
-                
+
                 System.out.println("Successfully created Booking Slots for " + mc.getName() + "...");
-                
+
             } catch (ScheduleBookingSlotException ex) {
                 System.out.println("Unable to schedule booking slots: " + ex.getMessage());
             }
