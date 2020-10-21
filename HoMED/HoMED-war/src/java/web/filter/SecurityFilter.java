@@ -117,7 +117,8 @@ public class SecurityFilter implements Filter {
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
             if (path.equals(pathArr[10])
                     || path.equals(pathArr[11])
-                    || path.equals(pathArr[12])) {
+                    || path.equals(pathArr[12])
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         }
