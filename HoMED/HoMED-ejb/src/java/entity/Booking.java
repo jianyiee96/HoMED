@@ -27,9 +27,11 @@ public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookingId;
-
+    
+    @Column(nullable = true, length = 8000)
     private String bookingComment;
 
+    @Column(nullable = true, length = 8000)
     private String cancellationComment;
 
     @ManyToOne(optional = false)
