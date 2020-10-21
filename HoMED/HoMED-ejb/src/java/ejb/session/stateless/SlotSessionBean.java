@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.BookingSlot;
 import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.BookingStatusEnum;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
@@ -49,6 +51,9 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             rangeEndCalendar.setTime(rangeEnd);
 
 //            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
+            List<BookingSlot> availableBookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 
             while (rangeStartCalendar.before(rangeEndCalendar)) {
@@ -56,11 +61,34 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
 
-                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
-                mc.getBookingSlots().add(bs);
-                em.persist(bs);
+                BookingSlot newBs = new BookingSlot(mc, currStart, currEnd);
+                Boolean isInvalid = Boolean.FALSE;
+                for (BookingSlot bs : availableBookingSlots) {
+                    if (bs.getStartDateTime().equals(currStart) && bs.getEndDateTime().equals(currEnd)) {
+                        // If there is no booking attached to the slot, means there is an available slot for booking, and should not create a new slot.
+                        if (bs.getBooking() == null) {
+
+                            isInvalid = Boolean.TRUE;
+                            break;
+
+                            // If there is a booking attached to the slot but the booking is not cancelled, means the slot is already booked (upcoming/absent) or past, and should not create a new slot.
+                        } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
+
+                            isInvalid = Boolean.TRUE;
+                            break;
+
+                        }
+                    }
+                }
+
+                if (isInvalid) {
+                    continue;
+                }
+
+                mc.getBookingSlots().add(newBs);
+                em.persist(newBs);
                 em.flush();
-                createdBookingSlots.add(bs);
+                createdBookingSlots.add(newBs);
             }
 
             System.out.println("Created " + createdBookingSlots.size() + " Booking Slots");

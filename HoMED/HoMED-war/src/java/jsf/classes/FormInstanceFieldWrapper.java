@@ -14,6 +14,7 @@ public class FormInstanceFieldWrapper {
 
     private static final SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
     private static final SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm");
+    final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     private FormInstanceField formInstanceField;
 
@@ -82,9 +83,9 @@ public class FormInstanceFieldWrapper {
                 return null;
             }
             if (formInstanceField.getFormFieldMapping().getInputType() == InputTypeEnum.DATE) {
-                dateTime = sdfDate.parse(formInstanceField.getFormInstanceFieldValues().get(0).getInputValue());
+                dateTime = JSON_DATE_FORMATTER.parse(formInstanceField.getFormInstanceFieldValues().get(0).getInputValue());
             } else if (formInstanceField.getFormFieldMapping().getInputType() == InputTypeEnum.TIME) {
-                dateTime = sdfTime.parse(formInstanceField.getFormInstanceFieldValues().get(0).getInputValue());
+                dateTime = JSON_DATE_FORMATTER.parse(formInstanceField.getFormInstanceFieldValues().get(0).getInputValue());
             }
         } catch (ParseException ex) {
             return null;

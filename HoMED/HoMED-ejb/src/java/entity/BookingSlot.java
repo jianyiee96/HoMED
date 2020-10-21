@@ -66,6 +66,7 @@ public class BookingSlot extends Slot implements Serializable, Comparable<Bookin
             return false;
         }
         BookingSlot other = (BookingSlot) object;
+
         if ((this.getSlotId() == null && other.getSlotId() != null) || (this.getSlotId() != null && !this.getSlotId().equals(other.getSlotId()))) {
             return false;
         }
@@ -74,7 +75,7 @@ public class BookingSlot extends Slot implements Serializable, Comparable<Bookin
 
     @Override
     public String toString() {
-        return "entity.BookingSlot[ id=" + this.getSlotId() + " ]";
+        return "Booking Slot [ id: " + this.getSlotId() + " ]";
     }
     
 }

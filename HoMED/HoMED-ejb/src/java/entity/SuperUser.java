@@ -41,7 +41,7 @@ public class SuperUser extends Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.SuperUser[ id=" + super.getEmployeeId() + " ]";
+        return "Super User [ id: " + super.getEmployeeId() + " ]";
     }
 
 }

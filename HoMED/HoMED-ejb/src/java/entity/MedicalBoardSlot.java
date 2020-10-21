@@ -59,7 +59,7 @@ public class MedicalBoardSlot extends Slot implements Serializable, Comparable<M
 
     @Override
     public String toString() {
-        return "entity.MedicalBoardSlot[ id=" + this.getSlotId() + " ]";
+        return "Medical Board Slot [ id: " + this.getSlotId() + " ]";
     }
 
 }

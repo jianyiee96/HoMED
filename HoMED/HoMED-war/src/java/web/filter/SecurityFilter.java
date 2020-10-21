@@ -76,24 +76,25 @@ public class SecurityFilter implements Filter {
             "/medical-centre-staff-management.xhtml", // 9
             "/booking-slot-management.xhtml", // 10
             "/medical-board-slot-management.xhtml", // 11
-            "/booking-management.xhtml", //12
-            "/queue-management.xhtml", //13
-            "/past-consultations.xhtml", //14
-            "/serviceman-consultation-records.xhtml", //15
-            "/current-consultation.xhtml" //16
+            "/booking-management.xhtml", // 12
+            "/queue-management.xhtml", // 13
+            "/past-consultations.xhtml", // 14
+            "/serviceman-consultation-records.xhtml", // 15
+            "/current-consultation.xhtml", // 16
+            "/queue-display.xhtml" // 17
         };
 
         // Pages that all logged in users can enter
         if (path.equals(pathArr[0])
                 || path.equals(pathArr[1])
                 || path.equals(pathArr[2])
+                || path.equals(pathArr[3])
                 || path.equals(pathArr[4])) {
             return 1;
         }
 
         if (accessRight == EmployeeRoleEnum.SUPER_USER) {
-            if (path.equals(pathArr[3])
-                    || path.equals(pathArr[5])
+            if (path.equals(pathArr[5])
                     || path.equals(pathArr[6])
                     || path.equals(pathArr[7])
                     || path.equals(pathArr[8])
@@ -109,13 +110,15 @@ public class SecurityFilter implements Filter {
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
             if (path.equals(pathArr[10])
-                    || path.equals(pathArr[12])) {
+                    || path.equals(pathArr[12])
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
             if (path.equals(pathArr[10])
                     || path.equals(pathArr[11])
-                    || path.equals(pathArr[12])) {
+                    || path.equals(pathArr[12])
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         }

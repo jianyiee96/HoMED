@@ -35,6 +35,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -61,6 +63,7 @@ import util.exceptions.CreateServicemanException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
@@ -89,6 +92,8 @@ public class DataInitializationSessionBean {
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
 
+    final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
     @PostConstruct
     public void postConstruct() {
         try {
@@ -112,9 +117,12 @@ public class DataInitializationSessionBean {
             List<ConsultationPurpose> consultationPurposes = initializeConsultationPurposes();
 
             List<BookingSlot> bookingSlots = initializeBookingSlots(medicalCentres);
-            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.2);
+            servicemen.remove(0);
+            servicemen.remove(0);
 
-            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.1);
+
+//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
 
             fillForms(bookings, 0.5);
             System.out.println("====================== End of DATA INIT ======================");
@@ -122,7 +130,7 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException ex) {
+                | ScheduleBookingSlotException | ServicemanNotFoundException ex) {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
@@ -163,12 +171,10 @@ public class DataInitializationSessionBean {
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     } else if (inputType == InputTypeEnum.TIME) {
                         Date date = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(sdf.format(date)));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(JSON_DATE_FORMATTER.format(date)));
                     }
                 }
             }
@@ -181,19 +187,26 @@ public class DataInitializationSessionBean {
     }
 
     private List<BookingSlot> initializeBookingSlots(List<MedicalCentre> medicalCentres) throws ScheduleBookingSlotException {
-        System.out.println("Creating Booking Slots...");
         List<BookingSlot> bookingSlots = new ArrayList<>();
-        int numOfDaysToCreate = 5;
+        int numOfDaysToCreate = 28;
 
         for (MedicalCentre mc : medicalCentres) {
+            System.out.println("Creating Booking Slots for " + mc.getName() + "...");
             List<OperatingHours> operatingHours = mc.getOperatingHours();
+
             for (int day = 0; day < numOfDaysToCreate; day++) {
                 Calendar date = Calendar.getInstance();
-                date.add(Calendar.DATE, day);
-                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
-                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
                 date.set(Calendar.SECOND, 0);
                 date.set(Calendar.MILLISECOND, 0);
+
+                while (date.get(Calendar.DAY_OF_WEEK) != 1) {
+                    date.add(Calendar.DATE, -1);
+                }
+
+                date.add(Calendar.DATE, day);
+
+                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
+                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
 
                 OperatingHours daysOh = operatingHours.stream()
                         .filter(oh -> oh.getDayOfWeek() == dayOfWeekEnum)
@@ -214,15 +227,14 @@ public class DataInitializationSessionBean {
                 end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
                 end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
 
-                if (start.getTime().before(new Date())) {
-                    start.setTime(new Date());
-                }
                 if (start.getTime().before(end.getTime())) {
                     bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
                 }
             }
+
+            System.out.println("Successfully created Booking Slots for " + mc.getName() + "...");
+
         }
-        System.out.println("Successfully created Booking Slots");
         return bookingSlots;
     }
 
@@ -232,17 +244,47 @@ public class DataInitializationSessionBean {
         rate = Math.min(rate, 1);
         rate = Math.max(0, rate);
 
+        HashMap<Serviceman, Integer> bookingHm = new HashMap<>();
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        HashMap<String, Integer> datesHm = new HashMap<>();
+
         for (BookingSlot bs : bookingSlots) {
+            cal2.setTime(bs.getStartDateTime());
+            boolean isAfterToday = cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
+                    && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+
             int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
             int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
-            if (Math.random() <= rate) {
-                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
-                Booking booking = bookingSessionBeanLocal.createBooking(servicemen.get(randServicemanIdx).getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId());
+
+            if (Math.random() <= rate && isAfterToday) {
+                Serviceman serviceman = servicemen.get(randServicemanIdx);
+                Booking booking = bookingSessionBeanLocal.createBooking(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
                 bookings.add(booking);
-                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
+//                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
+//                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
+
+                int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
+                bookingHm.put(serviceman, count + 1);
+
+                String dateStr = df.format(booking.getBookingSlot().getStartDateTime());
+                int countDate = datesHm.containsKey(dateStr) ? datesHm.get(dateStr) : 0;
+                datesHm.put(dateStr, countDate + 1);
             }
         }
-
+        System.out.println("Bookings Summary:");
+        System.out.println("By Serviceman:");
+        for (Serviceman serviceman : bookingHm.keySet()) {
+            System.out.println("\t" + serviceman.getName() + ": " + bookingHm.get(serviceman) + " bookings created");
+        }
+        System.out.println("");
+        System.out.println("By Date:");
+        for (String dateStr : datesHm.keySet()) {
+            System.out.println("\t" + dateStr + ": " + datesHm.get(dateStr) + " bookings created");
+        }
+        System.out.println("Successfully created Bookings");
         return bookings;
     }
 
@@ -341,9 +383,9 @@ public class DataInitializationSessionBean {
         formFieldOptions = new ArrayList<>();
         formFieldOptions.add(new FormFieldOption("North"));
         formFieldOptions.add(new FormFieldOption("South"));
-        formFieldOptions.add(new FormFieldOption("EAST"));
-        formFieldOptions.add(new FormFieldOption("WEST"));
-        formFieldOptions.add(new FormFieldOption("CENTRAL"));
+        formFieldOptions.add(new FormFieldOption("East"));
+        formFieldOptions.add(new FormFieldOption("West"));
+        formFieldOptions.add(new FormFieldOption("Central"));
         formFields.add(new FormField("What is your preferred location?", 10, InputTypeEnum.CHECK_BOX, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
         formFieldOptions = new ArrayList<>();
         formFieldOptions.add(new FormFieldOption("A+"));
@@ -434,28 +476,44 @@ public class DataInitializationSessionBean {
         return formTemplate.getFormTemplateId();
     }
 
-    private List<Serviceman> initializeServiceman() throws CreateServicemanException {
+    private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman4 = new Serviceman("2 Way Account", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        String serviceman1OTP = servicemanSessionBeanLocal.createServiceman(serviceman1);
-        String serviceman2OTP = servicemanSessionBeanLocal.createServiceman(serviceman2);
-        String serviceman3OTP = servicemanSessionBeanLocal.createServiceman(serviceman3);
-        String serviceman4OTP = servicemanSessionBeanLocal.createServiceman(serviceman4);
-
+        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Long serviceman1Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman1);
+        Long serviceman2Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman2);
+        Long serviceman3Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman3);
+        Long serviceman4Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman4);
+        serviceman1 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman1Id);
+        serviceman2 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman2Id);
+        serviceman3 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman3Id);
+        serviceman4 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman4Id);
+        
+        System.out.println("Serviceman INFO [INIT]");
+        System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber());
+        System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber());
+        System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber());
+        System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber());
+        System.out.println("Successfully created servicemen by init\n");
+        
+        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        String servicemanOtp1 = servicemanSessionBeanLocal.createServiceman(serviceman1Otp);
+        String servicemanOtp2 = servicemanSessionBeanLocal.createServiceman(serviceman2Otp);
+        
         System.out.println("Serviceman INFO [OTP]");
-        System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber() + "\tOTP: " + serviceman1OTP);
-        System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber() + "\tOTP: " + serviceman2OTP);
-        System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber() + "\tOTP: " + serviceman3OTP);
-        System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber() + "\tOTP: " + serviceman4OTP);
+        System.out.println("Email: " + serviceman1Otp.getEmail() + "\tPhone: " + serviceman1Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp1);
+        System.out.println("Email: " + serviceman2Otp.getEmail() + "\tPhone: " + serviceman2Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp2);
         System.out.println("Successfully created servicemen with OTP\n");
 
         servicemen.add(serviceman1);
         servicemen.add(serviceman2);
         servicemen.add(serviceman3);
         servicemen.add(serviceman4);
+        servicemen.add(serviceman1Otp);
+        servicemen.add(serviceman2Otp);
         return servicemen;
     }
 
@@ -475,11 +533,10 @@ public class DataInitializationSessionBean {
         Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
         Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
         Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
-        
+
         // NO Medical Centre Staff
         Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
         Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
-        Employee emp8 = new MedicalBoardAdmin("MedicalBoardAdmin No MC", "password", "dummyemailx8@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91637494", GenderEnum.MALE);
         Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
         Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
         Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
@@ -487,7 +544,6 @@ public class DataInitializationSessionBean {
         Long empId5 = employeeSessionBeanLocal.createEmployeeByInit(emp5);
         Long empId6 = employeeSessionBeanLocal.createEmployeeByInit(emp6);
         Long empId7 = employeeSessionBeanLocal.createEmployeeByInit(emp7);
-        Long empId8 = employeeSessionBeanLocal.createEmployeeByInit(emp8);
         emp1 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp1.getEmail());
         emp2 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp2.getEmail());
         emp3 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp3.getEmail());
@@ -495,7 +551,6 @@ public class DataInitializationSessionBean {
         emp5 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp5.getEmail());
         emp6 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp6.getEmail());
         emp7 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp7.getEmail());
-        emp8 = employeeSessionBeanLocal.retrieveEmployeeByEmail(emp8.getEmail());
 
         System.out.println("EMPLOYEE INFO [INIT]");
         System.out.println("Email: " + emp1.getEmail() + "\tPhone: " + emp1.getPhoneNumber());
@@ -505,7 +560,6 @@ public class DataInitializationSessionBean {
         System.out.println("Email: " + emp5.getEmail() + "\tPhone: " + emp5.getPhoneNumber());
         System.out.println("Email: " + emp6.getEmail() + "\tPhone: " + emp6.getPhoneNumber());
         System.out.println("Email: " + emp7.getEmail() + "\tPhone: " + emp7.getPhoneNumber());
-        System.out.println("Email: " + emp8.getEmail() + "\tPhone: " + emp8.getPhoneNumber());
         System.out.println("Successfully created employees by init\n");
 
         Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);

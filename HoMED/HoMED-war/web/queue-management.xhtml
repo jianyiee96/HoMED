@@ -20,7 +20,7 @@
         <ezcomp:manageFormInstance id="ccManageFormInstance" />
         <ezcomp:pageRedirect rendered="#{queueManagementManagedBean.currentMedicalOfficer.medicalCentre == null}"
                              header="Currently Not Assigned to Any Medical Centre"/>
-        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null}">
+        <h:form id="queueForm" rendered="#{queueManagementManagedBean.currentMedicalOfficer != null and queueManagementManagedBean.currentMedicalOfficer.medicalCentre != null}">
             <p:growl id="growl" globalOnly="true" showDetail="true" />
 
             <div class="p-grid crud-table">
@@ -56,6 +56,9 @@
 
                             <p:column headerText="Position" width="70" filterBy="#{index}" filterMatchMode="contains">
                                 <h:outputText value="#{index + 1}"/>
+                            </p:column>
+                            <p:column headerText="Queue Number" filterBy="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" filterMatchMode="contains">
+                                <h:outputText value="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" />
                             </p:column>
                             <p:column headerText="Serviceman Name" filterBy="#{consultation.booking.serviceman.name}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.serviceman.name}" />
@@ -108,6 +111,10 @@
                                                 <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingSlot.startDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>
                                                 </p:outputLabel>
+
+                                                <p:outputLabel value="Booking Comment " />
+                                                <p:outputLabel value="N.A." rendered="#{empty queueManagementManagedBean.selectedConsultation.booking.bookingComment}" class="display-text"/>
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.bookingComment}" rendered="#{not empty queueManagementManagedBean.selectedConsultation.booking.bookingComment}" class="display-text"/>
                                             </h:panelGrid>
                                         </h:panelGroup>
                                     </p:panelGrid>
@@ -133,7 +140,7 @@
 
                                         <p:outputLabel value="ROD date: " />
                                         <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.serviceman.rod}" class="display-text">
-                                            <f:convertDateTime pattern="yyyy/MM/dd"/>
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
                                         </p:outputLabel>
                                     </h:panelGrid>
                                 </li>

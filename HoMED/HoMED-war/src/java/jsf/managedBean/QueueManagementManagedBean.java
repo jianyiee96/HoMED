@@ -8,10 +8,7 @@ import entity.MedicalCentre;
 import entity.MedicalOfficer;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -107,6 +104,10 @@ public class QueueManagementManagedBean implements Serializable {
 
     public void setCurrentMedicalOfficer(MedicalOfficer currentMedicalOfficer) {
         this.currentMedicalOfficer = currentMedicalOfficer;
+    }
+
+    public String formatQueueNumber(Long bookingId) {
+        return String.format("%03d", bookingId % 1000);
     }
 
 }

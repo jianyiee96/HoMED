@@ -19,6 +19,7 @@ import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
 import util.exceptions.CreateConsultationException;
+import util.exceptions.DeferConsultationException;
 import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
@@ -87,6 +88,30 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             throw new StartConsultationException("Unknown exception: " + ex.getMessage());
         }
     }
+    
+    @Override
+    public void deferConsultation(Long consultationId, String remarks, String remarksForServiceman) throws DeferConsultationException {
+        Consultation consultation = retrieveConsultationById(consultationId);
+        if (consultation == null) {
+            throw new DeferConsultationException("Invalid Consultation Id");
+        } else if (consultation.getConsultationStatusEnum() != ConsultationStatusEnum.ONGOING) {
+            throw new DeferConsultationException("Invalid Consultation Status: Consultation is not in ONGOING status");
+        }
+        
+        try {
+            consultation.setConsultationStatusEnum(ConsultationStatusEnum.WAITING);
+            consultation.setStartDateTime(null);
+            consultation.setJoinQueueDateTime(new Date());
+            consultation.getMedicalOfficer().setCurrentConsultation(null);
+            consultation.setMedicalOfficer(null);
+            consultation.setRemarks(remarks);
+            consultation.setRemarksForServiceman(remarksForServiceman);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new DeferConsultationException("Unknown exception: " + ex.getMessage());
+        }
+
+    }
 
     @Override
     public void endConsultation(Long consultationId, String remarks, String remarksForServiceman) throws EndConsultationException {
@@ -116,7 +141,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     }
 
     @Override
-    public void invalidateConsultation(Long consultationId) throws InvalidateConsultationException {
+    public void invalidateConsultation(Long consultationId, String cancellationComment) throws InvalidateConsultationException {
         Consultation consultation = retrieveConsultationById(consultationId);
         if (consultation == null) {
             throw new InvalidateConsultationException("Invalid Consultation Id");
@@ -129,6 +154,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             Booking booking = consultation.getBooking();
 
             booking.setBookingStatusEnum(BookingStatusEnum.ABSENT);
+            booking.setCancellationComment(cancellationComment);
 
             List<Long> formInstanceIds = new ArrayList<>();
 

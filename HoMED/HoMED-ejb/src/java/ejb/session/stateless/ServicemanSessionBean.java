@@ -64,7 +64,32 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
         
         return query.getResultList();
     }
+    
+    @Override
+    public Long createServicemanByInit(Serviceman newServiceman) throws CreateServicemanException {
+        String errorMessage = "Failed to create Serviceman: ";
+        try {
+            Set<ConstraintViolation<Serviceman>> constraintViolations = validator.validate(newServiceman);
 
+            if (constraintViolations.isEmpty()) {
+                newServiceman.setIsActivated(true);
+                em.persist(newServiceman);
+                em.flush();
+                
+                return newServiceman.getServicemanId();
+            } else {
+                throw new CreateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        } catch (CreateServicemanException ex) {
+            throw new CreateServicemanException(errorMessage + ex.getMessage());
+        } catch (PersistenceException ex) {
+            throw new CreateServicemanException(preparePersistenceExceptionErrorMessage(ex));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new CreateServicemanException(generalUnexpectedErrorMessage + "creating serviceman account");
+        }
+    }
+    
     @Override
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException {
         String errorMessage = "Failed to create Serviceman: ";

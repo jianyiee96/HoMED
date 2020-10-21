@@ -151,7 +151,7 @@ public class FormField implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.FormField[ id=" + formFieldId + " ]";
+        return "Form Field [ id: " + formFieldId + " ]";
     }
 
 }

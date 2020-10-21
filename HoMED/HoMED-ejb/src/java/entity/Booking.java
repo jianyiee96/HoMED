@@ -20,7 +20,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import util.enumeration.BookingStatusEnum;
 
-
 @Entity
 public class Booking implements Serializable {
 
@@ -28,42 +27,65 @@ public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookingId;
+    
+    @Column(nullable = true, length = 8000)
+    private String bookingComment;
+
+    @Column(nullable = true, length = 8000)
+    private String cancellationComment;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Serviceman serviceman;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private ConsultationPurpose consultationPurpose;
 
     @OneToOne(optional = true)
     private Consultation consultation;
-    
+
     @OneToOne(optional = false)
     private BookingSlot bookingSlot;
-    
+
     @OneToMany
     private List<FormInstance> formInstances;
 
     @Enumerated(EnumType.STRING)
     @Column
     private BookingStatusEnum bookingStatusEnum;
-    
+
     public Booking() {
         this.formInstances = new ArrayList<>();
         this.bookingStatusEnum = BookingStatusEnum.UPCOMING;
     }
-    
-    public Booking(Serviceman serviceman, ConsultationPurpose consultationPurpose, BookingSlot bookingSlot) {
+
+    public Booking(Serviceman serviceman, ConsultationPurpose consultationPurpose, BookingSlot bookingSlot, String bookingComment) {
         this();
         this.serviceman = serviceman;
         this.consultationPurpose = consultationPurpose;
         this.bookingSlot = bookingSlot;
+        this.bookingComment = bookingComment;
     }
-    
+
     public Long getBookingId() {
         return bookingId;
+    }
+
+    public String getBookingComment() {
+        return bookingComment;
+    }
+
+    public void setBookingComment(String bookingComment) {
+        this.bookingComment = bookingComment;
+    }
+
+    public String getCancellationComment() {
+        return cancellationComment;
+    }
+
+    public void setCancellationComment(String cancellationComment) {
+        this.cancellationComment = cancellationComment;
     }
 
     public void setBookingId(Long bookingId) {
@@ -140,7 +162,7 @@ public class Booking implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Booking[ id=" + bookingId + " ]";
+        return "Booking [ id: " + bookingId + " ]";
     }
-    
+
 }

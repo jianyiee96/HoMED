@@ -9,14 +9,16 @@ public class ScheduleBookingReq {
     Long servicemanId;
     Long consultationPurposeId;
     Long bookingSlotId;
+    String bookingComment;
 
     public ScheduleBookingReq() {
     }
 
-    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) {
+    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) {
         this.servicemanId = servicemanId;
         this.consultationPurposeId = consultationPurposeId;
         this.bookingSlotId = bookingSlotId;
+        this.bookingComment = bookingComment;
     }
 
     public Long getServicemanId() {
@@ -42,5 +44,13 @@ public class ScheduleBookingReq {
     public void setBookingSlotId(Long bookingSlotId) {
         this.bookingSlotId = bookingSlotId;
     }
-    
+
+    public String getBookingComment() {
+        return bookingComment;
+    }
+
+    public void setBookingComment(String bookingComment) {
+        this.bookingComment = bookingComment;
+    }
+
 }

@@ -18,6 +18,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
+import util.exceptions.DeferConsultationException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
 
@@ -40,9 +41,7 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     private Consultation selectedConsultation;
 
-    private String consultationNotes;
-
-    private String remarksForServiceman;
+    private String cancelBookingComments;
 
     public CurrentConsultationManagedBean() {
         this.servicemanConsultations = new ArrayList<>();
@@ -50,8 +49,6 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        consultationNotes = "";
-        remarksForServiceman = "";
 
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
@@ -84,10 +81,10 @@ public class CurrentConsultationManagedBean implements Serializable {
             PrimeFaces.current().ajax().update("consultationForm:panelGroupForms");
         }
         if (manageFormInstanceManagedBean.getIsSuccessfulSubmit()) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Submission", "Successfully submitted " + manageFormInstanceManagedBean.getFormInstanceToView()));
         }
         if (manageFormInstanceManagedBean.getIsSuccessfulSave()) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Saved", "Successfully saved form instance" + manageFormInstanceManagedBean.getFormInstanceToView().toString()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Form Instance Saved", "Successfully saved form instance" + manageFormInstanceManagedBean.getFormInstanceToView()));
         }
     }
 
@@ -98,9 +95,7 @@ public class CurrentConsultationManagedBean implements Serializable {
             if (unsignedForms) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Form Instance Unsigned", "Please make sure all forms have been signed"));
             } else {
-                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), this.consultationNotes, this.remarksForServiceman);
-                this.consultationNotes = "";
-                this.remarksForServiceman = "";
+                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
                 try {
                     FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
                 } catch (IOException ex) {
@@ -112,16 +107,31 @@ public class CurrentConsultationManagedBean implements Serializable {
         }
     }
 
+    public void deferCurrentConsultation() {
+
+        try {
+            consultationSessionBeanLocal.deferConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
+            } catch (IOException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            }
+
+        } catch (DeferConsultationException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));
+        }
+    }
+
     public void marknoShowCurrentConsultation() {
         try {
-            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId());
+            consultationSessionBeanLocal.invalidateConsultation(selectedConsultation.getConsultationId(), cancelBookingComments);
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
             } catch (IOException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
             }
         } catch (InvalidateConsultationException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark No Show Error", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Absent Error: " + ex.getMessage(), null));
         }
     }
 
@@ -157,20 +167,12 @@ public class CurrentConsultationManagedBean implements Serializable {
         return manageFormInstanceManagedBean;
     }
 
-    public String getConsultationNotes() {
-        return consultationNotes;
+    public String getCancelBookingComments() {
+        return cancelBookingComments;
     }
 
-    public void setConsultationNotes(String consultationNotes) {
-        this.consultationNotes = consultationNotes;
-    }
-
-    public String getRemarksForServiceman() {
-        return remarksForServiceman;
-    }
-
-    public void setRemarksForServiceman(String remarksForServiceman) {
-        this.remarksForServiceman = remarksForServiceman;
+    public void setCancelBookingComments(String cancelBookingComments) {
+        this.cancelBookingComments = cancelBookingComments;
     }
 
 }

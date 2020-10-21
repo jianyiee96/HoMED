@@ -42,6 +42,7 @@ import util.exceptions.CreateBookingException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.UpdateBookingCommentException;
 
 @Named(value = "bookingManagedBean")
 @ViewScoped
@@ -95,9 +96,17 @@ public class BookingManagedBean implements Serializable {
 
     private HashMap<Long, String> formTemplateHm;
 
-    private BookingSlot bookingSlotToAttachForms;
+    private BookingSlot bookingSlotToUpdateDetails;
+
+    private String bookingComment;
 
     private Integer filterOption;
+
+    private String cancelBookingComments;
+
+    private BookingSlot bookingSlotToCancel;
+
+    private Boolean isEditBookingInformation;
 
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
@@ -115,6 +124,7 @@ public class BookingManagedBean implements Serializable {
         filteredBookingSlots = new ArrayList<>();
         servicemanToCreateBooking = new Serviceman();
         formTemplateHm = new HashMap<>();
+        isEditBookingInformation = false;
     }
 
     @PostConstruct
@@ -157,26 +167,32 @@ public class BookingManagedBean implements Serializable {
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
         alreadyLinkedFormTemplates = new ArrayList<>();
         additionalFormTemplates = new ArrayList<>();
+        bookingComment = null;
     }
 
-    public void deleteBooking(BookingSlot slot) {
+    public void deleteBooking() {
         try {
-            bookingSessionBean.cancelBooking(slot.getBooking().getBookingId());
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + slot.getBooking()));
+            bookingSessionBean.cancelBookingByClerk(bookingSlotToCancel.getBooking().getBookingId(), cancelBookingComments);
+            cancelBookingComments = "";
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled " + bookingSlotToCancel.getBooking()));
             initBookingSlots();
+            PrimeFaces.current().executeScript("PF('dlgCancelBooking').hide()");
         } catch (CancelBookingException ex) {
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cancel Booking: " + ex.getMessage(), null));
         }
     }
 
-    public void doAttachFormInstances(BookingSlot slot) {
-        bookingSlotToAttachForms = slot;
+    public void doUpdateBookingDetails(BookingSlot slot) {
+        bookingSlotToUpdateDetails = slotSessionBean.retrieveBookingSlotById(slot.getSlotId());
+        if (bookingSlotToUpdateDetails.getBooking().getBookingComment() == null) {
+            bookingSlotToUpdateDetails.getBooking().setBookingComment("");
+        }
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
         formTemplateHm = new HashMap<>();
         publishedFormTemplates.forEach(ft -> formTemplateHm.put(ft.getFormTemplateId(), ft.getFormTemplateName()));
 
-        alreadyLinkedFormTemplates = bookingSlotToAttachForms.getBooking().getFormInstances().stream()
+        alreadyLinkedFormTemplates = bookingSlotToUpdateDetails.getBooking().getFormInstances().stream()
                 .map(fi -> fi.getFormTemplateMapping())
                 .collect(Collectors.toList());
 
@@ -185,21 +201,36 @@ public class BookingManagedBean implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public void attachFormInstances() {
+    public void updateBooking() {
+
         try {
-            bookingSessionBean.attachFormInstancesByClerk(bookingSlotToAttachForms.getSlotId(), selectedAdditionalFormTemplatesToCreate);
+            bookingSessionBean.updateBookingComment(bookingSlotToUpdateDetails.getBooking().getBookingId(), bookingSlotToUpdateDetails.getBooking().getBookingComment());
+            bookingSessionBean.attachFormInstancesByClerk(bookingSlotToUpdateDetails.getSlotId(), selectedAdditionalFormTemplatesToCreate);
             PrimeFaces.current().executeScript("PF('dialogAttachAdditionalForms').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Attach Additional Forms", "Successfully attached additional forms for booking " + bookingSlotToAttachForms.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Booking Details", "Successfully updated and attached any additional forms for " + bookingSlotToUpdateDetails.getBooking()));
             initBookingSlots();
-        } catch (AttachFormInstancesException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Attach Additional Forms", ex.getMessage()));
+        } catch (AttachFormInstancesException | UpdateBookingCommentException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Booking Details", ex.getMessage()));
         }
+    }
+
+    public String initMarkAttendance(BookingSlot slot) {
+        String msg = "You will not be allowed to revert your action.";
+
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.HOUR, 1);
+
+        if (slot.getStartDateTime().after(date.getTime())) {
+            return "<p>The booking is more than one hour ahead of the scheduled time. Are you sure you want to mark attendance?</p>" + msg;
+        }
+
+        return msg;
     }
 
     public void markAttendance(BookingSlot slot) {
         try {
             bookingSessionBean.markBookingAttendance(slot.getBooking().getBookingId());
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Mark Attendance", "Successfully marked attendance for booking " + slot.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Mark Attendance", "Successfully marked attendance for " + slot.getBooking()));
             initBookingSlots();
         } catch (MarkBookingAttendanceException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Attendance", ex.getMessage()));
@@ -208,9 +239,9 @@ public class BookingManagedBean implements Serializable {
 
     public void createBooking() {
         try {
-            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate);
+            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created booking " + booking));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created " + booking));
             initBookingSlots();
         } catch (CreateBookingException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
@@ -493,12 +524,44 @@ public class BookingManagedBean implements Serializable {
         this.filteredBookingSlots = filteredBookingSlots;
     }
 
-    public BookingSlot getBookingSlotToAttachForms() {
-        return bookingSlotToAttachForms;
+    public BookingSlot getBookingSlotToUpdateDetails() {
+        return bookingSlotToUpdateDetails;
     }
 
-    public void setBookingSlotToAttachForms(BookingSlot bookingSlotToAttachForms) {
-        this.bookingSlotToAttachForms = bookingSlotToAttachForms;
+    public void setBookingSlotToUpdateDetails(BookingSlot bookingSlotToUpdateDetails) {
+        this.bookingSlotToUpdateDetails = bookingSlotToUpdateDetails;
+    }
+
+    public String getBookingComment() {
+        return bookingComment;
+    }
+
+    public void setBookingComment(String bookingComment) {
+        this.bookingComment = bookingComment;
+    }
+
+    public String getCancelBookingComments() {
+        return cancelBookingComments;
+    }
+
+    public void setCancelBookingComments(String cancelBookingComments) {
+        this.cancelBookingComments = cancelBookingComments;
+    }
+
+    public BookingSlot getBookingSlotToCancel() {
+        return bookingSlotToCancel;
+    }
+
+    public void setBookingSlotToCancel(BookingSlot bookingSlotToCancel) {
+        this.bookingSlotToCancel = bookingSlotToCancel;
+    }
+
+    public Boolean getIsEditBookingInformation() {
+        return isEditBookingInformation;
+    }
+
+    public void setIsEditBookingInformation(Boolean isEditBookingInformation) {
+        this.isEditBookingInformation = isEditBookingInformation;
     }
 
 }

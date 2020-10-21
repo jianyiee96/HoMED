@@ -59,7 +59,7 @@
                     </ui:fragment>
                     <po:menu widgetVar="RomaMenuWidget">
                         <p:menuitem id="om_dashboard" value="Dashboard" icon="fa fa-home" outcome="/homepage" />
-                        <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Medical Centre Management" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
+                        <p:menuitem value="#{currentEmployee.role == 'SUPER_USER' ? 'Medical Centre Management' : 'View All Medical Centres'}" icon="fa fa-hospital-o" outcome="/medical-centre-management" />
                         <p:submenu rendered="#{currentEmployee.role == 'SUPER_USER'}" label="Users Account Management" icon="fa fa-users">
                             <p:menuitem value="Employee Account" icon="fa fa-user-md" outcome="/employee-management" />
                             <p:menuitem value="Serviceman Account" icon="fa fa-user" outcome="/serviceman-management" />
@@ -72,9 +72,10 @@
                             <p:menuitem value="Booking Slot Management"  icon="fa fa-calendar" outcome="/booking-slot-management" />
                             <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management" icon="fa fa-calendar-o" outcome="/medical-board-slot-management" />
                         </p:submenu>
-                        <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Booking Management" icon="pi pi-calendar" outcome="/booking-management" />
+                        <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Booking Management" icon="pi pi-calendar" outcome="/booking-management"/>
+                        <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Queue Display" icon="pi pi-desktop" outcome="/queue-display"/>
                         <p:submenu rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" label="Consultation History" icon="fa fa-history" >
-                            <p:menuitem value="My Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
+                            <p:menuitem value="Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
                             <p:menuitem value="Serviceman Consultation Records" icon="fa fa-users" outcome="/serviceman-consultation-records" />
                         </p:submenu>
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />

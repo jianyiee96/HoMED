@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/favicon.ico']}"/>
+        </f:facet>
+        <title>Queue Display</title>
+        <h:outputScript name="js/nanoscroller.js" library="roma-layout" />
+        <h:outputScript name="js/layout.js" library="roma-layout" />
+        <style type="text/css">
+            html, body, .box-stretched {
+                height: 100%;
+            }
+
+            html, body {
+                height: 90vh;
+                /*overflow: hidden;*/
+            }
+            .header-text {
+                font-weight: bold;
+                font-size: 25px;
+            }
+            .primary-color {
+                color: #e67300;
+            }
+            .secondary-color {
+                color: #0044cc;
+            }
+            .header-text-sub {
+                font-weight: bolder;
+                font-size: 30px;
+            }
+            .header-text-main {
+                font-weight: bolder;
+                font-size: 25px;
+            }
+            .queue-number-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 280px;
+                height: 180px;
+                box-shadow: 0 10px 15px 0 rgba(0,0,0,0.2);
+                border-radius: 5px;
+                border-style: solid;
+                border-color: #e67300;
+                text-align: center;
+            }
+            .waiting-queue-number-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 150px;
+                height: 100px;
+                box-shadow: 0 10px 15px 0 rgba(0,0,0,0.2);
+                border-radius: 5px;
+                border-style: solid;
+                text-align: center;
+            }
+            .queue-number-text {
+                font-weight: 900;
+                font-size: 45px;
+                letter-spacing: 2px;
+            }
+            .doctor-text {
+                font-weight: bold;
+                font-size: 25px;
+            }
+        </style>
+        
+    </h:head>
+    <h:body>
+        <ezcomp:pageRedirect rendered="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre == null}"
+                             header="Currently Not Assigned to Any Medical Centre"/>
+        <h:form id="formQueueDisplay">
+            <p:growl id="growl-message" for="growl-message" showDetail="true">
+                <p:autoUpdate/>
+            </p:growl>
+
+            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="2" update="panel-all" /> 
+
+            <h:panelGroup id="panel-all" rendered="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre != null}" style="position: absolute; height: 100%; width: 100%">
+                <div class="p-grid" style="margin: 0;padding: 5px;height: 10%">
+                    <div class="card p-col-12" style="display: flex; align-items: center">
+                        <i class="fa fa-hospital-o header-text p-mr-3"/>
+                        <h:outputText value="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre.name}" class="header-text"/>
+                    </div>
+                </div>
+
+                <div class="p-grid p-align-stretch" style="margin: 0;padding: 5px;height: 90%">
+                    <div class="card p-col-4" style="margin-bottom: 0px;">
+                        <div class="p-grid p-justify-center">
+                            <div class="p-col-12" style="text-align: center">
+                                <h:outputText value="Now Serving" class="header-text-sub primary-color"/>
+                                <br/><br/>
+                                <h:outputText value="Queue Number" class="header-text-main"/>
+                            </div>
+                            <ui:repeat rendered="#{not empty queueDisplayManagedBean.currentBookings}" value="#{queueDisplayManagedBean.currentBookings}" var="booking">
+                                <div class="p-col-12">
+                                    <div style="display: flex; justify-content: center; align-content: center">
+                                        <h:panelGroup id="ongoing-queue-container" >
+                                            <div class="queue-number-container p-mt-2">
+                                                <h:outputText id="text-number" value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="primary-color queue-number-text"/><br/>
+                                                <h:outputText id="text-doctor" value="Dr #{booking.consultation.medicalOfficer.name}" class="secondary-color doctor-text"/>
+                                                <ui:fragment rendered="#{queueDisplayManagedBean.changedBookingsHS.contains(booking.bookingId)}" >
+                                                    <p:effect for="ongoing-queue-container" type="pulsate" event="load" />
+                                                    <p:media value="resources/sounds/alert.wav" width="0" height="0" player="quicktime" style="visibility: hidden;">
+                                                        <f:param name="autoPlay" value="true" />
+                                                    </p:media>
+                                                </ui:fragment>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </div>
+
+                    <div class="card p-col-8" style="margin-bottom: 0px">
+                        <div class="p-grid p-justify-start">
+                            <div class="p-col-12">
+                                <h:outputText value="Currently in Queue" class="header-text-sub"/>
+                            </div>
+                            <ui:repeat rendered="#{not empty queueDisplayManagedBean.queueingBookings}" value="#{queueDisplayManagedBean.queueingBookings}" var="booking">
+                                <div class="p-col-2 p-lg-2 p-md-4 p-sm-12">
+                                    <div style="display: flex; justify-content: center; align-content: center">
+                                        <div class="waiting-queue-number-container p-mt-2">
+                                            <h:outputText value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="queue-number-text"/><br/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <h:outputStylesheet name="default.css" library="css" />
+        <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
+        <h:outputStylesheet name="css/primeflex.min.css" library="roma-layout" />
+        <h:outputStylesheet name="icons.css" library="css" />
+        <h:outputStylesheet name="buttons.css" library="css" />
+
+        <h:outputStylesheet name="css/nanoscroller.css" library="roma-layout" />
+
+        <h:outputStylesheet name="css/layout-#{themeCustomiser.componentTheme}.css" library="roma-layout" />
+    </h:body>
+</html>
+

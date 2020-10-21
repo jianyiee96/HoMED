@@ -113,7 +113,7 @@ public class OperatingHours implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.OperatingHours[ id=" + operatingHoursId + " ]";
+        return "Operating Hours [ id: " + operatingHoursId + " ]";
     }
 
 }

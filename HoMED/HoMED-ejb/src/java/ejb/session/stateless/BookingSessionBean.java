@@ -11,6 +11,7 @@ import entity.FormInstance;
 import entity.FormTemplate;
 import entity.Serviceman;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -19,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
@@ -30,6 +32,7 @@ import util.exceptions.MarkBookingAbsentException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.UpdateBookingCommentException;
 
 @Stateless
 public class BookingSessionBean implements BookingSessionBeanLocal {
@@ -53,7 +56,18 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     private EntityManager em;
 
     @Override
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId) throws CreateBookingException {
+    public List<Booking> retrieveQueueBookingsByMedicalCentre(Long medicalCentreId) {
+        Query query = em.createQuery("SELECT b FROM Booking b "
+                + "WHERE b.bookingSlot.medicalCentre.medicalCentreId = :id "
+                + "AND b.consultation IS NOT NULL and b.consultation.consultationStatusEnum != :status "
+                + "ORDER BY b.consultation.joinQueueDateTime ASC");
+        query.setParameter("id", medicalCentreId);
+        query.setParameter("status", ConsultationStatusEnum.COMPLETED);
+        return query.getResultList();
+    }
+
+    @Override
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException {
 
         try {
 
@@ -71,7 +85,11 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 throw new CreateBookingException("Booking Slot not valid: Invalid Start Date");
             }
 
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot);
+            if (bookingComment == null) {
+                bookingComment = "";
+            }
+
+            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment);
 
             bookingSlot.setBooking(newBooking);
             serviceman.getBookings().add(newBooking);
@@ -103,11 +121,10 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds) throws CreateBookingException {
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment) throws CreateBookingException {
 
         try {
-            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId);
-
+            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment);
             if (!additionalFormTemplateIds.isEmpty()) {
                 attachFormInstancesByClerk(newBooking.getBookingSlot().getSlotId(), additionalFormTemplateIds);
             }
@@ -128,8 +145,6 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         if (bookingSlot == null) {
             throw new AttachFormInstancesException("Booking Slot Id not valid");
-        } else if (additionalFormTemplateIds.isEmpty()) {
-            throw new AttachFormInstancesException("No form templates selected");
         }
 
         Booking booking = bookingSlot.getBooking();
@@ -208,7 +223,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public void cancelBooking(Long bookingId) throws CancelBookingException {
+    public void cancelBooking(Long bookingId, String cancellationComment) throws CancelBookingException {
 
         if (bookingId == null) {
             throw new CancelBookingException("Please supply a valid Booking Id");
@@ -219,9 +234,17 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         if (booking != null) {
 
             if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
-
+                Calendar cal1 = Calendar.getInstance();
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(booking.getBookingSlot().getStartDateTime());
+                boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+                        && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+                if (sameDay) {
+                    throw new CancelBookingException("Unable to cancel booking scheduled for today");
+                }
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+                    booking.setCancellationComment(cancellationComment);
 
                     List<Long> formInstanceIds = new ArrayList<>();
 
@@ -254,7 +277,53 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public void markBookingAbsent(Long bookingId) throws MarkBookingAbsentException {
+    public void cancelBookingByClerk(Long bookingId, String cancellationComment) throws CancelBookingException {
+
+        if (bookingId == null) {
+            throw new CancelBookingException("Please supply a valid Booking Id");
+        }
+
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking != null) {
+
+            if (booking.getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
+                try {
+                    booking.setBookingStatusEnum(BookingStatusEnum.CANCELLED);
+                    booking.setCancellationComment(cancellationComment);
+
+                    List<Long> formInstanceIds = new ArrayList<>();
+
+                    for (FormInstance fi : booking.getFormInstances()) {
+                        formInstanceIds.add(fi.getFormInstanceId());
+                    }
+
+                    for (Long fiId : formInstanceIds) {
+                        formInstanceSessionBeanLocal.deleteFormInstance(fiId, Boolean.TRUE);
+                    }
+
+                    slotSessionBeanLocal.createBookingSlots(
+                            booking.getBookingSlot().getMedicalCentre().getMedicalCentreId(),
+                            booking.getBookingSlot().getStartDateTime(),
+                            booking.getBookingSlot().getEndDateTime());
+
+                } catch (ScheduleBookingSlotException | DeleteFormInstanceException ex) {
+                    throw new CancelBookingException("Unable to create replacement booking slot: " + ex.getMessage());
+
+                }
+
+            } else {
+                throw new CancelBookingException("Invalid Booking Status: You can only cancel bookings with upcoming");
+            }
+
+        } else {
+            throw new CancelBookingException("Invalid Booking Id");
+        }
+
+    }
+
+    @Override
+    public void markBookingAbsent(Long bookingId, String cancellationComment) throws MarkBookingAbsentException {
 
         Booking booking = retrieveBookingById(bookingId);
 
@@ -264,6 +333,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
                 try {
                     booking.setBookingStatusEnum(BookingStatusEnum.ABSENT);
+                    booking.setCancellationComment(cancellationComment);
 
                     List<Long> formInstanceIds = new ArrayList<>();
 
@@ -297,6 +367,19 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         Query query = em.createQuery("SELECT b FROM Booking b WHERE b.bookingStatusEnum = :status ");
         query.setParameter("status", BookingStatusEnum.UPCOMING);
         return query.getResultList();
+    }
+
+    @Override
+    public void updateBookingComment(Long bookingId, String bookingComment) throws UpdateBookingCommentException {
+
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking == null) {
+            throw new UpdateBookingCommentException("Invalid booking id");
+        }
+
+        booking.setBookingComment(bookingComment);
+
     }
 
 }

@@ -210,9 +210,9 @@
                 <f:facet name="footer">
                     <ui:fragment rendered="#{not empty manageFormInstanceManagedBean.formInstanceToView and manageFormInstanceManagedBean.isManageState}">
                         <div style="display: flex; justify-content: center; flex-direction: column">
-                            <p:commandButton value="Submit" icon="pi pi-upload" update="dataListFields"
+                            <p:commandButton value="Sign Off" icon="pi pi-upload" update="dataListFields"
                                              oncomplete="PF('dlgManageFormInstance').initPosition()" actionListener="#{manageFormInstanceManagedBean.submitFormInstance}">
-                                <p:confirm header="Submit Current Instance" message="Submitting this form instance signs off the form under your name. Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:confirm header="Sign Off Current Instance" message="Signs off the form under your name you will not be able to edit after. Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
                     </ui:fragment>
