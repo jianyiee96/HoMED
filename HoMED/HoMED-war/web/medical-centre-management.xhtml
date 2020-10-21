@@ -28,7 +28,7 @@
                         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
                         <div class="buttonbar">
-                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create"
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" rendered="#{currentEmployee.role == 'SUPER_USER'}"
                                              update="ccManageMedicalCentre:formManageMedicalCentre" process="@this" immediate="true"
                                              actionListener="#{manageMedicalCentreManagedBean.initCreate}" oncomplete="PF('dialogManageMedicalCentre').show()">
                                 <p:resetInput target="ccManageMedicalCentre:formManageMedicalCentre:panelManageMedicalCentre" />

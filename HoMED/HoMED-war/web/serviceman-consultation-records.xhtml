@@ -185,8 +185,8 @@
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
                                                 <p:outputLabel value="Booking Comment: " />
-                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment != null}" class="display-text" />                                
-                                                <p:outputLabel value="N.A." rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment == null}" class="display-text" />                                
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{not empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
+                                                <p:outputLabel value="N.A." rendered="#{empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
                                                 
                                                 <p:outputLabel value="Started at: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">

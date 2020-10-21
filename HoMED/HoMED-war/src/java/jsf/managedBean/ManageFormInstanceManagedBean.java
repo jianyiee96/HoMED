@@ -73,26 +73,26 @@ public class ManageFormInstanceManagedBean implements Serializable {
         formInstanceFieldWrappers = formInstanceToView.getFormInstanceFields().stream()
                 .map(fif -> new FormInstanceFieldWrapper(fif))
                 .collect(Collectors.toList());
-        System.out.println("RETRIEVING FORM INSTANCE:");
-        formInstanceFieldWrappers.forEach(wrapper -> {
-            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
-            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
-                System.out.println("\t- " + y.getInputValue());
-            });
-        });
+//        System.out.println("RETRIEVING FORM INSTANCE:");
+//        formInstanceFieldWrappers.forEach(wrapper -> {
+//            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+//            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+//                System.out.println("\t- " + y.getInputValue());
+//            });
+//        });
     }
 
     public void saveFormInstance() {
         try {
             formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareSubmission(false));
 
-            System.out.println("SAVING FORM INSTANCE:");
-            formInstanceFieldWrappers.forEach(wrapper -> {
-                System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
-                wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
-                    System.out.println("\t- " + y.getInputValue());
-                });
-            });
+//            System.out.println("SAVING FORM INSTANCE:");
+//            formInstanceFieldWrappers.forEach(wrapper -> {
+//                System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+//                wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+//                    System.out.println("\t- " + y.getInputValue());
+//                });
+//            });
 
             formInstanceSessionBean.updateFormInstanceFieldValues(formInstanceToView);
             PrimeFaces.current().executeScript("PF('dlgClose').hide()");
@@ -109,13 +109,13 @@ public class ManageFormInstanceManagedBean implements Serializable {
     public void submitFormInstance() {
         formInstanceFieldWrappers.forEach(wrapper -> wrapper.prepareSubmission(true));
 
-        System.out.println("SAVING FORM INSTANCE:");
-        formInstanceFieldWrappers.forEach(wrapper -> {
-            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
-            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
-                System.out.println("\t- " + y.getInputValue());
-            });
-        });
+//        System.out.println("SAVING FORM INSTANCE:");
+//        formInstanceFieldWrappers.forEach(wrapper -> {
+//            System.out.println("POSITON " + wrapper.getFormInstanceField().getFormFieldMapping().getPosition() + ": " + wrapper.getFormInstanceField().getFormInstanceFieldValues().size());
+//            wrapper.getFormInstanceField().getFormInstanceFieldValues().forEach(y -> {
+//                System.out.println("\t- " + y.getInputValue());
+//            });
+//        });
 
         formInstanceFieldWrappers.stream()
                 .forEach(wrapper -> {

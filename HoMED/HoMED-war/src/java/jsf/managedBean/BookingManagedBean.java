@@ -174,7 +174,7 @@ public class BookingManagedBean implements Serializable {
         try {
             bookingSessionBean.cancelBookingByClerk(bookingSlotToCancel.getBooking().getBookingId(), cancelBookingComments);
             cancelBookingComments = "";
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled booking " + bookingSlotToCancel.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Cancel Booking", "Successfully cancelled " + bookingSlotToCancel.getBooking()));
             initBookingSlots();
             PrimeFaces.current().executeScript("PF('dlgCancelBooking').hide()");
         } catch (CancelBookingException ex) {
@@ -207,7 +207,7 @@ public class BookingManagedBean implements Serializable {
             bookingSessionBean.updateBookingComment(bookingSlotToUpdateDetails.getBooking().getBookingId(), bookingSlotToUpdateDetails.getBooking().getBookingComment());
             bookingSessionBean.attachFormInstancesByClerk(bookingSlotToUpdateDetails.getSlotId(), selectedAdditionalFormTemplatesToCreate);
             PrimeFaces.current().executeScript("PF('dialogAttachAdditionalForms').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Booking Details", "Successfully updated and attached any additional forms for booking " + bookingSlotToUpdateDetails.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Booking Details", "Successfully updated and attached any additional forms for " + bookingSlotToUpdateDetails.getBooking()));
             initBookingSlots();
         } catch (AttachFormInstancesException | UpdateBookingCommentException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Booking Details", ex.getMessage()));
@@ -230,7 +230,7 @@ public class BookingManagedBean implements Serializable {
     public void markAttendance(BookingSlot slot) {
         try {
             bookingSessionBean.markBookingAttendance(slot.getBooking().getBookingId());
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Mark Attendance", "Successfully marked attendance for booking " + slot.getBooking()));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Mark Attendance", "Successfully marked attendance for " + slot.getBooking()));
             initBookingSlots();
         } catch (MarkBookingAttendanceException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Attendance", ex.getMessage()));
@@ -241,7 +241,7 @@ public class BookingManagedBean implements Serializable {
         try {
             Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
-            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created booking " + booking));
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created " + booking));
             initBookingSlots();
         } catch (CreateBookingException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
