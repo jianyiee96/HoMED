@@ -82,7 +82,6 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 }
 
                 if (isInvalid) {
-                    System.out.println("Duplicate Booking Slot (" + df.format(currStart) + " - " + df.format(currEnd) + ") Exists!");
                     continue;
                 }
 
