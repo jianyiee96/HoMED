@@ -89,9 +89,9 @@
             <p:growl id="growl-message" for="growl-message" showDetail="true">
                 <p:autoUpdate/>
             </p:growl>
-            
-            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="1" update="panel-all" /> 
-            
+
+            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="5" update="panel-all" /> 
+
             <h:panelGroup id="panel-all" rendered="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre != null}" style="position: absolute; height: 100%; width: 100%">
                 <div class="p-grid" style="margin: 0;padding: 5px;height: 10%">
                     <div class="card p-col-12" style="display: flex; align-items: center">
@@ -111,10 +111,13 @@
                             <ui:repeat rendered="#{not empty queueDisplayManagedBean.currentBookings}" value="#{queueDisplayManagedBean.currentBookings}" var="booking">
                                 <div class="p-col-12">
                                     <div style="display: flex; justify-content: center; align-content: center">
-                                        <div class="queue-number-container p-mt-2">
-                                            <h:outputText value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="primary-color queue-number-text"/><br/>
-                                            <h:outputText value="Dr #{booking.consultation.medicalOfficer.name}" class="secondary-color doctor-text"/>
-                                        </div>
+                                        <h:panelGroup id="ongoing-queue-container" >
+                                            <div class="queue-number-container p-mt-2">
+                                                <h:outputText id="text-number" value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="primary-color queue-number-text"/><br/>
+                                                <h:outputText id="text-doctor" value="Dr #{booking.consultation.medicalOfficer.name}" class="secondary-color doctor-text"/>
+                                                <p:effect for="ongoing-queue-container" rendered="#{queueDisplayManagedBean.changedBookingsHS.contains(booking.bookingId)}" type="pulsate" event="load" />
+                                            </div>
+                                        </h:panelGroup>
                                     </div>
                                 </div>
                             </ui:repeat>
