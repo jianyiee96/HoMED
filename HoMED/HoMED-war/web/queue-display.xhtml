@@ -56,6 +56,7 @@
                 border-radius: 5px;
                 border-style: solid;
                 border-color: #e67300;
+                text-align: center;
             }
             .waiting-queue-number-container {
                 display: flex;
@@ -67,6 +68,7 @@
                 box-shadow: 0 10px 15px 0 rgba(0,0,0,0.2);
                 border-radius: 5px;
                 border-style: solid;
+                text-align: center;
             }
             .queue-number-text {
                 font-weight: 900;
@@ -87,7 +89,9 @@
             <p:growl id="growl-message" for="growl-message" showDetail="true">
                 <p:autoUpdate/>
             </p:growl>
-            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="5" /> 
+            
+            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="1" update="panel-all" /> 
+            
             <h:panelGroup id="panel-all" rendered="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre != null}" style="position: absolute; height: 100%; width: 100%">
                 <div class="p-grid" style="margin: 0;padding: 5px;height: 10%">
                     <div class="card p-col-12" style="display: flex; align-items: center">
@@ -95,9 +99,8 @@
                         <h:outputText value="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre.name}" class="header-text"/>
                     </div>
                 </div>
+
                 <div class="p-grid p-align-stretch" style="margin: 0;padding: 5px;height: 90%">
-
-
                     <div class="card p-col-4" style="margin-bottom: 0px;">
                         <div class="p-grid p-justify-center">
                             <div class="p-col-12" style="text-align: center">
@@ -105,20 +108,19 @@
                                 <br/><br/>
                                 <h:outputText value="Queue Number" class="header-text-main"/>
                             </div>
-                            <h:panelGroup id="panel-current-bookings">
-                                <c:forEach rendered="#{not empty queueDisplayManagedBean.currentBookings}" items="#{queueDisplayManagedBean.currentBookings}" var="booking">
-                                    <div class="p-col-12">
-                                        <div style="display: flex; justify-content: center; align-content: center">
-                                            <div id="booking_#{booking.bookingId}" class="queue-number-container p-mt-2">
-                                                <h:outputText value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="primary-color queue-number-text"/><br/>
-                                                <h:outputText value="Dr #{booking.consultation.medicalOfficer.name}" class="secondary-color doctor-text"/>
-                                            </div>
+                            <ui:repeat rendered="#{not empty queueDisplayManagedBean.currentBookings}" value="#{queueDisplayManagedBean.currentBookings}" var="booking">
+                                <div class="p-col-12">
+                                    <div style="display: flex; justify-content: center; align-content: center">
+                                        <div class="queue-number-container p-mt-2">
+                                            <h:outputText value="#{queueDisplayManagedBean.formatQueueNumber(booking.bookingId)}" class="primary-color queue-number-text"/><br/>
+                                            <h:outputText value="Dr #{booking.consultation.medicalOfficer.name}" class="secondary-color doctor-text"/>
                                         </div>
                                     </div>
-                                </c:forEach>
-                            </h:panelGroup>
+                                </div>
+                            </ui:repeat>
                         </div>
                     </div>
+
                     <div class="card p-col-8" style="margin-bottom: 0px">
                         <div class="p-grid p-justify-start">
                             <div class="p-col-12">
@@ -138,8 +140,6 @@
                 </div>
             </h:panelGroup>
         </h:form>
-
-
 
         <h:outputStylesheet name="default.css" library="css" />
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
