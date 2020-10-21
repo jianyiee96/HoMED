@@ -90,7 +90,7 @@
                 <p:autoUpdate/>
             </p:growl>
 
-            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="5" update="panel-all" /> 
+            <p:poll listener="#{queueDisplayManagedBean.refreshDisplay()}" interval="2" update="panel-all" /> 
 
             <h:panelGroup id="panel-all" rendered="#{queueDisplayManagedBean.currentMedicalStaff.medicalCentre != null}" style="position: absolute; height: 100%; width: 100%">
                 <div class="p-grid" style="margin: 0;padding: 5px;height: 10%">
