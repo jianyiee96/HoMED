@@ -66,12 +66,10 @@ public class QueueDisplayManagedBean implements Serializable {
         });
 
         this.changedBookingsHS.clear();
-        System.out.println("DETECTNG CHANGES...");
         holderCurrentBookings.stream()
                 .map(b1 -> {
                     Boolean notFound = this.currentBookings.stream().noneMatch(b2 -> b1.equals(b2));
                     if (notFound) {
-                        System.out.println("New booking found: " + b1);
                         changedBookingsHS.add(b1.getBookingId());
                     }
                     return notFound;
