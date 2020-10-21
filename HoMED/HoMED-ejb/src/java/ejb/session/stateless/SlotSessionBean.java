@@ -50,33 +50,10 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             Calendar rangeEndCalendar = Calendar.getInstance();
             rangeEndCalendar.setTime(rangeEnd);
 
-            // To check for existing booking slots.
-            Calendar slotStart = Calendar.getInstance();
-            slotStart.setTime(rangeStart);
-            Calendar slotEnd = Calendar.getInstance();
-            slotEnd.setTime(rangeStart);
-            slotEnd.add(Calendar.MINUTE, 15);
-
-            List<BookingSlot> bookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
-            for (BookingSlot bs : bookingSlots) {
-                if (bs.getStartDateTime().equals(slotStart.getTime()) && bs.getEndDateTime().equals(slotEnd.getTime())) {
-                    // If there is no booking attached to the slot, means there is an available slot for booking, and should not create a new slot.
-                    if (bs.getBooking() == null) {
-
-                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                        throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
-                        
-                    // If there is a booking attached to the slot but the booking is not cancelled, means the slot is already booked (upcoming/absent) or past, and should not create a new slot.
-                    } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
-
-                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                        throw new ScheduleBookingSlotException("Duplicate Booking Slot (" + df.format(slotStart.getTime()) + " - " + df.format(slotEnd.getTime()) + ") Exists!");
-
-                    }
-                }
-            }
-
 //            rangeEndCalendar.add(Calendar.MINUTE, 150); // For testing: mass populate slots.
+            List<BookingSlot> availableBookingSlots = this.retrieveBookingSlotsByMedicalCentre(medicalCentreId);
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
             List<BookingSlot> createdBookingSlots = new ArrayList<>();
 
             while (rangeStartCalendar.before(rangeEndCalendar)) {
@@ -84,11 +61,35 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 rangeStartCalendar.add(Calendar.MINUTE, 15);
                 Date currEnd = rangeStartCalendar.getTime();
 
-                BookingSlot bs = new BookingSlot(mc, currStart, currEnd);
-                mc.getBookingSlots().add(bs);
-                em.persist(bs);
+                BookingSlot newBs = new BookingSlot(mc, currStart, currEnd);
+                Boolean isInvalid = Boolean.FALSE;
+                for (BookingSlot bs : availableBookingSlots) {
+                    if (bs.getStartDateTime().equals(currStart) && bs.getEndDateTime().equals(currEnd)) {
+                        // If there is no booking attached to the slot, means there is an available slot for booking, and should not create a new slot.
+                        if (bs.getBooking() == null) {
+
+                            isInvalid = Boolean.TRUE;
+                            break;
+
+                            // If there is a booking attached to the slot but the booking is not cancelled, means the slot is already booked (upcoming/absent) or past, and should not create a new slot.
+                        } else if (bs.getBooking() != null && bs.getBooking().getBookingStatusEnum() != BookingStatusEnum.CANCELLED) {
+
+                            isInvalid = Boolean.TRUE;
+                            break;
+
+                        }
+                    }
+                }
+
+                if (isInvalid) {
+                    System.out.println("Duplicate Booking Slot (" + df.format(currStart) + " - " + df.format(currEnd) + ") Exists!");
+                    continue;
+                }
+
+                mc.getBookingSlots().add(newBs);
+                em.persist(newBs);
                 em.flush();
-                createdBookingSlots.add(bs);
+                createdBookingSlots.add(newBs);
             }
 
             System.out.println("Created " + createdBookingSlots.size() + " Booking Slots");
