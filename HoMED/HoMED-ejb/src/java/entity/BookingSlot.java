@@ -66,10 +66,7 @@ public class BookingSlot extends Slot implements Serializable, Comparable<Bookin
             return false;
         }
         BookingSlot other = (BookingSlot) object;
-        // Customised check
-        if (this.getStartDateTime().equals(other.getStartDateTime()) && this.getEndDateTime().equals(other.getEndDateTime())) {
-            return true;
-        }
+
         if ((this.getSlotId() == null && other.getSlotId() != null) || (this.getSlotId() != null && !this.getSlotId().equals(other.getSlotId()))) {
             return false;
         }
