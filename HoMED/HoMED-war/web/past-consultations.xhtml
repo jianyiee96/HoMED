@@ -115,7 +115,7 @@
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
                                                     <p:outputLabel value="Booking Comment: " />
-                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment != null}" class="display-text" />                                
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{not empty pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
                                                     <p:outputLabel value="N.A." rendered="#{empty pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
                                                     
                                                     <p:outputLabel value="Started at: " />
