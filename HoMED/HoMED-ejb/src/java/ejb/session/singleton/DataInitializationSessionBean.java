@@ -708,7 +708,7 @@ public class DataInitializationSessionBean {
         List<MedicalCentre> medicalCentres = new ArrayList<>();
 
         MedicalCentre newMedicalCentre = new MedicalCentre();
-        newMedicalCentre.setName("HOME TEAM ACADEMY MEDICAL CENTRE");
+        newMedicalCentre.setName("Home Team Academy Medical Centre");
         newMedicalCentre.setPhone("64653921");
         // Street Name, Unit Number, Building Name, Country, Postal Code
         newMedicalCentre.setAddress(new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", null, "Singapore", "698928"));
