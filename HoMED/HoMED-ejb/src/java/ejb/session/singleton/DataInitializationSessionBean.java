@@ -28,6 +28,7 @@ import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.MedicalStaff;
 import entity.Serviceman;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -36,8 +37,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -105,6 +107,10 @@ public class DataInitializationSessionBean {
     }
 
     private void initializeData() {
+        // EDIT VARIABLES HERE
+        Double RATE_OF_CREATING_BOOKINGS = 0.1;
+        Double RATE_OF_FILLING_FORMS = 0.8;
+
         try {
             System.out.println("====================== Start of DATA INIT ======================");
 
@@ -120,11 +126,10 @@ public class DataInitializationSessionBean {
             servicemen.remove(0);
             servicemen.remove(0);
 
-            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, 0.1);
+            List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
 //            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
-
-            fillForms(bookings, 0.5);
+            fillForms(bookings, RATE_OF_FILLING_FORMS);
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
@@ -166,7 +171,7 @@ public class DataInitializationSessionBean {
                         int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
                     } else if (inputType == InputTypeEnum.TEXT) {
-                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue("This is a random string text that was filled up by serviceman."));
+                        fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(getRandomString()));
                     } else if (inputType == InputTypeEnum.NUMBER) {
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(String.valueOf((int) (Math.random() * 100))));
                     } else if (inputType == InputTypeEnum.DATE) {
@@ -249,7 +254,21 @@ public class DataInitializationSessionBean {
         Calendar cal2 = Calendar.getInstance();
 
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        HashMap<String, Integer> datesHm = new HashMap<>();
+        TreeMap<String, Integer> datesTm = new TreeMap<>((x, y) -> {
+            try {
+                if (x.equals(y)) {
+                    return 0;
+                }
+                Date d1 = df.parse(x);
+                Date d2 = df.parse(y);
+                if (d1.before(d2)) {
+                    return -1;
+                }
+                return 1;
+            } catch (ParseException ex) {
+                return -1;
+            }
+        });
 
         for (BookingSlot bs : bookingSlots) {
             cal2.setTime(bs.getStartDateTime());
@@ -263,26 +282,28 @@ public class DataInitializationSessionBean {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
                 Booking booking = bookingSessionBeanLocal.createBooking(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
                 bookings.add(booking);
-//                System.out.println("Booking Slot: " + bs.getStartDateTime() + "\t" + bs.getEndDateTime());
-//                System.out.println("Booking Created: Start[" + bs.getStartDateTime() + "+] End[" + bs.getEndDateTime() + "]");
 
                 int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
                 bookingHm.put(serviceman, count + 1);
 
                 String dateStr = df.format(booking.getBookingSlot().getStartDateTime());
-                int countDate = datesHm.containsKey(dateStr) ? datesHm.get(dateStr) : 0;
-                datesHm.put(dateStr, countDate + 1);
+                if (datesTm.containsKey(dateStr)) {
+                    datesTm.replace(dateStr, datesTm.get(dateStr) + 1);
+                } else {
+                    datesTm.put(dateStr, 1);
+                }
             }
         }
         System.out.println("Bookings Summary:");
         System.out.println("By Serviceman:");
+
         for (Serviceman serviceman : bookingHm.keySet()) {
             System.out.println("\t" + serviceman.getName() + ": " + bookingHm.get(serviceman) + " bookings created");
         }
         System.out.println("");
         System.out.println("By Date:");
-        for (String dateStr : datesHm.keySet()) {
-            System.out.println("\t" + dateStr + ": " + datesHm.get(dateStr) + " bookings created");
+        for (Map.Entry<String, Integer> entry : datesTm.entrySet()) {
+            System.out.println("\t" + entry.getKey() + ": " + entry.getValue() + " bookings created");
         }
         System.out.println("Successfully created Bookings");
         return bookings;
@@ -344,17 +365,110 @@ public class DataInitializationSessionBean {
     private List<ConsultationPurpose> initializeConsultationPurposes() throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
         List<ConsultationPurpose> consultationPurposes = new ArrayList<>();
 
-        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
-        ConsultationPurpose vaccinationConsultationPurpose = new ConsultationPurpose("Vaccination");
-        Long consultationPurposeId = consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
-        Long vaccinationId = consultationPurposeSessionBeanLocal.createConsultationPurpose(vaccinationConsultationPurpose);
+//        ConsultationPurpose consultationPurpose = new ConsultationPurpose("Consultation Purpose 1");
+//        ConsultationPurpose vaccinationConsultationPurpose = new ConsultationPurpose("Vaccination");
+//        Long consultationPurposeId = consultationPurposeSessionBeanLocal.createConsultationPurpose(consultationPurpose);
+//        Long vaccinationId = consultationPurposeSessionBeanLocal.createConsultationPurpose(vaccinationConsultationPurpose);
+//
+//        Long formTemplateId = initializeForm(consultationPurpose);
+//        Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
+//
+//        consultationPurposes.add(consultationPurpose);
+//        consultationPurposes.add(vaccinationConsultationPurpose);
+        ConsultationPurpose happinessCP = new ConsultationPurpose("Happiness Screening");
+        ConsultationPurpose celebrityCP = new ConsultationPurpose("Celebrity Screening");
+        ConsultationPurpose animalCP = new ConsultationPurpose("Pre-Animal Checkup");
+        consultationPurposeSessionBeanLocal.createConsultationPurpose(happinessCP);
+        consultationPurposeSessionBeanLocal.createConsultationPurpose(celebrityCP);
+        consultationPurposeSessionBeanLocal.createConsultationPurpose(animalCP);
+        FormTemplate happinessFT = initializeFormHappiness();
+        FormTemplate celebrityFT = initializeFormCelebrity();
+        FormTemplate animalFT = initializeFormAnimal();
 
-        Long formTemplateId = initializeForm(consultationPurpose);
-        Long vaccinationFormTemplateId = initializeVaccinationForm(vaccinationConsultationPurpose);
+        List<FormTemplate> formTemplates = new ArrayList<>();
+        formTemplates.add(happinessFT);
+        consultationPurposeSessionBeanLocal.relinkFormTemplates(happinessCP.getConsultationPurposeId(), formTemplates);
+        formTemplates = new ArrayList<>();
+        formTemplates.add(happinessFT);
+        formTemplates.add(celebrityFT);
+        consultationPurposeSessionBeanLocal.relinkFormTemplates(celebrityCP.getConsultationPurposeId(), formTemplates);
+        formTemplates = new ArrayList<>();
+        formTemplates.add(animalFT);
+        consultationPurposeSessionBeanLocal.relinkFormTemplates(animalCP.getConsultationPurposeId(), formTemplates);
 
-        consultationPurposes.add(consultationPurpose);
-        consultationPurposes.add(vaccinationConsultationPurpose);
+        consultationPurposes.add(happinessCP);
+        consultationPurposes.add(celebrityCP);
+        consultationPurposes.add(animalCP);
         return consultationPurposes;
+    }
+
+    private FormTemplate initializeFormHappiness() throws CreateFormTemplateException {
+        FormTemplate formTemplate = new FormTemplate("Happiness Survey Declaration");
+        formTemplate.setIsPublic(Boolean.TRUE);
+        Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
+        FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
+        otherFormTemplate.setFormTemplateId(formTemplateId);
+
+        List<FormField> formFields = new ArrayList<>();
+        formFields.add(new FormField("Happiness Indicator", 1, InputTypeEnum.HEADER, Boolean.FALSE, Boolean.FALSE, null));
+        List<FormFieldOption> formFieldOptions = new ArrayList<>();
+        formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("Very Unhappy"));
+        formFieldOptions.add(new FormFieldOption("Not Happy"));
+        formFieldOptions.add(new FormFieldOption("Neutral"));
+        formFieldOptions.add(new FormFieldOption("Happy"));
+        formFieldOptions.add(new FormFieldOption("Extremely Happy"));
+        formFields.add(new FormField("How happy are you??", 2, InputTypeEnum.SINGLE_DROPDOWN, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("Doctor Remarks:", 3, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.FALSE, null));
+
+        otherFormTemplate.setFormFields(formFields);
+        formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
+        formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
+
+        System.out.println("Successfully created Form Template: " + formTemplate.getFormTemplateName() + "\n");
+        return formTemplate;
+    }
+
+    private FormTemplate initializeFormCelebrity() throws CreateFormTemplateException {
+        FormTemplate formTemplate = new FormTemplate("Celebrity Survey Form");
+        formTemplate.setIsPublic(Boolean.TRUE);
+        Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
+        FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
+        otherFormTemplate.setFormTemplateId(formTemplateId);
+
+        List<FormField> formFields = new ArrayList<>();
+        List<FormFieldOption> formFieldOptions = new ArrayList<>();
+        formFields.add(new FormField("Who is your celebrity crush?", 1, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.TRUE, null));
+        formFields.add(new FormField("Doctor Remarks:", 2, InputTypeEnum.TEXT, Boolean.TRUE, Boolean.FALSE, null));
+
+        otherFormTemplate.setFormFields(formFields);
+        formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
+        formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
+
+        System.out.println("Successfully created Form Template: " + formTemplate.getFormTemplateName() + "\n");
+        return formTemplate;
+    }
+
+    private FormTemplate initializeFormAnimal() throws CreateFormTemplateException {
+        FormTemplate formTemplate = new FormTemplate("Animal questionnaire");
+        formTemplate.setIsPublic(Boolean.TRUE);
+        Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
+        FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
+        otherFormTemplate.setFormTemplateId(formTemplateId);
+
+        List<FormField> formFields = new ArrayList<>();
+        List<FormFieldOption> formFieldOptions = new ArrayList<>();
+        formFieldOptions.add(new FormFieldOption("YES"));
+        formFieldOptions.add(new FormFieldOption("NO"));
+        formFields.add(new FormField("Do you own a pet?", 1, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, Boolean.TRUE, formFieldOptions));
+        formFields.add(new FormField("If yes, what pet do you own?", 2, InputTypeEnum.TEXT, Boolean.FALSE, Boolean.TRUE, null));
+
+        otherFormTemplate.setFormFields(formFields);
+        formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
+        formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
+
+        System.out.println("Successfully created Form Template: " + formTemplate.getFormTemplateName() + "\n");
+        return formTemplate;
     }
 
     private Long initializeForm(ConsultationPurpose consultationPurpose) throws CreateConsultationPurposeException, CreateFormTemplateException, RelinkFormTemplatesException {
@@ -478,10 +592,10 @@ public class DataInitializationSessionBean {
 
     private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("513 Serangoon Road", "#04-01", "", "Singapore", "218154"));
         Long serviceman1Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman1);
         Long serviceman2Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman2);
         Long serviceman3Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman3);
@@ -490,19 +604,19 @@ public class DataInitializationSessionBean {
         serviceman2 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman2Id);
         serviceman3 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman3Id);
         serviceman4 = servicemanSessionBeanLocal.retrieveServicemanById(serviceman4Id);
-        
+
         System.out.println("Serviceman INFO [INIT]");
         System.out.println("Email: " + serviceman1.getEmail() + "\tPhone: " + serviceman1.getPhoneNumber());
         System.out.println("Email: " + serviceman2.getEmail() + "\tPhone: " + serviceman2.getPhoneNumber());
         System.out.println("Email: " + serviceman3.getEmail() + "\tPhone: " + serviceman3.getPhoneNumber());
         System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber());
         System.out.println("Successfully created servicemen by init\n");
-        
-        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
-        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"));
+
+        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("Enterprise one", "#01-40", "", "Singapore", "415934"));
+        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("2 Geylang East Avenue 2", "#04-109", "", "Singapore", "389754"));
         String servicemanOtp1 = servicemanSessionBeanLocal.createServiceman(serviceman1Otp);
         String servicemanOtp2 = servicemanSessionBeanLocal.createServiceman(serviceman2Otp);
-        
+
         System.out.println("Serviceman INFO [OTP]");
         System.out.println("Email: " + serviceman1Otp.getEmail() + "\tPhone: " + serviceman1Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp1);
         System.out.println("Email: " + serviceman2Otp.getEmail() + "\tPhone: " + serviceman2Otp.getPhoneNumber() + "\tOTP: " + servicemanOtp2);
@@ -528,15 +642,15 @@ public class DataInitializationSessionBean {
     private List<Employee> initializeEmployees() throws CreateEmployeeException, EmployeeNotFoundException {
         List<Employee> employees = new ArrayList<>();
 
-        Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "98765432", GenderEnum.MALE);
-        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "81234567", GenderEnum.FEMALE);
-        Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88888888", GenderEnum.MALE);
-        Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "88831888", GenderEnum.MALE);
-        Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "87241222", GenderEnum.MALE);
+        Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("16 Raffles Quay", "#01-00", "Hong Leong Building", "Singapore", "048581"), "98765432", GenderEnum.MALE);
+        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("115A Commonwealth Drive", "#02-14", "", "Singapore", "149596"), "81234567", GenderEnum.FEMALE);
+        Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 Orchard Road", "#07-02", "Wheelock Place", "Singapore", "238880"), "92675567", GenderEnum.MALE);
+        Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("woodlands east industrial estate 06-30", "06-30", "", "Singapore", "738733"), "88831888", GenderEnum.MALE);
+        Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("101 Eunos Avenue 3 EUNOS INDUSTRIAL ESTATE", "", "", "Singapore", "409835"), "87241222", GenderEnum.MALE);
 
         // NO Medical Centre Staff
-        Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
-        Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "91758375", GenderEnum.MALE);
+        Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("9 Penang Road", "#10-05", "", "Singapore", "238459"), "91758375", GenderEnum.MALE);
+        Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("141 Market Street", "#01-00", "INTERNATIONAL FACTORS BUILDING", "Singapore", "048944"), "91758375", GenderEnum.MALE);
         Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
         Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);
         Long empId3 = employeeSessionBeanLocal.createEmployeeByInit(emp3);
@@ -562,9 +676,9 @@ public class DataInitializationSessionBean {
         System.out.println("Email: " + emp7.getEmail() + "\tPhone: " + emp7.getPhoneNumber());
         System.out.println("Successfully created employees by init\n");
 
-        Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "92153472", GenderEnum.FEMALE);
-        Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "94360875", GenderEnum.MALE);
-        Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", "", "Singapore", "698928"), "97255472", GenderEnum.MALE);
+        Employee emp1Otp = new SuperUser("Super User OTP", "dummyemailxxx11@hotmail.com", new Address("101 Up Cross St", "#03-38", "", "Singapore", "058357"), "92153472", GenderEnum.FEMALE);
+        Employee emp2Otp = new MedicalOfficer("MO OTP", "dummyemailxxx12@hotmail.com", new Address("9 Pioneer Sector 1", "", "", "Singapore", "628421"), "94360875", GenderEnum.MALE);
+        Employee emp3Otp = new Clerk("Hew Jian Yiee", "dummyemailxxx13@hotmail.com", new Address("170 Upper Bukit Timah Road", "03-02", "Bukit Timah Shopping Centre", "Singapore", "588179"), "97255472", GenderEnum.MALE);
         String empOtp1 = employeeSessionBeanLocal.createEmployee(emp1Otp);
         String empOtp2 = employeeSessionBeanLocal.createEmployee(emp2Otp);
         String empOtp3 = employeeSessionBeanLocal.createEmployee(emp3Otp);
@@ -615,5 +729,33 @@ public class DataInitializationSessionBean {
 
         medicalCentres.add(newMedicalCentre);
         return medicalCentres;
+    }
+
+    String[] randomStrings = {
+        "Shingle color was not something the couple had ever talked about.",
+        "Behind the window was a reflection that only instilled fear.",
+        "She was too short to see over the fence.",
+        "Greetings from the real universe.",
+        "As the asteroid hurtled toward earth, Becky was upset her dentist appointment had been canceled.",
+        "She always speaks to him in a loud voice.",
+        "He turned in the research paper on Friday; otherwise, he would have not passed the class.",
+        "He learned the hardest lesson of his life and had the scars, both physical and mental, to prove it.",
+        "He used to get confused between soldiers and shoulders, but as a military man, he now soldiers responsibility.",
+        "She saw the brake lights, but not in time.",
+        "8% of 25 is the same as 25% of 8 and one of them is much easier to do in your head.",
+        "Tom got a small piece of pie.",
+        "Various sea birds are elegant, but nothing is as elegant as a gliding pelican.",
+        "He went back to the video to see what had been recorded and was shocked at what he saw.",
+        "Italy is my favorite country; in fact, I plan to spend two weeks there next year.",
+        "The complicated school homework left the parents trying to help their kids quite confused.",
+        "Excitement replaced fear until the final moment.",
+        "Blue sounded too cold at the time and yet it seemed to work for gin.",
+        "He told us a very exciting adventure story.",
+        "Iron pyrite is the most foolish of all minerals."
+    };
+
+    private String getRandomString() {
+        int randOption = ThreadLocalRandom.current().nextInt(1, randomStrings.length);
+        return randomStrings[randOption];
     }
 }
