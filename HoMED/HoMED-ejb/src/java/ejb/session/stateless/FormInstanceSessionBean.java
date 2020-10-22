@@ -314,7 +314,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         } else if (formInstance.getFormInstanceStatusEnum() != FormInstanceStatusEnum.SUBMITTED) {
             throw new ArchiveFormInstanceException("Invalid Form Instance status: Status of form instance must be SUBMITTED");
         } else if (formInstance.getBooking() != null && formInstance.getBooking().getBookingStatusEnum() == BookingStatusEnum.UPCOMING) {
-            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to an upcoming cooking.");
+            throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to an upcoming booking.");
         } else if (formInstance.getBooking() != null && formInstance.getBooking().getConsultation() != null && formInstance.getBooking().getConsultation().getConsultationStatusEnum() != ConsultationStatusEnum.COMPLETED) {
             throw new ArchiveFormInstanceException("Unable to Archive Form Instance: Form Instance is linked to a present consultation.");
 
