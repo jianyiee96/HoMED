@@ -86,37 +86,45 @@
                                         <div class="p-grid">
                                             <div class="p-col-9" style="padding-bottom: 0">
                                                 <div class="p-grid">
-                                                    <div class="p-col-3">
+                                                    <div class="p-col-5">
+                                                        <h:outputText value="Medical Board Slot Status:" />
+                                                    </div>
+                                                    <div class="p-col-7">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.getMedicalBoardSlotStatus(medicalBoardSlot)}" />
+                                                    </div>
+                                                </div>
+                                                <div class="p-grid">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Start Time:" />
                                                     </div>
-                                                    <div class="p-col-9">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-3">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="End Time:" />
                                                     </div>
-                                                    <div class="p-col-9">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.endDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-3">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Board Type:" />
                                                     </div>
-                                                    <div class="p-col-9">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />                                          
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-3">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Board Status:" />
                                                     </div>
-                                                    <div class="p-col-9">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />
                                                     </div>
                                                 </div>
