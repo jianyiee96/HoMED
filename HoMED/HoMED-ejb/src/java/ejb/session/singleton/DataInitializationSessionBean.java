@@ -377,7 +377,7 @@ public class DataInitializationSessionBean {
 //        consultationPurposes.add(vaccinationConsultationPurpose);
         ConsultationPurpose happinessCP = new ConsultationPurpose("Happiness Screening");
         ConsultationPurpose celebrityCP = new ConsultationPurpose("Celebrity Screening");
-        ConsultationPurpose animalCP = new ConsultationPurpose("Pre-Animal Checkup");
+        ConsultationPurpose animalCP = new ConsultationPurpose("Pet Clearance Checkup");
         consultationPurposeSessionBeanLocal.createConsultationPurpose(happinessCP);
         consultationPurposeSessionBeanLocal.createConsultationPurpose(celebrityCP);
         consultationPurposeSessionBeanLocal.createConsultationPurpose(animalCP);
@@ -404,7 +404,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormHappiness() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Happiness Survey Declaration");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
@@ -431,7 +431,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormCelebrity() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Celebrity Survey Form");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
@@ -451,7 +451,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormAnimal() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Animal questionnaire");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
@@ -708,7 +708,7 @@ public class DataInitializationSessionBean {
         List<MedicalCentre> medicalCentres = new ArrayList<>();
 
         MedicalCentre newMedicalCentre = new MedicalCentre();
-        newMedicalCentre.setName("HOME TEAM ACADEMY MEDICAL CENTRE");
+        newMedicalCentre.setName("Home Team Academy Medical Centre");
         newMedicalCentre.setPhone("64653921");
         // Street Name, Unit Number, Building Name, Country, Postal Code
         newMedicalCentre.setAddress(new Address("501 OLD CHOA CHU KANG ROAD", "#01-00", null, "Singapore", "698928"));

@@ -380,6 +380,18 @@ public class BookingSlotManagementManagedBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage("growl-message", message);
     }
 
+    public String getBookingSlotStatus(BookingSlot bookingSlot) {
+        if (bookingSlot.getBooking() != null) {
+            return "BOOKED";
+        } else {
+            if (bookingSlot.getStartDateTime().after(new Date())) {
+                return "AVAILABLE";
+            } else {
+                return "EXPIRED";
+            }
+        }
+    }
+
     public MedicalStaff getCurrentMedicalStaff() {
         return currentMedicalStaff;
     }

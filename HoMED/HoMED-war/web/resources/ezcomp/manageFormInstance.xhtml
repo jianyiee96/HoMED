@@ -83,7 +83,7 @@
 
                     <f:facet name="header">
                         <p:outputLabel value="#{manageFormInstanceManagedBean.formInstanceToView.formTemplateMapping.formTemplateName}" style="font-size: 25px;"/>
-                        <p:messages globalOnly="true" class="error-message p-mt-4" showDetail="true" showIcon="false" style="text-align:left"/>
+                        <p:messages rendered="#{manageFormInstanceManagedBean.formInstanceFieldWrappers.size() > 3}" globalOnly="true" class="error-message p-mt-4" showDetail="true" showIcon="false" style="text-align:left"/>
                     </f:facet>
                     <h:panelGroup id="panelGroupItem">
                         <div class="card" style="margin-bottom: 5px">
@@ -204,7 +204,7 @@
                     </h:panelGroup>
                     <f:facet name="footer">
                         <!--<p:focus id="errorMessageFocus" rendered="#{not empty facesContext.messageList}"/>-->
-                        <p:messages id="messages" globalOnly="true" class="error-message" showDetail="true" showIcon="false" style="text-align:left"/>
+                        <p:messages rendered="#{manageFormInstanceManagedBean.formInstanceFieldWrappers.size() > 3}" id="messages" globalOnly="true" class="error-message" showDetail="true" showIcon="false" style="text-align:left"/>
                     </f:facet>
                 </p:dataList>
                 <f:facet name="footer">

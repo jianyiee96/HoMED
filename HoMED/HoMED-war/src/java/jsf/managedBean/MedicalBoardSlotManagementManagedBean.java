@@ -341,6 +341,18 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage("growl-message", message);
     }
 
+    public String getMedicalBoardSlotStatus(MedicalBoardSlot medicalBoardSlot) {
+        if (medicalBoardSlot.getMedicalBoard() != null) {
+            return "BOOKED";
+        } else {
+            if (medicalBoardSlot.getStartDateTime().after(new Date())) {
+                return "AVAILABLE";
+            } else {
+                return "EXPIRED";
+            }
+        }
+    }
+
     public MedicalStaff getCurrentMedicalBoardAdmin() {
         return currentMedicalBoardAdmin;
     }
