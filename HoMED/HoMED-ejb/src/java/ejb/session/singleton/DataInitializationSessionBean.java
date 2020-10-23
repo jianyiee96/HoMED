@@ -404,7 +404,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormHappiness() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Happiness Survey Declaration");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
@@ -431,7 +431,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormCelebrity() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Celebrity Survey Form");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);
@@ -451,7 +451,7 @@ public class DataInitializationSessionBean {
 
     private FormTemplate initializeFormAnimal() throws CreateFormTemplateException {
         FormTemplate formTemplate = new FormTemplate("Animal questionnaire");
-        formTemplate.setIsPublic(Boolean.TRUE);
+        formTemplate.setIsPublic(Boolean.FALSE);
         Long formTemplateId = formTemplateSessionBeanLocal.createFormTemplate(formTemplate);
         FormTemplate otherFormTemplate = new FormTemplate(formTemplate.getFormTemplateName());
         otherFormTemplate.setFormTemplateId(formTemplateId);

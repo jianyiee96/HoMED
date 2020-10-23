@@ -57,9 +57,9 @@
                         <div class="p-col-12">
                             <div class="p-grid p-justify-between">
                                 <div style="width: 130px; margin-left: 15px"></div>
-                                <div>
+                                <div class="p-mt-3">
                                     <ui:fragment rendered="#{not manageServicemanManagedBean.isEditMode}">
-                                        <span style="display: inline-block" class="p-mt-3 role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
+                                        <span style="display: inline-block" class="role-badge role-#{manageServicemanManagedBean.servicemanToView.role}">#{manageServicemanManagedBean.servicemanToView.role.stringVal}</span>
                                         <ui:fragment rendered="#{manageServicemanManagedBean.isAdminView}">
                                             <i style="margin-left: 5px; font-size:25px" class="fa #{manageServicemanManagedBean.servicemanToView.isActivated?'fa-unlock':'fa-lock'}"/>
                                         </ui:fragment>
