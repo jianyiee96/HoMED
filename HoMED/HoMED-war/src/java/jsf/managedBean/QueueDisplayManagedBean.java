@@ -45,7 +45,9 @@ public class QueueDisplayManagedBean implements Serializable {
         if (currentEmployee != null && currentEmployee instanceof MedicalStaff) {
             currentMedicalStaff = (MedicalStaff) currentEmployee;
             currentMedicalCentre = currentMedicalStaff.getMedicalCentre();
-            refreshDisplay();
+            if (currentMedicalCentre != null) {
+                refreshDisplay();
+            }
         }
     }
 
@@ -109,5 +111,5 @@ public class QueueDisplayManagedBean implements Serializable {
     public HashSet<Long> getChangedBookingsHS() {
         return changedBookingsHS;
     }
-    
+
 }
