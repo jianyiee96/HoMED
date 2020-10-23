@@ -149,7 +149,7 @@
                     <div class="p-grid p-justify-center p-mt-3">
                         <p:inputTextarea class="p-col-12" placeholder="Insert comments for cancelling booking" value="#{bookingManagedBean.cancelBookingComments}"></p:inputTextarea>
                         <p:messages id="dlgMessages" class="p-col-12"/>
-                        <p:commandButton value='Confirm Cancel' styleClass="ui-confirmdialog-yes" icon="pi pi-times" actionListener="#{bookingManagedBean.deleteBooking()}"  update="panelGroupCancelBooking dataTableBookings" process="panelGroupCancelBooking"/>
+                        <p:commandButton value='Confirm Cancel' styleClass="ui-confirmdialog-yes" actionListener="#{bookingManagedBean.deleteBooking()}"  update="panelGroupCancelBooking dataTableBookings" process="panelGroupCancelBooking"/>
                     </div>
                 </h:panelGroup>
             </p:dialog>
