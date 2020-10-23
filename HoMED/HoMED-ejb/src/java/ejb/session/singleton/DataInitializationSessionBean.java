@@ -377,7 +377,7 @@ public class DataInitializationSessionBean {
 //        consultationPurposes.add(vaccinationConsultationPurpose);
         ConsultationPurpose happinessCP = new ConsultationPurpose("Happiness Screening");
         ConsultationPurpose celebrityCP = new ConsultationPurpose("Celebrity Screening");
-        ConsultationPurpose animalCP = new ConsultationPurpose("Pre-Animal Checkup");
+        ConsultationPurpose animalCP = new ConsultationPurpose("Pet Clearance Checkup");
         consultationPurposeSessionBeanLocal.createConsultationPurpose(happinessCP);
         consultationPurposeSessionBeanLocal.createConsultationPurpose(celebrityCP);
         consultationPurposeSessionBeanLocal.createConsultationPurpose(animalCP);
