@@ -68,7 +68,7 @@
                             <p:menuitem value="E-Form Utility" icon="fa fa-file-code-o" outcome="/form-util" />
                             <p:menuitem value="Consultation Utility" icon="fa fa-wrench" outcome="/consultation-util" />
                         </p:submenu>
-                        <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Scheduler Management" icon="pi pi-calendar-plus" >
+                        <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Schedule Management" icon="pi pi-calendar-plus" >
                             <p:menuitem value="Booking Slot Management"  icon="fa fa-calendar" outcome="/booking-slot-management" />
                         </p:submenu>
                         <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Booking Management" icon="pi pi-calendar" outcome="/booking-management"/>
