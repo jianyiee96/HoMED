@@ -30,7 +30,8 @@
                             <h2>Past Consultations</h2>
                             <p:dataTable id="dataTablePastConsultations" widgetVar="dataTablePastConsultations" var="consultation" value="#{pastConsultationsManagedBean.pastConsultationsForCurrentMedicalOfficer}"
                                          rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{pastConsultationsManagedBean.selectedPastConsultation}"
-                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
+                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending"
+                                         scrollable="true" scrollHeight="500">
                                 <p:ajax event="rowSelect" update="@form" process="@this"/>
 
                                 <f:facet name="header">
@@ -117,7 +118,7 @@
                                                     <p:outputLabel value="Booking Comment: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{not empty pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
                                                     <p:outputLabel value="N.A." rendered="#{empty pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
-                                                    
+
                                                     <p:outputLabel value="Started at: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
                                                         <f:convertDateTime pattern="HH:mm"/>

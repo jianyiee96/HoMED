@@ -2,6 +2,7 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
+import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
@@ -63,9 +64,12 @@ import util.exceptions.CreateFormTemplateException;
 import util.exceptions.CreateMedicalCentreException;
 import util.exceptions.CreateServicemanException;
 import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.EndConsultationException;
+import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ServicemanNotFoundException;
+import util.exceptions.StartConsultationException;
 import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
 
@@ -73,6 +77,9 @@ import util.exceptions.UpdateFormInstanceException;
 @LocalBean
 @Startup
 public class DataInitializationSessionBean {
+
+    @EJB(name = "ConsultationSessionBeanLocal")
+    private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -130,33 +137,80 @@ public class DataInitializationSessionBean {
 
 //            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
             fillForms(bookings, RATE_OF_FILLING_FORMS);
+            Date today = new Date();
+            List<Booking> pastBookings = bookings.stream()
+                    .filter(b -> b.getBookingSlot().getStartDateTime().before(today))
+                    .collect(Collectors.toList());
+            executeConsultationsForPastBookings(pastBookings);
+            // MARK ATTENDANCE FOR ALL PAST BOOKINGS
+            // CONSULTATION FOR ALL PAST BOOKINGS
             System.out.println("====================== End of DATA INIT ======================");
         } catch (CreateEmployeeException | CreateServicemanException | AssignMedicalStaffToMedicalCentreException
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException | ServicemanNotFoundException ex) {
+                | ScheduleBookingSlotException | ServicemanNotFoundException
+                | MarkBookingAttendanceException | StartConsultationException
+                | SubmitFormInstanceException | EndConsultationException ex) {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
     }
 
+    private void executeConsultationsForPastBookings(List<Booking> pastBookings) throws MarkBookingAttendanceException, StartConsultationException, SubmitFormInstanceException, EndConsultationException {
+        pastBookings.sort((x, y) -> {
+            if (x.getBookingSlot().getStartDateTime().before(y.getBookingSlot().getStartDateTime())) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        for (Booking booking : pastBookings) {
+            bookingSessionBeanLocal.markBookingAttendance(booking.getBookingId());
+            List<MedicalOfficer> medicalOfficers = booking.getBookingSlot().getMedicalCentre().getMedicalStaffList().stream()
+                    .filter(ms -> ms instanceof MedicalOfficer)
+                    .map(ms -> (MedicalOfficer) ms)
+                    .collect(Collectors.toList());
+            Collections.shuffle(medicalOfficers);
+
+            MedicalOfficer mo = medicalOfficers.get(0);
+
+            // Added offset time for queue time
+            int randTimeMinutes = ThreadLocalRandom.current().nextInt(1, 21);
+            Calendar c = new GregorianCalendar();
+            c.setTime(booking.getConsultation().getJoinQueueDateTime());
+            c.add(Calendar.MINUTE, randTimeMinutes);
+            consultationSessionBeanLocal.startConsultationByInit(booking.getConsultation().getConsultationId(), mo.getEmployeeId(), c.getTime());
+            for (FormInstance fi : booking.getFormInstances()) {
+                fillForm(fi, true);
+                formInstanceSessionBeanLocal.submitFormInstanceByDoctor(fi, mo.getEmployeeId());
+            }
+            randTimeMinutes = ThreadLocalRandom.current().nextInt(1, 15);
+            c.setTime(c.getTime());
+            c.add(Calendar.MINUTE, randTimeMinutes);
+            consultationSessionBeanLocal.endConsultationByInit(booking.getConsultation().getConsultationId(), getRandomString(), getRandomString(), c.getTime());
+        }
+        System.out.println("Successfully consulted all past bookings");
+    }
+
     private void fillForms(List<Booking> bookings, double rate) {
         rate = Math.min(rate, 1);
         rate = Math.max(0, rate);
+        Date today = new Date();
         for (Booking booking : bookings) {
             for (FormInstance fi : booking.getFormInstances()) {
-                if (Math.random() <= rate) {
-                    fillForm(fi);
+                if (booking.getBookingSlot().getStartDateTime().before(today)
+                        || Math.random() <= rate) {
+                    fillForm(fi, false);
                 }
             }
         }
     }
 
-    private void fillForm(FormInstance fi) {
+    private void fillForm(FormInstance fi, boolean isDoctor) {
         try {
             for (FormInstanceField fif : fi.getFormInstanceFields()) {
-                if (fif.getFormFieldMapping().getIsRequired() && fif.getFormFieldMapping().getIsServicemanEditable()) {
+                if (fif.getFormFieldMapping().getIsRequired() && ((!isDoctor && fif.getFormFieldMapping().getIsServicemanEditable()) || (isDoctor && !fif.getFormFieldMapping().getIsServicemanEditable()))) {
                     InputTypeEnum inputType = fif.getFormFieldMapping().getInputType();
                     if (inputType == InputTypeEnum.CHECK_BOX
                             || inputType == InputTypeEnum.MULTI_DROPDOWN) {
@@ -183,22 +237,128 @@ public class DataInitializationSessionBean {
                     }
                 }
             }
-
-            formInstanceSessionBeanLocal.updateFormInstanceFieldValues(fi);
-            formInstanceSessionBeanLocal.submitFormInstance(fi.getFormInstanceId());
+            if (!isDoctor) {
+                formInstanceSessionBeanLocal.updateFormInstanceFieldValues(fi);
+                formInstanceSessionBeanLocal.submitFormInstance(fi.getFormInstanceId());
+            }
         } catch (UpdateFormInstanceException | SubmitFormInstanceException ex) {
             System.out.println("Failed to fill up form instance: " + ex.getMessage());
         }
     }
 
+    private List<Booking> initializeBookings(List<BookingSlot> bookingSlots, List<ConsultationPurpose> consultationPurposes, List<Serviceman> servicemen, double rate) throws CreateBookingException {
+        System.out.println("Creating Bookings...");
+        List<Booking> bookings = new ArrayList<>();
+        rate = Math.min(rate, 1);
+        rate = Math.max(0, rate);
+
+        HashMap<Serviceman, Integer> bookingHm = new HashMap<>();
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        TreeMap<String, Integer> datesTm = new TreeMap<>((x, y) -> {
+            try {
+                if (x.equals(y)) {
+                    return 0;
+                }
+                Date d1 = df.parse(x);
+                Date d2 = df.parse(y);
+                if (d1.before(d2)) {
+                    return -1;
+                }
+                return 1;
+            } catch (ParseException ex) {
+                return -1;
+            }
+        });
+
+        for (BookingSlot bs : bookingSlots) {
+            cal2.setTime(bs.getStartDateTime());
+            boolean isAfterToday = cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
+                    && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+
+            int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
+            int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
+//          && isAfterToday
+            if (Math.random() <= rate) {
+                Serviceman serviceman = servicemen.get(randServicemanIdx);
+                Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
+                bookings.add(booking);
+
+                int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
+                bookingHm.put(serviceman, count + 1);
+
+                String dateStr = df.format(booking.getBookingSlot().getStartDateTime());
+                if (datesTm.containsKey(dateStr)) {
+                    datesTm.replace(dateStr, datesTm.get(dateStr) + 1);
+                } else {
+                    datesTm.put(dateStr, 1);
+                }
+            }
+        }
+        System.out.println("Bookings Summary:");
+        System.out.println("By Serviceman:");
+
+        for (Serviceman serviceman : bookingHm.keySet()) {
+            System.out.println("\t" + serviceman.getName() + ": " + bookingHm.get(serviceman) + " bookings created");
+        }
+        System.out.println("");
+        System.out.println("By Date:");
+        for (Map.Entry<String, Integer> entry : datesTm.entrySet()) {
+            System.out.println("\t" + entry.getKey() + ": " + entry.getValue() + " bookings created");
+        }
+        System.out.println("Successfully created Bookings\n");
+        return bookings;
+    }
+
     private List<BookingSlot> initializeBookingSlots(List<MedicalCentre> medicalCentres) throws ScheduleBookingSlotException {
         List<BookingSlot> bookingSlots = new ArrayList<>();
+        int numOfPastDaysToCreate = 30;
         int numOfDaysToCreate = 28;
 
         for (MedicalCentre mc : medicalCentres) {
             System.out.println("Creating Booking Slots for " + mc.getName() + "...");
             List<OperatingHours> operatingHours = mc.getOperatingHours();
 
+            for (int day = 0; day < numOfPastDaysToCreate; day++) {
+                Calendar date = Calendar.getInstance();
+                date.set(Calendar.SECOND, 0);
+                date.set(Calendar.MILLISECOND, 0);
+
+//                while (date.get(Calendar.DAY_OF_WEEK) != 1) {
+//                    date.add(Calendar.DATE, -1);
+//                }
+                date.add(Calendar.DATE, -day);
+
+                int dayIdx = date.get(Calendar.DAY_OF_WEEK);
+                DayOfWeekEnum dayOfWeekEnum = getDayOfWeekEnum(dayIdx);
+
+                OperatingHours daysOh = operatingHours.stream()
+                        .filter(oh -> oh.getDayOfWeek() == dayOfWeekEnum)
+                        .findFirst()
+                        .orElse(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+
+                if (!daysOh.getIsOpen()) {
+                    continue;
+                }
+
+                Calendar start = new GregorianCalendar();
+                Calendar end = new GregorianCalendar();
+                start.setTime(date.getTime());
+                end.setTime(date.getTime());
+
+                start.set(Calendar.HOUR_OF_DAY, daysOh.getOpeningHours().getHour());
+                start.set(Calendar.MINUTE, daysOh.getOpeningHours().getMinute());
+                end.set(Calendar.HOUR_OF_DAY, daysOh.getClosingHours().getHour());
+                end.set(Calendar.MINUTE, daysOh.getClosingHours().getMinute());
+
+                if (start.getTime().before(end.getTime())) {
+                    bookingSlots.addAll(slotSessionBeanLocal.createBookingSlots(mc.getMedicalCentreId(), start.getTime(), end.getTime()));
+                }
+            }
+
+            // Creating future bookings
             for (int day = 0; day < numOfDaysToCreate; day++) {
                 Calendar date = Calendar.getInstance();
                 date.set(Calendar.SECOND, 0);
@@ -237,76 +397,17 @@ public class DataInitializationSessionBean {
                 }
             }
 
-            System.out.println("Successfully created Booking Slots for " + mc.getName() + "...");
+            System.out.println("Successfully created Booking Slots for " + mc.getName() + "...\n");
 
         }
-        return bookingSlots;
-    }
-
-    private List<Booking> initializeBookings(List<BookingSlot> bookingSlots, List<ConsultationPurpose> consultationPurposes, List<Serviceman> servicemen, double rate) throws CreateBookingException {
-        System.out.println("Creating Bookings...");
-        List<Booking> bookings = new ArrayList<>();
-        rate = Math.min(rate, 1);
-        rate = Math.max(0, rate);
-
-        HashMap<Serviceman, Integer> bookingHm = new HashMap<>();
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        TreeMap<String, Integer> datesTm = new TreeMap<>((x, y) -> {
-            try {
-                if (x.equals(y)) {
-                    return 0;
-                }
-                Date d1 = df.parse(x);
-                Date d2 = df.parse(y);
-                if (d1.before(d2)) {
-                    return -1;
-                }
-                return 1;
-            } catch (ParseException ex) {
+        bookingSlots.sort((x, y) -> {
+            if (x.getStartDateTime().before(y.getStartDateTime())) {
                 return -1;
+            } else {
+                return 1;
             }
         });
-
-        for (BookingSlot bs : bookingSlots) {
-            cal2.setTime(bs.getStartDateTime());
-            boolean isAfterToday = cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
-                    && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
-
-            int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
-            int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
-
-            if (Math.random() <= rate && isAfterToday) {
-                Serviceman serviceman = servicemen.get(randServicemanIdx);
-                Booking booking = bookingSessionBeanLocal.createBooking(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
-                bookings.add(booking);
-
-                int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
-                bookingHm.put(serviceman, count + 1);
-
-                String dateStr = df.format(booking.getBookingSlot().getStartDateTime());
-                if (datesTm.containsKey(dateStr)) {
-                    datesTm.replace(dateStr, datesTm.get(dateStr) + 1);
-                } else {
-                    datesTm.put(dateStr, 1);
-                }
-            }
-        }
-        System.out.println("Bookings Summary:");
-        System.out.println("By Serviceman:");
-
-        for (Serviceman serviceman : bookingHm.keySet()) {
-            System.out.println("\t" + serviceman.getName() + ": " + bookingHm.get(serviceman) + " bookings created");
-        }
-        System.out.println("");
-        System.out.println("By Date:");
-        for (Map.Entry<String, Integer> entry : datesTm.entrySet()) {
-            System.out.println("\t" + entry.getKey() + ": " + entry.getValue() + " bookings created");
-        }
-        System.out.println("Successfully created Bookings");
-        return bookings;
+        return bookingSlots;
     }
 
     private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleBookingSlotException {

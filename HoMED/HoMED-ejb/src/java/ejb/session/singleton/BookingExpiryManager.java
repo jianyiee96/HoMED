@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ejb.DependsOn;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
@@ -23,6 +24,7 @@ import util.exceptions.MarkBookingAbsentException;
 @Singleton
 @LocalBean
 @Startup
+@DependsOn("DataInitializationSessionBean")
 public class BookingExpiryManager {
 
     @EJB
