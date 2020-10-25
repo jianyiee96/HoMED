@@ -20,6 +20,11 @@
         <h:outputScript name="js/nanoscroller.js" library="roma-layout" />
         <h:outputScript name="js/layout.js" library="roma-layout" />
         <ui:insert name="head"/>
+        <script>
+            PrimeFaces.locales['en_GB'] = {
+                firstDay: 1
+            };
+        </script>
     </h:head>
 
     <h:body styleClass="#{themeCustomiser.inputStyle}">
@@ -60,7 +65,7 @@
                 </f:facet>
             </p:ajaxStatus>
         </div>
-        
+
         <h:outputStylesheet name="default.css" library="css" />
         <h:outputStylesheet name="css/primeicons.css" library="roma-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="roma-layout" />
