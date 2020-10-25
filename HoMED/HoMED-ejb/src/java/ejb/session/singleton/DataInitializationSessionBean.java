@@ -165,30 +165,57 @@ public class DataInitializationSessionBean {
                 return 1;
             }
         });
+
+        // MARKING ATTENDANCE
         for (Booking booking : pastBookings) {
             bookingSessionBeanLocal.markBookingAttendance(booking.getBookingId());
+            Calendar calQueue = new GregorianCalendar();
+            calQueue.setTime(booking.getBookingSlot().getStartDateTime());
+            calQueue.add(Calendar.MINUTE, getRandomNumber(1, 16));
+            booking.getConsultation().setJoinQueueDateTime(calQueue.getTime());
+        }
+
+        pastBookings.sort((x, y) -> {
+            if (x.getConsultation().getJoinQueueDateTime().before(y.getConsultation().getJoinQueueDateTime())) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+
+        Calendar calCheck = new GregorianCalendar();
+        calCheck.setTime(pastBookings.get(0).getBookingSlot().getStartDateTime());
+        // STARTING AND ENDING CONSULT
+        for (Booking booking : pastBookings) {
             List<MedicalOfficer> medicalOfficers = booking.getBookingSlot().getMedicalCentre().getMedicalStaffList().stream()
                     .filter(ms -> ms instanceof MedicalOfficer)
                     .map(ms -> (MedicalOfficer) ms)
                     .collect(Collectors.toList());
             Collections.shuffle(medicalOfficers);
-
             MedicalOfficer mo = medicalOfficers.get(0);
 
+            Calendar calBooking = new GregorianCalendar();
+            calBooking.setTime(booking.getConsultation().getJoinQueueDateTime());
+
+//            To Make sure start of consultation is always after the previous consultation
+            if (calCheck.get(Calendar.DAY_OF_YEAR) == calBooking.get(Calendar.DAY_OF_YEAR)) {
+                if (calCheck.getTime().after(calBooking.getTime())) {
+                    calBooking.setTime(calCheck.getTime());
+                }
+            }
+
             // Added offset time for queue time
-            int randTimeMinutes = ThreadLocalRandom.current().nextInt(1, 21);
-            Calendar c = new GregorianCalendar();
-            c.setTime(booking.getConsultation().getJoinQueueDateTime());
-            c.add(Calendar.MINUTE, randTimeMinutes);
-            consultationSessionBeanLocal.startConsultationByInit(booking.getConsultation().getConsultationId(), mo.getEmployeeId(), c.getTime());
+            int randTimeMinutes = getRandomNumber(1, 16);
+            calBooking.add(Calendar.MINUTE, randTimeMinutes);
+            consultationSessionBeanLocal.startConsultationByInit(booking.getConsultation().getConsultationId(), mo.getEmployeeId(), calBooking.getTime());
             for (FormInstance fi : booking.getFormInstances()) {
                 fillForm(fi, true);
                 formInstanceSessionBeanLocal.submitFormInstanceByDoctor(fi, mo.getEmployeeId());
             }
-            randTimeMinutes = ThreadLocalRandom.current().nextInt(1, 15);
-            c.setTime(c.getTime());
-            c.add(Calendar.MINUTE, randTimeMinutes);
-            consultationSessionBeanLocal.endConsultationByInit(booking.getConsultation().getConsultationId(), getRandomString(), getRandomString(), c.getTime());
+            randTimeMinutes = getRandomNumber(1, 16);
+            calBooking.add(Calendar.MINUTE, randTimeMinutes);
+            consultationSessionBeanLocal.endConsultationByInit(booking.getConsultation().getConsultationId(), getRandomString(), getRandomString(), calBooking.getTime());
+            calCheck.setTime(calBooking.getTime());
         }
         System.out.println("Successfully consulted all past bookings");
     }
@@ -214,7 +241,7 @@ public class DataInitializationSessionBean {
                     InputTypeEnum inputType = fif.getFormFieldMapping().getInputType();
                     if (inputType == InputTypeEnum.CHECK_BOX
                             || inputType == InputTypeEnum.MULTI_DROPDOWN) {
-                        int randOption = ThreadLocalRandom.current().nextInt(1, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        int randOption = getRandomNumber(1, fif.getFormFieldMapping().getFormFieldOptions().size());
                         List<FormFieldOption> options = fif.getFormFieldMapping().getFormFieldOptions().stream().collect(Collectors.toList());
                         Collections.shuffle(options);
                         fif.setFormInstanceFieldValues(new ArrayList<>());
@@ -222,7 +249,7 @@ public class DataInitializationSessionBean {
                                 .forEach(x -> fif.getFormInstanceFieldValues().add(new FormInstanceFieldValue(options.get(x).getFormFieldOptionValue())));
                     } else if (inputType == InputTypeEnum.RADIO_BUTTON
                             || inputType == InputTypeEnum.SINGLE_DROPDOWN) {
-                        int randOption = ThreadLocalRandom.current().nextInt(0, fif.getFormFieldMapping().getFormFieldOptions().size());
+                        int randOption = getRandomNumber(1, fif.getFormFieldMapping().getFormFieldOptions().size());
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(fif.getFormFieldMapping().getFormFieldOptions().get(randOption).getFormFieldOptionValue()));
                     } else if (inputType == InputTypeEnum.TEXT) {
                         fif.getFormInstanceFieldValues().add(0, new FormInstanceFieldValue(getRandomString()));
@@ -278,8 +305,8 @@ public class DataInitializationSessionBean {
             boolean isAfterToday = cal1.get(Calendar.DAY_OF_YEAR) < cal2.get(Calendar.DAY_OF_YEAR)
                     && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
 
-            int randServicemanIdx = ThreadLocalRandom.current().nextInt(0, servicemen.size());
-            int randCpIdx = ThreadLocalRandom.current().nextInt(0, consultationPurposes.size());
+            int randServicemanIdx = getRandomNumber(0, servicemen.size());
+            int randCpIdx = getRandomNumber(0, consultationPurposes.size());
 //          && isAfterToday
             if (Math.random() <= rate) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
@@ -858,5 +885,9 @@ public class DataInitializationSessionBean {
     private String getRandomString() {
         int randOption = ThreadLocalRandom.current().nextInt(1, randomStrings.length);
         return randomStrings[randOption];
+    }
+
+    private Integer getRandomNumber(int startInc, int endExc) {
+        return ThreadLocalRandom.current().nextInt(startInc, endExc);
     }
 }
