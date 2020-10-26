@@ -69,7 +69,7 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
-
+    
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
