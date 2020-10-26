@@ -81,7 +81,9 @@ public class SecurityFilter implements Filter {
             "/past-consultations.xhtml", // 14
             "/serviceman-consultation-records.xhtml", // 15
             "/current-consultation.xhtml", // 16
-            "/queue-display.xhtml" // 17
+            "/queue-display.xhtml", // 17
+            "/report-management.xhtml", // 18
+            "/manage-report.xhtml" // 19
         };
 
         // Pages that all logged in users can enter
@@ -89,7 +91,9 @@ public class SecurityFilter implements Filter {
                 || path.equals(pathArr[1])
                 || path.equals(pathArr[2])
                 || path.equals(pathArr[3])
-                || path.equals(pathArr[4])) {
+                || path.equals(pathArr[4])
+                || path.equals(pathArr[18])
+                || path.equals(pathArr[19])) {
             return 1;
         }
 

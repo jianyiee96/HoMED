@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Report Management</ui:define>
+
+
+    <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+        <style type="text/css">
+            .ui-sticky {
+                top: 86px !important;
+            }
+            @media (max-width: 960px) {
+                .ui-sticky {
+                    top: 86px !important;
+                }
+            }
+            .report-cols {
+                text-align: center;
+            }
+            .report-name, .report-name.ui-inputfield {
+                text-align: center;
+                font-weight: bold;
+                font-size: 30px;
+            }
+            .report-subtitle, .report-subtitle.ui-inputfield {
+                font-size: 20px;
+                font-style: italic;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            .line-icon::before,
+            .line-icon::after {      
+                /* Styles kept */
+                width: 35%;
+                height: 1px;
+
+                /* Changed to border-top (instead of border) to simulate a line better */
+                border-top: 1px solid #ccc; 
+
+                /* Styles added */
+                display: inline-block;
+                content: '';
+
+                /* Use padding to vertical align the line */
+                /* Use padding in em for a responsive icon height */
+                padding-top: 0.5em; 
+
+                /* Use margins to give the lines some spacement around the icon */
+                /* Use margins in % for a responsive spacement */
+                margin-left: 5%; 
+                margin-right: 5%;
+            }
+        </style>
+
+        <f:metadata>
+            <f:viewParam name="reportToViewId" value="#{manageReportManagedBean.reportToViewId}" />
+        </f:metadata>
+
+        <ezcomp:pageRedirect rendered="#{manageReportManagedBean.report eq null}"
+                             header="#{manageReportManagedBean.redirectMessage}" btnOutcome="/report-management.xhtml" btnIcon="fa fa-files-o"/>
+
+        <h:form id="formReport" rendered="#{manageReportManagedBean.report ne null}">
+            <p:growl id="growl-message" for="growl-message" showDetail="true" />
+            <p:toolbar id="tb" style="margin-top: -16px">
+                <f:facet name="left">
+                    <div class="p-mt-2">
+                        <h:outputText value="Last Modified: " style="font-weight: 800"/>
+                        <h:outputText value="#{manageReportManagedBean.report.lastModified}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </div>
+                </f:facet>
+                <f:facet name="right">
+                    <p:commandButton class="p-mr-2 success-button" title="Publish" icon="pi pi-upload"/>
+                    <p:commandButton class="p-mr-2 warning-button" title="Print" icon="pi pi-print"/>
+                    <p:commandButton class="p-mr-2 danger-button" title="Delete" icon="pi pi-trash"/>
+                    <p:commandButton rendered="#{not manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Edit" icon="pi pi-pencil" process="@this"
+                                     value="Edit" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
+                    <p:commandButton rendered="#{manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Done Editing" icon="pi pi-check" process="@form"
+                                     value="Done Editing" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
+                </f:facet>
+            </p:toolbar>
+            <p:sticky target="tb" />
+            <p:panel>
+                <div class="p-grid p-justify-center">
+                    <div class="p-col-12 p-md-8" style="padding-top: 50px;padding-bottom: 50px;">
+                        <div class="p-grid p-dir-col report-cols p-justify-center">
+                            <h:outputText class="report-name" value="#{not empty manageReportManagedBean.report.name ? manageReportManagedBean.report.name : 'Enter Report Name'}"
+                                          rendered="#{not manageReportManagedBean.isEditMode}"/>
+                            <p:inputText id="report-name" class="report-name" value="#{manageReportManagedBean.report.name}" placeholder="Enter Report Name"
+                                         rendered="#{manageReportManagedBean.isEditMode}"/>
+                            <p:message for="report-name" class="error-message"/>
+                            <p:separator/>
+                            <h:outputText class="report-subtitle" value="#{manageReportManagedBean.report.description}"
+                                          rendered="#{not manageReportManagedBean.isEditMode and not empty manageReportManagedBean.report.description}"/>
+                            <p:inputTextarea class="report-subtitle" value="#{manageReportManagedBean.report.description}" placeholder="Enter Report Description"
+                                             rendered="#{manageReportManagedBean.isEditMode}"/>
+                            <div class="p-col-12">
+                                <p:commandButton class="p-mt-5" icon="pi pi-clock" style="opacity: 1; font-size: 18px"
+                                                 rendered="#{manageReportManagedBean.isEditMode or not empty manageReportManagedBean.report.filterStartDate}"
+                                                 disabled="#{not manageReportManagedBean.isEditMode}"
+                                                 value="#{empty manageReportManagedBean.report.filterDateType ? 'Set Global Date Filter' : manageReportManagedBean.report.filterDateString}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <ui:fragment rendered="#{manageReportManagedBean.isEditMode}">
+                        <div class="p-col-12 p-md-8 report-cols">
+                            <div class='line-container'>
+                                <div class='line-icon'>
+                                    <p:commandLink id="cmdlink-add" process="@this" style="position: relative;">
+                                        <i class="pi pi-plus" style="font-weight: bold; font-size: 25px"/>
+                                    </p:commandLink>
+                                    <p:menu overlay="true" trigger="cmdlink-add" my="left top" at="left bottom">
+                                        <p:submenu label="New Field">
+                                            <p:menuitem value="Header" icon="fa fa-header"/>
+                                            <p:menuitem value="Chart" icon="pi pi-chart-line"/>
+                                        </p:submenu>
+                                    </p:menu>
+                                </div>
+                            </div>
+                        </div>
+                    </ui:fragment>
+                </div>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
+
