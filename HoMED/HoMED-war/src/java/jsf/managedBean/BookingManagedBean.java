@@ -345,10 +345,12 @@ public class BookingManagedBean implements Serializable {
 
     public boolean isDateInCurrentWeek(Date date) {
         Calendar currentCalendar = Calendar.getInstance();
+        currentCalendar.add(Calendar.DATE, -1);
         int week = currentCalendar.get(Calendar.WEEK_OF_YEAR);
         int year = currentCalendar.get(Calendar.YEAR);
         Calendar targetCalendar = Calendar.getInstance();
         targetCalendar.setTime(date);
+        targetCalendar.add(Calendar.DATE, -1);
         int targetWeek = targetCalendar.get(Calendar.WEEK_OF_YEAR);
         int targetYear = targetCalendar.get(Calendar.YEAR);
         return week == targetWeek && year == targetYear;
