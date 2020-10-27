@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.ConsultationPurpose;
 import entity.FormTemplate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
@@ -138,7 +139,24 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
             ftUnlink.getConsultationPurposes().remove(cp);
         }
 
-        em.remove(cp);
+        cp.setFormTemplates(new ArrayList<>());
+        cp.setIsActive(Boolean.FALSE);
+
+    }
+    
+    @Override
+    public void restoreConsultationPurpose(Long id) {
+
+        ConsultationPurpose cp = retrieveConsultationPurpose(id);
+        cp.setIsActive(Boolean.TRUE);
+
+    }
+    
+    @Override
+    public void toggleConsultationPurposeReviewOnly(Long id) {
+
+        ConsultationPurpose cp = retrieveConsultationPurpose(id);
+        cp.setReviewOnly(!cp.getReviewOnly());
 
     }
 
