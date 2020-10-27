@@ -24,9 +24,18 @@ public interface ConsultationPurposeSessionBeanLocal {
     
     public List<ConsultationPurpose> retrieveAllConsultationPurposes();
     
+    public List<ConsultationPurpose> retrieveAllActiveConsultationPurposes();
+    
+    public List<ConsultationPurpose> retrieveAllActiveNonReviewOnlyConsultationPurposes();
+    
     public void relinkFormTemplates(Long id, List<FormTemplate> formTemplates) throws RelinkFormTemplatesException;
     
     public List<ConsultationPurpose> retrieveAllFormTemplateLinkedConsultationPurposes(Long id);
     
     public void deleteConsultationPurpose(Long id);
+    
+    public void restoreConsultationPurpose(Long id);
+
+    public void toggleConsultationPurposeReviewOnly(Long id);
+
 }

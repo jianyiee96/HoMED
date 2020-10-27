@@ -70,7 +70,7 @@ public class ConsultationResource {
         }
 
         try {
-            List<ConsultationPurpose> consultationPurposes = consultationPurposeSessionBeanLocal.retrieveAllConsultationPurposes();
+            List<ConsultationPurpose> consultationPurposes = consultationPurposeSessionBeanLocal.retrieveAllActiveConsultationPurposes();
             for (ConsultationPurpose cp : consultationPurposes) {
                 cp.setFormTemplates(null);
                 cp.setBookings(null);

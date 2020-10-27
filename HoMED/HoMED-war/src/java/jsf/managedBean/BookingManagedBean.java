@@ -108,6 +108,8 @@ public class BookingManagedBean implements Serializable {
 
     private Boolean isEditBookingInformation;
 
+    private String selectedBookingType;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
     private Date dateToCreateBooking;
@@ -160,7 +162,7 @@ public class BookingManagedBean implements Serializable {
         createBookingIdx = 0;
         bookingSlotsToCreate = new ArrayList<>();
         consultationPurposeToCreateId = null;
-        consultationPurposes = consultationPurposeSessionBean.retrieveAllConsultationPurposes();
+        consultationPurposes = new ArrayList<>();
         publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         formTemplateHm = new HashMap<>();
@@ -168,6 +170,8 @@ public class BookingManagedBean implements Serializable {
         alreadyLinkedFormTemplates = new ArrayList<>();
         additionalFormTemplates = new ArrayList<>();
         bookingComment = null;
+        selectedBookingType = null;
+        bookingSlotToCreateId = null;
     }
 
     public void deleteBooking() {
@@ -290,6 +294,28 @@ public class BookingManagedBean implements Serializable {
         bookingSlotsToCreate = slotSessionBean.retrieveMedicalCentreBookingSlotsByDate(currentMedicalCentre.getMedicalCentreId(), dateToCreateBooking).stream()
                 .filter(bs -> bs.getStartDateTime().after(currentTime) && bs.getBooking() == null)
                 .collect(Collectors.toList());
+        
+        // @WK . Help Update this to filter base on slot type after you are done with booking slot functon update
+        if (selectedBookingType.equals("Pre-Medical Board Review")) {
+            bookingSlotsToCreate = new ArrayList<>();
+        } else if (selectedBookingType.equals("General Consultation")) {
+            
+        }
+    }
+
+    public void selectBookingType() {
+
+        if (selectedBookingType.equals("Pre-Medical Board Review")) {
+            this.consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveConsultationPurposes();
+        } else if (selectedBookingType.equals("General Consultation")) {
+            this.consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveNonReviewOnlyConsultationPurposes();
+        }
+
+        consultationPurposeToCreateId = null;
+        alreadyLinkedFormTemplates = new ArrayList<>();
+        additionalFormTemplates = new ArrayList<>();
+        selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
+
     }
 
     public void selectConsultationPurpose() {
@@ -311,7 +337,7 @@ public class BookingManagedBean implements Serializable {
                     .collect(Collectors.toList());
         }
     }
-
+    
     public void doFilterBookings() {
         // 1 - Day
         // 2 - Week
@@ -452,6 +478,7 @@ public class BookingManagedBean implements Serializable {
 
     public void setBookingSlotToCreateId(Long bookingSlotToCreateId) {
         this.bookingSlotToCreateId = bookingSlotToCreateId;
+        System.out.println(bookingSlotToCreateId + " < ");
     }
 
     public DateFormat getTimeFormat() {
@@ -564,6 +591,14 @@ public class BookingManagedBean implements Serializable {
 
     public void setIsEditBookingInformation(Boolean isEditBookingInformation) {
         this.isEditBookingInformation = isEditBookingInformation;
+    }
+
+    public String getSelectedBookingType() {
+        return selectedBookingType;
+    }
+
+    public void setSelectedBookingType(String selectedBookingType) {
+        this.selectedBookingType = selectedBookingType;
     }
 
 }

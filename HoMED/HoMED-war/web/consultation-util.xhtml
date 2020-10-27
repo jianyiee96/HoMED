@@ -52,6 +52,14 @@
                             <p:column headerText="Name" sortBy="#{consultationPurpose.consultationPurposeName}">
                                 <h:outputText value="#{consultationPurpose.consultationPurposeName}" />
                             </p:column>
+                            
+                            <p:column headerText="Consultation Type">
+                                <h:outputText class="consultation-status-badge review-only-#{consultationPurpose.reviewOnly}" value="#{consultationPurposeUtilityManagedBean.renderReview(consultationPurpose.reviewOnly)}" />
+                            </p:column>
+                            
+                            <p:column headerText="Status">
+                                <h:outputText class="consultation-status-badge is-active-#{consultationPurpose.isActive}" value="#{consultationPurposeUtilityManagedBean.renderIsActive(consultationPurpose.isActive)}" />
+                            </p:column>
 
                             <p:column style="text-align: center" exportable="false">
 
@@ -59,10 +67,19 @@
                                     <f:attribute name="consultationPurposeToView" value="#{consultationPurpose}" />
                                 </p:commandButton> 
 
-                                <p:commandButton class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-trash"  title="Delete" actionListener="#{consultationPurposeUtilityManagedBean.deleteConsultationPurpose}">
+                                <p:commandButton disabled="#{not consultationPurpose.isActive}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-key"  title="Toggle" actionListener="#{consultationPurposeUtilityManagedBean.toggleConsultationPurposeReviewOnly}">
+                                    <f:attribute name="consultationPurposeIdToToggle" value="#{consultationPurpose.consultationPurposeId}" />
+                                </p:commandButton> 
+                                
+                                <p:commandButton rendered="#{consultationPurpose.isActive}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-trash"  title="Delete" actionListener="#{consultationPurposeUtilityManagedBean.deleteConsultationPurpose}">
                                     <f:attribute name="consultationPurposeIdToDelete" value="#{consultationPurpose.consultationPurposeId}" />
                                     <p:confirm header="Delete Consultation Purpose" escape="false" message="Any linkage of Form Templates to [#{consultationPurpose.consultationPurposeName}] will be removed. &lt;br/&gt;Do you want to proceed?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton> 
+                                
+                                <p:commandButton rendered="#{not consultationPurpose.isActive}" class="rounded-button success-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-undo"  title="Restore" actionListener="#{consultationPurposeUtilityManagedBean.restoreConsultationPurpose}">
+                                    <f:attribute name="consultationPurposeIdToRestore" value="#{consultationPurpose.consultationPurposeId}" />
+                                </p:commandButton> 
+                                
                             </p:column>
                         </p:dataTable>    
                     </div>
@@ -82,7 +99,7 @@
                             <h3>#{consultationPurposeUtilityManagedBean.selectedConsultationPurpose.consultationPurposeName}</h3>
 
                             <p:pickList id="pickList" value="#{consultationPurposeUtilityManagedBean.dualListFormTemplates}" converter="formTemplateConverter" var="ft" itemLabel="#{ft}" itemValue="#{ft}"
-                                        effect="fade" responsive="true">
+                                        effect="fade" responsive="true" disabled="#{not consultationPurposeUtilityManagedBean.selectedConsultationPurpose.isActive}">
                                 <f:facet name="sourceCaption">Form Templates that are not linked</f:facet>
                                 <f:facet name="targetCaption">Linked Form Templates</f:facet>
                                 <p:ajax event="transfer" listener="#{consultationPurposeUtilityManagedBean.onTransfer}" update="editorForm" />
