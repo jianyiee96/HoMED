@@ -295,7 +295,7 @@ public class BookingManagedBean implements Serializable {
                 .filter(bs -> bs.getStartDateTime().after(currentTime) && bs.getBooking() == null)
                 .collect(Collectors.toList());
         
-        // @WeeKeat . Help Update this to filter base on slot type after you are done with booking slot functon update
+        // @WK . Help Update this to filter base on slot type after you are done with booking slot functon update
         if (selectedBookingType.equals("Pre-Medical Board Review")) {
             bookingSlotsToCreate = new ArrayList<>();
         } else if (selectedBookingType.equals("General Consultation")) {
