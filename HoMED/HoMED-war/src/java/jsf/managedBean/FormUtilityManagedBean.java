@@ -28,6 +28,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import jsf.classes.FormFieldWrapper;
 import org.primefaces.PrimeFaces;
+import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
 import util.exceptions.CreateFormTemplateException;
@@ -288,6 +289,10 @@ public class FormUtilityManagedBean implements Serializable {
 
     }
 
+    public FormFieldAccessEnum[] getFormFieldAccess() {
+        return FormFieldAccessEnum.values();
+    }
+    
     public InputTypeEnum[] getInputTypes() {
         return InputTypeEnum.values();
     }

@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.InputTypeEnum;
 
 /**
@@ -42,30 +43,30 @@ public class FormField implements Serializable {
     @Column
     private InputTypeEnum inputType;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private FormFieldAccessEnum formFieldAccess;
+
     @Column(nullable = false)
     @NotNull(message = "isRequired must not be null")
     private Boolean isRequired;
-
-    @Column(nullable = false)
-    @NotNull(message = "isServicemanEditable must not be null")
-    private Boolean isServicemanEditable;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FormFieldOption> formFieldOptions;
 
     public FormField() {
+        this.formFieldAccess = FormFieldAccessEnum.SERVICEMAN;
         this.isRequired = false;
-        this.isServicemanEditable = false;
         this.formFieldOptions = new ArrayList<>();
         this.position = 1;
     }
 
-    public FormField(String question, Integer position, InputTypeEnum inputType, Boolean isRequired, Boolean isServicemanEditable, List<FormFieldOption> formFieldOptions) {
+    public FormField(String question, Integer position, InputTypeEnum inputType, Boolean isRequired, FormFieldAccessEnum formFieldAccess, List<FormFieldOption> formFieldOptions) {
         this.question = question;
         this.position = position;
         this.inputType = inputType;
         this.isRequired = isRequired;
-        this.isServicemanEditable = isServicemanEditable;
+        this.formFieldAccess = formFieldAccess;
         if (formFieldOptions == null) {
             this.formFieldOptions = new ArrayList<>();
         } else {
@@ -105,20 +106,24 @@ public class FormField implements Serializable {
         this.inputType = inputType;
     }
 
+    public FormFieldAccessEnum getFormFieldAccess() {
+        return formFieldAccess;
+    }
+
+    public void setFormFieldAccess(FormFieldAccessEnum formFieldAccess) {
+        this.formFieldAccess = formFieldAccess;
+    }
+    
+    public Boolean getIsServicemanEditable(){
+        return this.formFieldAccess == FormFieldAccessEnum.SERVICEMAN || this.formFieldAccess == FormFieldAccessEnum.SERVICEMAN_MO;
+    }
+
     public Boolean getIsRequired() {
         return isRequired;
     }
 
     public void setIsRequired(Boolean isRequired) {
         this.isRequired = isRequired;
-    }
-
-    public Boolean getIsServicemanEditable() {
-        return isServicemanEditable;
-    }
-
-    public void setIsServicemanEditable(Boolean isServicemanEditable) {
-        this.isServicemanEditable = isServicemanEditable;
     }
 
     public List<FormFieldOption> getFormFieldOptions() {

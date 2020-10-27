@@ -93,10 +93,10 @@
                                     <div class="p-grid">
                                         <div class="p-col-12">
                                             <p:outputLabel style="margin-left: -35px;" class="form-status-badge consultation-badge" value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.position}"/>
-                                            <p:outputLabel rendered="#{not formInstanceFieldWrapper.formInstanceField.formFieldMapping.isServicemanEditable and formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType != 'HEADER'}"
-                                                           class="form-status-badge privacy-private" value="Doctor"/>
+                                            <p:outputLabel rendered="#{formInstanceFieldWrapper.renderAccessLabel() and formInstanceFieldWrapper.formInstanceField.formFieldMapping.inputType != 'HEADER'}"
+                                                           class="form-status-badge privacy-private" value="#{formInstanceFieldWrapper.formInstanceField.formFieldMapping.formFieldAccess.text}"/>
                                             <p:commandButton styleClass="rounded-button outlined-button p-mr-2 p-mb-2" icon="pi pi-#{formInstanceFieldWrapper.isEditable ? 'unlock' : 'lock'}" style="float: right;" process="@this" update="panelGroupItem"
-                                                             title="#{formInstanceFieldWrapper.isEditable ? 'Lock' : 'Unlock'}" rendered ="#{not manageFormInstanceManagedBean.isViewState and formInstanceFieldWrapper.formInstanceField.formFieldMapping.isServicemanEditable}">
+                                                             title="#{formInstanceFieldWrapper.isEditable ? 'Lock' : 'Unlock'}" rendered ="#{not manageFormInstanceManagedBean.isViewState and formInstanceFieldWrapper.renderLock()}">
                                                 <p:confirm disabled="#{not formInstanceFieldWrapper.isEditable}" header="Lock Field" message="Locking this field will revert any edits to its original state. Are you sure?" icon="pi pi-exclamation-triangle" />
                                                 <f:setPropertyActionListener target="#{formInstanceFieldWrapper.isEditable}" value="#{not formInstanceFieldWrapper.isEditable}"/>
                                             </p:commandButton>

@@ -97,7 +97,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             newFF.setFormFieldOptions(newFFOs);
             newFF.setInputType(ff.getInputType());
             newFF.setIsRequired(ff.getIsRequired());
-            newFF.setIsServicemanEditable(ff.getIsServicemanEditable());
+            newFF.setFormFieldAccess(ff.getFormFieldAccess());
             newFF.setPosition(ff.getPosition());
             newFF.setQuestion(ff.getQuestion());
             em.persist(newFF);
