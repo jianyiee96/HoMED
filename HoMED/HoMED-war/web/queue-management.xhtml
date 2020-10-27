@@ -40,7 +40,7 @@
                         <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{queueManagementManagedBean.waitingConsultations}" rowIndexVar="index"
                                      rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{queueManagementManagedBean.selectedConsultation}"
                                      styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.joinQueueDateTime}"
-                                     scrollable="true" scrollHeight="300">
+                                     scrollable="true" scrollHeight="500">
                             <p:ajax event="rowSelect" update="queueForm" process="@this"/>
 
                             <f:facet name="header">

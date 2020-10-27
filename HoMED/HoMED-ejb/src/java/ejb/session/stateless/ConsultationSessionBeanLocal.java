@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.Consultation;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.CreateConsultationException;
@@ -44,5 +45,10 @@ public interface ConsultationSessionBeanLocal {
     public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId);
 
     public void deferConsultation(Long consultationId, String remarks, String remarksForServiceman) throws DeferConsultationException;
+
+    public void startConsultationByInit(Long consultationId, Long medicalOfficerId, Date startDate) throws StartConsultationException;
+
+    public void endConsultationByInit(Long consultationId, String remarks, String remarksForServiceman, Date endDate) throws EndConsultationException;
+
 
 }

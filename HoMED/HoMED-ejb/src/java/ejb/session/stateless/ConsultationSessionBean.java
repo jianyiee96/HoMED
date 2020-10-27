@@ -90,6 +90,38 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
     }
     
     @Override
+    public void startConsultationByInit(Long consultationId, Long medicalOfficerId, Date startDate) throws StartConsultationException {
+
+        Consultation consultation = retrieveConsultationById(consultationId);
+        MedicalOfficer medicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(medicalOfficerId);
+
+        if (consultation == null) {
+            throw new StartConsultationException("Invalid Consultation Id");
+        } else if (consultation.getConsultationStatusEnum() != ConsultationStatusEnum.WAITING) {
+            throw new StartConsultationException("Invalid Consultation Status: Consultation is not in WAITING status");
+        } else if (medicalOfficer == null) {
+            throw new StartConsultationException("Invalid MedicalOfficer Id");
+        } else if (medicalOfficer.getCurrentConsultation() != null) {
+            throw new StartConsultationException("Unable to start Consultation: Medical Officer has a current consultation");
+        } else if (medicalOfficer.getMedicalCentre() == null) {
+            throw new StartConsultationException("Unable to start Consultation: Medical Officer is not attached to medical centre");
+        } else if (!medicalOfficer.getMedicalCentre().equals(consultation.getBooking().getBookingSlot().getMedicalCentre())) {
+            throw new StartConsultationException("Unable to start Consultation: Medical Officer's attached medical centre does not match with booking medical centre");
+        }
+
+        try {
+            // DIFFERENCE - To create a custom start date
+//            consultation.setStartDateTime(new Date());
+            consultation.setStartDateTime(startDate);
+            consultation.setConsultationStatusEnum(ConsultationStatusEnum.ONGOING);
+            consultation.setMedicalOfficer(medicalOfficer);
+            medicalOfficer.setCurrentConsultation(consultation);
+        } catch (Exception ex) {
+            throw new StartConsultationException("Unknown exception: " + ex.getMessage());
+        }
+    }
+    
+    @Override
     public void deferConsultation(Long consultationId, String remarks, String remarksForServiceman) throws DeferConsultationException {
         Consultation consultation = retrieveConsultationById(consultationId);
         if (consultation == null) {
@@ -129,6 +161,35 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         }
         try {
             consultation.setEndDateTime(new Date());
+            consultation.setConsultationStatusEnum(ConsultationStatusEnum.COMPLETED);
+            consultation.getMedicalOfficer().setCurrentConsultation(null);
+            consultation.getMedicalOfficer().getCompletedConsultations().add(consultation);
+            consultation.setRemarks(remarks);
+            consultation.setRemarksForServiceman(remarksForServiceman);
+        } catch (Exception ex) {
+            throw new EndConsultationException("Unknown exception: " + ex.getMessage());
+        }
+
+    }
+    
+    @Override
+    public void endConsultationByInit(Long consultationId, String remarks, String remarksForServiceman, Date endDate) throws EndConsultationException {
+        Consultation consultation = retrieveConsultationById(consultationId);
+        if (consultation == null) {
+            throw new EndConsultationException("Invalid Consultation Id");
+        } else if (consultation.getConsultationStatusEnum() != ConsultationStatusEnum.ONGOING) {
+            throw new EndConsultationException("Invalid Consultation Status: Consultation is not in ONGOING status");
+        }
+
+        for (FormInstance fi : consultation.getBooking().getFormInstances()) {
+            if (fi.getSignedBy() == null) {
+                throw new EndConsultationException("Unable to end Consultation: All form instances are required to be signed by attending medical officer");
+            }
+        }
+        try {
+            // DIFFERENCE - To create a custom end date
+//            consultation.setEndDateTime(new Date());
+            consultation.setEndDateTime(endDate);
             consultation.setConsultationStatusEnum(ConsultationStatusEnum.COMPLETED);
             consultation.getMedicalOfficer().setCurrentConsultation(null);
             consultation.getMedicalOfficer().getCompletedConsultations().add(consultation);
