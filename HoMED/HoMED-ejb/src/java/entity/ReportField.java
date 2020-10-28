@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.FilterDateType;
+import util.enumeration.ReportDataType;
+import util.enumeration.ReportDataValue;
 import util.enumeration.ReportFieldType;
 
 @Entity
@@ -43,7 +45,7 @@ public class ReportField implements Serializable {
     private ReportFieldType type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column(nullable = false)
     private FilterDateType filterDateType;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -54,10 +56,19 @@ public class ReportField implements Serializable {
     @Column(nullable = true)
     private Date filterEndDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ReportDataType reportDataType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ReportDataValue reportDataValue;
+
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReportFieldGroup> reportFieldGroups;
 
     public ReportField() {
+        this.filterDateType = FilterDateType.NONE;
         this.reportFieldGroups = new ArrayList<>();
     }
 
@@ -143,6 +154,30 @@ public class ReportField implements Serializable {
             result = year.format(filterStartDate);
         }
         return result;
+    }
+
+    public FilterDateType getFilterDateType() {
+        return filterDateType;
+    }
+
+    public void setFilterDateType(FilterDateType filterDateType) {
+        this.filterDateType = filterDateType;
+    }
+
+    public ReportDataType getReportDataType() {
+        return reportDataType;
+    }
+
+    public void setReportDataType(ReportDataType reportDataType) {
+        this.reportDataType = reportDataType;
+    }
+
+    public ReportDataValue getReportDataValue() {
+        return reportDataValue;
+    }
+
+    public void setReportDataValue(ReportDataValue reportDataValue) {
+        this.reportDataValue = reportDataValue;
     }
 
     @Override

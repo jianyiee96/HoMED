@@ -59,7 +59,7 @@ public class Report implements Serializable {
     private ReportStatusEnum reportStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column(nullable = false)
     private FilterDateType filterDateType;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -78,6 +78,7 @@ public class Report implements Serializable {
     private Employee employee;
 
     public Report() {
+        this.filterDateType = FilterDateType.NONE;
         this.dateCreated = new Date();
         this.lastModified = new Date();
         this.reportStatus = ReportStatusEnum.PERSONAL;
