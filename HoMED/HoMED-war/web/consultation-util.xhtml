@@ -53,10 +53,6 @@
                                 <h:outputText value="#{consultationPurpose.consultationPurposeName}" />
                             </p:column>
                             
-                            <p:column headerText="Consultation Type">
-                                <h:outputText class="consultation-status-badge review-only-#{consultationPurpose.reviewOnly}" value="#{consultationPurposeUtilityManagedBean.renderReview(consultationPurpose.reviewOnly)}" />
-                            </p:column>
-                            
                             <p:column headerText="Status">
                                 <h:outputText class="consultation-status-badge is-active-#{consultationPurpose.isActive}" value="#{consultationPurposeUtilityManagedBean.renderIsActive(consultationPurpose.isActive)}" />
                             </p:column>
@@ -65,10 +61,6 @@
 
                                 <p:commandButton class="rounded-button info-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes"  icon="pi pi-search" title="View" actionListener="#{consultationPurposeUtilityManagedBean.selectConsultationPurpose}">
                                     <f:attribute name="consultationPurposeToView" value="#{consultationPurpose}" />
-                                </p:commandButton> 
-
-                                <p:commandButton disabled="#{not consultationPurpose.isActive}" class="rounded-button help-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-key"  title="Toggle" actionListener="#{consultationPurposeUtilityManagedBean.toggleConsultationPurposeReviewOnly}">
-                                    <f:attribute name="consultationPurposeIdToToggle" value="#{consultationPurpose.consultationPurposeId}" />
                                 </p:commandButton> 
                                 
                                 <p:commandButton rendered="#{consultationPurpose.isActive}" class="rounded-button danger-button" style="margin: 3px" update="@form editorForm formAllConsultationPurposes" icon="pi pi-trash"  title="Delete" actionListener="#{consultationPurposeUtilityManagedBean.deleteConsultationPurpose}">

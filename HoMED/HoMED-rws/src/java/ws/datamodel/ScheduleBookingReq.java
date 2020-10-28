@@ -10,15 +10,17 @@ public class ScheduleBookingReq {
     Long consultationPurposeId;
     Long bookingSlotId;
     String bookingComment;
+    Boolean isForReview;
 
     public ScheduleBookingReq() {
     }
 
-    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) {
+    public ScheduleBookingReq(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) {
         this.servicemanId = servicemanId;
         this.consultationPurposeId = consultationPurposeId;
         this.bookingSlotId = bookingSlotId;
         this.bookingComment = bookingComment;
+        this.isForReview = isForReview;
     }
 
     public Long getServicemanId() {
@@ -51,6 +53,14 @@ public class ScheduleBookingReq {
 
     public void setBookingComment(String bookingComment) {
         this.bookingComment = bookingComment;
+    }
+
+    public Boolean getIsForReview() {
+        return isForReview;
+    }
+
+    public void setIsForReview(Boolean isForReview) {
+        this.isForReview = isForReview;
     }
 
 }

@@ -311,7 +311,7 @@ public class DataInitializationSessionBean {
 //          && isAfterToday
             if (Math.random() <= rate) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
-                Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.");
+                Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.", Boolean.FALSE);
                 bookings.add(booking);
 
                 int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;

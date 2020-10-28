@@ -127,16 +127,6 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
     }
 
     @Override
-    public List<ConsultationPurpose> retrieveAllActiveNonReviewOnlyConsultationPurposes() {
-        Query query = em.createQuery("SELECT c FROM ConsultationPurpose c WHERE c.isActive = TRUE AND c.reviewOnly = FALSE");
-        List<ConsultationPurpose> cps = query.getResultList();
-        for (ConsultationPurpose cp : cps) {
-            cp.getFormTemplates().size();
-        }
-        return cps;
-    }
-
-    @Override
     public List<ConsultationPurpose> retrieveAllFormTemplateLinkedConsultationPurposes(Long id) {
         Query query = em.createQuery("SELECT distinct c FROM ConsultationPurpose c JOIN c.formTemplates ft WHERE ft.formTemplateId = :id");
         query.setParameter("id", id);
@@ -169,14 +159,6 @@ public class ConsultationPurposeSessionBean implements ConsultationPurposeSessio
 
         ConsultationPurpose cp = retrieveConsultationPurpose(id);
         cp.setIsActive(Boolean.TRUE);
-
-    }
-
-    @Override
-    public void toggleConsultationPurposeReviewOnly(Long id) {
-
-        ConsultationPurpose cp = retrieveConsultationPurpose(id);
-        cp.setReviewOnly(!cp.getReviewOnly());
 
     }
 

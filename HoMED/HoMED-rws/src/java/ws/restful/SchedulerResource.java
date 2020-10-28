@@ -111,8 +111,12 @@ public class SchedulerResource {
         }
 
         try {
-
-            Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment());
+            Boolean isForReview = Boolean.FALSE;
+            if(scheduleBookingReq.getIsForReview() != null) {
+                isForReview = scheduleBookingReq.getIsForReview();
+            }
+            
+            Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment(), isForReview);
             Long bookingId = booking.getBookingId();
             return Response.status(Response.Status.OK).entity(new ScheduleBookingRsp(bookingId)).build();
 

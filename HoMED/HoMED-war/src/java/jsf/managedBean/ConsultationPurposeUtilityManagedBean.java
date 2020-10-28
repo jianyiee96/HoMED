@@ -106,22 +106,6 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully activate consultation purpose!", "Database has been updated."));
     }
 
-    public void toggleConsultationPurposeReviewOnly(ActionEvent event) {
-        Long consultationPurposeId = (Long) event.getComponent().getAttributes().get("consultationPurposeIdToToggle");
-        consultationPurposeSessionBeanLocal.toggleConsultationPurposeReviewOnly(consultationPurposeId);
-
-        this.consultationPurposes = consultationPurposeSessionBeanLocal.retrieveAllConsultationPurposes();
-        this.allFormTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
-        
-        for (ConsultationPurpose cp : this.consultationPurposes) {
-            if (cp.getConsultationPurposeId().equals(consultationPurposeId)) {
-                this.setSelectedConsultationPurpose(cp);
-                break;
-            }
-        }
-        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("ConsultationPurposeUtilityManagedBean.allFormTemplates", allFormTemplates);
-    }
-
     public void selectConsultationPurpose(ActionEvent event) {
         selectedConsultationPurpose = (ConsultationPurpose) event.getComponent().getAttributes().get("consultationPurposeToView");
         setSelectedConsultationPurpose(selectedConsultationPurpose);
@@ -194,12 +178,5 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
         }
     }
 
-    public String renderReview(boolean value) {
-        if (value) {
-            return "Review Only";
-        } else {
-            return "Any Consultation";
-        }
-    }
 
 }
