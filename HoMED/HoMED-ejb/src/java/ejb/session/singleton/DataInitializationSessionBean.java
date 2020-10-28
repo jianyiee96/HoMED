@@ -703,13 +703,13 @@ public class DataInitializationSessionBean {
         formFieldOptions.add(new FormFieldOption("YES"));
         formFieldOptions.add(new FormFieldOption("NO"));
         formFields.add(new FormField("Have you ever had chicken pox before or had the Varicella vaccine", 8, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, formFieldOptions));
-        formFields.add(new FormField("Vaccine to be given: Seasonal Flu", 9, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Vaccine to be given: Tetanus", 10, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Vaccine to be given: Hepatitis B", 11, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Vaccine to be given: Hepatitis A", 12, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Vaccine to be given: Typhoid", 13, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Vaccine to be given: Varicella", 14, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN_MO, null));
+        formFields.add(new FormField("Vaccine to be given: Seasonal Flu", 9, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("Vaccine to be given: Tetanus", 10, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("Vaccine to be given: Hepatitis B", 11, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("Vaccine to be given: Hepatitis A", 12, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("Vaccine to be given: Typhoid", 13, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("Vaccine to be given: Varicella", 14, InputTypeEnum.DATE, Boolean.FALSE, FormFieldAccessEnum.MO, null));
+        formFields.add(new FormField("If others, please specify:", 15, InputTypeEnum.TEXT, Boolean.FALSE, FormFieldAccessEnum.MO, null));
 
         otherFormTemplate.setFormFields(formFields);
         otherFormTemplate.setDeclaration("I certify that I have answered the above questionnaire to the best of my knowledge.");
