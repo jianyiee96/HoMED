@@ -19,7 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-import org.jboss.weld.context.bound.Bound;
 import util.enumeration.BookingStatusEnum;
 
 @Entity
