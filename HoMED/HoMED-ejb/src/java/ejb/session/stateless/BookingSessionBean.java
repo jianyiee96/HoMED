@@ -67,7 +67,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
     
     @Override
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException {
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException {
 
         try {
 
@@ -89,7 +89,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 bookingComment = "";
             }
 
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment);
+            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment, isForReview);
 
             bookingSlot.setBooking(newBooking);
             serviceman.getBookings().add(newBooking);
@@ -122,7 +122,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     
     @Override
     // TO SUPPORT INIT CREATE OF HISTORICAL DATA
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException {
+    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException {
 
         try {
 
@@ -146,7 +146,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 bookingComment = "";
             }
 
-            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment);
+            Booking newBooking = new Booking(serviceman, consultationPurpose, bookingSlot, bookingComment, isForReview);
 
             bookingSlot.setBooking(newBooking);
             serviceman.getBookings().add(newBooking);
@@ -178,10 +178,10 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment) throws CreateBookingException {
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment, Boolean isForReview) throws CreateBookingException {
 
         try {
-            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment);
+            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment, isForReview);
             if (!additionalFormTemplateIds.isEmpty()) {
                 attachFormInstancesByClerk(newBooking.getBookingSlot().getSlotId(), additionalFormTemplateIds);
             }

@@ -350,15 +350,6 @@
 
                     <h:panelGroup id="panelForms" rendered="#{bookingManagedBean.createBookingIdx == 1}">
                         <div class="p-grid p-formgrid ui-fluid">
-                            <div class="p-field p-col-12">
-                                <i class="fa fa-tag p-mx-2"/>
-                                <p:outputLabel for="view-booking-type" value="Booking Type: " indicateRequired="false"/>
-                                <p:selectOneRadio id="view-booking-type" value="#{bookingManagedBean.selectedBookingType}" required="true" onchange="PF('dialogCreateBooking').initPosition()">
-                                    <f:selectItem itemValue="Pre-Medical Board Review" itemLabel="Pre-Medical Board Review"/>
-                                    <f:selectItem itemValue="General Consultation" itemLabel="General Consultation"/>
-                                    <p:ajax event="valueChange" listener="#{bookingManagedBean.selectBookingType}" update="panelForms" oncomplete="PF('dialogCreateBooking').initPosition()"/>
-                                </p:selectOneRadio>
-                            </div>
                             <div class="p-field  p-col-12">
                                 <i class="pi pi-list p-mx-2"/>
                                 <p:outputLabel for="view-consultationPurpose" value="Select Consultation Purpose:"  class="p-mr-2"/>
@@ -399,6 +390,15 @@
                                 <p:inputText id="input-comment" disabled="#{bookingManagedBean.consultationPurposeToCreateId eq null}" value="#{bookingManagedBean.bookingComment}"></p:inputText>
 
                             </div>
+                            <div class="p-field p-col-12">
+                                <i class="fa fa-tag p-mx-2"/>
+                                <p:outputLabel for="view-booking-type" value="Medical Review Type: " indicateRequired="false"/>
+                                <p:selectOneRadio id="view-booking-type" value="#{bookingManagedBean.selectedBookingType}" required="true" onchange="PF('dialogCreateBooking').initPosition()">
+                                    <f:selectItem itemValue="Pre-Medical Board Review" itemLabel="Pre-Medical Board Review"/>
+                                    <f:selectItem itemValue="General Consultation" itemLabel="General Consultation"/>
+                                    <p:ajax event="valueChange" update="panelForms" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                </p:selectOneRadio>
+                            </div>
                         </div>
                     </h:panelGroup>
 
@@ -422,7 +422,7 @@
                                     <p:ajax event="itemSelect" update="panelForms panelButtons" oncomplete="PF('dialogCreateBooking').initPosition()"/>
                                     <f:facet name="footer">
                                         <p:separator />
-                                        <h:outputText value="#{bookingManagedBean.bookingSlotsToCreate.size()} available slots for #{bookingManagedBean.selectedBookingType}" style="font-weight:bold;"/>
+                                        <h:outputText value="#{bookingManagedBean.bookingSlotsToCreate.size()} available slots" style="font-weight:bold;"/>
                                     </f:facet>
                                 </p:selectOneMenu>
                                 <p:message class="error-message" for="view-bookingSlot" />

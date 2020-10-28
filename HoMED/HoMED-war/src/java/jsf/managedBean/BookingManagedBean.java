@@ -162,7 +162,7 @@ public class BookingManagedBean implements Serializable {
         createBookingIdx = 0;
         bookingSlotsToCreate = new ArrayList<>();
         consultationPurposeToCreateId = null;
-        consultationPurposes = new ArrayList<>();
+        consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveConsultationPurposes();
         publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         formTemplateHm = new HashMap<>();
@@ -243,7 +243,10 @@ public class BookingManagedBean implements Serializable {
 
     public void createBooking() {
         try {
-            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment);
+            
+            boolean isForReview = this.selectedBookingType.equals("Pre-Medical Board Review");
+            
+            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment, isForReview);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created " + booking));
             initBookingSlots();
@@ -294,28 +297,6 @@ public class BookingManagedBean implements Serializable {
         bookingSlotsToCreate = slotSessionBean.retrieveMedicalCentreBookingSlotsByDate(currentMedicalCentre.getMedicalCentreId(), dateToCreateBooking).stream()
                 .filter(bs -> bs.getStartDateTime().after(currentTime) && bs.getBooking() == null)
                 .collect(Collectors.toList());
-        
-        // @WK . Help Update this to filter base on slot type after you are done with booking slot functon update
-        if (selectedBookingType.equals("Pre-Medical Board Review")) {
-            bookingSlotsToCreate = new ArrayList<>();
-        } else if (selectedBookingType.equals("General Consultation")) {
-            
-        }
-    }
-
-    public void selectBookingType() {
-
-        if (selectedBookingType.equals("Pre-Medical Board Review")) {
-            this.consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveConsultationPurposes();
-        } else if (selectedBookingType.equals("General Consultation")) {
-            this.consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveNonReviewOnlyConsultationPurposes();
-        }
-
-        consultationPurposeToCreateId = null;
-        alreadyLinkedFormTemplates = new ArrayList<>();
-        additionalFormTemplates = new ArrayList<>();
-        selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
-
     }
 
     public void selectConsultationPurpose() {

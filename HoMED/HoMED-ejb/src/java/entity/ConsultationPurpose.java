@@ -44,13 +44,8 @@ public class ConsultationPurpose implements Serializable {
     @NotNull
     private Boolean isActive;
     
-    @Column(nullable = false)
-    @NotNull
-    private Boolean reviewOnly;
-    
     public ConsultationPurpose() {
-        reviewOnly = Boolean.FALSE;
-        isActive = Boolean.FALSE;
+        isActive = Boolean.TRUE;
         formTemplates = new ArrayList<>();
         bookings = new ArrayList<>();
     }
@@ -98,14 +93,6 @@ public class ConsultationPurpose implements Serializable {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public Boolean getReviewOnly() {
-        return reviewOnly;
-    }
-
-    public void setReviewOnly(Boolean reviewOnly) {
-        this.reviewOnly = reviewOnly;
     }
 
     @Override

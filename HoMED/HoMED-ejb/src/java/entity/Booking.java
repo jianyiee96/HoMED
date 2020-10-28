@@ -18,6 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+import org.jboss.weld.context.bound.Bound;
 import util.enumeration.BookingStatusEnum;
 
 @Entity
@@ -54,18 +56,24 @@ public class Booking implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column
     private BookingStatusEnum bookingStatusEnum;
+    
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isForReview;
 
     public Booking() {
+        this.isForReview = Boolean.FALSE;
         this.formInstances = new ArrayList<>();
         this.bookingStatusEnum = BookingStatusEnum.UPCOMING;
     }
 
-    public Booking(Serviceman serviceman, ConsultationPurpose consultationPurpose, BookingSlot bookingSlot, String bookingComment) {
+    public Booking(Serviceman serviceman, ConsultationPurpose consultationPurpose, BookingSlot bookingSlot, String bookingComment, Boolean isForReview) {
         this();
         this.serviceman = serviceman;
         this.consultationPurpose = consultationPurpose;
         this.bookingSlot = bookingSlot;
         this.bookingComment = bookingComment;
+        this.isForReview = isForReview;
     }
 
     public Long getBookingId() {
@@ -138,6 +146,14 @@ public class Booking implements Serializable {
 
     public void setBookingStatusEnum(BookingStatusEnum bookingStatusEnum) {
         this.bookingStatusEnum = bookingStatusEnum;
+    }
+
+    public Boolean getIsForReview() {
+        return isForReview;
+    }
+
+    public void setIsForReview(Boolean isForReview) {
+        this.isForReview = isForReview;
     }
 
     @Override
