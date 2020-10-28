@@ -31,8 +31,13 @@
                                 <div class="p-grid">
                                     <div class="p-col-12">
                                         <p:outputLabel style="margin-left: -35px;" class="form-status-badge consultation-badge" value="#{formField.position}"/>
-                                        <p:outputLabel rendered="#{not formField.isServicemanEditable and formField.inputType != 'HEADER'}"
-                                                       class="form-status-badge privacy-private" value="Doctor"/>
+                                        
+
+                                        <p:outputLabel rendered="#{formField.formFieldAccess == 'MO' and formField.inputType != 'HEADER'}"
+                                                       class="form-status-badge privacy-private" value="Medical Officer"/>
+                                        <p:outputLabel rendered="#{formField.formFieldAccess == 'BOARD' and formField.inputType != 'HEADER'}"
+                                                       class="form-status-badge privacy-private" value="Medical Board"/>
+                                        
                                         <p:outputLabel id="btnInputType" value="#{formField.inputType.inputTypeString}"
                                                        title="#{formField.inputType.description}"
                                                        styleClass="tooltip-btn" style="float: right"/>
