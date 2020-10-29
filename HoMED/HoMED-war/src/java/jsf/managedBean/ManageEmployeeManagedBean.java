@@ -5,12 +5,12 @@ import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Employee;
 import entity.MedicalCentre;
+import entity.MedicalOfficer;
 import entity.MedicalStaff;
 import entity.Serviceman;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -26,6 +26,7 @@ import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateEmployeeException;
+import util.exceptions.UpdateMedicalOfficerChairmanStatusException;
 
 @Named(value = "manageEmployeeManagedBean")
 @ViewScoped
@@ -52,6 +53,7 @@ public class ManageEmployeeManagedBean implements Serializable {
     private HashMap<Long, MedicalCentre> medicalCentresHm;
 
     private Long medicalCentreId;
+    private Boolean isMedicalOfficerChairman;
 
     private Boolean isAdminView;
     private Boolean isEditMode;
@@ -86,6 +88,7 @@ public class ManageEmployeeManagedBean implements Serializable {
     private void init() {
         // Wee Keat to Bryan: Added this to ensure the ID is refreshed whenever a new employee is selected.
         this.medicalCentreId = null;
+        this.isMedicalOfficerChairman = null;
         this.isHideAdminPanel = false;
         this.servicemanToCopy = null;
     }
@@ -106,14 +109,23 @@ public class ManageEmployeeManagedBean implements Serializable {
     public void doCreate() {
         try {
             employeeSessionBean.createEmployee(employeeToView);
+
+            // Added this to retrieve the newly created Employee
+            employeeToView = employeeSessionBean.retrieveEmployeeByEmail(employeeToView.getEmail());
+
             if (employeeToView instanceof MedicalStaff) {
                 employeeSessionBean.assignMedicalStaffToMedicalCentre(employeeToView.getEmployeeId(), medicalCentreId);
+            }
+            if (employeeToView instanceof MedicalOfficer) {
+                employeeSessionBean.updateMedicalOfficerChairmanStatus(employeeToView.getEmployeeId(), isMedicalOfficerChairman);
             }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully created Employee! Please inform employee that OTP has been sent to their email.", null));
             this.isHideAdminPanel = true;
             this.isEditMode = false;
-        } catch (CreateEmployeeException | AssignMedicalStaffToMedicalCentreException ex) {
+        } catch (CreateEmployeeException | AssignMedicalStaffToMedicalCentreException | UpdateMedicalOfficerChairmanStatusException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+        } catch (EmployeeNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unexpected errors occurred. Please contact System Admin!", null));
         }
     }
 
@@ -123,9 +135,12 @@ public class ManageEmployeeManagedBean implements Serializable {
             if (employeeToView instanceof MedicalStaff) {
                 employeeSessionBean.assignMedicalStaffToMedicalCentre(employeeToView.getEmployeeId(), medicalCentreId);
             }
+            if (employeeToView instanceof MedicalOfficer) {
+                employeeSessionBean.updateMedicalOfficerChairmanStatus(employeeToView.getEmployeeId(), isMedicalOfficerChairman);
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully updated employee!", null));
             this.isEditMode = false;
-        } catch (UpdateEmployeeException | AssignMedicalStaffToMedicalCentreException ex) {
+        } catch (UpdateEmployeeException | AssignMedicalStaffToMedicalCentreException | UpdateMedicalOfficerChairmanStatusException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
         }
     }
@@ -192,6 +207,9 @@ public class ManageEmployeeManagedBean implements Serializable {
                 this.medicalCentreId = mc.getMedicalCentreId();
             }
         }
+        if (employeeToView instanceof MedicalOfficer) {
+            this.isMedicalOfficerChairman = ((MedicalOfficer) employeeToView).getIsChairman();
+        }
         this.employeeToView = employeeToView;
     }
 
@@ -237,6 +255,14 @@ public class ManageEmployeeManagedBean implements Serializable {
 
     public void setMedicalCentreId(Long medicalCentreId) {
         this.medicalCentreId = medicalCentreId;
+    }
+
+    public Boolean getIsMedicalOfficerChairman() {
+        return isMedicalOfficerChairman;
+    }
+
+    public void setIsMedicalOfficerChairman(Boolean isMedicalOfficerChairman) {
+        this.isMedicalOfficerChairman = isMedicalOfficerChairman;
     }
 
     public List<MedicalCentre> getMedicalCentres() {

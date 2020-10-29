@@ -21,6 +21,7 @@ import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
+import util.exceptions.UpdateMedicalOfficerChairmanStatusException;
 
 /**
  *
@@ -60,5 +61,7 @@ public interface EmployeeSessionBeanLocal {
     public Employee updateEmployeeMatchingAccount(Serviceman serviceman, String newEmail, String hashPassword, Boolean isActivated);
 
     public void assignMedicalStaffToMedicalCentre(Long employeeId, Long medicalCentreId) throws AssignMedicalStaffToMedicalCentreException;
+
+    public void updateMedicalOfficerChairmanStatus(Long employeeId, Boolean isMedicalOfficerChairman) throws UpdateMedicalOfficerChairmanStatusException;
 
 }

@@ -30,7 +30,7 @@
 
         <h:form id="formManageEmployee">
             <p:dialog id="dialogManageEmployee" widgetVar="dialogManageEmployee" header="#{manageEmployeeManagedBean.isCreateState ? 'Create Employee' : 'Employee Details'}" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageEmployee').initPosition()"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageEmployee').initPosition()" position="center top"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">
@@ -48,6 +48,7 @@
                                     <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
                                         <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
                                             <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
+                                            <p:ajax event="valueChange" update="@this panelGroupAttachedMedicalCentre panelGroupMedicalOfficerChairmanStatus" oncomplete="PF('dialogManageEmployee').show()" />
                                         </p:selectOneMenu>
                                     </ui:fragment>
                                 </div>
@@ -154,25 +155,48 @@
                             </div>
                         </div>
 
-                        <ui:fragment rendered="#{manageEmployeeManagedBean.employeeToView.role != 'SUPER_USER'}">
-                            <div class="p-col-12">
-                                <div class="card ui-fluid">
-                                    <h5>Attached Medical Centre</h5>
-                                    <div class="p-formgrid p-grid">
-                                        <div class="p-field p-col-12">
-                                            <i class="fa fa-hospital-o p-mr-2 p-ml-2"/>
-                                            <p:outputLabel for="view-medical-centre" value="Medical Centre"/>
-                                            <p:selectOneMenu id="view-medical-centre" value="#{manageEmployeeManagedBean.medicalCentreId}" rendered="#{manageEmployeeManagedBean.isEditMode}">
-                                                <f:selectItem value="#{null}" itemLabel="N.A."/>
-                                                <f:selectItems value="#{manageEmployeeManagedBean.medicalCentres}" var="mc" itemValue="#{mc.medicalCentreId}" itemLabel="#{mc.name}"/>
-                                            </p:selectOneMenu>
-                                            <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.medicalCentreId ne null ? manageEmployeeManagedBean.medicalCentresHm.get(manageEmployeeManagedBean.medicalCentreId).name : 'N.A.'}" class="view-text" />
-                                            <p:message class="error-message" for="view-medical-centre" />
+                        <h:panelGroup id="panelGroupAttachedMedicalCentre" style="width: 100%;">
+                            <ui:fragment rendered="#{manageEmployeeManagedBean.employeeToView.role != null and manageEmployeeManagedBean.employeeToView.role != 'SUPER_USER'}">
+                                <div class="p-col-12">
+                                    <div class="card ui-fluid">
+                                        <h5>Attached Medical Centre</h5>
+                                        <div class="p-formgrid p-grid">
+                                            <div class="p-field p-col-12">
+                                                <i class="fa fa-hospital-o p-mr-2 p-ml-2"/>
+                                                <p:outputLabel for="view-medical-centre" value="Medical Centre"/>
+                                                <p:selectOneMenu id="view-medical-centre" value="#{manageEmployeeManagedBean.medicalCentreId}" rendered="#{manageEmployeeManagedBean.isEditMode}">
+                                                    <f:selectItem value="#{null}" itemLabel="N.A."/>
+                                                    <f:selectItems value="#{manageEmployeeManagedBean.medicalCentres}" var="mc" itemValue="#{mc.medicalCentreId}" itemLabel="#{mc.name}"/>
+                                                </p:selectOneMenu>
+                                                <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.medicalCentreId ne null ? manageEmployeeManagedBean.medicalCentresHm.get(manageEmployeeManagedBean.medicalCentreId).name : 'N.A.'}" class="view-text" />
+                                                <p:message class="error-message" for="view-medical-centre" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </ui:fragment>
+                            </ui:fragment>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="panelGroupMedicalOfficerChairmanStatus" style="width: 100%;">
+                            <ui:fragment rendered="#{manageEmployeeManagedBean.employeeToView.role != null and manageEmployeeManagedBean.employeeToView.role == 'MEDICAL_OFFICER'}">
+                                <div class="p-col-12">
+                                    <div class="card ui-fluid">
+                                        <h5>Medical Board Chairman Status</h5>
+                                        <div class="p-formgrid p-grid">
+                                            <div class="p-field p-col-12">
+                                                <i class="fa fa-user-md p-mr-2 p-ml-2"/>
+                                                <p:outputLabel for="chairman-status" value="Chairman Status: " style='margin-right: 10px;' />
+                                                <p:selectBooleanButton id="chairman-status" value="#{manageEmployeeManagedBean.isMedicalOfficerChairman}" rendered="#{manageEmployeeManagedBean.isEditMode}"
+                                                                       onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style='width: 60px;' />
+                                                <h:outputText rendered="#{not manageEmployeeManagedBean.isEditMode}" class="chairman-status-badge #{manageEmployeeManagedBean.isMedicalOfficerChairman ? 'is-chairman' : 'is-not-chairman'}"
+                                                              value="#{manageEmployeeManagedBean.isMedicalOfficerChairman ? 'Yes' : 'No'}" />
+                                                <p:message class="error-message" for="chairman-status" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:fragment>
+                        </h:panelGroup>
 
                         <div class="p-col-12">
                             <p:messages globalOnly="true" class="error-message">

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.Validator;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -35,6 +33,7 @@ import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
+import util.exceptions.UpdateMedicalOfficerChairmanStatusException;
 import util.security.CryptographicHelper;
 
 @Stateless
@@ -154,8 +153,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new EmployeeNotFoundException("Employee ID " + id + " does not exist!");
         }
     }
-    
-    @Override 
+
+    @Override
     public MedicalOfficer retrieveMedicalOfficerById(Long id) {
         MedicalOfficer medicalOfficer = em.find(MedicalOfficer.class, id);
         return medicalOfficer;
@@ -270,6 +269,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         String errorMessage = "Failed to delete Employee: ";
         try {
             Employee employeeToRemove = retrieveEmployeeById(employeeId);
+            
+            // Temporary fix
+            if (employeeToRemove instanceof MedicalStaff) {
+                MedicalStaff medicalStaff = (MedicalStaff) employeeToRemove;
+                medicalStaff.setMedicalCentre(null);
+            }
+            
             //for reference when other entities are related to Employee
 //        if(employeeToRemove.getSaleTransactionEntities().isEmpty())
 //        {
@@ -449,6 +455,28 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new AssignMedicalStaffToMedicalCentreException(generalUnexpectedErrorMessage + "assigning medical staff to medical centre");
+        }
+    }
+
+    @Override
+    public void updateMedicalOfficerChairmanStatus(Long employeeId, Boolean isMedicalOfficerChairman) throws UpdateMedicalOfficerChairmanStatusException {
+        String errorMessage = "Failed to update Medical Officer chairman status: ";
+
+        try {
+            Employee employeeToUpdate = retrieveEmployeeById(employeeId);
+            if (!(employeeToUpdate instanceof MedicalOfficer)) {
+                throw new UpdateMedicalOfficerChairmanStatusException("Employee is not a Medical Officer");
+            }
+            MedicalOfficer medicalOfficer = (MedicalOfficer) employeeToUpdate;
+            medicalOfficer.setIsChairman(isMedicalOfficerChairman);
+
+        } catch (UpdateMedicalOfficerChairmanStatusException ex) {
+            throw new UpdateMedicalOfficerChairmanStatusException(errorMessage + ex.getMessage());
+        } catch (EmployeeNotFoundException ex) {
+            throw new UpdateMedicalOfficerChairmanStatusException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new UpdateMedicalOfficerChairmanStatusException(generalUnexpectedErrorMessage + "updating Medical Officer chairman status");
         }
     }
 

@@ -12,6 +12,8 @@ import util.enumeration.GenderEnum;
 @Entity
 public class MedicalOfficer extends MedicalStaff implements Serializable {
 
+    private Boolean isChairman;
+
     @OneToMany(mappedBy = "medicalOfficer")
     private List<Consultation> completedConsultations;
 
@@ -29,6 +31,7 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, password, email, address, phoneNumber, gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
+        
         this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
@@ -36,6 +39,7 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     public MedicalOfficer(String name, String email, Address address, String phoneNumber, GenderEnum gender) {
         super(name, email, address, phoneNumber, gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
+        
         this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
@@ -43,8 +47,17 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     public MedicalOfficer(Employee e) {
         super(e.name, e.password, e.email, e.address, e.phoneNumber, e.gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
+        
         this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
+    }
+
+    public Boolean getIsChairman() {
+        return isChairman;
+    }
+
+    public void setIsChairman(Boolean isChairman) {
+        this.isChairman = isChairman;
     }
 
     public List<Consultation> getCompletedConsultations() {
@@ -88,5 +101,4 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     public String toString() {
         return "Medical Officer [ id: " + super.getEmployeeId() + " ]";
     }
-
 }
