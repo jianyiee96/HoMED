@@ -29,9 +29,15 @@ public class MedicalBoardCase implements Serializable {
 
     @OneToOne(optional = false)
     private Consultation consultation;
-    
-    @OneToOne(optional = false)
-    private FormInstance medicalBoardForm;
+
+    public MedicalBoardCase() {
+
+    }
+
+    public MedicalBoardCase(Consultation consultation) {
+        this();
+        this.consultation = consultation;
+    }
 
     public Long getMedicalBoardCaseId() {
         return medicalBoardCaseId;
@@ -57,13 +63,6 @@ public class MedicalBoardCase implements Serializable {
         this.consultation = consultation;
     }
 
-    public FormInstance getMedicalBoardForm() {
-        return medicalBoardForm;
-    }
-
-    public void setMedicalBoardForm(FormInstance medicalBoardForm) {
-        this.medicalBoardForm = medicalBoardForm;
-    }
 
     @Override
     public int hashCode() {
