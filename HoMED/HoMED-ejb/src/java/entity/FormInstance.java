@@ -65,7 +65,7 @@ public class FormInstance implements Serializable {
     
     @ManyToOne(optional = true)
     private MedicalOfficer signedBy;
-
+    
     public FormInstance() {
         this.dateCreated = new Date();
         this.formInstanceStatusEnum = FormInstanceStatusEnum.DRAFT;

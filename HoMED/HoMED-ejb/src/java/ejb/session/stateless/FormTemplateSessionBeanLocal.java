@@ -37,7 +37,7 @@ public interface FormTemplateSessionBeanLocal {
     public List<FormTemplate> retrieveAllFormTemplates();
 
     public List<FormTemplate> retrieveAllPublishedFormTemplates();
-
+    
     public List<FormTemplate> retrieveAllPublishedPublicFormTemplates();
     
 }
