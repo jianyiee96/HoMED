@@ -8,12 +8,20 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class MedicalBoardSlot extends Slot implements Serializable, Comparable<MedicalBoardSlot> {
 
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = false)
     private MedicalBoard medicalBoard;
+
+    @OneToOne(optional = true)
+    private MedicalOfficer chairman;
+    @OneToOne(optional = true)
+    private MedicalOfficer medicalOfficerOne;
+    @OneToOne(optional = true)
+    private MedicalOfficer medicalOfficerTwo;
 
     public MedicalBoardSlot() {
     }
@@ -30,6 +38,30 @@ public class MedicalBoardSlot extends Slot implements Serializable, Comparable<M
 
     public void setMedicalBoard(MedicalBoard medicalBoard) {
         this.medicalBoard = medicalBoard;
+    }
+
+    public MedicalOfficer getChairman() {
+        return chairman;
+    }
+
+    public void setChairman(MedicalOfficer chairman) {
+        this.chairman = chairman;
+    }
+
+    public MedicalOfficer getMedicalOfficerOne() {
+        return medicalOfficerOne;
+    }
+
+    public void setMedicalOfficerOne(MedicalOfficer medicalOfficerOne) {
+        this.medicalOfficerOne = medicalOfficerOne;
+    }
+
+    public MedicalOfficer getMedicalOfficerTwo() {
+        return medicalOfficerTwo;
+    }
+
+    public void setMedicalOfficerTwo(MedicalOfficer medicalOfficerTwo) {
+        this.medicalOfficerTwo = medicalOfficerTwo;
     }
 
     @Override

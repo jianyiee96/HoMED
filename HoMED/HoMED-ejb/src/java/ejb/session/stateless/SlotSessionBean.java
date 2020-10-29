@@ -22,6 +22,7 @@ import util.enumeration.BookingStatusEnum;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ScheduleMedicalBoardSlotException;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
@@ -99,36 +100,60 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         }
     }
 
-    @Override
-    public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
-        rangeStart = roundDate30Minute(rangeStart);
-        rangeEnd = roundDate30Minute(rangeEnd);
-
-        if (!rangeStart.before(rangeEnd)) {
-            throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
+    public List<MedicalBoardSlot> createMedicalBoardSlots(List<Date> startDates, List<Date> endDates) {
+        if (startDates.size() != endDates.size()) {
+            System.out.println("Inconsistent date range size!");
         }
-        Calendar rangeStartCalendar = Calendar.getInstance();
-        rangeStartCalendar.setTime(rangeStart);
-        Calendar rangeEndCalendar = Calendar.getInstance();
-        rangeEndCalendar.setTime(rangeEnd);
 
+        int numSlots = startDates.size();
         List<MedicalBoardSlot> createdMedicalBoardSlots = new ArrayList<>();
 
-        while (rangeStartCalendar.before(rangeEndCalendar)) {
-            Date currStart = rangeStartCalendar.getTime();
-            rangeStartCalendar.add(Calendar.MINUTE, 30);
-            Date currEnd = rangeStartCalendar.getTime();
+        for (int i = 0; i < numSlots; i++) {
 
-            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+            if (!startDates.get(i).before(endDates.get(i))) {
+                System.out.println("Invalid Date Range Selected: [" + startDates.get(i) + " to " + endDates.get(i) + "]");
+            }
+
+            MedicalBoardSlot mbs = new MedicalBoardSlot(startDates.get(i), endDates.get(i));
             em.persist(mbs);
             em.flush();
+
             createdMedicalBoardSlots.add(mbs);
+            System.out.println("Created medical board slot [" + startDates.get(i) + " to " + endDates.get(i) + "]");
         }
 
-        System.out.println("Created " + createdMedicalBoardSlots.size() + " Medical Board Slots");
         return createdMedicalBoardSlots;
     }
 
+//    @Override
+//    public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
+//        rangeStart = roundDate30Minute(rangeStart);
+//        rangeEnd = roundDate30Minute(rangeEnd);
+//
+//        if (!rangeStart.before(rangeEnd)) {
+//            throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
+//        }
+//        Calendar rangeStartCalendar = Calendar.getInstance();
+//        rangeStartCalendar.setTime(rangeStart);
+//        Calendar rangeEndCalendar = Calendar.getInstance();
+//        rangeEndCalendar.setTime(rangeEnd);
+//
+//        List<MedicalBoardSlot> createdMedicalBoardSlots = new ArrayList<>();
+//
+//        while (rangeStartCalendar.before(rangeEndCalendar)) {
+//            Date currStart = rangeStartCalendar.getTime();
+//            rangeStartCalendar.add(Calendar.MINUTE, 30);
+//            Date currEnd = rangeStartCalendar.getTime();
+//
+//            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
+//            em.persist(mbs);
+//            em.flush();
+//            createdMedicalBoardSlots.add(mbs);
+//        }
+//
+//        System.out.println("Created " + createdMedicalBoardSlots.size() + " Medical Board Slots");
+//        return createdMedicalBoardSlots;
+//    }
     @Override
     public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
         Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb");
