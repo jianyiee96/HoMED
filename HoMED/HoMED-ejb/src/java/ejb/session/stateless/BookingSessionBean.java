@@ -24,6 +24,7 @@ import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
+import util.exceptions.ConvertBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.CreateConsultationException;
 import util.exceptions.DeleteFormInstanceException;
@@ -432,11 +433,24 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         Booking booking = retrieveBookingById(bookingId);
 
         if (booking == null) {
-            throw new UpdateBookingCommentException("Invalid booking id");
+            throw new UpdateBookingCommentException("Invalid Booking id");
         }
 
         booking.setBookingComment(bookingComment);
 
+    }
+
+    @Override
+    public void convertBookingToReview(Long bookingId) throws ConvertBookingException {
+
+        Booking booking = retrieveBookingById(bookingId);
+
+        if (booking == null) {
+            throw new ConvertBookingException("Invalid Booking id");
+        }
+        
+        booking.setIsForReview(Boolean.TRUE);
+        
     }
 
 }

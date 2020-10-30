@@ -238,7 +238,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         }
         return fts;
     }
-
+    
     @Override
     public List<FormTemplate> retrieveAllPublishedFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formTemplateStatus = :publish");
@@ -249,7 +249,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
         }
         return fts;
     }
-    
+
     @Override
     public List<FormTemplate> retrieveAllPublishedPublicFormTemplates() {
         Query query = em.createQuery("SELECT f FROM FormTemplate f WHERE f.formTemplateStatus = :publish AND f.isPublic = TRUE");

@@ -57,6 +57,8 @@ public class Consultation implements Serializable {
     @ManyToOne(optional = true)
     private MedicalOfficer medicalOfficer;
     
+    @OneToOne(optional = true)
+    private MedicalBoardCase medicalBoardCase;
     
     public Consultation() {
         this.consultationStatusEnum = ConsultationStatusEnum.WAITING;
@@ -134,7 +136,15 @@ public class Consultation implements Serializable {
     public void setMedicalOfficer(MedicalOfficer medicalOfficer) {
         this.medicalOfficer = medicalOfficer;
     }
-    
+
+    public MedicalBoardCase getMedicalBoardCase() {
+        return medicalBoardCase;
+    }
+
+    public void setMedicalBoardCase(MedicalBoardCase medicalBoardCase) {
+        this.medicalBoardCase = medicalBoardCase;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
