@@ -79,10 +79,15 @@
                                 <p:column headerText="Consultation Purpose">
                                     <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
+                                <p:column headerText="PMB Review" width="12%">
+                                    <ui:fragment rendered="#{consultation.booking.isForReview}" >
+                                        <i class="pi pi-check"></i> 
+                                    </ui:fragment>
+                                </p:column>
                                 <p:column headerText="Attending Doctor">
                                     <h:outputText value="#{consultation.medicalOfficer.name}" />
                                 </p:column>
-                                <p:column headerText="Status">
+                                <p:column headerText="Status" width="12%">
                                     <h:outputText value="#{consultation.consultationStatusEnum}" styleClass="form-status-badge status-#{consultation.consultationStatusEnum}"/>
                                 </p:column>
                             </p:dataTable>
@@ -109,6 +114,9 @@
 
                                                 <p:outputLabel value="Purpose: " />
                                                 <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
+
+                                                <p:outputLabel value="Type: " />
+                                                <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.booking.isForReview ? 'Pre-Medical Board Review' : 'General Consultation'}" class="display-text" />                                
 
                                                 <p:outputLabel value="Booking Comment: " />
                                                 <p:outputLabel rendered="#{not empty currentConsultationManagedBean.selectedConsultation.booking.bookingComment}" value="#{currentConsultationManagedBean.selectedConsultation.booking.bookingComment}" class="display-text" />                                
@@ -187,6 +195,27 @@
                                             <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.remarksForServiceman == null}" value="No remarks" />
                                         </h:panelGrid>
                                     </li>
+                                    <ui:fragment rendered="#{currentConsultationManagedBean.selectedConsultation.booking.isForReview}">
+                                        <li>
+                                            <h5>Pre-Medical Board Review</h5>
+                                            <h:panelGrid columns="1" cellpadding="5" width="100%">
+                                                <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.medicalBoardCase != null}" value="Proceeded with #{currentConsultationManagedBean.selectedConsultation.medicalBoardCase.medicalBoardType.stringVal}" />
+                                                <p:outputLabel rendered="#{currentConsultationManagedBean.selectedConsultation.medicalBoardCase == null}" value="Did not proceed with Medical Board" />
+
+                                            </h:panelGrid>
+
+                                            <ui:fragment rendered="#{currentConsultationManagedBean.selectedConsultation.medicalBoardCase != null}">
+                                                <div style="padding: 5px; margin-top: 5px">
+                                                    <h6>Statement of Case:</h6>
+                                                    <h:panelGrid frame="box" columns="1" cellpadding="5" width="100%">
+                                                        <p:outputLabel value="#{currentConsultationManagedBean.selectedConsultation.medicalBoardCase.statementOfCase}" escape="false" />
+                                                    </h:panelGrid>
+                                                </div>
+                                            </ui:fragment>
+
+                                        </li>
+
+                                    </ui:fragment>
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{currentConsultationManagedBean.isCurrentConsultation}">
                                     <li>
@@ -205,6 +234,68 @@
                                             </p:inputTextarea>
                                         </div>
                                     </li>
+
+                                    <li>
+                                        <h5 style="display: inline-block">Pre-Medical Board Review</h5>
+                                        <p:commandButton actionListener="#{currentConsultationManagedBean.toggleCurrentConsultationType()}" update="consultationForm" rendered="#{not currentConsultationManagedBean.currentConsultationTypeConvertedToReview and not currentConsultationManagedBean.currentMedicalOfficer.currentConsultation.booking.isForReview}" value="Convert To Review" styleClass="" class="outlined-button rounded-button secondary-button p-ml-2" icon="pi pi-refresh" />
+                                        <p:commandButton actionListener="#{currentConsultationManagedBean.toggleCurrentConsultationType()}" update="consultationForm" rendered="#{currentConsultationManagedBean.currentConsultationTypeConvertedToReview and not currentConsultationManagedBean.currentMedicalOfficer.currentConsultation.booking.isForReview}" value="Undo Convert" class="rounded-button secondary-button p-ml-2" icon="pi pi-undo" />
+
+                                        <ui:fragment rendered="#{not currentConsultationManagedBean.currentConsultationTypeConvertedToReview  and not currentConsultationManagedBean.selectedConsultation.booking.isForReview}">
+                                            <h:panelGrid columns="1" cellpadding="5">
+                                                <p:outputLabel value="This consultation is not a Pre-Medical Board Review" />
+                                            </h:panelGrid>
+                                        </ui:fragment>
+
+                                        <ui:fragment rendered="#{currentConsultationManagedBean.currentConsultationTypeConvertedToReview or currentConsultationManagedBean.selectedConsultation.booking.isForReview}">
+
+                                            <h:panelGrid columns="1" cellpadding="5" width="100%">
+                                                <p:outputLabel value="Action: " />
+                                                <p:selectOneButton unselectable="false" class="board-button-set" value="#{currentConsultationManagedBean.currentConsultationReviewAction}">
+                                                    <f:selectItem itemLabel="No Action" itemValue="NIL" />
+                                                    <f:selectItem itemLabel="Medical Board in Presence" itemValue="MBIP" />
+                                                    <f:selectItem itemLabel="Medical Board in Absence" itemValue="MBIA" />
+                                                    <p:ajax event="change" update="consultationForm" process="consultationForm"/>
+
+                                                </p:selectOneButton>
+
+                                                <p:outputLabel rendered="#{currentConsultationManagedBean.currentConsultationReviewAction == 'MBIP' or currentConsultationManagedBean.currentConsultationReviewAction == 'MBIA' }" value="Statement of Case: " />
+                                                <p:textEditor rendered="#{currentConsultationManagedBean.currentConsultationReviewAction == 'MBIP' or currentConsultationManagedBean.currentConsultationReviewAction == 'MBIA' }" 
+                                                              widgetVar="text-editor" value="#{currentConsultationManagedBean.currentConsultationStatement}" 
+                                                              height="200" style="margin-bottom:5px">
+                                                    <f:facet name="toolbar">
+                                                        <span class="ql-formats">
+                                                            <button class="ql-bold"></button>
+                                                            <button class="ql-italic"></button>
+                                                            <button class="ql-underline"></button>
+                                                            <button class="ql-strike"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-header" value="1"></button>
+                                                            <button class="ql-header" value="2"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-list" value="ordered"></button>
+                                                            <button class="ql-list" value="bullet"></button>
+                                                            <button class="ql-indent" value="-1"></button>
+                                                            <button class="ql-indent" value="+1"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <select class="ql-color"></select>
+                                                            <select class="ql-background"></select>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-clean"></button>
+                                                        </span>
+                                                    </f:facet>
+                                                    <p:ajax event="keyup" process="@this"/>
+                                                </p:textEditor>
+                                            </h:panelGrid>
+
+
+                                        </ui:fragment>
+
+                                    </li>
+
                                     <li>
                                         <div style="display: flex; justify-content: center">
                                             <p:commandButton update="consultationForm" actionListener="#{currentConsultationManagedBean.endCurrentConsultation()}" value="End Consultation" class="success-button p-ml-2" icon="pi pi-check-square">

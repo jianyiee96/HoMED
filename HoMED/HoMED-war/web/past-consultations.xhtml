@@ -53,10 +53,6 @@
                                     <h:outputText value="#{consultation.booking.serviceman.role}" />
                                 </p:column>
 
-                                <p:column headerText="Serviceman Gender" sortBy="#{consultation.booking.serviceman.gender}" filterBy="#{consultation.booking.serviceman.gender}" filterMatchMode="contains">
-                                    <h:outputText value="#{consultation.booking.serviceman.gender}" />
-                                </p:column>
-
                                 <p:column headerText="Consultation Date" sortBy="#{consultation.startDateTime}" filterBy="#{consultation.startDateTime}" filterMatchMode="contains">
                                     <h:outputText value="#{consultation.startDateTime}">
                                         <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
@@ -65,6 +61,12 @@
 
                                 <p:column headerText="Consultation Purpose" sortBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
                                     <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                </p:column>
+
+                                <p:column headerText="PMB Review" width="12%">
+                                    <ui:fragment rendered="#{consultation.booking.isForReview}" >
+                                        <i class="pi pi-check"></i> 
+                                    </ui:fragment>
                                 </p:column>
                             </p:dataTable>
                         </p:panel>
@@ -114,6 +116,9 @@
 
                                                     <p:outputLabel value="Purpose: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
+
+                                                    <p:outputLabel value="Type: " />
+                                                    <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.isForReview ? 'Pre-Medical Board Review' : 'General Consultation'}" class="display-text" />                                
 
                                                     <p:outputLabel value="Booking Comment: " />
                                                     <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{not empty pastConsultationsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
@@ -181,6 +186,24 @@
                                             <h:outputText rendered="#{pastConsultationsManagedBean.selectedPastConsultation.remarksForServiceman == null}" value="No remarks" />
                                         </h:panelGrid>
                                     </li>
+                                    <ui:fragment rendered="#{pastConsultationsManagedBean.selectedPastConsultation.booking.isForReview}">
+                                        <li>
+                                            <h5>Pre-Medical Board Review</h5>
+                                            <h:panelGrid columns="1" cellpadding="5">
+                                                <p:outputLabel rendered="#{pastConsultationsManagedBean.selectedPastConsultation.medicalBoardCase != null}" value="Proceeded with #{pastConsultationsManagedBean.selectedPastConsultation.medicalBoardCase.medicalBoardType.stringVal}" />
+                                                <p:outputLabel rendered="#{pastConsultationsManagedBean.selectedPastConsultation.medicalBoardCase == null}" value="Did not proceed with Medical Board" />
+                                            </h:panelGrid>
+
+                                            <ui:fragment rendered="#{pastConsultationsManagedBean.selectedPastConsultation.medicalBoardCase != null}">
+                                                <div style="padding: 5px; margin-top: 5px">
+                                                    <h6>Statement of Case:</h6>
+                                                    <h:panelGrid frame="box" columns="1" cellpadding="5" width="100%">
+                                                        <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.medicalBoardCase.statementOfCase}" escape="false" />
+                                                    </h:panelGrid>
+                                                </div>
+                                            </ui:fragment>
+                                        </li>
+                                    </ui:fragment>
                                 </ul>
                             </div>
                         </div>
