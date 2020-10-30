@@ -59,7 +59,6 @@ public class NotificationSessionBean implements NotificationSessionBeanLocal {
 
                 return newNotification.getNotificationId();
             } else {
-                System.out.println("caught");
                 throw new CreateNotificationException(prepareInputDataValidationErrorsMessage(constraintViolations));
             }
 
@@ -73,13 +72,13 @@ public class NotificationSessionBean implements NotificationSessionBeanLocal {
         Query query = em.createQuery("SELECT n FROM Notification n WHERE n.serviceman.servicemanId = :inServicemanId");
         query.setParameter("inServicemanId", servicemanId);
 
-        if (markAsFetched) {
-            List<Notification> notifications = query.getResultList();
+        List<Notification> notifications = query.getResultList();
 
+        if (markAsFetched) {
             notifications.forEach(n -> n.setIsFetched(true));
         }
 
-        return query.getResultList();
+        return notifications;
     }
 
     @Override

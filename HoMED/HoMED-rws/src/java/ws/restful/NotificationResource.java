@@ -25,7 +25,7 @@ import ws.datamodel.ErrorRsp;
 import ws.datamodel.ReadAllNotificationsReq;
 import ws.datamodel.ReadNotificationReq;
 import ws.datamodel.RetrieveAllServicemanNotificationsRsp;
-import ws.datamodel.hasUnfetchedServicemanNotificationsRsp;
+import ws.datamodel.HasUnfetchedServicemanNotificationsRsp;
 
 /**
  * REST Web Service
@@ -106,8 +106,7 @@ public class NotificationResource {
 
         try {
             List<Notification> unfetchedNotifications = notificationSessionBeanLocal.retrieveAllUnfetchedNotificationsByServicemanId(Long.parseLong(servicemanId));
-            System.out.println(unfetchedNotifications);
-            return Response.status(Response.Status.OK).entity(new hasUnfetchedServicemanNotificationsRsp(!unfetchedNotifications.isEmpty())).build();
+            return Response.status(Response.Status.OK).entity(new HasUnfetchedServicemanNotificationsRsp(!unfetchedNotifications.isEmpty())).build();
 
         } catch (Exception ex) {
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
@@ -256,7 +255,6 @@ public class NotificationResource {
 
             for (Notification n : serviceman.getNotifications()) {
                 if (n.getIsFetched()) {
-                    System.out.println("deleted");
                     notificationSessionBeanLocal.deleteNotification(n.getNotificationId());
                 }
             }
