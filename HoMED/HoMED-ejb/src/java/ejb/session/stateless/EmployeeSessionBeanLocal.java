@@ -61,4 +61,6 @@ public interface EmployeeSessionBeanLocal {
 
     public void assignMedicalStaffToMedicalCentre(Long employeeId, Long medicalCentreId) throws AssignMedicalStaffToMedicalCentreException;
 
+    public List<MedicalOfficer> retrieveAllMedicalOfficers();
+
 }

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.validation.Validator;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -64,6 +62,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     @Override
     public List<Employee> retrieveAllEmployees() {
         Query query = em.createQuery("SELECT e FROM Employee e");
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<MedicalOfficer> retrieveAllMedicalOfficers() {
+        Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo");
 
         return query.getResultList();
     }
@@ -154,8 +159,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
             throw new EmployeeNotFoundException("Employee ID " + id + " does not exist!");
         }
     }
-    
-    @Override 
+
+    @Override
     public MedicalOfficer retrieveMedicalOfficerById(Long id) {
         MedicalOfficer medicalOfficer = em.find(MedicalOfficer.class, id);
         return medicalOfficer;

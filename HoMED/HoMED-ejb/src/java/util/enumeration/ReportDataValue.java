@@ -1,7 +1,8 @@
 package util.enumeration;
 
 public enum ReportDataValue {
-    QTY("Quantity");
+    QTY("Quantity"),
+    TREND("Trend");
 
     private String text;
 

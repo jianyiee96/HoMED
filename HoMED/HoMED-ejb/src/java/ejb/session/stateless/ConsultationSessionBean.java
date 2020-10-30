@@ -272,6 +272,13 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
         return query.getResultList();
     }
+    
+    @Override
+    public List<Consultation> retrieveAllConsultations() {
+        Query query = em.createQuery("SELECT c FROM Consultation c GROUP BY c.medicalOfficer ORDER BY c.startDateTime ASC");
+
+        return query.getResultList();
+    }
 
     @Override
     public List<Consultation> retrieveCompletedConsultationsByMedicalOfficerId(Long medicalOfficerId) {

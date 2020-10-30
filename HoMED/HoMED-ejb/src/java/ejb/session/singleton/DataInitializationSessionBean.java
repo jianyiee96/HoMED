@@ -188,7 +188,7 @@ public class DataInitializationSessionBean {
         // STARTING AND ENDING CONSULT
         for (Booking booking : pastBookings) {
             List<MedicalOfficer> medicalOfficers = booking.getBookingSlot().getMedicalCentre().getMedicalStaffList().stream()
-                    .filter(ms -> ms instanceof MedicalOfficer)
+                    .filter(ms -> ms instanceof MedicalOfficer && ms.getMedicalCentre() != null)
                     .map(ms -> (MedicalOfficer) ms)
                     .collect(Collectors.toList());
             Collections.shuffle(medicalOfficers);

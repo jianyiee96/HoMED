@@ -18,9 +18,13 @@ public enum ReportFieldType {
     
     public static ReportFieldType[] getReportFieldTypes(ReportDataGrouping reportDataGrouping) {
         if (reportDataGrouping == ReportDataGrouping.S_PES
-                || reportDataGrouping == ReportDataGrouping.S_BT) {
+                || reportDataGrouping == ReportDataGrouping.S_BT
+                || reportDataGrouping == ReportDataGrouping.S_BK
+                || reportDataGrouping == ReportDataGrouping.MO_CS
+                || reportDataGrouping == ReportDataGrouping.MO_FI
+                || reportDataGrouping == ReportDataGrouping.MO_MC) {
             return new ReportFieldType[]{BAR, PIE};
         }
-        return values();
+        return new ReportFieldType[]{BAR, PIE, LINE};
     }
 }

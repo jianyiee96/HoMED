@@ -197,7 +197,7 @@
                                     <p:menu overlay="true" trigger="cmdlink-add" my="left top" at="left bottom">
                                         <p:submenu label="New Field">
                                             <p:menuitem value="Header" icon="fa fa-header" actionListener="#{manageReportManagedBean.addHeader}" process="@this" update="panelReport"/>
-                                            <p:menuitem value="Chart" icon="pi pi-chart-line" actionListener="#{manageReportManagedBean.doOpenDialogAddChart}" update="panelAddChart" process="@this" resetValues="true"
+                                            <p:menuitem value="Chart" icon="pi pi-chart-line" actionListener="#{manageReportManagedBean.doOpenDialogAddChart}" update="@form" process="@this" resetValues="true"
                                                         oncomplete="PF('dialogAddChart').show()">
                                             </p:menuitem>
                                         </p:submenu>
@@ -290,7 +290,7 @@
                     </div>
                 </p:outputPanel>        
             </p:dialog>
-            <p:dialog id="dialogAddChart" widgetVar="dialogAddChart" header="Add Chart" showEffect="fade"
+            <p:dialog id="dialogAddChart" widgetVar="dialogAddChart" header="#{manageReportManagedBean.dialogHeaderAddChart}" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAddChart').initPosition()"
                       minWidth="500" width="700" class="dlg-add-chart">
                 <p:outputPanel id="panelAddChart">
@@ -470,9 +470,15 @@
                                                     <h:outputText class="field-subtitle" value="#{manageReportManagedBean.reportField.description}"/>
                                                 </div>
                                             </h:panelGroup>
-                                            <div class="p-field p-col-12">
+                                            <div class="p-col-12">
                                                 <p:pieChart model="#{manageReportManagedBean.pieModel}" rendered="#{manageReportManagedBean.reportField.type == 'PIE'}"/>
-                                                <p:barChart model="#{manageReportManagedBean.barModel}" rendered="#{manageReportManagedBean.reportField.type == 'BAR'}"/>
+                                                <ui:fragment rendered="#{manageReportManagedBean.reportField.type == 'BAR'}">
+                                                    <div class="p-grid p-mt-3">
+                                                        <h:outputText value="test1" class="p-col-1" style="padding: 0; writing-mode:vertical-rl;"/>
+                                                        <p:barChart model="#{manageReportManagedBean.barModel}" class="p-col-11"/>
+                                                        <h:outputText value="test2" class="p-col-12"/>
+                                                    </div>
+                                                </ui:fragment>
                                             </div>
                                         </div>
                                     </h:panelGroup>
