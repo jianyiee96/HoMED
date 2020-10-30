@@ -129,13 +129,17 @@
                             <h:outputText class="report-name" value="#{not empty manageReportManagedBean.report.name ? manageReportManagedBean.report.name : 'Enter Report Name'}"
                                           rendered="#{not manageReportManagedBean.isEditMode}"/>
                             <p:inputText id="report-name" class="report-name" value="#{manageReportManagedBean.report.name}" placeholder="Enter Report Name"
-                                         rendered="#{manageReportManagedBean.isEditMode}"/>
+                                         rendered="#{manageReportManagedBean.isEditMode}">
+                                <p:ajax process="@this" update="@this"/>
+                            </p:inputText>
                             <p:message for="report-name" class="error-message"/>
                             <p:separator/>
                             <h:outputText class="report-subtitle" value="#{manageReportManagedBean.report.description}"
                                           rendered="#{not manageReportManagedBean.isEditMode and not empty manageReportManagedBean.report.description}"/>
                             <p:inputTextarea class="report-subtitle" value="#{manageReportManagedBean.report.description}" placeholder="Enter Report Description"
-                                             rendered="#{manageReportManagedBean.isEditMode}"/>
+                                             rendered="#{manageReportManagedBean.isEditMode}">
+                                <p:ajax process="@this" update="@this"/>
+                            </p:inputTextarea>
                             <div class="p-col-12">
                                 <h:panelGroup id="panelGroupDateFilterBtn">
                                     <p:commandButton class="p-mt-5" icon="pi pi-clock" style="opacity: 1; font-size: 18px"
@@ -151,7 +155,7 @@
                     </div>
 
                     <ui:repeat value="#{manageReportManagedBean.report.reportFields}" var="field">
-                        <div class="card field-card p-col-12 p-md-8">
+                        <div class="card field-card p-col-12 p-md-8 p-mb-5">
                             <div class="p-grid p-col-nogutter">
                                 <div class="p-col-12 p-col-nogutter">
                                     <p:commandButton icon="pi pi-trash" styleClass="danger-button text-button rounded-button" style="float:right"
@@ -162,18 +166,22 @@
                                     </p:commandButton>
                                     <h:outputText class="field-name" value="#{not empty field.name ? field.name : 'Enter Field Name'}"
                                                   rendered="#{not manageReportManagedBean.isEditMode}"/>
-                                    <p:inputText id="test" class="field-name p-col-12 p-md-8" value="#{field.name}" placeholder="Enter Field Name"
-                                                 rendered="#{manageReportManagedBean.isEditMode}"/>
-                                    <p:message for="test" class="error-message" styleClass="p-col-12 p-md-8"/>
+                                    <p:inputText id="field-name" class="field-name p-col-12 p-md-11" value="#{field.name}" placeholder="Enter Field Name"
+                                                 rendered="#{manageReportManagedBean.isEditMode}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
+                                    <p:message for="field-name" class="error-message" styleClass="p-col-12 p-md-8"/>
                                 </div>
-                                <div class="p-col-12 p-md-8 p-col-nogutter">
+                                <div class="p-col-12 p-md-11 p-col-nogutter">
                                     <p:separator class="p-my-1"/>
                                 </div>
                                 <div class="p-col-12 p-col-nogutter">
                                     <h:outputText class="field-subtitle" value="#{field.description}"
                                                   rendered="#{not manageReportManagedBean.isEditMode and not empty field.description}"/>
-                                    <p:inputTextarea class="field-subtitle p-col-12 p-md-8" value="#{field.description}" placeholder="Enter Field Description"
-                                                     rendered="#{manageReportManagedBean.isEditMode}"/>
+                                    <p:inputTextarea class="field-subtitle p-col-12 p-md-11" value="#{field.description}" placeholder="Enter Field Description"
+                                                     rendered="#{manageReportManagedBean.isEditMode}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputTextarea>
                                 </div>
                             </div>
                         </div>
@@ -189,9 +197,8 @@
                                     <p:menu overlay="true" trigger="cmdlink-add" my="left top" at="left bottom">
                                         <p:submenu label="New Field">
                                             <p:menuitem value="Header" icon="fa fa-header" actionListener="#{manageReportManagedBean.addHeader}" process="@this" update="panelReport"/>
-                                            <p:menuitem value="Chart" icon="pi pi-chart-line" update="panelAddChart" process="@this" resetValues="true"
+                                            <p:menuitem value="Chart" icon="pi pi-chart-line" actionListener="#{manageReportManagedBean.doOpenDialogAddChart}" update="panelAddChart" process="@this" resetValues="true"
                                                         oncomplete="PF('dialogAddChart').show()">
-                                                <f:setPropertyActionListener target="#{manageReportManagedBean.idxAddChart}" value="0"/>
                                             </p:menuitem>
                                         </p:submenu>
                                     </p:menu>
@@ -293,7 +300,7 @@
                                 <p:steps activeIndex="#{manageReportManagedBean.idxAddChart}" style="width: 100%">
                                     <p:menuitem value="Data"/>
                                     <p:menuitem value="Date"/>
-                                    <p:menuitem value="Chart Type"/>
+                                    <p:menuitem value="Chart"/>
                                     <p:menuitem value="Preview"/>
                                 </p:steps>
                             </div>
@@ -302,7 +309,7 @@
                             <div class="p-grid p-justify-between p-align-center">
                                 <p:commandButton update="panelAddChart" process="@this"
                                                  disabled="#{manageReportManagedBean.idxAddChart == 0}"
-                                                 icon="pi pi-angle-left" styleClass="p-col-2 rounded-button outlined-button p-mr-2"
+                                                 icon="pi pi-angle-left" styleClass="rounded-button outlined-button p-mr-2" style="width: 2.5rem; height: 2.5rem"
                                                  oncomplete="PF('dialogAddChart').initPosition()">
                                     <f:setPropertyActionListener target="#{manageReportManagedBean.idxAddChart}" value="#{manageReportManagedBean.idxAddChart - 1}"/>
                                 </p:commandButton>
@@ -319,29 +326,162 @@
                                             </div>
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="data-values" value="Select Data Value" />
-                                                <p:selectOneMenu id="data-values">  
+                                                <p:selectOneMenu id="data-values" value="#{manageReportManagedBean.reportField.reportDataValue}">  
                                                     <f:selectItems value="#{manageReportManagedBean.reportDataValues}" var="value" itemLabel="#{value.text}"/>
                                                     <p:ajax process="@this" update="panelGroupData"/>
                                                 </p:selectOneMenu>
                                                 <p:message for="data-values" class="error-message"/>
                                             </div>
+                                            <h:panelGroup rendered="#{not empty manageReportManagedBean.reportDataGroupings}">
+                                                <div class="p-field p-col-12">
+                                                    <p:outputLabel for="data-group" value="Select Data Grouping" />
+                                                    <p:selectOneMenu id="data-group" value="#{manageReportManagedBean.reportField.reportDataGrouping}">
+                                                        <f:selectItems value="#{manageReportManagedBean.reportDataGroupings}" var="grouping" itemLabel="#{grouping.text}"/>
+                                                        <p:ajax process="@this" update="panelGroupData"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="data-group" class="error-message"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{manageReportManagedBean.idxAddChart == 1}" id="panelGroupDate">
+                                        <div class="p-formgrid p-grid ui-fluid">
+                                            <h:panelGroup rendered="#{manageReportManagedBean.checkAddChartDate()}">
+                                                <div class="p-field p-col-12">
+                                                    <ui:fragment rendered="#{manageReportManagedBean.report.filterDateType != 'NONE'}">
+                                                        <h5>Global Date Filter Already Applied</h5>
+                                                        <i class="pi pi-clock p-mr-2" style="font-size: 20px"/><h:outputText value="#{manageReportManagedBean.report.filterDateString}" style="font-size: 20px"/>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{manageReportManagedBean.report.filterDateType == 'NONE'}">
+                                                        <h5 class="p-mb-5">Date Selection for Dataset</h5>
+                                                        <p:outputPanel id="panelGroupDateSelect">
+                                                            <div class="p-grid">
+                                                                <div class="p-col-3">
+                                                                    <p:selectOneRadio value="#{manageReportManagedBean.filterDateType}" layout="responsive" columns="1">
+                                                                        <f:selectItems value="#{manageReportManagedBean.filterDateTypes}" var="type" itemLabel="#{type.text}" itemValue="#{type}"/>
+                                                                        <p:ajax event="change" process="@this" update="panelGroupDateSelect" oncomplete="PF('dialogAddChart').initPosition()" resetValues="true" listener="#{manageReportManagedBean.selectFilterDateType}"/>
+                                                                    </p:selectOneRadio>
+                                                                </div>
+                                                                <div class="p-col-9">
+                                                                    <div class="ui-fluid p-formgrid p-grid">
+                                                                        <div class="p-field p-col">
+                                                                            <ui:fragment rendered="#{manageReportManagedBean.filterDateType == 'DAY' or manageReportManagedBean.filterDateType == 'WEEK' or manageReportManagedBean.filterDateType == 'CUSTOM'}">
+                                                                                <p:outputLabel for="grp-date-start" value="#{(manageReportManagedBean.filterDateType == 'WEEK' or manageReportManagedBean.filterDateType == 'CUSTOM')? 'Start ' : 'Select '}Date" />
+                                                                                <p:inputText id="grp-date-start" value="#{manageReportManagedBean.filterStartDate}" placeholder="dd/mm/yyyy"
+                                                                                             required="true" requiredMessage="Start Date Must be Provided">  
+                                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                                    <p:ajax event="valueChange" process="@this" update="panelGroupDateSelect" listener="#{manageReportManagedBean.typeFilterDate}"/>
+                                                                                </p:inputText>
+                                                                                <p:message for="grp-date-start" class="error-message"/>
+                                                                            </ui:fragment>
+                                                                            <ui:fragment rendered="#{manageReportManagedBean.filterDateType == 'MONTH'}">
+                                                                                <p:outputLabel for="grp-date-month" value="Select Month" />
+                                                                                <p:inputText id="grp-date-month" value="#{manageReportManagedBean.filterStartDate}" placeholder="mmm yyyy"
+                                                                                             required="true" requiredMessage="Month and Year Must be Provided">  
+                                                                                    <f:convertDateTime pattern="MMM yyyy"/>
+                                                                                    <p:ajax event="valueChange" process="@this" update="panelGroupDateSelect"/>
+                                                                                </p:inputText>
+                                                                                <p:message for="grp-date-month" class="error-message"/>
+                                                                            </ui:fragment>
+                                                                            <ui:fragment rendered="#{manageReportManagedBean.filterDateType == 'YEAR'}">
+                                                                                <p:outputLabel for="grp-date-year" value="Select Year" />
+                                                                                <p:selectOneMenu id="grp-date-year" value="#{manageReportManagedBean.filterStartDate}">  
+                                                                                    <f:convertDateTime pattern="yyyy"/>
+                                                                                    <f:selectItems value="#{manageReportManagedBean.years}" var="year"/>
+                                                                                    <p:ajax event="valueChange" process="@this" update="panelGroupDateSelect"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="grp-date-year" class="error-message"/>
+                                                                            </ui:fragment>
+                                                                        </div>
+                                                                        <div class="p-field p-col">
+                                                                            <ui:fragment rendered="#{(manageReportManagedBean.filterDateType == 'WEEK' or manageReportManagedBean.filterDateType == 'CUSTOM')}">
+                                                                                <p:outputLabel for="grp-date-end" value="End Date" />
+                                                                                <p:inputText id="grp-date-end" value="#{manageReportManagedBean.filterEndDate}" placeholder="dd/mm/yyyy"
+                                                                                             required="true" requiredMessage="End Date Must be Provided">  
+                                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                                    <p:ajax event="valueChange" process="@this" update="panelGroupDateSelect" listener="#{manageReportManagedBean.typeFilterDate}"/>
+                                                                                </p:inputText>
+                                                                                <p:message for="grp-date-end" class="error-message"/>
+                                                                            </ui:fragment>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="ui-fluid p-field">
+                                                                        <p:datePicker value="#{manageReportManagedBean.filterStartDate}" inline="true" pattern="dd/MM/yyyy" maxdate="#{manageReportManagedBean.today}"
+                                                                                      locale="en_GB"
+                                                                                      rendered="#{manageReportManagedBean.filterDateType == 'DAY'}">
+                                                                            <p:ajax event="dateSelect" process="@this" update="panelGroupDateSelect" resetValues="true"/>
+                                                                        </p:datePicker>
+                                                                        <p:datePicker view="month" value="#{manageReportManagedBean.filterStartDate}"  inline="true" pattern="MMM yyyy" maxdate="#{manageReportManagedBean.today}"
+                                                                                      yearNavigator="true" yearRange="#{manageReportManagedBean.yearRange}" 
+                                                                                      locale="en_GB"
+                                                                                      rendered="#{manageReportManagedBean.filterDateType == 'MONTH'}">
+                                                                            <p:ajax event="dateSelect" process="@this" update="panelGroupDateSelect" />
+                                                                        </p:datePicker>
+                                                                        <p:datePicker value="#{manageReportManagedBean.filterRangeDates}" inline="true" pattern="dd/MM/yyyy" maxdate="#{manageReportManagedBean.today}"
+                                                                                      locale="en_GB" selectionMode="range"
+                                                                                      rendered="#{manageReportManagedBean.filterDateType == 'WEEK' or manageReportManagedBean.filterDateType == 'CUSTOM'}">
+                                                                            <p:ajax event="dateSelect" process="@this" update="panelGroupDateSelect" listener="#{manageReportManagedBean.selectFilterRangeDate}" resetValues="true"/>
+                                                                        </p:datePicker>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </p:outputPanel>
+                                                    </ui:fragment>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup rendered="#{not manageReportManagedBean.checkAddChartDate()}">
+                                                <div class="p-field p-col-12">
+                                                    <h:outputText value="No date selection required for #{manageReportManagedBean.reportField.reportDataType.text} : #{manageReportManagedBean.reportField.reportDataGrouping.text}" style="font-size: 20px"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{manageReportManagedBean.idxAddChart == 2}" id="panelGroupChart">
+                                        <div class="p-formgrid p-grid ui-fluid">
                                             <div class="p-field p-col-12">
-                                                <p:outputLabel for="data-group" value="Select Data Grouping" />
-                                                <p:selectOneMenu id="data-group">
-                                                    <f:selectItem itemLabel="None" itemValue="#{null}" noSelectionOption="true"/>
-                                                    <f:selectItems value="#{manageReportManagedBean.reportDataTypes}" var="type" itemLabel="#{type.text}"/>
-                                                    <p:ajax process="@this" update="panelGroupData"/>
+                                                <p:outputLabel for="chart-name" value="Enter Chart Name" />
+                                                <p:inputText id="chart-name" value="#{manageReportManagedBean.reportField.name}" placeholder="Chart Name">
+                                                    <p:ajax event="valueChange" process="@this" update="panelGroupChart"/>
+                                                </p:inputText>
+                                                <p:message for="chart-name" class="error-message"/>
+                                            </div>
+                                            <div class="p-field p-col-12">
+                                                <p:outputLabel for="chart-description" value="Enter Chart Description" />
+                                                <p:inputTextarea id="chart-description" value="#{manageReportManagedBean.reportField.description}" placeholder="Chart Description"/>
+                                            </div>
+                                            <div class="p-field p-col-12">
+                                                <p:outputLabel for="chart-type" value="Select Chart Type" />
+                                                <p:selectOneMenu id="chart-type" value="#{manageReportManagedBean.reportField.type}">
+                                                    <f:selectItems value="#{manageReportManagedBean.reportFieldTypes}" var="type" itemLabel="#{type.text}"/>
                                                 </p:selectOneMenu>
-                                                <p:message for="data-group" class="error-message"/>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{manageReportManagedBean.idxAddChart == 3}" id="panelGroupPreview">
+                                        <div class="p-formgrid p-grid ui-fluid">
+                                            <div class="p-col-12 p-col-nogutter">
+                                                <h:outputText class="field-name" value="#{manageReportManagedBean.reportField.name}"/>
+                                            </div>
+                                            <div class="p-col-12 p-col-nogutter">
+                                                <p:separator class="p-my-1"/>
+                                            </div>
+                                            <h:panelGroup rendered="#{not empty manageReportManagedBean.reportField.description}">
+                                                <div class="p-field p-col-12 p-col-nogutter">
+                                                    <h:outputText class="field-subtitle" value="#{manageReportManagedBean.reportField.description}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            <div class="p-field p-col-12">
+                                                <p:pieChart model="#{manageReportManagedBean.pieModel}" rendered="#{manageReportManagedBean.reportField.type == 'PIE'}"/>
+                                                <p:barChart model="#{manageReportManagedBean.barModel}" rendered="#{manageReportManagedBean.reportField.type == 'BAR'}"/>
                                             </div>
                                         </div>
                                     </h:panelGroup>
                                 </div>
                                 <p:commandButton update="panelAddChart"  process="panelAddChart"
                                                  disabled="#{manageReportManagedBean.idxAddChart == 3}"
-                                                 icon="pi pi-angle-right" styleClass="p-col-2 rounded-button outlined-button p-ml-2"
+                                                 icon="pi pi-angle-right" styleClass="rounded-button outlined-button p-ml-2"  style="width: 2.5rem; height: 2.5rem"
+                                                 actionListener="#{manageReportManagedBean.doDialogAddChartNextPage()}"
                                                  oncomplete="PF('dialogAddChart').initPosition()">
-                                    <f:setPropertyActionListener target="#{manageReportManagedBean.idxAddChart}" value="#{manageReportManagedBean.idxAddChart + 1}"/>
                                 </p:commandButton>
                             </div>
                         </div>

@@ -1,10 +1,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,25 +22,17 @@ public class ReportFieldGroup implements Serializable {
     @Size(min = 1, max = 128, message = "Group Name must be between length 1 to 128")
     private String name;
 
-    @ElementCollection
-    private List<String> groupValues;
+    @Column(nullable = false, length = 128)
+    @NotNull(message = "Group Quantity cannot be empty")
+    private Integer quantity;
 
     public ReportFieldGroup() {
-        this.groupValues = new ArrayList();
     }
 
-    public ReportFieldGroup(String name, List<String> groupValues) {
+    public ReportFieldGroup(String name, Integer quantity) {
         this();
         this.name = name;
-        this.groupValues = groupValues;
-    }
-
-    public List<String> getGroupValues() {
-        return groupValues;
-    }
-
-    public void setGroupValues(List<String> groupValues) {
-        this.groupValues = groupValues;
+        this.quantity = quantity;
     }
 
     public Long getReportFieldValueGroupId() {
@@ -60,6 +49,14 @@ public class ReportFieldGroup implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     @Override

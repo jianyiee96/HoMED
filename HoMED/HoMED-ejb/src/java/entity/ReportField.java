@@ -19,6 +19,7 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.FilterDateType;
+import util.enumeration.ReportDataGrouping;
 import util.enumeration.ReportDataType;
 import util.enumeration.ReportDataValue;
 import util.enumeration.ReportFieldType;
@@ -63,6 +64,10 @@ public class ReportField implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private ReportDataValue reportDataValue;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ReportDataGrouping reportDataGrouping;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReportFieldGroup> reportFieldGroups;
@@ -180,6 +185,14 @@ public class ReportField implements Serializable {
         this.reportDataValue = reportDataValue;
     }
 
+    public ReportDataGrouping getReportDataGrouping() {
+        return reportDataGrouping;
+    }
+
+    public void setReportDataGrouping(ReportDataGrouping reportDataGrouping) {
+        this.reportDataGrouping = reportDataGrouping;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -204,5 +217,5 @@ public class ReportField implements Serializable {
     public String toString() {
         return "ReportField [ id:" + reportFieldId + " ]";
     }
-
+    
 }

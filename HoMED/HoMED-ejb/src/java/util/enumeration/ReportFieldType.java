@@ -15,4 +15,12 @@ public enum ReportFieldType {
     public String getText() {
         return text;
     }
+    
+    public static ReportFieldType[] getReportFieldTypes(ReportDataGrouping reportDataGrouping) {
+        if (reportDataGrouping == ReportDataGrouping.S_PES
+                || reportDataGrouping == ReportDataGrouping.S_BT) {
+            return new ReportFieldType[]{BAR, PIE};
+        }
+        return values();
+    }
 }

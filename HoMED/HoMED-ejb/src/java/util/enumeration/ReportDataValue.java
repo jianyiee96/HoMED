@@ -1,9 +1,7 @@
 package util.enumeration;
 
 public enum ReportDataValue {
-    S_PES("PES Status"),
-    S_BT("Blood Type"),
-    S_CS("Bookings");
+    QTY("Quantity");
 
     private String text;
 
@@ -14,11 +12,11 @@ public enum ReportDataValue {
     public String getText() {
         return text;
     }
-    
+
     public static ReportDataValue[] getReportDataTypeValues(ReportDataType type) {
-        if (type == ReportDataType.SERVICEMAN) { 
-            return new ReportDataValue[]{S_PES,S_BT,S_CS};
+        if (type == ReportDataType.SERVICEMAN) {
+            return new ReportDataValue[]{QTY};
         }
-        return new ReportDataValue[]{S_PES};
+        return new ReportDataValue[]{QTY};
     }
 }
