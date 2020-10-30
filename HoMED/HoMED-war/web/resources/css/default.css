@@ -69,3 +69,8 @@
 .fc-center{
     float:right;
 }
+
+body .board-button-set.ui-selectonebutton .ui-button {
+    width: 200px;
+
+}

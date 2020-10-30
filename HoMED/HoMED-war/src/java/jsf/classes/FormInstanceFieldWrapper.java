@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.InputTypeEnum;
 
 public class FormInstanceFieldWrapper {
@@ -20,6 +21,8 @@ public class FormInstanceFieldWrapper {
 
     private Boolean isEditable;
 
+    private FormFieldAccessEnum accessEnum;
+
     private Date dateTime;
 
     private String errorMessage;
@@ -27,7 +30,8 @@ public class FormInstanceFieldWrapper {
     public FormInstanceFieldWrapper(FormInstanceField formInstanceField) {
         this.formInstanceField = formInstanceField;
         prepareLoad();
-        this.isEditable = !formInstanceField.getFormFieldMapping().getIsServicemanEditable();
+        this.accessEnum = formInstanceField.getFormFieldMapping().getFormFieldAccess();
+        this.isEditable = formInstanceField.getFormFieldMapping().getFormFieldAccess() == FormFieldAccessEnum.MO;
     }
 
     public void prepareLoad() {
@@ -61,8 +65,16 @@ public class FormInstanceFieldWrapper {
         this.formInstanceField = formInstanceField;
     }
 
+    public FormFieldAccessEnum getAccessEnum() {
+        return accessEnum;
+    }
+
+    public void setAccessEnum(FormFieldAccessEnum accessEnum) {
+        this.accessEnum = accessEnum;
+    }
+
     public Boolean getIsEditable() {
-        return isEditable;
+        return this.isEditable;
     }
 
     public void setIsEditable(Boolean isEditable) {
@@ -75,6 +87,14 @@ public class FormInstanceFieldWrapper {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public boolean renderAccessLabel() {
+        return this.accessEnum == FormFieldAccessEnum.MO;
+    }
+
+    public boolean renderLock() {
+        return this.accessEnum == FormFieldAccessEnum.SERVICEMAN_MO;
     }
 
     public Date getDateTime() {

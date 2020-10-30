@@ -108,6 +108,8 @@ public class BookingManagedBean implements Serializable {
 
     private Boolean isEditBookingInformation;
 
+    private String selectedBookingType;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Date must be provided")
     private Date dateToCreateBooking;
@@ -160,7 +162,7 @@ public class BookingManagedBean implements Serializable {
         createBookingIdx = 0;
         bookingSlotsToCreate = new ArrayList<>();
         consultationPurposeToCreateId = null;
-        consultationPurposes = consultationPurposeSessionBean.retrieveAllConsultationPurposes();
+        consultationPurposes = consultationPurposeSessionBean.retrieveAllActiveConsultationPurposes();
         publishedFormTemplates = formTemplateSessionBean.retrieveAllPublishedFormTemplates();
         selectedAdditionalFormTemplatesToCreate = new ArrayList<>();
         formTemplateHm = new HashMap<>();
@@ -168,6 +170,8 @@ public class BookingManagedBean implements Serializable {
         alreadyLinkedFormTemplates = new ArrayList<>();
         additionalFormTemplates = new ArrayList<>();
         bookingComment = null;
+        selectedBookingType = null;
+        bookingSlotToCreateId = null;
     }
 
     public void deleteBooking() {
@@ -239,7 +243,10 @@ public class BookingManagedBean implements Serializable {
 
     public void createBooking() {
         try {
-            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment);
+            
+            boolean isForReview = this.selectedBookingType.equals("Pre-Medical Board Review");
+            
+            Booking booking = bookingSessionBean.createBookingByClerk(servicemanToCreateBooking.getServicemanId(), consultationPurposeToCreateId, bookingSlotToCreateId, selectedAdditionalFormTemplatesToCreate, bookingComment, isForReview);
             PrimeFaces.current().executeScript("PF('dialogCreateBooking').hide()");
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Booking", "Successfully created " + booking));
             initBookingSlots();
@@ -311,7 +318,7 @@ public class BookingManagedBean implements Serializable {
                     .collect(Collectors.toList());
         }
     }
-
+    
     public void doFilterBookings() {
         // 1 - Day
         // 2 - Week
@@ -452,6 +459,7 @@ public class BookingManagedBean implements Serializable {
 
     public void setBookingSlotToCreateId(Long bookingSlotToCreateId) {
         this.bookingSlotToCreateId = bookingSlotToCreateId;
+        System.out.println(bookingSlotToCreateId + " < ");
     }
 
     public DateFormat getTimeFormat() {
@@ -564,6 +572,14 @@ public class BookingManagedBean implements Serializable {
 
     public void setIsEditBookingInformation(Boolean isEditBookingInformation) {
         this.isEditBookingInformation = isEditBookingInformation;
+    }
+
+    public String getSelectedBookingType() {
+        return selectedBookingType;
+    }
+
+    public void setSelectedBookingType(String selectedBookingType) {
+        this.selectedBookingType = selectedBookingType;
     }
 
 }

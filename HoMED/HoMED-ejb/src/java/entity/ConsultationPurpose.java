@@ -40,12 +40,18 @@ public class ConsultationPurpose implements Serializable {
     @OneToMany
     private List<Booking> bookings;
     
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isActive;
+    
     public ConsultationPurpose() {
+        isActive = Boolean.TRUE;
         formTemplates = new ArrayList<>();
         bookings = new ArrayList<>();
     }
     
     public ConsultationPurpose(String consultationPurposeName) {
+        this();
         this.consultationPurposeName = consultationPurposeName;
     }
     
@@ -80,8 +86,14 @@ public class ConsultationPurpose implements Serializable {
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
-    
-    
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 
     @Override
     public int hashCode() {

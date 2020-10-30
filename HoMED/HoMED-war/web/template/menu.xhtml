@@ -73,6 +73,7 @@
                         </p:submenu>
                         <p:submenu rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" label="Schedule Management" icon="pi pi-calendar-plus" >
                             <p:menuitem value="Booking Slot Management"  icon="fa fa-calendar" outcome="/booking-slot-management" />
+                            <p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management" icon="fa fa-calendar-o" outcome="/medical-board-slot-management" />
                         </p:submenu>
                         <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Booking Management" icon="pi pi-calendar" outcome="/booking-management"/>
                         <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Queue Display" icon="pi pi-desktop" outcome="/queue-display"/>
@@ -85,7 +86,6 @@
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
                     </po:menu>
                 </h:form>
-                            <!--<p:menuitem rendered="#{currentEmployee.role == 'MB_ADMIN'}" value="Medical Board Slot Management" icon="fa fa-calendar-o" outcome="/medical-board-slot-management" />-->
                 <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">
                                             <p:menuitem id="om_formlayout" value="Form Layout" icon="pi pi-id-card" outcome="/login" />
                                             <p:menuitem id="om_input" value="Input" icon="pi pi-check-square" outcome="/login" />

@@ -74,9 +74,36 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
     public void deleteConsultationPurpose(ActionEvent event) {
         Long consultationPurposeId = (Long) event.getComponent().getAttributes().get("consultationPurposeIdToDelete");
         consultationPurposeSessionBeanLocal.deleteConsultationPurpose(consultationPurposeId);
-        postConstruct();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted consultation purpose!", "Database has been updated."));
 
+        this.consultationPurposes = consultationPurposeSessionBeanLocal.retrieveAllConsultationPurposes();
+        this.allFormTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
+
+        for (ConsultationPurpose cp : this.consultationPurposes) {
+            if (cp.getConsultationPurposeId().equals(consultationPurposeId)) {
+                this.setSelectedConsultationPurpose(cp);
+                break;
+
+            }
+        }
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("ConsultationPurposeUtilityManagedBean.allFormTemplates", allFormTemplates);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully de-activate consultation purpose!", "Database has been updated."));
+    }
+
+    public void restoreConsultationPurpose(ActionEvent event) {
+        Long consultationPurposeId = (Long) event.getComponent().getAttributes().get("consultationPurposeIdToRestore");
+        consultationPurposeSessionBeanLocal.restoreConsultationPurpose(consultationPurposeId);
+
+        this.consultationPurposes = consultationPurposeSessionBeanLocal.retrieveAllConsultationPurposes();
+        this.allFormTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
+
+        for (ConsultationPurpose cp : this.consultationPurposes) {
+            if (cp.getConsultationPurposeId().equals(consultationPurposeId)) {
+                this.setSelectedConsultationPurpose(cp);
+                break;
+            }
+        }
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("ConsultationPurposeUtilityManagedBean.allFormTemplates", allFormTemplates);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully activate consultation purpose!", "Database has been updated."));
     }
 
     public void selectConsultationPurpose(ActionEvent event) {
@@ -142,5 +169,14 @@ public class ConsultationPurposeUtilityManagedBean implements Serializable {
     public void setDualListFormTemplates(DualListModel<FormTemplate> dualListFormTemplates) {
         this.dualListFormTemplates = dualListFormTemplates;
     }
+
+    public String renderIsActive(boolean value) {
+        if (value) {
+            return "Active";
+        } else {
+            return "Inactive";
+        }
+    }
+
 
 }

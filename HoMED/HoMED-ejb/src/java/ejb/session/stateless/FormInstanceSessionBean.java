@@ -28,6 +28,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
+import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;

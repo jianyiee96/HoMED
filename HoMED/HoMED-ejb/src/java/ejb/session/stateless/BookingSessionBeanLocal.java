@@ -9,6 +9,7 @@ import java.util.List;
 import javax.ejb.Local;
 import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
+import util.exceptions.ConvertBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.MarkBookingAbsentException;
 import util.exceptions.MarkBookingAttendanceException;
@@ -17,7 +18,7 @@ import util.exceptions.UpdateBookingCommentException;
 @Local
 public interface BookingSessionBeanLocal {
 
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException;
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException;
     
     public void cancelBooking(Long bookingId, String cancellationComment) throws CancelBookingException;
 
@@ -33,7 +34,7 @@ public interface BookingSessionBeanLocal {
     
     public List<Booking> retrieveAllUpcomingBookings();
 
-    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment) throws CreateBookingException;
+    public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment, Boolean isForReview) throws CreateBookingException;
 
     public Booking attachFormInstancesByClerk(Long bookingSlotId, List<Long> additionalFormTemplateIds) throws AttachFormInstancesException;
 
@@ -43,6 +44,8 @@ public interface BookingSessionBeanLocal {
 
     public List<Booking> retrieveQueueBookingsByMedicalCentre(Long medicalCentreId);
 
-    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment) throws CreateBookingException;
+    public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException;
+    
+    public void convertBookingToReview(Long bookingId) throws ConvertBookingException;
     
 }
