@@ -7,6 +7,7 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
 import ejb.session.stateless.MedicalCentreSessionBeanLocal;
+import ejb.session.stateless.NotificationSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import java.util.logging.Level;
@@ -106,6 +107,16 @@ public class SessionBeanLookup {
         try {
             javax.naming.Context c = new InitialContext();
             return (ConsultationSessionBeanLocal) c.lookup(ejbModuleJndiPath + "ConsultationSessionBean!ejb.session.stateless.ConsultationSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+
+    public NotificationSessionBeanLocal lookupNotificationSessionBeanLocal() {
+        try {
+            javax.naming.Context c = new InitialContext();
+            return (NotificationSessionBeanLocal) c.lookup(ejbModuleJndiPath + "NotificationSessionBean!ejb.session.stateless.NotificationSessionBeanLocal");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

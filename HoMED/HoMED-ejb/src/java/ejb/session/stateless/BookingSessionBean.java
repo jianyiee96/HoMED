@@ -65,7 +65,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         query.setParameter("status", ConsultationStatusEnum.COMPLETED);
         return query.getResultList();
     }
-    
+
     @Override
     public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException {
 
@@ -119,7 +119,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
     }
-    
+
     @Override
     // TO SUPPORT INIT CREATE OF HISTORICAL DATA
     public Booking createBookingByInit(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException {

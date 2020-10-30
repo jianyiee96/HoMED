@@ -82,7 +82,10 @@ public class Serviceman implements Serializable {
 
     @OneToMany
     private List<Booking> bookings;
-    
+
+    @OneToMany
+    private List<Notification> notifications;
+
     @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
@@ -100,19 +103,20 @@ public class Serviceman implements Serializable {
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     private String salt;
-    
+
     @Column(columnDefinition = "CHAR(32)")
     private String token;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date tokenExp;
-    
+
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
         this.address = new Address();
         this.formInstances = new ArrayList<>();
         this.bookings = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     // Cloning
@@ -130,7 +134,7 @@ public class Serviceman implements Serializable {
         this.role = another.role;
         this.salt = another.salt;
     }
-    
+
     public Serviceman(String name, String password, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
@@ -144,7 +148,7 @@ public class Serviceman implements Serializable {
         this.address = address;
         setPassword(password);
     }
-    
+
     public Serviceman(String name, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
@@ -224,7 +228,7 @@ public class Serviceman implements Serializable {
             this.password = null;
         }
     }
-    
+
     public void setHashPassword(String password) {
         this.password = password;
     }
@@ -268,7 +272,15 @@ public class Serviceman implements Serializable {
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
-    
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -312,7 +324,7 @@ public class Serviceman implements Serializable {
     public void setTokenExp(Date tokenExp) {
         this.tokenExp = tokenExp;
     }
-    
+
     @Override
     public String toString() {
         return "Serviceman [ id: " + servicemanId + " ]";
