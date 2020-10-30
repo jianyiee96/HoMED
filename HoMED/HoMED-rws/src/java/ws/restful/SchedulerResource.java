@@ -5,11 +5,13 @@
 package ws.restful;
 
 import ejb.session.stateless.BookingSessionBeanLocal;
+import ejb.session.stateless.NotificationSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Booking;
 import entity.BookingSlot;
 import entity.FormInstance;
+import entity.Notification;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import util.exceptions.CancelBookingException;
 import util.exceptions.CreateBookingException;
+import util.exceptions.CreateNotificationException;
 import ws.datamodel.CancelBookingReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.QueryBookingSlotsReq;
@@ -46,11 +49,14 @@ public class SchedulerResource {
 
     private final BookingSessionBeanLocal bookingSessionBeanLocal;
 
+    private final NotificationSessionBeanLocal notificationSessionBeanLocal;
+
     public SchedulerResource() {
         this.sessionBeanLookup = new SessionBeanLookup();
         this.servicemanSessionBeanLocal = this.sessionBeanLookup.lookupServicemanSessionBeanLocal();
         this.slotSessionBeanLocal = this.sessionBeanLookup.lookupSlotSessionBeanLocal();
         this.bookingSessionBeanLocal = this.sessionBeanLookup.lookupBookingSessionBeanLocal();
+        this.notificationSessionBeanLocal = this.sessionBeanLookup.lookupNotificationSessionBeanLocal();
     }
 
     @Path("queryBookingSlots")
@@ -112,15 +118,19 @@ public class SchedulerResource {
 
         try {
             Boolean isForReview = Boolean.FALSE;
-            if(scheduleBookingReq.getIsForReview() != null) {
+            if (scheduleBookingReq.getIsForReview() != null) {
                 isForReview = scheduleBookingReq.getIsForReview();
             }
-            
+
             Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment(), isForReview);
             Long bookingId = booking.getBookingId();
+
+            Notification n = new Notification("Booking Created Successfully", "Your booking has been created successfully.");
+            notificationSessionBeanLocal.createNewNotification(n, scheduleBookingReq.getServicemanId(), true);
+
             return Response.status(Response.Status.OK).entity(new ScheduleBookingRsp(bookingId)).build();
 
-        } catch (CreateBookingException ex) {
+        } catch (CreateBookingException | CreateNotificationException ex) {
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();

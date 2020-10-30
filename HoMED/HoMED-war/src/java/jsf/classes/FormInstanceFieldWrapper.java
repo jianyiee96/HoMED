@@ -47,7 +47,7 @@ public class FormInstanceFieldWrapper {
                 .collect(Collectors.toList()));
 
         if (checkError) {
-            if (this.getFormInstanceField().getFormFieldMapping().getIsRequired() && this.accessEnum != FormFieldAccessEnum.BOARD) {
+            if (this.getFormInstanceField().getFormFieldMapping().getIsRequired()) {
                 if (this.getFormInstanceField().getFormInstanceFieldValues().isEmpty()) {
                     this.setErrorMessage("Question " + this.getFormInstanceField().getFormFieldMapping().getPosition() + " is required");
                 } else {
@@ -90,7 +90,7 @@ public class FormInstanceFieldWrapper {
     }
 
     public boolean renderAccessLabel() {
-        return this.accessEnum == FormFieldAccessEnum.BOARD || this.accessEnum == FormFieldAccessEnum.MO;
+        return this.accessEnum == FormFieldAccessEnum.MO;
     }
 
     public boolean renderLock() {

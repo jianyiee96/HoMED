@@ -1,7 +1,9 @@
 package jsf.managedBean;
 
+import ejb.session.stateless.BookingSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import entity.Consultation;
 import entity.Employee;
 import entity.MedicalOfficer;
@@ -18,6 +20,9 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
+import util.enumeration.MedicalBoardTypeEnum;
+import util.exceptions.ConvertBookingException;
+import util.exceptions.CreateMedicalBoardCaseException;
 import util.exceptions.DeferConsultationException;
 import util.exceptions.EndConsultationException;
 import util.exceptions.InvalidateConsultationException;
@@ -33,6 +38,12 @@ public class CurrentConsultationManagedBean implements Serializable {
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
     @EJB
+    private BookingSessionBeanLocal bookingSessionBeanLocal;
+
+    @EJB
+    private MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanlocal;
+
+    @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     private List<Consultation> servicemanConsultations;
@@ -42,6 +53,12 @@ public class CurrentConsultationManagedBean implements Serializable {
     private Consultation selectedConsultation;
 
     private String cancelBookingComments;
+
+    private Boolean currentConsultationTypeConvertedToReview;
+
+    private String currentConsultationReviewAction;
+
+    private String currentConsultationStatement;
 
     public CurrentConsultationManagedBean() {
         this.servicemanConsultations = new ArrayList<>();
@@ -54,6 +71,13 @@ public class CurrentConsultationManagedBean implements Serializable {
         if (currentEmployee != null && currentEmployee instanceof MedicalOfficer) {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
             selectedConsultation = currentMedicalOfficer.getCurrentConsultation();
+            currentConsultationReviewAction = "NIL";
+
+            if (selectedConsultation != null && selectedConsultation.getBooking().getIsForReview()) {
+                currentConsultationTypeConvertedToReview = null;
+            } else {
+                currentConsultationTypeConvertedToReview = Boolean.FALSE;
+            }
         }
 
         refreshServicemanConsultations();
@@ -95,14 +119,47 @@ public class CurrentConsultationManagedBean implements Serializable {
             if (unsignedForms) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Form Instance Unsigned", "Please make sure all forms have been signed"));
             } else {
-                consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
+
+                // Case 1: Started as general consultation, ended as general consultation
+                if (!selectedConsultation.getBooking().getIsForReview() && !this.currentConsultationTypeConvertedToReview) {
+
+                    consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
+
+                } // Case 2: Started as general consultation, converted to review and ended as premedical board review
+                else if (!selectedConsultation.getBooking().getIsForReview() && this.currentConsultationTypeConvertedToReview) {
+
+                    bookingSessionBeanLocal.convertBookingToReview(selectedConsultation.getBooking().getBookingId());
+
+                    if (this.currentConsultationReviewAction.equals("MBIP")) {
+                        medicalBoardCaseSessionBeanlocal.createMedicalBoardCaseByReview(selectedConsultation.getConsultationId(), MedicalBoardTypeEnum.PRESENCE, currentConsultationStatement);
+                    } else if (this.currentConsultationReviewAction.equals("MBIA")) {
+                        medicalBoardCaseSessionBeanlocal.createMedicalBoardCaseByReview(selectedConsultation.getConsultationId(), MedicalBoardTypeEnum.ABSENCE, currentConsultationStatement);
+                    }
+                    
+                    consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
+
+
+                } // Case 3: Started as premedical board review, ended as premedical board review.
+                else if (selectedConsultation.getBooking().getIsForReview()) {
+
+                    if (this.currentConsultationReviewAction.equals("MBIP")) {
+                        medicalBoardCaseSessionBeanlocal.createMedicalBoardCaseByReview(selectedConsultation.getConsultationId(), MedicalBoardTypeEnum.PRESENCE, currentConsultationStatement);
+                    } else if (this.currentConsultationReviewAction.equals("MBIA")) {
+                        medicalBoardCaseSessionBeanlocal.createMedicalBoardCaseByReview(selectedConsultation.getConsultationId(), MedicalBoardTypeEnum.ABSENCE, currentConsultationStatement);
+                    }
+
+                    consultationSessionBeanLocal.endConsultation(selectedConsultation.getConsultationId(), currentMedicalOfficer.getCurrentConsultation().getRemarks(), currentMedicalOfficer.getCurrentConsultation().getRemarksForServiceman());
+
+
+                }
+
                 try {
                     FacesContext.getCurrentInstance().getExternalContext().redirect("queue-management.xhtml");
                 } catch (IOException ex) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
                 }
             }
-        } catch (EndConsultationException ex) {
+        } catch (EndConsultationException | ConvertBookingException | CreateMedicalBoardCaseException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to end consultation!", ex.getMessage()));
         }
     }
@@ -133,6 +190,10 @@ public class CurrentConsultationManagedBean implements Serializable {
         } catch (InvalidateConsultationException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mark Absent Error: " + ex.getMessage(), null));
         }
+    }
+
+    public void toggleCurrentConsultationType() {
+        this.currentConsultationTypeConvertedToReview = !this.currentConsultationTypeConvertedToReview;
     }
 
     public Boolean getIsCurrentConsultation() {
@@ -173,6 +234,30 @@ public class CurrentConsultationManagedBean implements Serializable {
 
     public void setCancelBookingComments(String cancelBookingComments) {
         this.cancelBookingComments = cancelBookingComments;
+    }
+
+    public Boolean getCurrentConsultationTypeConvertedToReview() {
+        return currentConsultationTypeConvertedToReview;
+    }
+
+    public void setCurrentConsultationTypeConvertedToReview(Boolean currentConsultationTypeConvertedToReview) {
+        this.currentConsultationTypeConvertedToReview = currentConsultationTypeConvertedToReview;
+    }
+
+    public String getCurrentConsultationReviewAction() {
+        return currentConsultationReviewAction;
+    }
+
+    public void setCurrentConsultationReviewAction(String currentConsultationReviewAction) {
+        this.currentConsultationReviewAction = currentConsultationReviewAction;
+    }
+
+    public String getCurrentConsultationStatement() {
+        return currentConsultationStatement;
+    }
+
+    public void setCurrentConsultationStatement(String currentConsultationStatement) {
+        this.currentConsultationStatement = currentConsultationStatement;
     }
 
 }

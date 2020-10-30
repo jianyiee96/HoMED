@@ -54,10 +54,10 @@
                                 </div>
                             </f:facet>
 
-                            <p:column headerText="Position" width="70" filterBy="#{index}" filterMatchMode="contains">
+                            <p:column headerText="Position" width="8%" filterBy="#{index}" filterMatchMode="contains">
                                 <h:outputText value="#{index + 1}"/>
                             </p:column>
-                            <p:column headerText="Queue Number" filterBy="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" filterMatchMode="contains">
+                            <p:column headerText="Queue Number" width="13%" filterBy="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" filterMatchMode="contains">
                                 <h:outputText value="#{queueManagementManagedBean.formatQueueNumber(consultation.booking.bookingId)}" />
                             </p:column>
                             <p:column headerText="Serviceman Name" filterBy="#{consultation.booking.serviceman.name}" filterMatchMode="contains">
@@ -68,13 +68,19 @@
                                     <f:convertDateTime pattern="HH:mm"/>
                                 </h:outputText>
                             </p:column>
-                            <p:column headerText="Booking Time" filterBy="#{consultation.booking.bookingSlot.startDateTime}" filterMatchMode="contains">
+                            <p:column headerText="Booking Time" width="12%" filterBy="#{consultation.booking.bookingSlot.startDateTime}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.bookingSlot.startDateTime}" >
                                     <f:convertDateTime pattern="HH:mm"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="Consultation Purpose" filterBy="#{consultation.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
                                 <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
+                            </p:column>
+
+                            <p:column headerText="PMB Review" width="12%">
+                                <ui:fragment rendered="#{consultation.booking.isForReview}" >
+                                    <i  class="pi pi-check"></i> 
+                                </ui:fragment>
                             </p:column>
                         </p:dataTable>
                     </p:panel>
@@ -99,6 +105,9 @@
                                                 <p:outputLabel value="Purpose: " />
                                                 <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
+                                                <p:outputLabel value="Type: " />
+                                                <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.booking.isForReview ? 'Pre-Medical Board Review' : 'General Consultation'}" class="display-text" />                                
+                                                
                                                 <p:outputLabel value="Queueing Since: " />
                                                 <p:outputLabel value="#{queueManagementManagedBean.selectedConsultation.joinQueueDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>

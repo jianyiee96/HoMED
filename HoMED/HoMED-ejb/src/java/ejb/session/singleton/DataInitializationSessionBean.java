@@ -311,7 +311,8 @@ public class DataInitializationSessionBean {
 //          && isAfterToday
             if (Math.random() <= rate) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
-                Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.", Boolean.FALSE);
+                Boolean isForReview = getRandomNumber(0,10) % 2 == 0 ? Boolean.TRUE : Boolean.FALSE;
+                Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.", isForReview);
                 bookings.add(booking);
 
                 int count = bookingHm.containsKey(serviceman) ? bookingHm.get(serviceman) : 0;
@@ -595,7 +596,6 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Who is your favaourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
         formFields.add(new FormField("Who is your favourite serviceman?", 4, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.MO, null));
         formFields.add(new FormField("Who is your favourite chairman?", 5, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        formFields.add(new FormField("Who is your favourite serviceman / docotor", 6, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.BOARD, null));
         
         otherFormTemplate.setFormFields(formFields);
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);

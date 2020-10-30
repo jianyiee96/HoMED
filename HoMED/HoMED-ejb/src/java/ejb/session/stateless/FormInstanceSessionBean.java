@@ -283,8 +283,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         for (FormInstanceField fif : formInstance.getFormInstanceFields()) {
 
             if (fif.getFormFieldMapping().getIsRequired()
-                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER
-                    && fif.getFormFieldMapping().getFormFieldAccess() != FormFieldAccessEnum.BOARD) { // not header, is required
+                    && fif.getFormFieldMapping().getInputType() != InputTypeEnum.HEADER) { // not header, is required
                 boolean hasContent = false;
                 for (FormInstanceFieldValue fifv : fif.getFormInstanceFieldValues()) {
                     if (fifv.getInputValue() != null && !fifv.getInputValue().equals("")) {

@@ -155,7 +155,13 @@
                                 <p:column headerText="Consultation Purpose">
                                     <h:outputText value="#{consultation.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
-                                
+
+                                <p:column headerText="PMB Review" width="12%">
+                                    <ui:fragment rendered="#{consultation.booking.isForReview}" >
+                                        <i class="pi pi-check"></i> 
+                                    </ui:fragment>
+                                </p:column>
+
                                 <p:column headerText="Attending Doctor">
                                     <h:outputText value="#{consultation.medicalOfficer.name}" />
                                 </p:column>
@@ -184,10 +190,13 @@
                                                 <p:outputLabel value="Purpose: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.consultationPurpose.consultationPurposeName}" class="display-text" />                                
 
+                                                <p:outputLabel value="Type: " />
+                                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.isForReview ? 'Pre-Medical Board Review' : 'General Consultation'}" class="display-text" />                                
+
                                                 <p:outputLabel value="Booking Comment: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" rendered="#{not empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
                                                 <p:outputLabel value="N.A." rendered="#{empty servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.bookingComment}" class="display-text" />                                
-                                                
+
                                                 <p:outputLabel value="Started at: " />
                                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.startDateTime}" class="display-text">
                                                     <f:convertDateTime pattern="HH:mm"/>
@@ -250,6 +259,25 @@
                                         <h:outputText rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.remarksForServiceman == null}" value="No remarks" />
                                     </h:panelGrid>
                                 </li>
+                                <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.booking.isForReview}">
+                                    <li>
+                                        <h5>Pre-Medical Board Review</h5>
+                                        <h:panelGrid columns="1" cellpadding="5">
+                                            <p:outputLabel rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase != null}" value="Proceeded with #{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase.medicalBoardType.stringVal}" />
+                                            <p:outputLabel rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase == null}" value="Did not proceed with Medical Board" />
+                                        </h:panelGrid>
+                                        
+                                        <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase != null}">
+                                            <div style="padding: 5px; margin-top: 5px">
+                                                <h6>Statement of Case:</h6>
+                                                <h:panelGrid frame="box" columns="1" cellpadding="5" width="100%">
+                                                    <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase.statementOfCase}" escape="false" />
+                                                </h:panelGrid>
+                                            </div>
+                                        </ui:fragment>
+                                        
+                                    </li>
+                                </ui:fragment>
                             </ul>
                         </div>
                     </div>

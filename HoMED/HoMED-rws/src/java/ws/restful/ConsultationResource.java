@@ -139,15 +139,17 @@ public class ConsultationResource {
 
             for (Consultation c : consultations) {
 
+                c.getMedicalBoardCase().setConsultation(null);
+
                 Booking b = c.getBooking();
 
                 BookingSlot bs = b.getBookingSlot();
                 bs.setBooking(null);
-                
+
                 MedicalCentre mc = bs.getMedicalCentre();
                 mc.setBookingSlots(null);
                 mc.setMedicalStaffList(null);
-                
+
                 b.setConsultation(null);
                 b.setConsultationPurpose(new ConsultationPurpose(b.getConsultationPurpose().getConsultationPurposeName()));
                 b.setServiceman(null);
