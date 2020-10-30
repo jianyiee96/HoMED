@@ -8,14 +8,14 @@ package ws.datamodel;
  *
  * @author Keith Lim <https://github.com/keithlim>
  */
-public class HasUnfetchedServicemanNotificationsRsp2 {
+public class HasUnfetchedServicemanNotificationsRsp {
 
     private Boolean hasUnfetchedNotifications;
 
-    public HasUnfetchedServicemanNotificationsRsp2() {
+    public HasUnfetchedServicemanNotificationsRsp() {
     }
 
-    public HasUnfetchedServicemanNotificationsRsp2(Boolean hasUnfetchedNotifications) {
+    public HasUnfetchedServicemanNotificationsRsp(Boolean hasUnfetchedNotifications) {
         this.hasUnfetchedNotifications = hasUnfetchedNotifications;
     }
 
