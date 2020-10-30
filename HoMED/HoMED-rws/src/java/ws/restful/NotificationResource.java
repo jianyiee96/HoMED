@@ -88,7 +88,7 @@ public class NotificationResource {
     @Path("hasUnfetchedNotifications")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response hasUnfetchServicemanNotifications(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
+    public Response hasUnfetchedServicemanNotifications(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
 
         try {
             String token = headers.getRequestHeader("Token").get(0);
