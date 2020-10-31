@@ -127,10 +127,15 @@
                                                         <h:outputText value="Chairman:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:selectOneMenu value="#{medicalBoardSlotWrapper.chairmanId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
+                                                        <p:selectOneMenu  value="#{medicalBoardSlotWrapper.chairmanId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedChairmen}" var="chairman" itemValue="#{chairman.employeeId}" itemLabel="#{chairman.name}"/>
 
+                                                            <f:facet name="footer">
+                                                                <p:separator />
+                                                                <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedChairmen.size()} remaining #{medicalBoardSlotWrapper.unallocatedChairmen.size() > 1 ? 'chairmen' : 'chairman'}" />
+                                                            </f:facet>
+                                                            
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
 
@@ -148,6 +153,11 @@
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
 
+                                                            <f:facet name="footer">
+                                                                <p:separator />
+                                                                <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne.size()} remaining #{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne.size() > 1 ? 'medical officers' : 'medical officers'}" />
+                                                            </f:facet>
+                                                            
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
                                                         <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" 
@@ -164,6 +174,11 @@
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
 
+                                                            <f:facet name="footer">
+                                                                <p:separator />
+                                                                <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo.size()} remaining #{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo.size() > 1 ? 'medical officers' : 'medical officers'}" />
+                                                            </f:facet>
+                                                            
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
 
@@ -188,7 +203,7 @@
                                                     <!-- Save Changes from Edit Button -->
                                                     <p:commandButton rendered="#{medicalBoardSlotWrapper.isEditMode}"
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.saveEdit(medicalBoardSlotWrapper)}"
-                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="@form" 
                                                                      styleClass="rounded-button success-button text-button" title="Save Changes" icon="pi pi-save">
                                                         <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="false" />
                                                         <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isEditState}" value="false" />
