@@ -42,7 +42,7 @@
                         <h:panelGroup id='rightPanel'>
                             <h:panelGrid columns="4">
                                 <p:commandButton rendered="#{not medicalBoardSlotManagementManagedBean.isScheduleState}" value="Schedule" icon="pi pi-calendar-plus" styleClass="primary-button" title="Schedule Medical Board Slots"
-                                                 disabled="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet.size() != 0}"
+                                                 disabled="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}"
                                                  update="rightPanel @form" process="@this" oncomplete="PF('medicalBoardSlots').update()">
                                     <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="true" />
                                 </p:commandButton>
@@ -66,7 +66,7 @@
                                 </p:commandButton>
                             </h:panelGrid>
 
-                            <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet.size() != 0}" columns="2">
+                            <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}" columns="2">
                                 <h2>Selected Medical Board Slots</h2>
 
                                 <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.deleteAllSelectedMedicalBoardSlots}"
@@ -77,11 +77,11 @@
                                 </p:commandButton>
                             </h:panelGrid>
 
-                            <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet.size() != 0}"
-                                      value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsTreeSet}" var="medicalBoardSlot">
+                            <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}"
+                                      value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet}" var="medicalBoardSlotWrapper">
                                 <div style="position: relative; margin-bottom: 1rem;">
                                     <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -7.5px; margin-top:-10px; position: absolute;" 
-                                                   value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotsMapping.get(medicalBoardSlot)}" />
+                                                   value="#{medicalBoardSlotWrapper.index}" />
 
                                     <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
                                         <div class="p-grid">
@@ -100,7 +100,7 @@
                                                         <h:outputText value="Board Date:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />                                      
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
@@ -109,7 +109,7 @@
                                                         <h:outputText value="Start Time:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlot.startDateTime)}" />                                      
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
@@ -118,7 +118,7 @@
                                                         <h:outputText value="End Time:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlot.endDateTime)}" />                                      
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlotWrapper.medicalBoardSlot.endDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
@@ -136,14 +136,14 @@
                                                 <div class="p-col">
                                                     
                                                     
-                                                    <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlot.startDateTime)}"
-                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
+                                                    <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}"
+                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"
                                                                      styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" >
                                                         <p:confirm header="Delete Medical Board Slot" message="Confirm delete medical board slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
 
-                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlot)}"
+                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" styleClass="rounded-button text-button" title="Close" icon="pi pi-times" />           
                                                 </div>
                                             </div>

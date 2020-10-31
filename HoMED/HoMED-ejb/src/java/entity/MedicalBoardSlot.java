@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
-public class MedicalBoardSlot extends Slot implements Serializable, Comparable<MedicalBoardSlot> {
+public class MedicalBoardSlot extends Slot implements Serializable {
 
     @ManyToOne(optional = true)
     private MedicalOfficer chairman;
@@ -67,18 +67,6 @@ public class MedicalBoardSlot extends Slot implements Serializable, Comparable<M
 
     public void setMedicalBoardCases(List<MedicalBoardCase> medicalBoardCases) {
         this.medicalBoardCases = medicalBoardCases;
-    }
-
-    @Override
-    public int compareTo(MedicalBoardSlot another) {
-
-        if (super.getStartDateTime().before(another.getStartDateTime())) {
-            return -1;
-        } else if (super.getStartDateTime().after(another.getStartDateTime())) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     @Override

@@ -15,14 +15,11 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -30,6 +27,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import jsf.classes.MedicalBoardSlotWrapper;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
@@ -37,7 +35,6 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import util.exceptions.RemoveSlotException;
-import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
 
 @Named(value = "medicalBoardSlotManagementManagedBean")
@@ -49,10 +46,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
     private MedicalStaff currentMedicalBoardAdmin;
 
-    private List<MedicalBoardSlot> medicalBoardSlots;
-
-    private Map<MedicalBoardSlot, ScheduleEvent> selectedMedicalBoardSlotsTreeMap;
-    private Map<MedicalBoardSlot, Integer> selectedMedicalBoardSlotsMapping;
+    private Set<MedicalBoardSlotWrapper> selectedMedicalBoardSlotWrappersTreeSet;
 
     private Boolean isScheduleState;
 
@@ -73,7 +67,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
-        this.selectedMedicalBoardSlotsTreeMap = new TreeMap<>();
+        this.selectedMedicalBoardSlotWrappersTreeSet = new TreeSet<>();
         Employee currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
         if (currentEmployee != null && currentEmployee instanceof MedicalBoardAdmin) {
             currentMedicalBoardAdmin = (MedicalBoardAdmin) currentEmployee;
@@ -85,8 +79,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         existingEventModel.clear();
         newEventModel.clear();
 
-        selectedMedicalBoardSlotsMapping = new HashMap<>();
-        medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+        List<MedicalBoardSlot> medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
 
         int startHour = 24;
         int endHour = 0;
@@ -95,18 +88,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             startHour = Math.min(startHour, mbs.getStartHour());
             endHour = Math.max(endHour, mbs.getEndHour());
 
-            // Need to handle for Medical Board Status in SR4
-//            if (mbs.getMedicalBoard() != null) {
-//                existingEventModel.addEvent(DefaultScheduleEvent.builder()
-//                        .title("Upcoming")
-//                        .startDate(mbs.getStartDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-//                        .endDate(mbs.getEndDateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-//                        .overlapAllowed(false)
-//                        .editable(false)
-//                        .styleClass("booked-medical-board-slot")
-//                        .data(mbs)
-//                        .build());
-//            } else {
             if (mbs.getEndDateTime().after(new Date())) {
                 existingEventModel.addEvent(DefaultScheduleEvent.builder()
                         .title("Available")
@@ -128,7 +109,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                         .data(mbs)
                         .build());
             }
-//            }
         }
 
         if (startHour >= endHour) {
@@ -150,26 +130,19 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
     private void updateSelectedMedicalBoardSlotsView(MedicalBoardSlot medicalBoardSlotToRemove) {
         int idx = 0;
-        for (Map.Entry<MedicalBoardSlot, ScheduleEvent> entrySet : selectedMedicalBoardSlotsTreeMap.entrySet()) {
 
-            MedicalBoardSlot mbs = entrySet.getKey();
-            ScheduleEvent scheduleEvent = entrySet.getValue();
+        for (MedicalBoardSlotWrapper mbsWrapper : this.selectedMedicalBoardSlotWrappersTreeSet) {
+            MedicalBoardSlot mbs = mbsWrapper.getMedicalBoardSlot();
+            ScheduleEvent scheduleEvent = mbsWrapper.getScheduleEvent();
 
             String title;
             String styleClass = "selected-booking-slot";
+
             boolean isSameMedicalBoardSlot = mbs.equals(medicalBoardSlotToRemove);
             if (!isSameMedicalBoardSlot) {
                 idx++;
             }
 
-//            if (mbs.getMedicalBoard() != null) {
-//                title = "Upcoming";
-//                if (isSameMedicalBoardSlot) {
-//                    styleClass = "booked-medical-board-slot";
-//                } else {
-//                    title += "[" + idx + "]";
-//                }
-//            } else {
             if (mbs.getEndDateTime().after(new Date())) {
                 title = "Available";
 
@@ -189,9 +162,8 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                     title += "[" + idx + "]";
                 }
             }
-//            }
 
-            selectedMedicalBoardSlotsMapping.put(mbs, idx);
+            mbsWrapper.setIndex(idx);
 
             existingEventModel.updateEvent(DefaultScheduleEvent.builder()
                     .id(scheduleEvent.getId())
@@ -212,18 +184,25 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
             if (event.getData() != null) {
                 MedicalBoardSlot mbs = (MedicalBoardSlot) event.getData();
-                if (!this.selectedMedicalBoardSlotsTreeMap.containsKey(mbs)) {
-                    if (selectedMedicalBoardSlotsTreeMap.size() >= 10) {
-                        addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Booking Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
-                    } else {
-                        // To add the mbs-event pair to the tree map first before updating the colour of the event.
-                        this.selectedMedicalBoardSlotsTreeMap.put(mbs, event);
-                        updateSelectedMedicalBoardSlotsView(null);
-                    }
-                } else {
+                Optional<MedicalBoardSlotWrapper> optionalMbsWrapper = this.selectedMedicalBoardSlotWrappersTreeSet
+                        .stream()
+                        .filter(wrapper -> wrapper.getMedicalBoardSlot().equals(mbs))
+                        .findFirst();
+
+                if (optionalMbsWrapper.isPresent()) {
+                    MedicalBoardSlotWrapper mbsWrapper = optionalMbsWrapper.get();
+
                     // To reset the colour of the event first before removing the mbs-event pair from the tree map.
                     updateSelectedMedicalBoardSlotsView(mbs);
-                    this.selectedMedicalBoardSlotsTreeMap.remove(mbs);
+                    this.selectedMedicalBoardSlotWrappersTreeSet.remove(mbsWrapper);
+                } else {
+                    if (this.selectedMedicalBoardSlotWrappersTreeSet.size() >= 10) {
+                        addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Too Many Medical Board Slots Selected", "Only a maximum of 10 medical board slots can be selected in one shot!"));
+                    } else {
+                        // To add the mbs-event pair to the tree map first before updating the colour of the event.
+                        this.selectedMedicalBoardSlotWrappersTreeSet.add(new MedicalBoardSlotWrapper(mbs, event));
+                        updateSelectedMedicalBoardSlotsView(null);
+                    }
                 }
             }
         } else {
@@ -337,24 +316,25 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         return dateFormat.format(date);
     }
 
-    public void closeSelectedMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
-        updateSelectedMedicalBoardSlotsView(medicalBoardSlot);
-        this.selectedMedicalBoardSlotsTreeMap.remove(medicalBoardSlot);
+    public void closeSelectedMedicalBoardSlot(MedicalBoardSlotWrapper medicalBoardSlotWrapper) {
+        updateSelectedMedicalBoardSlotsView(medicalBoardSlotWrapper.getMedicalBoardSlot());
+
+        this.selectedMedicalBoardSlotWrappersTreeSet.remove(medicalBoardSlotWrapper);
     }
 
-    public void deleteSelectedMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+    public void deleteSelectedMedicalBoardSlot(MedicalBoardSlotWrapper medicalBoardSlotWrapper) {
         try {
-            slotSessionBeanLocal.removeMedicalBoardSlot(medicalBoardSlot.getSlotId());
+            slotSessionBeanLocal.removeMedicalBoardSlot(medicalBoardSlotWrapper.getMedicalBoardSlot().getSlotId());
 
-            updateSelectedMedicalBoardSlotsView(medicalBoardSlot);
-            
-            // Remove the event from the schedule component
-            this.existingEventModel.deleteEvent(this.selectedMedicalBoardSlotsTreeMap.get(medicalBoardSlot));
+            updateSelectedMedicalBoardSlotsView(medicalBoardSlotWrapper.getMedicalBoardSlot());
 
-            // Remove the slot from the tree map
-            this.selectedMedicalBoardSlotsTreeMap.remove(medicalBoardSlot);
+            // Remove the selected event from the schedule component
+            this.existingEventModel.deleteEvent(medicalBoardSlotWrapper.getScheduleEvent());
+
+            // Remove the selected wrapper from the tree set
+            this.selectedMedicalBoardSlotWrappersTreeSet.remove(medicalBoardSlotWrapper);
         } catch (RemoveSlotException ex) {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Booking Slot", ex.getMessage()));
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Unable to Delete Medical Board Slot", ex.getMessage()));
         }
     }
 
@@ -418,32 +398,27 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         this.currentMedicalBoardAdmin = currentMedicalBoardAdmin;
     }
 
-    public List<MedicalBoardSlot> getMedicalBoardSlots() {
-        return medicalBoardSlots;
+    public Set<MedicalBoardSlotWrapper> getSelectedMedicalBoardSlotWrappersTreeSet() {
+        return selectedMedicalBoardSlotWrappersTreeSet;
     }
 
-    public void setMedicalBoardSlots(List<MedicalBoardSlot> medicalBoardSlots) {
-        this.medicalBoardSlots = medicalBoardSlots;
-    }
-
-    public Map<MedicalBoardSlot, ScheduleEvent> getSelectedMedicalBoardSlotsTreeMap() {
-        return selectedMedicalBoardSlotsTreeMap;
-    }
-
-    public Set<MedicalBoardSlot> getSelectedMedicalBoardSlotsTreeSet() {
-        Set<MedicalBoardSlot> selectedMedicalBoardSlotsTreeSet = new TreeSet<>();
-
-        selectedMedicalBoardSlotsTreeMap.entrySet().forEach(entrySet -> {
-            selectedMedicalBoardSlotsTreeSet.add(entrySet.getKey());
-        });
-
-        return selectedMedicalBoardSlotsTreeSet;
-    }
-
-    public Map<MedicalBoardSlot, Integer> getSelectedMedicalBoardSlotsMapping() {
-        return selectedMedicalBoardSlotsMapping;
-    }
-
+//    public Map<MedicalBoardSlot, ScheduleEvent> getSelectedMedicalBoardSlotsTreeMap() {
+//        return selectedMedicalBoardSlotsTreeMap;
+//    }
+//
+//    public Set<MedicalBoardSlot> getSelectedMedicalBoardSlotsTreeSet() {
+//        Set<MedicalBoardSlot> selectedMedicalBoardSlotsTreeSet = new TreeSet<>();
+//
+//        selectedMedicalBoardSlotsTreeMap.entrySet().forEach(entrySet -> {
+//            selectedMedicalBoardSlotsTreeSet.add(entrySet.getKey());
+//        });
+//
+//        return selectedMedicalBoardSlotsTreeSet;
+//    }
+//
+//    public Map<MedicalBoardSlot, Integer> getSelectedMedicalBoardSlotsMapping() {
+//        return selectedMedicalBoardSlotsMapping;
+//    }
     public Boolean getIsScheduleState() {
         return isScheduleState;
     }

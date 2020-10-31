@@ -176,35 +176,6 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         return mbs;
     }
 
-//    @Override
-//    public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
-//        rangeStart = roundDate30Minute(rangeStart);
-//        rangeEnd = roundDate30Minute(rangeEnd);
-//
-//        if (!rangeStart.before(rangeEnd)) {
-//            throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
-//        }
-//        Calendar rangeStartCalendar = Calendar.getInstance();
-//        rangeStartCalendar.setTime(rangeStart);
-//        Calendar rangeEndCalendar = Calendar.getInstance();
-//        rangeEndCalendar.setTime(rangeEnd);
-//
-//        List<MedicalBoardSlot> createdMedicalBoardSlots = new ArrayList<>();
-//
-//        while (rangeStartCalendar.before(rangeEndCalendar)) {
-//            Date currStart = rangeStartCalendar.getTime();
-//            rangeStartCalendar.add(Calendar.MINUTE, 30);
-//            Date currEnd = rangeStartCalendar.getTime();
-//
-//            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
-//            em.persist(mbs);
-//            em.flush();
-//            createdMedicalBoardSlots.add(mbs);
-//        }
-//
-//        System.out.println("Created " + createdMedicalBoardSlots.size() + " Medical Board Slots");
-//        return createdMedicalBoardSlots;
-//    }
     @Override
     public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
         Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb");
