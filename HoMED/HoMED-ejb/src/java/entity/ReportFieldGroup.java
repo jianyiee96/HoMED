@@ -15,7 +15,7 @@ public class ReportFieldGroup implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reportFieldValueGroupId;
+    private Long reportFieldGroupId;
 
     @Column(nullable = true, length = 128)
     @NotNull(message = "Group Name must be between length 1 to 128")
@@ -35,12 +35,12 @@ public class ReportFieldGroup implements Serializable {
         this.quantity = quantity;
     }
 
-    public Long getReportFieldValueGroupId() {
-        return reportFieldValueGroupId;
+    public Long getReportFieldGroupId() {
+        return reportFieldGroupId;
     }
 
-    public void setReportFieldValueGroupId(Long reportFieldValueGroupId) {
-        this.reportFieldValueGroupId = reportFieldValueGroupId;
+    public void setReportFieldGroupId(Long reportFieldGroupId) {
+        this.reportFieldGroupId = reportFieldGroupId;
     }
 
     public String getName() {
@@ -62,18 +62,18 @@ public class ReportFieldGroup implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (reportFieldValueGroupId != null ? reportFieldValueGroupId.hashCode() : 0);
+        hash += (reportFieldGroupId != null ? reportFieldGroupId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the reportFieldValueGroupId fields are not set
+        // TODO: Warning - this method won't work in the case the reportFieldGroupId fields are not set
         if (!(object instanceof ReportFieldGroup)) {
             return false;
         }
         ReportFieldGroup other = (ReportFieldGroup) object;
-        if ((this.reportFieldValueGroupId == null && other.reportFieldValueGroupId != null) || (this.reportFieldValueGroupId != null && !this.reportFieldValueGroupId.equals(other.reportFieldValueGroupId))) {
+        if ((this.reportFieldGroupId == null && other.reportFieldGroupId != null) || (this.reportFieldGroupId != null && !this.reportFieldGroupId.equals(other.reportFieldGroupId))) {
             return false;
         }
         return true;
@@ -81,7 +81,7 @@ public class ReportFieldGroup implements Serializable {
 
     @Override
     public String toString() {
-        return "ReportFieldValueGroup [ id: " + reportFieldValueGroupId + " ]";
+        return "ReportFieldValueGroup [ id: " + reportFieldGroupId + " ]";
     }
 
 }

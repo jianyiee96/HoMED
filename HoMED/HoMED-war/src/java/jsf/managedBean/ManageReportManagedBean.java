@@ -2,59 +2,55 @@ package jsf.managedBean;
 
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.ReportSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Consultation;
+import entity.Employee;
 import entity.MedicalOfficer;
 import entity.Report;
 import entity.ReportField;
 import entity.ReportFieldGroup;
 import entity.Serviceman;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import javax.servlet.http.HttpServletRequest;
+import jsf.classes.ReportFieldWrapper;
 import org.primefaces.PrimeFaces;
-import org.primefaces.model.charts.ChartData;
-import org.primefaces.model.charts.axes.cartesian.CartesianScaleLabel;
-import org.primefaces.model.charts.axes.cartesian.CartesianScales;
-import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
-import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearTicks;
-import org.primefaces.model.charts.bar.BarChartDataSet;
-import org.primefaces.model.charts.bar.BarChartModel;
-import org.primefaces.model.charts.bar.BarChartOptions;
-import org.primefaces.model.charts.optionconfig.legend.Legend;
-import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
-import org.primefaces.model.charts.pie.PieChartDataSet;
-import org.primefaces.model.charts.pie.PieChartModel;
 import util.enumeration.BookingStatusEnum;
-import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FilterDateType;
 import util.enumeration.ReportDataGrouping;
 import util.enumeration.ReportDataType;
 import util.enumeration.ReportDataValue;
 import util.enumeration.ReportFieldType;
+import util.enumeration.ReportNotFoundException;
+import util.exceptions.CreateReportException;
+import util.exceptions.UpdateReportException;
 
 @Named(value = "manageReportManagedBean")
 @ViewScoped
 public class ManageReportManagedBean implements Serializable {
+
+    @EJB(name = "ReportSessionBeanLocal")
+    private ReportSessionBeanLocal reportSessionBeanLocal;
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -65,9 +61,13 @@ public class ManageReportManagedBean implements Serializable {
     @EJB(name = "ServicemanSessionBeanLocal")
     private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
 
-    private Long reportToViewId;
+    private Employee currentEmployee;
     private String redirectMessage;
 
+    // To detect new report creation (AKA when url param is empty)
+    private Boolean isCreateState;
+    // To detect view only (for viewing other employees published reports)
+    private Boolean isViewState;
     private Boolean isEditMode;
     private Report report;
     private FilterDateType filterDateType;
@@ -75,7 +75,12 @@ public class ManageReportManagedBean implements Serializable {
     private Date filterEndDate;
     private List<Date> filterRangeDates;
 
-    private ReportField reportField;
+    private List<ReportFieldWrapper> reportFieldWrappers;
+
+    // Either ADD/EDIT Mode
+    private Boolean isAddMode;
+    private ReportFieldWrapper reportFieldToAddWrapper;
+    private Integer reportFieldToEditWrapperIdx;
 
     private String dialogHeaderAddChart;
     private Integer idxAddChart;
@@ -84,46 +89,55 @@ public class ManageReportManagedBean implements Serializable {
     private List<Consultation> consultationsData;
     private List<MedicalOfficer> medicalOfficersData;
 
-    private PieChartModel pieModel;
-    private BarChartModel barModel;
-
-    List<String> bgColors;
-    List<String> borderColors;
-
     public ManageReportManagedBean() {
         filterRangeDates = new ArrayList<>();
+        this.reportFieldWrappers = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
-        this.pieModel = new PieChartModel();
-        this.barModel = new BarChartModel();
         refreshData();
-        setColours();
         this.report = new Report();
-        this.reportField = new ReportField();
         this.dialogHeaderAddChart = "";
+        this.isAddMode = true;
         this.idxAddChart = 0;
-        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        if (flash.get("isCreate") != null) {
-            this.isEditMode = true;
-        } else {
-            try {
-                String param = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("reportToViewId");
-                if (param != null) {
-                    this.reportToViewId = Long.parseLong(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("reportToViewId"));
-                    // DO CHECK HERE
-                    // Ensure that the report that is being viewed is either published/owned by current employee
-                    // IF VALID, REFRESH AND RETRIEVE FROM DB
-                    // set filterDateType, filterStartDate, filterEndDate
 
+        currentEmployee = (Employee) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("currentEmployee");
+        try {
+            String param = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("reportToViewId");
+            if (param != null) {
+                isCreateState = false;
+                isEditMode = false;
+                Long reportToViewId = Long.parseLong(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("reportToViewId"));
+                Report report = this.reportSessionBeanLocal.retrieveReportById(reportToViewId);
+                if (!currentEmployee.equals(report.getEmployee()) && report.getDatePublished() == null) {
+                    this.report = null;
+                    this.redirectMessage = "Report either does not belong to you or it is not published! Redirecting to Report Management.";
+                } else if (!currentEmployee.equals(report.getEmployee()) && report.getDatePublished() != null) {
+                    isViewState = true;
+                    this.report = report;
+                    processReport(this.report);
+                } else {
+                    this.report = report;
+                    processReport(this.report);
                 }
-            } catch (NumberFormatException ex) {
-                this.report = null;
-                this.redirectMessage = "Invalid Report ID! Redirecting to Report Management.";
-//                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "View Report", "Invalid Report ID"));
+            } else {
+                isViewState = false;
+                isCreateState = true;
+                isEditMode = true;
+
+//                Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+//                System.out.println("OBJECT: " + flash.get("createReportSuccess"));
+//                if (flash.get("createReportSuccess") != null) {
+//                    FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Report Success", "......"));
+//                }
             }
-            this.isEditMode = false;
+        } catch (NumberFormatException ex) {
+            this.report = null;
+            this.redirectMessage = "Invalid Report ID! Redirecting to Report Management.";
+        } catch (ReportNotFoundException ex) {
+            this.report = null;
+            this.redirectMessage = "Invalid Report ID! Redirecting to Report Management.";
         }
     }
 
@@ -133,16 +147,45 @@ public class ManageReportManagedBean implements Serializable {
         this.medicalOfficersData = employeeSessionBeanLocal.retrieveAllMedicalOfficers();
     }
 
-    public void addHeader() {
-        ReportField rf = new ReportField();
-        rf.setType(ReportFieldType.HEADER);
-        this.report.getReportFields().add(rf);
+    public void processReport(Report report) {
+        reportFieldWrappers = report.getReportFields().stream()
+                .map(field -> {
+                    ReportFieldWrapper wrapper = new ReportFieldWrapper(field);
+                    wrapper.createChart();
+                    return wrapper;
+                })
+                .collect(Collectors.toList());
     }
 
-    public void doDeleteField(ReportField reportField) {
-        if (this.report.getReportFields().contains(reportField)) {
-            this.report.getReportFields().remove(reportField);
+    public void revProcessReport(Report report) {
+        // Maintain order of the fields
+        this.report.setReportFields(reportFieldWrappers.stream()
+                .map(wrapper -> wrapper.getReportField())
+                .collect(Collectors.toList())
+        );
+    }
+
+    public void addHeader() {
+        ReportField reportField = new ReportField();
+        reportField.setType(ReportFieldType.HEADER);
+        ReportFieldWrapper reportFieldWrapper = new ReportFieldWrapper(reportField);
+        this.reportFieldWrappers.add(reportFieldWrapper);
+        this.report.getReportFields().add(reportField);
+    }
+
+    public void doDeleteFieldWrapper(ReportFieldWrapper reportFieldWrapper) {
+        if (this.report.getReportFields().contains(reportFieldWrapper.getReportField())) {
+            this.report.getReportFields().remove(reportFieldWrapper.getReportField());
         }
+        this.reportFieldWrappers.remove(reportFieldWrapper);
+    }
+
+    public void doShiftDown(Integer initPos) {
+        Collections.swap(reportFieldWrappers, initPos, initPos + 1);
+    }
+
+    public void doShiftUp(Integer initPos) {
+        Collections.swap(reportFieldWrappers, initPos, initPos - 1);
     }
 
     public void doOpenDialogFilterDate() {
@@ -226,51 +269,84 @@ public class ManageReportManagedBean implements Serializable {
         }
     }
 
+    public void doOpenDialogEditChart(ReportFieldWrapper reportFieldWrapper, Integer idx) {
+        this.idxAddChart = 0;
+        this.isAddMode = false;
+        this.dialogHeaderAddChart = "Edit Chart";
+        reportFieldToEditWrapperIdx = idx;
+        reportFieldToAddWrapper = new ReportFieldWrapper(reportFieldWrapper);
+    }
+
     public void doOpenDialogAddChart() {
         this.idxAddChart = 0;
+        this.isAddMode = true;
         this.dialogHeaderAddChart = "Add Chart";
-        reportField = new ReportField();
-        reportField.setReportDataType(ReportDataType.SERVICEMAN);
-        reportField.setReportDataValue(ReportDataValue.QTY);
-        reportField.setReportDataGrouping(ReportDataGrouping.S_BT);
+        ReportField reportFieldToAdd = new ReportField();
+        reportFieldToAddWrapper = new ReportFieldWrapper(reportFieldToAdd);
+
+        // ADD CHART DEFAULT VALUES
+        reportFieldToAdd.setReportDataType(ReportDataType.SERVICEMAN);
+        reportFieldToAdd.setReportDataValue(ReportDataValue.QTY);
+        reportFieldToAdd.setReportDataGrouping(ReportDataGrouping.S_BT);
 
     }
 
     public void doDialogAddChartNextPage() {
+        ReportField reportField = this.reportFieldToAddWrapper.getReportField();
         this.idxAddChart += 1;
         if (idxAddChart == 1) {
             if (checkAddChartDate()) {
-                this.filterDateType = this.reportField.getFilterDateType();
-                this.filterStartDate = this.reportField.getFilterStartDate();
-                this.filterEndDate = this.reportField.getFilterEndDate();
+                this.filterDateType = reportField.getFilterDateType();
+                this.filterStartDate = reportField.getFilterStartDate();
+                this.filterEndDate = reportField.getFilterEndDate();
                 typeFilterDate();
             }
         } else if (idxAddChart == 2) {
             if (checkAddChartDate()) {
                 if (this.report.getFilterDateType() == FilterDateType.NONE) {
-                    this.reportField.setFilterDateType(this.filterDateType);
-                    this.reportField.setFilterStartDate(filterStartDate);
+                    reportField.setFilterDateType(this.filterDateType);
+                    reportField.setFilterStartDate(filterStartDate);
                     if (filterDateType == filterDateType.CUSTOM || filterDateType == filterDateType.WEEK) {
-                        this.reportField.setFilterEndDate(filterEndDate);
+                        reportField.setFilterEndDate(filterEndDate);
                     } else {
-                        this.reportField.setFilterEndDate(null);
+                        reportField.setFilterEndDate(null);
                     }
                 } else {
-                    this.reportField.setFilterDateType(this.report.getFilterDateType());
-                    this.reportField.setFilterStartDate(this.report.getFilterStartDate());
-                    this.reportField.setFilterEndDate(this.report.getFilterEndDate());
+                    reportField.setFilterDateType(this.report.getFilterDateType());
+                    reportField.setFilterStartDate(this.report.getFilterStartDate());
+                    reportField.setFilterEndDate(this.report.getFilterEndDate());
                 }
             }
         } else if (idxAddChart == 3) {
-            processField(this.reportField);
-            createChart(this.reportField);
+            processField(reportField);
+            reportFieldToAddWrapper.createChart();
         }
     }
 
     public Boolean checkAddChartDate() {
-        return this.reportField.getReportDataGrouping() == ReportDataGrouping.S_BK
-                || this.reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS
-                || this.reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI;
+        ReportField reportField = this.reportFieldToAddWrapper.getReportField();
+        return reportField.getReportDataGrouping() == ReportDataGrouping.S_BK
+                || reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS
+                || reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI;
+    }
+
+    public String getAddChartbtnText() {
+        Integer numOfData = getTotalNumberOfData(reportFieldToAddWrapper.getReportField());
+        if (numOfData == 0) {
+            return "No Data";
+        } else {
+            return isAddMode ? "Confirm Add Chart" : "Confirm Edit Chart";
+        }
+    }
+
+    public void doConfirmAddChart() {
+        if (isAddMode) {
+            this.report.getReportFields().add(this.reportFieldToAddWrapper.getReportField());
+            this.reportFieldWrappers.add(this.reportFieldToAddWrapper);
+        } else {
+            System.out.println("Successfully REPLACED");
+            this.reportFieldWrappers.set(reportFieldToEditWrapperIdx, this.reportFieldToAddWrapper);
+        }
     }
 
     private void processField(ReportField reportField) {
@@ -367,6 +443,7 @@ public class ManageReportManagedBean implements Serializable {
                     });
             sortedResultList = sortByType(freqMap, "STRING");
         }
+
         List<ReportFieldGroup> groups = reportField.getReportFieldGroups();
         groups.clear();
 
@@ -385,123 +462,46 @@ public class ManageReportManagedBean implements Serializable {
         return list;
     }
 
-    private void createChart(ReportField reportField) {
-        if (reportField.getType() == ReportFieldType.PIE) {
-            createPieModel(reportField.getReportFieldGroups());
-        } else if (reportField.getType() == ReportFieldType.BAR) {
-            createBarModel(reportField.getReportFieldGroups());
-        } else if (reportField.getType() == ReportFieldType.LINE) {
+    public void doCreate() {
+        try {
+            this.report.setLastModified(new Date());
+            revProcessReport(report);
+            this.report = reportSessionBeanLocal.createReport(this.report, currentEmployee.getEmployeeId());
+            processReport(this.report);
+            this.isCreateState = false;
+            this.isEditMode = false;
 
+//            String result = "Successfully created " + this.report.toString();
+//            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("createReportSuccess", true);
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            String url = request.getRequestURL().toString() + "?reportToViewId=" + this.report.getReportId();
+            FacesContext.getCurrentInstance().getExternalContext().redirect(url);
+
+            // I'm trying to display this on the page refresh
+//            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Report", "Successfully created " + this.report));
+        } catch (CreateReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Create Report", ex.getMessage()));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
         }
-    }
-
-    private void createPieModel(List<ReportFieldGroup> groups) {
-        this.pieModel = new PieChartModel();
-        ChartData data = new ChartData();
-
-        PieChartDataSet dataSet = new PieChartDataSet();
-        List<Number> values = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-        List<String> borderColors = new ArrayList<>();
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).getQuantity() > 0) {
-                values.add(groups.get(i).getQuantity());
-                labels.add(groups.get(i).getName());
-                borderColors.add(this.borderColors.get(i % this.borderColors.size()));
-            }
-        }
-        dataSet.setData(values);
-
-        dataSet.setBackgroundColor(borderColors);
-
-        data.addChartDataSet(dataSet);
-        data.setLabels(labels);
-
-        this.pieModel.setData(data);
-    }
-
-    public void createBarModel(List<ReportFieldGroup> groups) {
-        barModel = new BarChartModel();
-        ChartData data = new ChartData();
-
-        BarChartDataSet barDataSet = new BarChartDataSet();
-        barDataSet.setLabel("Dataset");
-
-        List<Number> values = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-        List<String> bgColors = new ArrayList<>();
-        List<String> borderColors = new ArrayList<>();
-        for (int i = 0; i < groups.size(); i++) {
-            values.add(groups.get(i).getQuantity());
-            labels.add(groups.get(i).getName());
-            bgColors.add(this.bgColors.get(i % this.bgColors.size()));
-            borderColors.add(this.borderColors.get(i % this.borderColors.size()));
-        }
-        barDataSet.setData(values);
-        barDataSet.setBackgroundColor(bgColors);
-        barDataSet.setBorderColor(borderColors);
-        barDataSet.setBorderWidth(1);
-        data.addChartDataSet(barDataSet);
-        data.setLabels(labels);
-        barModel.setData(data);
-
-        //Options
-        BarChartOptions options = new BarChartOptions();
-        CartesianScales cScales = new CartesianScales();
-        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-        linearAxes.setOffset(true);
-        CartesianLinearTicks ticks = new CartesianLinearTicks();
-        ticks.setStepSize(1);
-        ticks.setBeginAtZero(true);
-        linearAxes.setTicks(ticks);
-        CartesianScaleLabel label = new CartesianScaleLabel();
-        label.setLabelString("TEST");
-        linearAxes.setScaleLabel(label);
-        cScales.addYAxesData(linearAxes);
-        options.setScales(cScales);
-
-        Legend legend = new Legend();
-        legend.setDisplay(true);
-        legend.setPosition("top");
-        LegendLabel legendLabels = new LegendLabel();
-        legendLabels.setFontStyle("bold");
-        legendLabels.setFontColor("#2980B9");
-        legend.setLabels(legendLabels);
-        options.setLegend(legend);
-
-        barModel.setOptions(options);
-    }
-
-    public void setColours() {
-        bgColors = new ArrayList<>();
-        borderColors = new ArrayList<>();
-        bgColors.add("rgba(255, 99, 132, 0.2)");
-        bgColors.add("rgba(255, 159, 64, 0.2)");
-        bgColors.add("rgba(255, 205, 86, 0.2)");
-        bgColors.add("rgba(75, 192, 192, 0.2)");
-        bgColors.add("rgba(54, 162, 235, 0.2)");
-        bgColors.add("rgba(153, 102, 255, 0.2)");
-        bgColors.add("rgba(201, 203, 207, 0.2)");
-
-        borderColors.add("rgb(255, 99, 132)");
-        borderColors.add("rgb(255, 159, 64)");
-        borderColors.add("rgb(255, 205, 86)");
-        borderColors.add("rgb(75, 192, 192)");
-        borderColors.add("rgb(54, 162, 235)");
-        borderColors.add("rgb(153, 102, 255)");
-        borderColors.add("rgb(201, 203, 207)");
     }
 
     public void doEdit() {
-        isEditMode = !isEditMode;
-    }
-
-    public Long getReportToViewId() {
-        return reportToViewId;
-    }
-
-    public void setReportToViewId(Long reportToViewId) {
-        this.reportToViewId = reportToViewId;
+        if (isEditMode) {
+            try {
+                report.setLastModified(new Date());
+                revProcessReport(report);
+                this.report = reportSessionBeanLocal.updateReport(this.report);
+                processReport(this.report);
+                this.isCreateState = false;
+                isEditMode = false;
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Report", "Successfully updated " + this.report));
+            } catch (UpdateReportException ex) {
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Report", ex.getMessage()));
+            }
+        } else {
+            isEditMode = true;
+        }
     }
 
     public Boolean getIsEditMode() {
@@ -612,14 +612,6 @@ public class ManageReportManagedBean implements Serializable {
         return cal.getTime();
     }
 
-    public ReportField getReportField() {
-        return reportField;
-    }
-
-    public void setReportField(ReportField reportField) {
-        this.reportField = reportField;
-    }
-
     public Integer getIdxAddChart() {
         return idxAddChart;
     }
@@ -633,7 +625,7 @@ public class ManageReportManagedBean implements Serializable {
     }
 
     public ReportDataValue[] getReportDataValues() {
-        ReportDataType reportDataType = this.reportField.getReportDataType();
+        ReportDataType reportDataType = this.reportFieldToAddWrapper.getReportField().getReportDataType();
         if (reportDataType == null) {
             return ReportDataValue.values();
         } else {
@@ -642,8 +634,8 @@ public class ManageReportManagedBean implements Serializable {
     }
 
     public ReportDataGrouping[] getReportDataGroupings() {
-        ReportDataType reportDataType = this.reportField.getReportDataType();
-        ReportDataValue reportDataValue = this.reportField.getReportDataValue();
+        ReportDataType reportDataType = this.reportFieldToAddWrapper.getReportField().getReportDataType();
+        ReportDataValue reportDataValue = this.reportFieldToAddWrapper.getReportField().getReportDataValue();
         if (reportDataType == null) {
             return null;
         } else {
@@ -652,7 +644,7 @@ public class ManageReportManagedBean implements Serializable {
     }
 
     public ReportFieldType[] getReportFieldTypes() {
-        ReportDataGrouping reportDataGrouping = this.reportField.getReportDataGrouping();
+        ReportDataGrouping reportDataGrouping = this.reportFieldToAddWrapper.getReportField().getReportDataGrouping();
         if (reportDataGrouping == null) {
             return ReportFieldType.values();
         } else {
@@ -660,24 +652,54 @@ public class ManageReportManagedBean implements Serializable {
         }
     }
 
-    public PieChartModel getPieModel() {
-        return pieModel;
-    }
-
-    public void setPieModel(PieChartModel pieModel) {
-        this.pieModel = pieModel;
-    }
-
-    public BarChartModel getBarModel() {
-        return barModel;
-    }
-
-    public void setBarModel(BarChartModel barModel) {
-        this.barModel = barModel;
-    }
-
     public String getDialogHeaderAddChart() {
         return dialogHeaderAddChart;
+    }
+
+    public Integer getTotalNumberOfData(ReportField reportField) {
+        return reportField.getReportFieldGroups().stream()
+                .map(grp -> grp.getQuantity())
+                .reduce(0, (x, y) -> x + y);
+    }
+
+    public ReportFieldWrapper getReportFieldToAddWrapper() {
+        return reportFieldToAddWrapper;
+    }
+
+    public void setReportFieldToAddWrapper(ReportFieldWrapper reportFieldToAddWrapper) {
+        this.reportFieldToAddWrapper = reportFieldToAddWrapper;
+    }
+
+    public List<ReportFieldWrapper> getReportFieldWrappers() {
+        return reportFieldWrappers;
+    }
+
+    public void setReportFieldWrappers(List<ReportFieldWrapper> reportFieldWrappers) {
+        this.reportFieldWrappers = reportFieldWrappers;
+    }
+
+    public Boolean getIsAddMode() {
+        return isAddMode;
+    }
+
+    public void setIsAddMode(Boolean isAddMode) {
+        this.isAddMode = isAddMode;
+    }
+
+    public Boolean getIsCreateState() {
+        return isCreateState;
+    }
+
+    public void setIsCreateState(Boolean isCreateState) {
+        this.isCreateState = isCreateState;
+    }
+
+    public Boolean getIsViewState() {
+        return isViewState;
+    }
+
+    public void setIsViewState(Boolean isViewState) {
+        this.isViewState = isViewState;
     }
 
 }

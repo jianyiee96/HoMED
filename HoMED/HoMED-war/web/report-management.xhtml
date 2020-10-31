@@ -18,6 +18,10 @@
         </style>
 
         <h:form id="formReports">
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
             <p:growl id="growl-message" for="growl-message" showDetail="true" />
             <div class="p-grid crud-table">
                 <div class="p-col-12">
@@ -53,18 +57,29 @@
                             <p:column headerText="Report Name" width="30%" sortBy="#{report.name}" filterBy="#{report.name}" filterMatchMode="contains">
                                 <h:outputText value="#{report.name}" />
                             </p:column>
+                            
+                            <p:column headerText="No Of Fields" width="10%" sortBy="#{report.reportFields.size()}" filterBy="#{report.reportFields.size()}" filterMatchMode="contains">
+                                <h:outputText value="#{report.reportFields.size()}" />
+                            </p:column>
 
                             <p:column headerText="Status" width="10%" sortBy="#{report.reportStatus}" filterBy="#{report.reportStatus}" filterMatchMode="contains">
                                 <h:outputText value="#{report.reportStatus.text}" />
                             </p:column>
 
-                            <p:column headerText="Last Modified" width="15%" sortBy="#{report.lastModified}" filterBy="#{report.lastModified}" filterMatchMode="contains">
+                            <p:column headerText="Last Modified" width="12%" sortBy="#{report.lastModified}" filterBy="#{report.lastModified}" filterMatchMode="contains">
                                 <h:outputText value="#{report.lastModified}" >
                                     <f:convertDateTime pattern="dd/MM/yyyy"/>
                                 </h:outputText>
                             </p:column>
+                            
+                            <p:column headerText="Published" width="12%" sortBy="#{report.datePublished}" filterBy="#{report.datePublished}" filterMatchMode="contains">
+                                <h:outputText value="-" rendered="#{empty report.datePublished}"/>
+                                <h:outputText value="#{report.datePublished}" rendered="#{not empty report.datePublished}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
 
-                            <p:column headerText="Owner" width="15%" sortBy="#{report.employee.name}" filterBy="#{report.employee.name}" filterMatchMode="contains">
+                            <p:column headerText="Owner" width="12%" sortBy="#{report.employee.name}" filterBy="#{report.employee.name}" filterMatchMode="contains">
                                 <h:outputText value="#{report.employee.name}" />
                             </p:column>
 
@@ -73,9 +88,11 @@
                                     <f:param name="reportToViewId" value="#{report.reportId}" />
                                 </p:button>
                                 <p:commandButton class="rounded-button success-button p-mr-2 p-mb-2" icon="pi pi-upload" title="Publish"/>
-                                <p:commandButton class="rounded-button danger-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete"/>
-                                <p:commandButton class="rounded-button warning-button p-mr-2 p-mb-2" icon="pi pi-undo" title="Restore"/>
-                                <p:commandButton class="rounded-button help-button p-mr-2 p-mb-2" icon="pi pi-folder" title="Archive"/>
+                                <p:commandButton class="rounded-button danger-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete"
+                                                 actionListener="#{reportManagementManagedBean.doDeleteReport(report.reportId)}"
+                                                 update="@form" process="@this">
+                                    <p:confirm header="Delete Report" message="Confirm delete #{report}" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
                             </p:column>
                         </p:dataTable>
                     </div>

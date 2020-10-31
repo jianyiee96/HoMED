@@ -43,7 +43,7 @@ public class Report implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date dateCreated;
-
+    
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = true)
     private Date datePublished;

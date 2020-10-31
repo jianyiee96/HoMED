@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -85,6 +86,29 @@ public class ReportField implements Serializable {
         this.filterStartDate = filterStartDate;
         this.filterEndDate = filterEndDate;
         this.reportFieldGroups = reportFieldGroups;
+    }
+
+    public ReportField(ReportField another) {
+        this();
+        this.reportFieldId = another.getReportFieldId();
+        this.name = another.name;
+        this.description = another.description;
+        this.type = another.type;
+        this.filterDateType = another.getFilterDateType();
+        this.filterStartDate = another.filterStartDate != null ? new Date(another.filterStartDate.getTime()) : null;
+        this.filterEndDate = another.filterEndDate != null ? new Date(another.filterEndDate.getTime()) : null;
+        this.reportDataType = another.getReportDataType();
+        this.reportDataValue = another.getReportDataValue();
+        this.reportDataGrouping = another.getReportDataGrouping();
+        this.reportFieldGroups = another.reportFieldGroups.stream()
+                .map(grp -> {
+                    ReportFieldGroup newGroup = new ReportFieldGroup();
+                    newGroup.setReportFieldGroupId(grp.getReportFieldGroupId());
+                    newGroup.setName(grp.getName());
+                    newGroup.setQuantity(grp.getQuantity());
+                    return newGroup;
+                })
+                .collect(Collectors.toList());
     }
 
     public Long getReportFieldId() {
@@ -217,5 +241,5 @@ public class ReportField implements Serializable {
     public String toString() {
         return "ReportField [ id:" + reportFieldId + " ]";
     }
-    
+
 }

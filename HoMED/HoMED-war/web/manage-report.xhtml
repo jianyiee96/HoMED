@@ -36,7 +36,7 @@
             }
             .field-name, .field-name.ui-inputfield {
                 font-weight: bold;
-                font-size: 20px;
+                font-size: 23px;
             }
             .field-subtitle, .field-subtitle.ui-inputfield {
                 font-size: 15px;
@@ -67,14 +67,29 @@
                 margin-right: 5%;
             }
             .card.field-card {
-                padding: 2rem;
                 -webkit-box-shadow: 0px 0px 11px 1px rgba(150,150,150,1);
                 -moz-box-shadow: 0px 0px 11px 1px rgba(150,150,150,1);
-                box-shadow: 0px 0px 11px 1px rgba(150,150,150,1);
+                box-shadow: 0px 0px 6px 1px rgba(150,150,150,1);
                 border-radius: 15px; 
             }
             .dlg-add-chart .ui-dialog-content.ui-widget-content {
                 padding-top: 0;
+            }
+            .total-quantity-font {
+                font-family: Georgia, serif;
+                font-size: 20px;
+                letter-spacing: 2px;
+                word-spacing: 2px;
+                color: #8C8C8C;
+                font-weight: normal;
+                text-decoration: none;
+                font-style: normal;
+                font-variant: normal;
+                text-transform: none;
+            }
+
+            .p-col-12.col-no-padding {
+                padding: 0;
             }
         </style>
         <script type="text/javascript">
@@ -90,13 +105,14 @@
             //]]>
         </script>
         <f:metadata>
-            <f:viewParam name="reportToViewId" value="#{manageReportManagedBean.reportToViewId}" />
+            <f:viewParam name="reportToViewId"/>
         </f:metadata>
 
         <ezcomp:pageRedirect rendered="#{manageReportManagedBean.report eq null}"
                              header="#{manageReportManagedBean.redirectMessage}" btnOutcome="/report-management.xhtml" btnIcon="fa fa-files-o"/>
 
         <h:form id="formReport" rendered="#{manageReportManagedBean.report ne null}">
+            <p:focus context="panelReport" />
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
@@ -109,16 +125,27 @@
                         <h:outputText value="#{manageReportManagedBean.report.lastModified}">
                             <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
                         </h:outputText>
+                        <h:outputText value="Published Date: " style="font-weight: 800" class="p-ml-4"/>
+                        <h:outputText value="Not Published" rendered="#{empty manageReportManagedBean.report.datePublished}"/>
+                        <h:outputText value="#{manageReportManagedBean.report.lastModified}" rendered="#{not empty manageReportManagedBean.report.datePublished}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
                     </div>
                 </f:facet>
                 <f:facet name="right">
-                    <p:commandButton class="p-mr-2 success-button" title="Publish" icon="pi pi-upload"/>
                     <p:commandButton class="p-mr-2 warning-button" title="Print" icon="pi pi-print"/>
-                    <p:commandButton class="p-mr-2 danger-button" title="Delete" icon="pi pi-trash"/>
-                    <p:commandButton rendered="#{not manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Edit" icon="pi pi-pencil" process="@this"
-                                     value="Edit" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
-                    <p:commandButton rendered="#{manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Done Editing" icon="pi pi-check" process="@form"
-                                     value="Done Editing" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
+                    <h:panelGroup rendered="#{not manageReportManagedBean.isViewState}">
+                        <p:commandButton class="p-mr-2 success-button" title="Publish" icon="pi pi-upload"/>
+                        <p:commandButton class="p-mr-2 danger-button" title="Delete" icon="pi pi-trash"/>
+                        <p:commandButton rendered="#{manageReportManagedBean.isCreateState}" class="p-mr-2 info-button" title="Create" icon="fa fa-pencil-square-o" process="@form"
+                                         value="Create" actionListener="#{manageReportManagedBean.doCreate}" update="@form"/>
+                        <h:panelGroup rendered="#{not manageReportManagedBean.isCreateState}">
+                            <p:commandButton rendered="#{not manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Edit" icon="pi pi-pencil" process="@this"
+                                             value="Edit" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
+                            <p:commandButton rendered="#{manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Done Editing" icon="pi pi-check" process="@form"
+                                             value="Done Editing" actionListener="#{manageReportManagedBean.doEdit}" update="@form" />
+                        </h:panelGroup>
+                    </h:panelGroup>
                 </f:facet>
             </p:toolbar>
             <p:sticky target="tb" />
@@ -130,9 +157,9 @@
                                           rendered="#{not manageReportManagedBean.isEditMode}"/>
                             <p:inputText id="report-name" class="report-name" value="#{manageReportManagedBean.report.name}" placeholder="Enter Report Name"
                                          rendered="#{manageReportManagedBean.isEditMode}">
-                                <p:ajax process="@this" update="@this"/>
+                                <p:ajax process="@this" update="@this message-report-name"/>
                             </p:inputText>
-                            <p:message for="report-name" class="error-message"/>
+                            <p:message for="report-name" class="error-message" id="message-report-name"/>
                             <p:separator/>
                             <h:outputText class="report-subtitle" value="#{manageReportManagedBean.report.description}"
                                           rendered="#{not manageReportManagedBean.isEditMode and not empty manageReportManagedBean.report.description}"/>
@@ -153,40 +180,132 @@
                             </div>
                         </div>
                     </div>
-
-                    <ui:repeat value="#{manageReportManagedBean.report.reportFields}" var="field">
-                        <div class="card field-card p-col-12 p-md-8 p-mb-5">
-                            <div class="p-grid p-col-nogutter">
-                                <div class="p-col-12 p-col-nogutter">
-                                    <p:commandButton icon="pi pi-trash" styleClass="danger-button text-button rounded-button" style="float:right"
-                                                     actionListener="#{manageReportManagedBean.doDeleteField(field)}"
-                                                     process="@this" update="formReport:panelReport"
-                                                     rendered="#{manageReportManagedBean.isEditMode}">
-                                        <p:confirm header="Delete Report Field" message="Confirm delete #{field.type.text} field?" icon="pi pi-exclamation-triangle" />
-                                    </p:commandButton>
-                                    <h:outputText class="field-name" value="#{not empty field.name ? field.name : 'Enter Field Name'}"
-                                                  rendered="#{not manageReportManagedBean.isEditMode}"/>
-                                    <p:inputText id="field-name" class="field-name p-col-12 p-md-11" value="#{field.name}" placeholder="Enter Field Name"
-                                                 rendered="#{manageReportManagedBean.isEditMode}">
-                                        <p:ajax process="@this" update="@this"/>
-                                    </p:inputText>
-                                    <p:message for="field-name" class="error-message" styleClass="p-col-12 p-md-8"/>
-                                </div>
-                                <div class="p-col-12 p-md-11 p-col-nogutter">
-                                    <p:separator class="p-my-1"/>
-                                </div>
-                                <div class="p-col-12 p-col-nogutter">
-                                    <h:outputText class="field-subtitle" value="#{field.description}"
-                                                  rendered="#{not manageReportManagedBean.isEditMode and not empty field.description}"/>
-                                    <p:inputTextarea class="field-subtitle p-col-12 p-md-11" value="#{field.description}" placeholder="Enter Field Description"
-                                                     rendered="#{manageReportManagedBean.isEditMode}">
-                                        <p:ajax process="@this" update="@this"/>
-                                    </p:inputTextarea>
+                    <ui:fragment id ="fragmentReportFields">
+                        <ui:fragment rendered="#{empty manageReportManagedBean.reportFieldWrappers}">
+                            <div class="p-col-12 p-md-8 p-mb-5">
+                                <div style="display: flex; justify-content: center">
+                                    <h:outputText value="No Report Fields" class="total-quantity-font"/>
                                 </div>
                             </div>
-                        </div>
-                    </ui:repeat>
+                        </ui:fragment>
+                        <ui:repeat id="ui-wrappers" value="#{manageReportManagedBean.reportFieldWrappers}" var="wrapper" varStatus="status">
+                            <div class="card field-card p-col-12 p-md-8 p-mb-5">
+                                <h:panelGroup rendered="#{wrapper.reportField.type == 'HEADER' and manageReportManagedBean.isEditMode}">
+                                    <div class="p-grid p-m-3">
+                                        <div class="p-col-11 p-col-nogutter">
+                                            <p:inputText id="field-name" class="field-name p-col-12" value="#{wrapper.reportField.name}" placeholder="Enter Field Name">
+                                                <p:ajax process="@this" update="@this message-field-name"/>
+                                            </p:inputText>
+                                            <p:message for="field-name" class="error-message" id="message-field-name"/>
+                                        </div>
+                                        <div class="p-col-1 p-col-nogutter">
+                                            <p:commandButton id="menu-header" icon="pi pi-bars" class="text-button rounded-button p-ml-2" style="float:right;"
+                                                             rendered="#{manageReportManagedBean.isEditMode}">
+                                            </p:commandButton>
+                                            <p:menu overlay="true" trigger="menu-header" my="left top" at="left bottom">
+                                                <p:submenu label="Options">
+                                                    <p:menuitem value="Delete Field" icon="pi pi-trash" actionListener="#{manageReportManagedBean.doDeleteFieldWrapper(wrapper)}"
+                                                                process="@this" update="formReport:panelReport" resetValues="true">
+                                                        <p:confirm header="Delete Report Field" message="Confirm delete #{wrapper.reportField.type.text} field?" icon="pi pi-exclamation-triangle" />
+                                                    </p:menuitem>
+                                                    <p:menuitem value="Shift Up" icon="pi pi-chevron-up" actionListener="#{manageReportManagedBean.doShiftUp(status.index)}"
+                                                                process="@this" update="formReport:panelReport" immediate="true" resetValues="true"
+                                                                rendered="#{status.index != 0}">
+                                                    </p:menuitem>
+                                                    <p:menuitem value="Shift Down" icon="pi pi-chevron-down" actionListener="#{manageReportManagedBean.doShiftDown(status.index)}"
+                                                                process="@this" update="formReport:panelReport" immediate="true" resetValues="true"
+                                                                rendered="#{status.index != manageReportManagedBean.reportFieldWrappers.size() - 1}">
+                                                    </p:menuitem>
+                                                </p:submenu>
+                                            </p:menu>
+                                        </div>
+                                        <div class="p-col-12 p-md-11 p-col-nogutter">  
+                                            <p:separator class="p-my-1"/>
+                                        </div>
+                                        <div class="p-col-12 p-col-nogutter p-mt-2">
+                                            <p:inputTextarea class="field-subtitle p-col-12 p-md-11" value="#{wrapper.reportField.description}" placeholder="Enter Field Description">
+                                                <p:ajax process="@this" update="@this"/>
+                                            </p:inputTextarea>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{(wrapper.reportField.type == 'HEADER' and not manageReportManagedBean.isEditMode) or wrapper.reportField.type != 'HEADER'}">
+                                    <div class="p-grid p-m-3">
+                                        <div class="p-col-12 p-col-nogutter">
+                                            <div style="display: flex; justify-content: space-between">
+                                                <h:outputText class="field-name p-col-12 p-md-9" value="#{wrapper.reportField.name}"/>
+                                                <div class="p-col-12 p-md-3 p-col-nogutter" style="display: flex; align-items: center; justify-content: flex-end">
+                                                    <h:panelGroup rendered="#{wrapper.reportField.filterDateType ne null and wrapper.reportField.filterDateType != 'NONE'}">
+                                                        <i class="pi pi-clock field-subtitle p-mr-2"/>
+                                                        <h:outputText class="field-subtitle" value="#{wrapper.reportField.filterDateString}"/>
+                                                    </h:panelGroup>
+                                                    <p:commandButton id="menu-non-header" icon="pi pi-bars" class="text-button rounded-button p-ml-2" style="float:right;"
+                                                                     rendered="#{manageReportManagedBean.isEditMode}">
+                                                    </p:commandButton>
+                                                    <p:menu overlay="true" trigger="menu-non-header" my="left top" at="left bottom">
+                                                        <p:submenu label="Options">
+                                                            <p:menuitem value="Edit Chart" icon="pi pi-pencil" actionListener="#{manageReportManagedBean.doOpenDialogEditChart(wrapper, status.index)}"
+                                                                        process="@this" update="@form:dialogAddChart" resetValues="true"
+                                                                        oncomplete="PF('dialogAddChart').show()">
+                                                            </p:menuitem>
+                                                            <p:menuitem value="Delete Field" icon="pi pi-trash" actionListener="#{manageReportManagedBean.doDeleteFieldWrapper(wrapper)}"
+                                                                        process="@this" update="formReport:panelReport" resetValues="true">
+                                                                <p:confirm header="Delete Report Field" message="Confirm delete #{wrapper.reportField.type.text} field?" icon="pi pi-exclamation-triangle" />
+                                                            </p:menuitem>
+                                                            <p:menuitem value="Shift Up" icon="pi pi-chevron-up" actionListener="#{manageReportManagedBean.doShiftUp(status.index)}"
+                                                                        process="@this" update="formReport:panelReport" immediate="true" resetValues="true"
+                                                                        rendered="#{status.index != 0}">
+                                                            </p:menuitem>
+                                                            <p:menuitem value="Shift Down" icon="pi pi-chevron-down" actionListener="#{manageReportManagedBean.doShiftDown(status.index)}"
+                                                                        process="@this" update="formReport:panelReport" immediate="true" resetValues="true"
+                                                                        rendered="#{status.index != manageReportManagedBean.reportFieldWrappers.size() - 1}">
+                                                            </p:menuitem>
+                                                        </p:submenu>
+                                                    </p:menu>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="p-col-12 p-md-12 p-col-nogutter">  
+                                            <p:separator class="p-my-1"/>
+                                        </div>
+                                        <div class="p-col-12 p-col-nogutter p-mt-2">
+                                            <h:outputText class="field-subtitle p-col-12 p-md-12" value="#{wrapper.reportField.description}"
+                                                          rendered="#{not empty wrapper.reportField.description}"/>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{wrapper.reportField.type != 'HEADER'}">
+                                    <div class="p-grid p-m-3">
+                                        <div class="p-col-12">
+                                            <p:pieChart model="#{wrapper.chart}" rendered="#{wrapper.reportField.type == 'PIE'}"/>
+                                            <ui:fragment rendered="#{wrapper.reportField.type == 'BAR'}">
+                                                <div class="p-grid p-mt-3 p-align-center">
+                                                    <div class="p-col-12 p-col-nogutter">
+                                                        <div class="p-grid p-align-center">
+                                                            <div class="p-col-1 p-col-nogutter" style="text-align: right">
+                                                                <h:outputText value="#{wrapper.reportField.reportDataGrouping.y_axis}" style="padding: 0; writing-mode:vertical-lr;transform: rotate(180deg);"/>
+                                                            </div>
+                                                            <div class="p-col-11 p-col-nogutter">
+                                                                <p:barChart model="#{wrapper.chart}" style="width: 100%; height: 400px;"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-offset-1 p-col-11 p-col-nogutter" style="text-align: center">
+                                                        <h:outputText value="#{wrapper.reportField.reportDataGrouping.x_axis}" class="p-col" style="text-align: center"/>
+                                                    </div>
 
+                                                </div>
+                                            </ui:fragment>
+                                        </div>
+                                        <div class="p-col-12 p-mt-2 p-col-nogutter">
+                                            <h:outputText class="total-quantity-font" value="Total Quantity: #{manageReportManagedBean.getTotalNumberOfData(wrapper.reportField)}"/>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+
+                        </ui:repeat>
+                    </ui:fragment>
                     <ui:fragment rendered="#{manageReportManagedBean.isEditMode}">
                         <div class="p-col-12 p-md-8 report-cols">
                             <div class='line-container'>
@@ -197,7 +316,7 @@
                                     <p:menu overlay="true" trigger="cmdlink-add" my="left top" at="left bottom">
                                         <p:submenu label="New Field">
                                             <p:menuitem value="Header" icon="fa fa-header" actionListener="#{manageReportManagedBean.addHeader}" process="@this" update="panelReport"/>
-                                            <p:menuitem value="Chart" icon="pi pi-chart-line" actionListener="#{manageReportManagedBean.doOpenDialogAddChart}" update="@form" process="@this" resetValues="true"
+                                            <p:menuitem value="Chart" icon="pi pi-chart-line" actionListener="#{manageReportManagedBean.doOpenDialogAddChart}" update="@form:dialogAddChart" process="@this" resetValues="true"
                                                         oncomplete="PF('dialogAddChart').show()">
                                             </p:menuitem>
                                         </p:submenu>
@@ -293,7 +412,7 @@
             <p:dialog id="dialogAddChart" widgetVar="dialogAddChart" header="#{manageReportManagedBean.dialogHeaderAddChart}" showEffect="fade"
                       draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAddChart').initPosition()"
                       minWidth="500" width="700" class="dlg-add-chart">
-                <p:outputPanel id="panelAddChart">
+                <p:outputPanel id="panelAddChart" rendered="#{not empty manageReportManagedBean.reportFieldToAddWrapper}">
                     <div class="p-grid">
                         <div class="p-col-12 p-mb-5">
                             <div class="p-grid p-justify-center">
@@ -318,7 +437,7 @@
                                         <div class="p-formgrid p-grid ui-fluid">
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="data-type" value="Select Data Type" />
-                                                <p:selectOneMenu id="data-type" value="#{manageReportManagedBean.reportField.reportDataType}">  
+                                                <p:selectOneMenu id="data-type" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataType}">  
                                                     <f:selectItems value="#{manageReportManagedBean.reportDataTypes}" var="type" itemLabel="#{type.text}"/>
                                                     <p:ajax process="@this" update="panelGroupData"/>
                                                 </p:selectOneMenu>
@@ -326,7 +445,7 @@
                                             </div>
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="data-values" value="Select Data Value" />
-                                                <p:selectOneMenu id="data-values" value="#{manageReportManagedBean.reportField.reportDataValue}">  
+                                                <p:selectOneMenu id="data-values" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataValue}">  
                                                     <f:selectItems value="#{manageReportManagedBean.reportDataValues}" var="value" itemLabel="#{value.text}"/>
                                                     <p:ajax process="@this" update="panelGroupData"/>
                                                 </p:selectOneMenu>
@@ -335,7 +454,7 @@
                                             <h:panelGroup rendered="#{not empty manageReportManagedBean.reportDataGroupings}">
                                                 <div class="p-field p-col-12">
                                                     <p:outputLabel for="data-group" value="Select Data Grouping" />
-                                                    <p:selectOneMenu id="data-group" value="#{manageReportManagedBean.reportField.reportDataGrouping}">
+                                                    <p:selectOneMenu id="data-group" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataGrouping}">
                                                         <f:selectItems value="#{manageReportManagedBean.reportDataGroupings}" var="grouping" itemLabel="#{grouping.text}"/>
                                                         <p:ajax process="@this" update="panelGroupData"/>
                                                     </p:selectOneMenu>
@@ -431,7 +550,7 @@
                                             </h:panelGroup>
                                             <h:panelGroup rendered="#{not manageReportManagedBean.checkAddChartDate()}">
                                                 <div class="p-field p-col-12">
-                                                    <h:outputText value="No date selection required for #{manageReportManagedBean.reportField.reportDataType.text} : #{manageReportManagedBean.reportField.reportDataGrouping.text}" style="font-size: 20px"/>
+                                                    <h:outputText value="No date selection required for #{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataType.text} : #{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataGrouping.text}" style="font-size: 20px"/>
                                                 </div>
                                             </h:panelGroup>
                                         </div>
@@ -440,18 +559,20 @@
                                         <div class="p-formgrid p-grid ui-fluid">
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="chart-name" value="Enter Chart Name" />
-                                                <p:inputText id="chart-name" value="#{manageReportManagedBean.reportField.name}" placeholder="Chart Name">
-                                                    <p:ajax event="valueChange" process="@this" update="panelGroupChart"/>
+                                                <p:inputText id="chart-name" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.name}" placeholder="Chart Name">
+                                                    <p:ajax event="valueChange" process="@this" update="@this"/>
                                                 </p:inputText>
                                                 <p:message for="chart-name" class="error-message"/>
                                             </div>
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="chart-description" value="Enter Chart Description" />
-                                                <p:inputTextarea id="chart-description" value="#{manageReportManagedBean.reportField.description}" placeholder="Chart Description"/>
+                                                <p:inputTextarea id="chart-description" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.description}" placeholder="Chart Description">
+                                                    <p:ajax process="@this" update="@this"/>
+                                                </p:inputTextarea>
                                             </div>
                                             <div class="p-field p-col-12">
                                                 <p:outputLabel for="chart-type" value="Select Chart Type" />
-                                                <p:selectOneMenu id="chart-type" value="#{manageReportManagedBean.reportField.type}">
+                                                <p:selectOneMenu id="chart-type" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.type}">
                                                     <f:selectItems value="#{manageReportManagedBean.reportFieldTypes}" var="type" itemLabel="#{type.text}"/>
                                                 </p:selectOneMenu>
                                             </div>
@@ -460,25 +581,51 @@
                                     <h:panelGroup rendered="#{manageReportManagedBean.idxAddChart == 3}" id="panelGroupPreview">
                                         <div class="p-formgrid p-grid ui-fluid">
                                             <div class="p-col-12 p-col-nogutter">
-                                                <h:outputText class="field-name" value="#{manageReportManagedBean.reportField.name}"/>
+                                                <div style="display: flex; justify-content: space-between">
+                                                    <h:outputText class="field-name" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.name}"/>
+                                                    <h:panelGroup rendered="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.filterDateType ne null and manageReportManagedBean.reportFieldToAddWrapper.reportField.filterDateType != 'NONE'}">
+                                                        <div>
+                                                            <i class="pi pi-clock field-subtitle p-mr-2"/>
+                                                            <h:outputText class="field-subtitle" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.filterDateString}"/>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </div>
                                             </div>
                                             <div class="p-col-12 p-col-nogutter">
                                                 <p:separator class="p-my-1"/>
                                             </div>
-                                            <h:panelGroup rendered="#{not empty manageReportManagedBean.reportField.description}">
+                                            <h:panelGroup rendered="#{not empty manageReportManagedBean.reportFieldToAddWrapper.reportField.description}">
                                                 <div class="p-field p-col-12 p-col-nogutter">
-                                                    <h:outputText class="field-subtitle" value="#{manageReportManagedBean.reportField.description}"/>
+                                                    <h:outputText class="field-subtitle" value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.description}"/>
                                                 </div>
                                             </h:panelGroup>
                                             <div class="p-col-12">
-                                                <p:pieChart model="#{manageReportManagedBean.pieModel}" rendered="#{manageReportManagedBean.reportField.type == 'PIE'}"/>
-                                                <ui:fragment rendered="#{manageReportManagedBean.reportField.type == 'BAR'}">
-                                                    <div class="p-grid p-mt-3">
-                                                        <h:outputText value="test1" class="p-col-1" style="padding: 0; writing-mode:vertical-rl;"/>
-                                                        <p:barChart model="#{manageReportManagedBean.barModel}" class="p-col-11"/>
-                                                        <h:outputText value="test2" class="p-col-12"/>
+                                                <p:pieChart model="#{manageReportManagedBean.reportFieldToAddWrapper.chart}" rendered="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.type == 'PIE'}"/>
+                                                <ui:fragment rendered="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.type == 'BAR'}">
+                                                    <div class="p-grid p-mt-3 p-align-center">
+                                                        <div class="p-col-12">
+                                                            <div class="p-grid p-align-center">
+                                                                <div class="p-col-fixed" style="width:20px">
+                                                                    <h:outputText value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataGrouping.y_axis}" style="padding: 0; writing-mode:vertical-lr;transform: rotate(180deg);"/>
+                                                                </div>
+                                                                <p:barChart model="#{manageReportManagedBean.reportFieldToAddWrapper.chart}" class="p-col"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-fixed" style="width:20px"/>
+                                                        <h:outputText value="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.reportDataGrouping.x_axis}" class="p-col" style="text-align: center"/>
+
                                                     </div>
                                                 </ui:fragment>
+                                            </div>
+                                            <div class="p-col-12 p-mt-2">
+                                                <h:outputText class="total-quantity-font" value="Total Quantity: #{manageReportManagedBean.getTotalNumberOfData(manageReportManagedBean.reportFieldToAddWrapper.reportField)}"/>
+                                            </div>
+                                            <div class="p-col-12 p-mt-5">
+                                                <p:commandButton value="#{manageReportManagedBean.getAddChartbtnText()}" icon="pi pi-plus"
+                                                                 process="@this" update="panelReport" 
+                                                                 actionListener="#{manageReportManagedBean.doConfirmAddChart()}"
+                                                                 disabled="#{manageReportManagedBean.getTotalNumberOfData(manageReportManagedBean.reportFieldToAddWrapper.reportField) == 0}"
+                                                                 oncomplete="PF('dialogAddChart').hide()"/>
                                             </div>
                                         </div>
                                     </h:panelGroup>
