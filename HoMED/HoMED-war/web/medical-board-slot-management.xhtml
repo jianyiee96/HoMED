@@ -66,16 +66,7 @@
                                 </p:commandButton>
                             </h:panelGrid>
 
-                            <h:panelGrid width="100%" style="margin-top: 1.75rem;" rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}" columns="2">
-                                <h2>Selected Medical Board Slots</h2>
-
-                                <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.deleteAllSelectedMedicalBoardSlots}"
-                                                 disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" value="Delete All" oncomplete="PF('medicalBoardSlots').update()"
-                                                 style="margin-bottom: 15px; float: right"
-                                                 styleClass="danger-button" title="Delete All Selected Medical Board Slots" icon="pi pi-trash">
-                                    <p:confirm header="Delete Medical Board Slot" message="Confirm delete medical board slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
-                            </h:panelGrid>
+                            <h2>Selected Medical Board Slots</h2>
 
                             <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}"
                                       value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet}" var="medicalBoardSlotWrapper">
@@ -130,21 +121,80 @@
                                                         <p:outputLabel value="'TO BE DONE IN SR4'" />                                          
                                                     </div>
                                                 </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Chairman:" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:selectOneMenu id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}" rendered="#{manageEmployeeManagedBean.isEditMode}" >
+                                                            <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" value="#{not medicalBoardSlotWrapper.medicalBoardSlot.chairman ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.chairman}" />                                          
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Medical Officer 1" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne}" />                                          
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Medical Officer 2" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo}" />                                          
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="p-col-4" style="padding-top: 0; text-align: right;">
                                                 <div class="p-col">
-                                                    
-                                                    
-                                                    <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}"
+
+                                                    <!-- Edit Button -->
+                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime) and !medicalBoardSlotWrapper.isEditMode}"
+                                                                     disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState or medicalBoardSlotManagementManagedBean.isEditState}"
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     styleClass="rounded-button secondary-button text-button" title="Edit" icon="pi pi-pencil">
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="true" />
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isEditState}" value="true" />
+                                                    </p:commandButton>
+
+                                                    <!-- Save Changes from Edit Button -->
+                                                    <p:commandButton rendered="#{medicalBoardSlotWrapper.isEditMode}"
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     styleClass="rounded-button success-button text-button" title="Save Changes" icon="pi pi-save">
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="false" />
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isEditState}" value="false" />
+                                                    </p:commandButton>
+
+                                                    <!-- Revert Changes from Edit Button -->
+                                                    <p:commandButton rendered="#{medicalBoardSlotWrapper.isEditMode}"
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     styleClass="rounded-button help-button text-button" title="Revert Changes" icon="fa fa-undo">
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="false" />
+                                                        <f:setPropertyActionListener target="#{medicalBoardSlotManagementManagedBean.isEditState}" value="false" />
+                                                    </p:commandButton>
+
+                                                    <!-- Delete Button -->
+                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}"
+                                                                     disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" 
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
-                                                                     disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"
-                                                                     styleClass="rounded-button text-button danger-button" title="Delete" icon="pi pi-trash" >
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     styleClass="rounded-button danger-button text-button" title="Delete" icon="pi pi-trash" >
                                                         <p:confirm header="Delete Medical Board Slot" message="Confirm delete medical board slot? You will not be able to revert the action!" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
 
-                                                    <p:commandButton update="formSchedule:rightPanel" actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
-                                                                     oncomplete="PF('medicalBoardSlots').update()" styleClass="rounded-button text-button" title="Close" icon="pi pi-times" />           
+                                                    <!-- Close Button -->
+                                                    <p:commandButton actionListener="#{medicalBoardSlotManagementManagedBean.closeSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
+                                                                     oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
+                                                                     styleClass="rounded-button text-button" title="Close" icon="pi pi-times" />           
                                                 </div>
                                             </div>
                                         </div>

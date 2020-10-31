@@ -143,6 +143,18 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
     }
 
+    public List<MedicalOfficer> retrieveMedicalOfficers() {
+        Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo");
+        return query.getResultList();
+    }
+    
+    public List<MedicalOfficer> retrieveChairmen() {
+        Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo WHERE mo.isChairman = :inIsChairman");
+        query.setParameter("inIsChairman", true);
+        
+        return query.getResultList();
+    }
+
     @Override
     public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException {
         Employee employee = em.find(Employee.class, id);
@@ -269,13 +281,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         String errorMessage = "Failed to delete Employee: ";
         try {
             Employee employeeToRemove = retrieveEmployeeById(employeeId);
-            
+
             // Temporary fix
             if (employeeToRemove instanceof MedicalStaff) {
                 MedicalStaff medicalStaff = (MedicalStaff) employeeToRemove;
                 medicalStaff.setMedicalCentre(null);
             }
-            
+
             //for reference when other entities are related to Employee
 //        if(employeeToRemove.getSaleTransactionEntities().isEmpty())
 //        {

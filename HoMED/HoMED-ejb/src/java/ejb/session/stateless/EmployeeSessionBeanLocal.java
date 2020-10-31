@@ -64,4 +64,8 @@ public interface EmployeeSessionBeanLocal {
 
     public void updateMedicalOfficerChairmanStatus(Long employeeId, Boolean isMedicalOfficerChairman) throws UpdateMedicalOfficerChairmanStatusException;
 
+    public List<MedicalOfficer> retrieveMedicalOfficers();
+
+    public List<MedicalOfficer> retrieveChairmen();
+
 }
