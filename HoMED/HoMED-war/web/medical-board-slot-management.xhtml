@@ -82,7 +82,7 @@
                                                         <h:outputText value="Board Status:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="'TO BE DONE IN SR4'" />                                      
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.getBoardStatus(medicalBoardSlotWrapper.medicalBoardSlot)}" />                                      
                                                     </div>
                                                 </div>
 
@@ -135,7 +135,7 @@
                                                                 <p:separator />
                                                                 <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedChairmen.size()} remaining #{medicalBoardSlotWrapper.unallocatedChairmen.size() > 1 ? 'chairmen' : 'chairman'}" />
                                                             </f:facet>
-                                                            
+
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
 
@@ -157,7 +157,7 @@
                                                                 <p:separator />
                                                                 <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne.size()} remaining #{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne.size() > 1 ? 'medical officers' : 'medical officers'}" />
                                                             </f:facet>
-                                                            
+
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
                                                         <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" 
@@ -178,7 +178,7 @@
                                                                 <p:separator />
                                                                 <h:outputText style="font-weight: bold;" value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo.size()} remaining #{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo.size() > 1 ? 'medical officers' : 'medical officers'}" />
                                                             </f:facet>
-                                                            
+
                                                             <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
 
@@ -194,6 +194,7 @@
                                                     <!-- Edit Button -->
                                                     <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime) and !medicalBoardSlotWrapper.isEditMode}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState or medicalBoardSlotManagementManagedBean.isEditState}"
+                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.initEdit(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
                                                                      styleClass="rounded-button secondary-button text-button" title="Edit" icon="pi pi-pencil">
                                                         <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="true" />
@@ -211,6 +212,7 @@
 
                                                     <!-- Revert Changes from Edit Button -->
                                                     <p:commandButton rendered="#{medicalBoardSlotWrapper.isEditMode}"
+                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.revert(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
                                                                      styleClass="rounded-button help-button text-button" title="Revert Changes" icon="fa fa-undo">
                                                         <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="false" />

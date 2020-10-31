@@ -111,12 +111,25 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             String title;
             String styleClass;
 
-            if (medicalBoardSlotOuter.getEndDateTime().after(new Date())) {
-                styleClass = "available-medical-board-slot";
-                title = "Available";
+            if (medicalBoardSlotOuter.getMedicalBoardCases().isEmpty()) {
+                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
+                    title = "Board Cases Unallocated";
+                    styleClass = "unallocated-medical-board-slot";
+                } else {
+                    title = "Expired";
+                    styleClass = "expired-medical-board-slot";
+                }
             } else {
-                styleClass = "expired-medical-board-slot";
-                title = "Expired";
+                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
+                    title = "Board Cases Allocated";
+                    styleClass = "allocated-medical-board-slot";
+                } else if (medicalBoardSlotOuter.getStartDateTime().before(new Date()) && medicalBoardSlotOuter.getEndDateTime().after(new Date())) {
+                    title = "Board Cases Ongoing";
+                    styleClass = "ongoing-medical-board-slot";
+                } else {
+                    title = "Board Cases Completed";
+                    styleClass = "completed-medical-board-slot";
+                }
             }
 
             Integer idx = 0;
@@ -126,7 +139,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
                 if (medicalBoardSlotInner.equals(medicalBoardSlotOuter)) {
                     title += "[" + mbsWrapper.getIndex() + "]";
-                    styleClass = "selected-booking-slot";
+                    styleClass = "selected-medical-board-slot";
                     break;
                 }
             }
@@ -159,6 +172,24 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
         this.minTime = startHour + ":00:00";
         this.maxTime = endHour + ":00:00";
+    }
+
+    public String getBoardStatus(MedicalBoardSlot medicalBoardSlot) {
+        if (medicalBoardSlot.getMedicalBoardCases().isEmpty()) {
+            if (medicalBoardSlot.getStartDateTime().after(new Date())) {
+                return "Board Cases Unallocated";
+            } else {
+                return "Expired";
+            }
+        } else {
+            if (medicalBoardSlot.getStartDateTime().after(new Date())) {
+                return "Board Cases Allocated";
+            } else if (medicalBoardSlot.getStartDateTime().before(new Date()) && medicalBoardSlot.getEndDateTime().after(new Date())) {
+                return "Board Cases Ongoing";
+            } else {
+                return "Board Cases Completed";
+            }
+        }
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {
@@ -276,7 +307,7 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
                     refreshMedicalBoardSlots();
 
-                    addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slots Created", "Medical Board slots for medical board reviews have been created successfully!"));
+                    addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slots Created", "Medical Board Slots for medical board reviews have been created successfully!"));
                 } catch (ScheduleMedicalBoardSlotException ex) {
                     addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Board Slot Scheduler", ex.getMessage()));
                 }
@@ -284,6 +315,26 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         } else {
             addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "No Medical Board Slot Scheduled", "Please schedule at least one medical board slot!"));
         }
+    }
+
+    public void initEdit(MedicalBoardSlotWrapper medicalBoardSlotWrapper) {
+        if (medicalBoardSlotWrapper.getMedicalBoardSlot().getChairman() != null) {
+            medicalBoardSlotWrapper.setChairmanId(medicalBoardSlotWrapper.getMedicalBoardSlot().getChairman().getEmployeeId());
+        }
+
+        if (medicalBoardSlotWrapper.getMedicalBoardSlot().getMedicalOfficerOne() != null) {
+            medicalBoardSlotWrapper.setMedicalOfficerOneId(medicalBoardSlotWrapper.getMedicalBoardSlot().getMedicalOfficerOne().getEmployeeId());
+        }
+
+        if (medicalBoardSlotWrapper.getMedicalBoardSlot().getMedicalOfficerTwo() != null) {
+            medicalBoardSlotWrapper.setMedicalOfficerTwoId(medicalBoardSlotWrapper.getMedicalBoardSlot().getMedicalOfficerTwo().getEmployeeId());
+        }
+    }
+
+    public void revert(MedicalBoardSlotWrapper medicalBoardSlotWrapper) {
+        medicalBoardSlotWrapper.setChairmanId(null);
+        medicalBoardSlotWrapper.setMedicalOfficerOneId(null);
+        medicalBoardSlotWrapper.setMedicalOfficerTwoId(null);
     }
 
     public void saveEdit(MedicalBoardSlotWrapper medicalBoardSlotWrapper) {
@@ -298,6 +349,8 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         try {
             slotSessionBeanLocal.updateMedicalBoardSlot(medicalBoardSlotWrapper.getMedicalBoardSlot());
             refreshMedicalBoardSlots();
+
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Slot Updated", "Medical Board team has been updated successfully!"));
         } catch (UpdateMedicalBoardSlotException ex) {
             addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Board Slot Scheduler", ex.getMessage()));
         }
