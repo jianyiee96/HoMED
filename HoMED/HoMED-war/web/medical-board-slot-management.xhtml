@@ -85,54 +85,57 @@
 
                                     <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
                                         <div class="p-grid">
-                                            <div class="p-col-9" style="padding-bottom: 0">
+                                            <div class="p-col-8" style="padding-bottom: 0">
                                                 <div class="p-grid">
-                                                    <div class="p-col-5">
-                                                        <h:outputText value="Medical Board Slot Status:" />
-                                                    </div>
-                                                    <div class="p-col-7">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.getMedicalBoardSlotStatus(medicalBoardSlot)}" />
-                                                    </div>
-                                                </div>
-                                                <div class="p-grid">
-                                                    <div class="p-col-5">
-                                                        <h:outputText value="Start Time:" />
-                                                    </div>
-                                                    <div class="p-col-7">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
-                                                    </div>
-                                                </div>
-
-                                                <div class="p-grid">
-                                                    <div class="p-col-5">
-                                                        <h:outputText value="End Time:" />
-                                                    </div>
-                                                    <div class="p-col-7">
-                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.endDateTime)}" />                                      
-                                                    </div>
-                                                </div>
-
-                                                <div class="p-grid">
-                                                    <div class="p-col-5">
-                                                        <h:outputText value="Board Type:" />
-                                                    </div>
-                                                    <div class="p-col-7">
-                                                        <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />                                          
-                                                    </div>
-                                                </div>
-
-                                                <div class="p-grid">
-                                                    <div class="p-col-5">
+                                                    <div class="p-col-4">
                                                         <h:outputText value="Board Status:" />
                                                     </div>
-                                                    <div class="p-col-7">
-                                                        <p:outputLabel value="#{ medicalBoardSlot.medicalBoard == null ? 'N.A' : 'TO BE DONE IN SR4' }" />
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="'TO BE DONE IN SR4'" />                                      
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Board Date:" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />                                      
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Start Time:" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlot.startDateTime)}" />                                      
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="End Time:" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlot.endDateTime)}" />                                      
+                                                    </div>
+                                                </div>
+
+                                                <div class="p-grid">
+                                                    <div class="p-col-4">
+                                                        <h:outputText value="Duration:" />
+                                                    </div>
+                                                    <div class="p-col-8">
+                                                        <p:outputLabel value="'TO BE DONE IN SR4'" />                                          
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="p-col-3" style="padding-top: 0; text-align: right;">
+                                            <div class="p-col-4" style="padding-top: 0; text-align: right;">
                                                 <div class="p-col">
+                                                    
+                                                    
                                                     <p:commandButton update="formSchedule:rightPanel" rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlot.startDateTime)}"
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlot)}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" oncomplete="PF('medicalBoardSlots').update()"

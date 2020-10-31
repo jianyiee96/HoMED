@@ -5,39 +5,36 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class MedicalBoardSlot extends Slot implements Serializable, Comparable<MedicalBoardSlot> {
 
-    @ManyToOne(optional = false)
-    private MedicalBoard medicalBoard;
-
-    @OneToOne(optional = true)
+    @ManyToOne(optional = true)
     private MedicalOfficer chairman;
-    @OneToOne(optional = true)
+
+    @ManyToOne(optional = true)
     private MedicalOfficer medicalOfficerOne;
-    @OneToOne(optional = true)
+
+    @ManyToOne(optional = true)
     private MedicalOfficer medicalOfficerTwo;
 
+    @OneToMany(mappedBy = "medicalBoardSlot")
+    private List<MedicalBoardCase> medicalBoardCases;
+
     public MedicalBoardSlot() {
+        this.medicalBoardCases = new ArrayList<>();
     }
 
     public MedicalBoardSlot(Date start, Date end) {
         this();
         super.setStartDateTime(start);
         super.setEndDateTime(end);
-    }
-
-    public MedicalBoard getMedicalBoard() {
-        return medicalBoard;
-    }
-
-    public void setMedicalBoard(MedicalBoard medicalBoard) {
-        this.medicalBoard = medicalBoard;
     }
 
     public MedicalOfficer getChairman() {
@@ -62,6 +59,14 @@ public class MedicalBoardSlot extends Slot implements Serializable, Comparable<M
 
     public void setMedicalOfficerTwo(MedicalOfficer medicalOfficerTwo) {
         this.medicalOfficerTwo = medicalOfficerTwo;
+    }
+
+    public List<MedicalBoardCase> getMedicalBoardCases() {
+        return medicalBoardCases;
+    }
+
+    public void setMedicalBoardCases(List<MedicalBoardCase> medicalBoardCases) {
+        this.medicalBoardCases = medicalBoardCases;
     }
 
     @Override

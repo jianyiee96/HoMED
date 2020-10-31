@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
@@ -27,7 +28,7 @@ public class MedicalBoardCase implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column
     private MedicalBoardTypeEnum medicalBoardType;
-    
+
     @Enumerated(EnumType.STRING)
     @Column
     private MedicalBoardCaseStatusEnum medicalBoardCaseStatus;
@@ -40,7 +41,10 @@ public class MedicalBoardCase implements Serializable {
 
     @Column(nullable = true, length = 6000)
     private String boardFindings;
-    
+
+    @ManyToOne(optional = true)
+    private MedicalBoardSlot medicalBoardSlot;
+
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
     }
@@ -75,7 +79,7 @@ public class MedicalBoardCase implements Serializable {
     public void setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum medicalBoardCaseStatus) {
         this.medicalBoardCaseStatus = medicalBoardCaseStatus;
     }
-    
+
     public Consultation getConsultation() {
         return consultation;
     }
@@ -98,6 +102,14 @@ public class MedicalBoardCase implements Serializable {
 
     public void setBoardFindings(String boardFindings) {
         this.boardFindings = boardFindings;
+    }
+
+    public MedicalBoardSlot getMedicalBoardSlot() {
+        return medicalBoardSlot;
+    }
+
+    public void setMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        this.medicalBoardSlot = medicalBoardSlot;
     }
 
     @Override

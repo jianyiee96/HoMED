@@ -439,38 +439,38 @@ public class DataInitializationSessionBean {
         return bookingSlots;
     }
 
-    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleBookingSlotException {
-        System.out.println("Creating Medical Board Slots...");
-        List<MedicalBoardSlot> medicalBoardSlots = new ArrayList<>();
-        int numOfDaysToCreate = 5;
-
-        for (int day = 0; day < numOfDaysToCreate; day++) {
-            Calendar date = Calendar.getInstance();
-            date.add(Calendar.DATE, day);
-            date.set(Calendar.SECOND, 0);
-            date.set(Calendar.MILLISECOND, 0);
-
-            Calendar start = new GregorianCalendar();
-            Calendar end = new GregorianCalendar();
-            start.setTime(date.getTime());
-            end.setTime(date.getTime());
-
-            start.set(Calendar.HOUR_OF_DAY, 12);
-            start.set(Calendar.MINUTE, 30);
-            end.set(Calendar.HOUR_OF_DAY, 17);
-            end.set(Calendar.MINUTE, 30);
-
-            if (start.getTime().before(new Date())) {
-                start.setTime(new Date());
-            }
-            if (start.getTime().before(end.getTime())) {
-                medicalBoardSlots.addAll(slotSessionBeanLocal.createMedicalBoardSlots(start.getTime(), end.getTime()));
-            }
-        }
-
-        System.out.println("Successfully created Medical Board Slots");
-        return medicalBoardSlots;
-    }
+//    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleBookingSlotException {
+//        System.out.println("Creating Medical Board Slots...");
+//        List<MedicalBoardSlot> medicalBoardSlots = new ArrayList<>();
+//        int numOfDaysToCreate = 5;
+//
+//        for (int day = 0; day < numOfDaysToCreate; day++) {
+//            Calendar date = Calendar.getInstance();
+//            date.add(Calendar.DATE, day);
+//            date.set(Calendar.SECOND, 0);
+//            date.set(Calendar.MILLISECOND, 0);
+//
+//            Calendar start = new GregorianCalendar();
+//            Calendar end = new GregorianCalendar();
+//            start.setTime(date.getTime());
+//            end.setTime(date.getTime());
+//
+//            start.set(Calendar.HOUR_OF_DAY, 12);
+//            start.set(Calendar.MINUTE, 30);
+//            end.set(Calendar.HOUR_OF_DAY, 17);
+//            end.set(Calendar.MINUTE, 30);
+//
+//            if (start.getTime().before(new Date())) {
+//                start.setTime(new Date());
+//            }
+//            if (start.getTime().before(end.getTime())) {
+//                medicalBoardSlots.addAll(slotSessionBeanLocal.createMedicalBoardSlots(start.getTime(), end.getTime()));
+//            }
+//        }
+//
+//        System.out.println("Successfully created Medical Board Slots");
+//        return medicalBoardSlots;
+//    }
 
     private DayOfWeekEnum getDayOfWeekEnum(int day) {
         switch (day) {
