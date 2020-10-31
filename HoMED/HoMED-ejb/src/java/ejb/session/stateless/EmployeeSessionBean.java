@@ -143,15 +143,18 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
         }
     }
 
+    @Override
     public List<MedicalOfficer> retrieveMedicalOfficers() {
         Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo");
+        
         return query.getResultList();
     }
-    
+
+    @Override
     public List<MedicalOfficer> retrieveChairmen() {
         Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo WHERE mo.isChairman = :inIsChairman");
         query.setParameter("inIsChairman", true);
-        
+
         return query.getResultList();
     }
 

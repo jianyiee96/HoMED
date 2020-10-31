@@ -23,6 +23,7 @@ import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
+import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
@@ -189,19 +190,45 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
+    public MedicalBoardSlot updateMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) throws UpdateMedicalBoardSlotException {
+        String errorMessage = "Failed to update Medical Board Slot: ";
+
+        if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
+            MedicalBoardSlot medicalBoardSlotToUpdate = retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+
+            if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
+                medicalBoardSlotToUpdate.setStartDateTime(medicalBoardSlot.getStartDateTime());
+                medicalBoardSlotToUpdate.setEndDateTime(medicalBoardSlot.getEndDateTime());
+                medicalBoardSlotToUpdate.setChairman(medicalBoardSlot.getChairman());
+                medicalBoardSlotToUpdate.setMedicalOfficerOne(medicalBoardSlot.getMedicalOfficerOne());
+                medicalBoardSlotToUpdate.setMedicalOfficerTwo(medicalBoardSlot.getMedicalOfficerTwo());
+
+                em.flush();
+
+                return medicalBoardSlotToUpdate;
+            } else {
+                throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board cases have been allocated!");
+            }
+        } else {
+            throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
+        }
+    }
+
+    @Override
     public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException {
+        String errorMessage = "Failed to remove Medical Board Slot: ";
         MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
 
         if (medicalBoardSlot != null) {
             if (medicalBoardSlot.getChairman() != null || medicalBoardSlot.getMedicalOfficerOne() != null || medicalBoardSlot.getMedicalOfficerTwo() != null) {
-                throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board members have been assigned!");
+                throw new RemoveSlotException(errorMessage + "Medical Board members have been assigned!");
             } else if (!medicalBoardSlot.getMedicalBoardCases().isEmpty()) {
-                throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board cases have been allocated!");
+                throw new RemoveSlotException(errorMessage + "Medical Board cases have been allocated!");
             } else {
                 em.remove(medicalBoardSlot);
             }
         } else {
-            throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board slot not found!");
+            throw new RemoveSlotException(errorMessage + "Medical Board slot not found!");
         }
     }
 

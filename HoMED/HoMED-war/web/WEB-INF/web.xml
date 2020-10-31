@@ -107,4 +107,16 @@
         <local>ejb.session.stateless.EmployeeSessionBeanLocal</local>
         <ejb-link>HoMED-ejb.jar#EmployeeSessionBean</ejb-link>
     </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>EmployeeSessionBeanLocal1</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>ejb.session.stateless.EmployeeSessionBeanLocal</local>
+        <ejb-link>HoMED-ejb.jar#EmployeeSessionBean</ejb-link>
+    </ejb-local-ref>
+    <ejb-local-ref>
+        <ejb-ref-name>SlotSessionBeanLocal</ejb-ref-name>
+        <ejb-ref-type>Session</ejb-ref-type>
+        <local>ejb.session.stateless.SlotSessionBeanLocal</local>
+        <ejb-link>HoMED-ejb.jar#SlotSessionBean</ejb-link>
+    </ejb-local-ref>
 </web-app>

@@ -12,7 +12,7 @@
 
         <h:form id="formSchedule">
             <div class="p-grid">
-                <div class="p-col-8">
+                <div class="p-lg-8 p-md-12 p-sm-12">
                     <div class="card">
 
                         <div class='buttonbar'>
@@ -23,19 +23,17 @@
                                         timeFormat="HH:mm" slotDuration="00:30:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
                                         aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
                                         draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
-
                                 <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />
                                 <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message rightPanel'  />
                                 <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
                                 <p:ajax event="eventResize" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
-
                             </p:schedule>
 
                         </div>
                     </div>
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-lg-4 p-md-12 p-sm-12">
                     <div class="card">
                         <h2>Control Panel</h2>
 
@@ -66,7 +64,9 @@
                                 </p:commandButton>
                             </h:panelGrid>
 
-                            <h2>Selected Medical Board Slots</h2>
+                            <ui:fragment rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}">
+                                <h2>Selected Medical Board Slots</h2>
+                            </ui:fragment>
 
                             <p:repeat rendered="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet.size() != 0}"
                                       value="#{medicalBoardSlotManagementManagedBean.selectedMedicalBoardSlotWrappersTreeSet}" var="medicalBoardSlotWrapper">
@@ -74,7 +74,7 @@
                                     <p:outputLabel class="form-status-badge slot-badge" style="margin-left: -7.5px; margin-top:-10px; position: absolute;" 
                                                    value="#{medicalBoardSlotWrapper.index}" />
 
-                                    <div class="card" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
+                                    <div class="card ui-fluid" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
                                         <div class="p-grid">
                                             <div class="p-col-8" style="padding-bottom: 0">
                                                 <div class="p-grid">
@@ -118,7 +118,7 @@
                                                         <h:outputText value="Duration:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="'TO BE DONE IN SR4'" />                                          
+                                                        <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDuration(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime, medicalBoardSlotWrapper.medicalBoardSlot.endDateTime)}" />                                          
                                                     </div>
                                                 </div>
 
@@ -127,11 +127,15 @@
                                                         <h:outputText value="Chairman:" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:selectOneMenu id="view-gender" value="#{manageEmployeeManagedBean.employeeToView.gender}" rendered="#{manageEmployeeManagedBean.isEditMode}" >
-                                                            <f:selectItems value="#{employeeAccountManagementManagedBean.getGenders()}"/>
+                                                        <p:selectOneMenu value="#{medicalBoardSlotWrapper.chairmanId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
+                                                            <f:selectItem value="#{null}" itemLabel="N.A." />
+                                                            <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedChairmen}" var="chairman" itemValue="#{chairman.employeeId}" itemLabel="#{chairman.name}"/>
+
+                                                            <p:ajax event="valueChange" update="formSchedule:rightPanel" />
                                                         </p:selectOneMenu>
 
-                                                        <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" value="#{not medicalBoardSlotWrapper.medicalBoardSlot.chairman ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.chairman}" />                                          
+                                                        <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" 
+                                                                       value="#{medicalBoardSlotWrapper.medicalBoardSlot.chairman == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.chairman.name}" />                                          
                                                     </div>
                                                 </div>
 
@@ -140,7 +144,14 @@
                                                         <h:outputText value="Medical Officer 1" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne}" />                                          
+                                                        <p:selectOneMenu value="#{medicalBoardSlotWrapper.medicalOfficerOneId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
+                                                            <f:selectItem value="#{null}" itemLabel="N.A." />
+                                                            <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
+
+                                                            <p:ajax event="valueChange" update="formSchedule:rightPanel" />
+                                                        </p:selectOneMenu>
+                                                        <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" 
+                                                                       value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerOne.name}" />  
                                                     </div>
                                                 </div>
 
@@ -149,7 +160,15 @@
                                                         <h:outputText value="Medical Officer 2" />
                                                     </div>
                                                     <div class="p-col-8">
-                                                        <p:outputLabel value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo}" />                                          
+                                                        <p:selectOneMenu value="#{medicalBoardSlotWrapper.medicalOfficerTwoId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
+                                                            <f:selectItem value="#{null}" itemLabel="N.A." />
+                                                            <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
+
+                                                            <p:ajax event="valueChange" update="formSchedule:rightPanel" />
+                                                        </p:selectOneMenu>
+
+                                                        <p:outputLabel rendered="#{not medicalBoardSlotWrapper.isEditMode}" 
+                                                                       value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardSlotWrapper.medicalBoardSlot.medicalOfficerTwo.name}" />                                          
                                                     </div>
                                                 </div>
                                             </div>
@@ -168,6 +187,7 @@
 
                                                     <!-- Save Changes from Edit Button -->
                                                     <p:commandButton rendered="#{medicalBoardSlotWrapper.isEditMode}"
+                                                                     actionListener="#{medicalBoardSlotManagementManagedBean.saveEdit(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
                                                                      styleClass="rounded-button success-button text-button" title="Save Changes" icon="pi pi-save">
                                                         <f:setPropertyActionListener target="#{medicalBoardSlotWrapper.isEditMode}" value="false" />

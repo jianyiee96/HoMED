@@ -12,6 +12,7 @@ import javax.ejb.Local;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
+import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Local
 public interface SlotSessionBeanLocal {
@@ -35,6 +36,8 @@ public interface SlotSessionBeanLocal {
     public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId);
 
     public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException;
+
+    public MedicalBoardSlot updateMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) throws UpdateMedicalBoardSlotException;
 
 
 }

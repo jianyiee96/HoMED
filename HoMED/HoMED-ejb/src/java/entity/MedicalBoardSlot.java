@@ -42,7 +42,17 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     }
 
     public void setChairman(MedicalOfficer chairman) {
+        if (this.chairman != null) {
+            this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
+        }
+
         this.chairman = chairman;
+
+        if (this.chairman != null) {
+            if (!this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
     }
 
     public MedicalOfficer getMedicalOfficerOne() {
@@ -50,7 +60,17 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     }
 
     public void setMedicalOfficerOne(MedicalOfficer medicalOfficerOne) {
+        if (this.medicalOfficerOne != null) {
+            this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
+        }
+
         this.medicalOfficerOne = medicalOfficerOne;
+
+        if (this.medicalOfficerOne != null) {
+            if (!this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
     }
 
     public MedicalOfficer getMedicalOfficerTwo() {
@@ -58,7 +78,17 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     }
 
     public void setMedicalOfficerTwo(MedicalOfficer medicalOfficerTwo) {
+        if (this.medicalOfficerTwo != null) {
+            this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
+        }
+
         this.medicalOfficerTwo = medicalOfficerTwo;
+
+        if (this.medicalOfficerTwo != null) {
+            if (!this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
     }
 
     public List<MedicalBoardCase> getMedicalBoardCases() {
