@@ -69,6 +69,7 @@ import util.exceptions.EndConsultationException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ScheduleMedicalBoardSlotException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.StartConsultationException;
 import util.exceptions.SubmitFormInstanceException;
@@ -136,7 +137,8 @@ public class DataInitializationSessionBean {
 
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
-//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+            
             fillForms(bookings, RATE_OF_FILLING_FORMS);
             Date today = new Date();
             List<Booking> pastBookings = bookings.stream()
@@ -150,7 +152,8 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException | ServicemanNotFoundException
+                | ScheduleBookingSlotException | ScheduleMedicalBoardSlotException
+                | ServicemanNotFoundException
                 | MarkBookingAttendanceException | StartConsultationException
                 | SubmitFormInstanceException | EndConsultationException ex) {
             System.out.println(ex.getMessage());
@@ -311,7 +314,7 @@ public class DataInitializationSessionBean {
 //          && isAfterToday
             if (Math.random() <= rate) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
-                Boolean isForReview = getRandomNumber(0,10) % 2 == 0 ? Boolean.TRUE : Boolean.FALSE;
+                Boolean isForReview = getRandomNumber(0, 10) % 2 == 0 ? Boolean.TRUE : Boolean.FALSE;
                 Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.", isForReview);
                 bookings.add(booking);
 
@@ -439,38 +442,34 @@ public class DataInitializationSessionBean {
         return bookingSlots;
     }
 
-//    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleBookingSlotException {
-//        System.out.println("Creating Medical Board Slots...");
-//        List<MedicalBoardSlot> medicalBoardSlots = new ArrayList<>();
-//        int numOfDaysToCreate = 5;
-//
-//        for (int day = 0; day < numOfDaysToCreate; day++) {
-//            Calendar date = Calendar.getInstance();
-//            date.add(Calendar.DATE, day);
-//            date.set(Calendar.SECOND, 0);
-//            date.set(Calendar.MILLISECOND, 0);
-//
-//            Calendar start = new GregorianCalendar();
-//            Calendar end = new GregorianCalendar();
-//            start.setTime(date.getTime());
-//            end.setTime(date.getTime());
-//
-//            start.set(Calendar.HOUR_OF_DAY, 12);
-//            start.set(Calendar.MINUTE, 30);
-//            end.set(Calendar.HOUR_OF_DAY, 17);
-//            end.set(Calendar.MINUTE, 30);
-//
-//            if (start.getTime().before(new Date())) {
-//                start.setTime(new Date());
-//            }
-//            if (start.getTime().before(end.getTime())) {
-//                medicalBoardSlots.addAll(slotSessionBeanLocal.createMedicalBoardSlots(start.getTime(), end.getTime()));
-//            }
-//        }
-//
-//        System.out.println("Successfully created Medical Board Slots");
-//        return medicalBoardSlots;
-//    }
+    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleMedicalBoardSlotException {
+        System.out.println("Creating Medical Board Slots...");
+
+        int numOfDaysToCreate = 3;
+        List<MedicalBoardSlot> medicalBoardSlots = new ArrayList<>();
+
+        for (int day = 0; day < numOfDaysToCreate; day++) {
+            Calendar date = Calendar.getInstance();
+            date.add(Calendar.DATE, day);
+            date.set(Calendar.SECOND, 0);
+            date.set(Calendar.MILLISECOND, 0);
+
+            Calendar start = new GregorianCalendar();
+            Calendar end = new GregorianCalendar();
+            start.setTime(date.getTime());
+            end.setTime(date.getTime());
+
+            start.set(Calendar.HOUR_OF_DAY, 14);
+            start.set(Calendar.MINUTE, 30);
+            end.set(Calendar.HOUR_OF_DAY, 17);
+            end.set(Calendar.MINUTE, 30);
+
+            medicalBoardSlots.add(slotSessionBeanLocal.createMedicalBoardSlot(start.getTime(), end.getTime()));
+        }
+
+        System.out.println("Successfully created Medical Board Slots");
+        return medicalBoardSlots;
+    }
 
     private DayOfWeekEnum getDayOfWeekEnum(int day) {
         switch (day) {
@@ -596,7 +595,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Who is your favaourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
         formFields.add(new FormField("Who is your favourite serviceman?", 4, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.MO, null));
         formFields.add(new FormField("Who is your favourite chairman?", 5, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        
+
         otherFormTemplate.setFormFields(formFields);
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
         formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());

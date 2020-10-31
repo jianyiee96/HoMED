@@ -219,20 +219,15 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         String errorMessage = "Failed to remove Medical Board Slot: ";
         MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
 
-        System.out.println("1");
         if (medicalBoardSlot != null) {
             if (medicalBoardSlot.getChairman() != null || medicalBoardSlot.getMedicalOfficerOne() != null || medicalBoardSlot.getMedicalOfficerTwo() != null) {
-                System.out.println("2");
                 throw new RemoveSlotException(errorMessage + "Medical Board members have been assigned!");
             } else if (!medicalBoardSlot.getMedicalBoardCases().isEmpty()) {
-                System.out.println("3");
                 throw new RemoveSlotException(errorMessage + "Medical Board cases have been allocated!");
             } else {
-                System.out.println("4");
                 em.remove(medicalBoardSlot);
             }
         } else {
-            System.out.println("5");
             throw new RemoveSlotException(errorMessage + "Medical Board slot not found!");
         }
     }
