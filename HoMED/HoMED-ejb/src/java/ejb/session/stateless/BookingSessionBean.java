@@ -9,6 +9,7 @@ import entity.BookingSlot;
 import entity.ConsultationPurpose;
 import entity.FormInstance;
 import entity.FormTemplate;
+import entity.Notification;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +28,7 @@ import util.exceptions.CancelBookingException;
 import util.exceptions.ConvertBookingException;
 import util.exceptions.CreateBookingException;
 import util.exceptions.CreateConsultationException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.MarkBookingAbsentException;
@@ -52,6 +54,9 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
+    
+    @EJB
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -112,10 +117,11 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
             }
 
-            // Notification module can fire here
+            Notification n = new Notification("Booking Created Successfully", "Your booking has been created successfully.");
+            notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
             return newBooking;
 
-        } catch (ServicemanNotFoundException ex) {
+        } catch (ServicemanNotFoundException | CreateNotificationException ex) {
             throw new CreateBookingException("Serviceman Id not valid");
         }
 
