@@ -26,11 +26,11 @@
             }
         </style>
 
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
         <ui:fragment rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() != 0}">
 
-            <h:form>
-                <p:growl />
-
+            <h:form id="formMedicalBoardManagement">
                 <div class="p-grid">
                     <div class="p-sm-12 p-md-4 p-lg-4">
                         <div class="card">
@@ -39,7 +39,9 @@
 
                             <p:dataScroller value="#{medicalBoardManagementManagedBean.medicalBoardSlots}" var="medicalBoardSlot" chunkSize="5" mode="inline" scrollHeight="900">
 
-                                <p:commandLink style="color: #{medicalBoardManagementManagedBean.getCommandLinkColour(medicalBoardSlot)}" update="@form" process="@this">
+                                <p:commandLink style="color: #{medicalBoardManagementManagedBean.getCommandLinkColour(medicalBoardSlot)}" 
+                                               actionListener="#{medicalBoardManagementManagedBean.selectMedicalBoardSlot(medicalBoardSlot)}" 
+                                               update="@form" process="@this">
 
                                     <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
 
@@ -145,23 +147,24 @@
                                                         <h:panelGrid columns="2" cellpadding="5">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
-                                                            <p:inplace>
+                                                            <p:inplace id="inplaceEstTimeForEachBoardInPresence">
                                                                 <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInPresenceCase}" size="3">
-                                                                    <p:ajax update="@form" />
+                                                                    <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInPresence" />
                                                                 </p:inputNumber>
                                                             </p:inplace>
 
                                                             <p:selectManyMenu id="selectManyMenuMedicalBoardInPresenceCases" widgetVar="selectManyMenuMedicalBoardInPresenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds}" showCheckbox="true" scrollHeight="250">
                                                                 <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="medicalBoardInPresence" itemLabel="#{medicalBoardInPresence.consultation.booking.serviceman.name}" itemValue="#{medicalBoardInPresence.medicalBoardCaseId}" />
-                                                                <p:ajax update="@form" />
+                                                                <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary" />
                                                             </p:selectManyMenu>
                                                             <p:outputLabel />
 
-                                                            <p:outputLabel value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
-                                                            <h:outputText value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds.size()}" />
+                                                            <p:outputLabel for="outputTextNumBoardInPresenceSelected" value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextNumBoardInPresenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds.size()}" />
 
-                                                            <p:outputLabel value="Estimated Time Required: " style="font-weight: bold" />
-                                                            <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+                                                            <p:outputLabel for="outputTextEstTimeBoardInPresence" value="Estimated Time Required: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextEstTimeBoardInPresence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+
                                                         </h:panelGrid>
                                                     </ui:fragment>
 
@@ -201,23 +204,23 @@
                                                         <h:panelGrid columns="2" cellpadding="5">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
-                                                            <p:inplace>
+                                                            <p:inplace id="inplaceEstTimeForEachBoardInAbsence">
                                                                 <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInAbsenceCase}" size="3">
-                                                                    <p:ajax update="@form" />
+                                                                    <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInAbsence" />
                                                                 </p:inputNumber>
                                                             </p:inplace>
 
                                                             <p:selectManyMenu id="selectManyMenuMedicalBoardInAbsenceCases" widgetVar="selectManyMenuMedicalBoardInAbsenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds}" showCheckbox="true" scrollHeight="250">
                                                                 <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="medicalBoardInAbsence" itemLabel="#{medicalBoardInAbsence.consultation.booking.serviceman.name}" itemValue="#{medicalBoardInAbsence.medicalBoardCaseId}" />
-                                                                <p:ajax update="@form" />
+                                                                <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary" />
                                                             </p:selectManyMenu>
                                                             <p:outputLabel />
 
                                                             <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
-                                                            <h:outputText value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds.size()}" />
+                                                            <h:outputText id="outputTextNumBoardInAbsenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds.size()}" />
 
                                                             <p:outputLabel value="Estimated Time Required: " style="font-weight: bold" />
-                                                            <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(false)}" />
+                                                            <h:outputText id="outputTextEstTimeBoardInAbsence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(false)}" />
 
                                                         </h:panelGrid>           
                                                     </ui:fragment>
@@ -253,7 +256,7 @@
                                                 <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Summary</span>
                                             </div>
 
-                                            <h:panelGrid columns="2" cellpadding="5">
+                                            <h:panelGrid id="panelGridMedicalBoardSummary" columns="2" cellpadding="5">
 
                                                 <p:outputLabel value="Total Estimated Time Needed for Medical Board: " />
                                                 <h:outputText value="#{medicalBoardManagementManagedBean.calculateTotalEstimatedTimeNeeded()}" />
@@ -266,15 +269,11 @@
                                             <div style="text-align: right;">
                                                 <p:commandButton id="saveChanges" actionListener="#{medicalBoardManagementManagedBean.saveChanges()}" 
                                                                  title="Save Changes" value="Save"
-                                                                 update="@form" icon="fa fa-save" styleClass="success-button p-mr-3">
-                                                    <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
-                                                </p:commandButton>
+                                                                 update="@form" icon="fa fa-save" styleClass="success-button p-mr-3" />
 
                                                 <p:commandButton id="revertChanges" actionListener="#{medicalBoardManagementManagedBean.revertChanges()}" 
                                                                  title="Revert Changes" value="Revert"
-                                                                 update="@form" icon="fa fa-undo" styleClass="help-button">
-                                                    <p:confirm header="Confirmation" message="Are you sure you want to reset this employee's password?" icon="pi pi-exclamation-triangle" />
-                                                </p:commandButton>
+                                                                 update="@form" icon="fa fa-undo" styleClass="help-button" />
                                             </div>
                                         </li>
                                     </ui:fragment>
@@ -286,5 +285,6 @@
                 </div>
             </h:form>
         </ui:fragment>
+
     </ui:define>
 </ui:composition>

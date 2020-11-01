@@ -18,9 +18,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.PrimeFaces;
 import util.enumeration.MedicalBoardSlotStatusEnum;
+import util.enumeration.MedicalBoardTypeEnum;
+import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Named(value = "medicalBoardManagementManagedBean")
 @ViewScoped
@@ -38,11 +43,14 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     private List<MedicalBoardCase> medicalBoardInPresenceCases;
     private List<MedicalBoardCase> medicalBoardInAbsenceCases;
 
-    private List<Integer> selectedMedicalBoardInPresenceCaseIds;
-    private List<Integer> selectedMedicalBoardInAbsenceCaseIds;
+    private List<Long> selectedMedicalBoardInPresenceCaseIds;
+    private List<Long> selectedMedicalBoardInAbsenceCaseIds;
 
     public MedicalBoardManagementManagedBean() {
         this.medicalBoardSlots = new ArrayList<>();
+        
+        this.medicalBoardInPresenceCases = new ArrayList<>();
+        this.medicalBoardInAbsenceCases = new ArrayList<>();
 
         this.selectedMedicalBoardInPresenceCaseIds = new ArrayList<>();
         this.selectedMedicalBoardInAbsenceCaseIds = new ArrayList<>();
@@ -52,8 +60,8 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     public void postConstruct() {
         this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
 
-        this.medicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInPresenceCases();
-        this.medicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInAbsenceCases();
+//        this.medicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInPresenceCases();
+//        this.medicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInAbsenceCases();
     }
 
     public String renderDateTime(Date date) {
@@ -170,16 +178,51 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         Calendar date = Calendar.getInstance();
         date.setTime(this.selectedMedicalBoardSlot.getStartDateTime());
         Long dateInMillis = date.getTimeInMillis();
-        
+
         return new Date(dateInMillis + (timeNeededInMins * minuteInMillis));
     }
-    
+
     public void saveChanges() {
-        
+        List<Long> medicalBoardCaseIds = new ArrayList<>();
+        medicalBoardCaseIds.addAll(selectedMedicalBoardInPresenceCaseIds);
+        medicalBoardCaseIds.addAll(selectedMedicalBoardInAbsenceCaseIds);
+
+        try {
+            medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(selectedMedicalBoardSlot, medicalBoardCaseIds);
+
+            PrimeFaces.current().ajax().update("formMedicalBoardManagement");
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Cases Allocated", "Medical Board Cases have been allocated successfully!"));
+        } catch (UpdateMedicalBoardSlotException ex) {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Board Management", ex.getMessage()));
+        }
     }
-    
-    public void revertChanges() {
+
+    public void selectMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        revertChanges();
+
+        this.selectedMedicalBoardSlot = medicalBoardSlot;
         
+        System.out.println("mbs:" + medicalBoardSlot);
+        
+        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot));
+        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
+
+        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot));
+        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
+    }
+
+    public void revertChanges() {
+        this.selectedMedicalBoardInAbsenceCaseIds.clear();
+        this.selectedMedicalBoardInPresenceCaseIds.clear();
+
+        if (this.selectedMedicalBoardSlot != null) {
+            this.selectedMedicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(this.selectedMedicalBoardSlot.getSlotId());
+        }
+    }
+
+    private void addMessage(FacesMessage message) {
+        FacesContext.getCurrentInstance().addMessage("growl-message", message);
+        PrimeFaces.current().ajax().update("growl-message");
     }
 
     public List<MedicalBoardSlot> getMedicalBoardSlots() {
@@ -214,19 +257,19 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.medicalBoardInAbsenceCases = medicalBoardInAbsenceCases;
     }
 
-    public List<Integer> getSelectedMedicalBoardInPresenceCaseIds() {
+    public List<Long> getSelectedMedicalBoardInPresenceCaseIds() {
         return selectedMedicalBoardInPresenceCaseIds;
     }
 
-    public void setSelectedMedicalBoardInPresenceCaseIds(List<Integer> selectedMedicalBoardInPresenceCaseIds) {
+    public void setSelectedMedicalBoardInPresenceCaseIds(List<Long> selectedMedicalBoardInPresenceCaseIds) {
         this.selectedMedicalBoardInPresenceCaseIds = selectedMedicalBoardInPresenceCaseIds;
     }
 
-    public List<Integer> getSelectedMedicalBoardInAbsenceCaseIds() {
+    public List<Long> getSelectedMedicalBoardInAbsenceCaseIds() {
         return selectedMedicalBoardInAbsenceCaseIds;
     }
 
-    public void setSelectedMedicalBoardInAbsenceCaseIds(List<Integer> selectedMedicalBoardInAbsenceCaseIds) {
+    public void setSelectedMedicalBoardInAbsenceCaseIds(List<Long> selectedMedicalBoardInAbsenceCaseIds) {
         this.selectedMedicalBoardInAbsenceCaseIds = selectedMedicalBoardInAbsenceCaseIds;
     }
 

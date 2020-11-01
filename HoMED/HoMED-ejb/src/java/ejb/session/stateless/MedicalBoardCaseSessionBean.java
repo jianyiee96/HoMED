@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Consultation;
 import entity.MedicalBoardCase;
+import entity.MedicalBoardSlot;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -14,9 +15,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
+import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
 public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanLocal {
+
+    @EJB(name = "SlotSessionBeanLocal")
+    private SlotSessionBeanLocal slotSessionBeanLocal;
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
@@ -55,17 +60,19 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     }
 
     @Override
-    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardInPresenceCases() {
+    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum medicalBoardTypeEnum) {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
-        query.setParameter("boardType", MedicalBoardTypeEnum.PRESENCE);
+        query.setParameter("boardType", medicalBoardTypeEnum);
 
         return query.getResultList();
     }
 
     @Override
-    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardInAbsenceCases() {
-        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
-        query.setParameter("boardType", MedicalBoardTypeEnum.ABSENCE);
+    public List<MedicalBoardCase> retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum medicalBoardTypeEnum, MedicalBoardSlot medicalBoardSlot) {
+
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot = :boardSlot AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
+        query.setParameter("boardSlot", medicalBoardSlot);
+        query.setParameter("boardType", medicalBoardTypeEnum);
 
         return query.getResultList();
     }
@@ -74,6 +81,24 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public MedicalBoardCase retrieveMedicalBoardCaseById(Long medicalBoardCaseId) {
         MedicalBoardCase medicalBoardCase = em.find(MedicalBoardCase.class, medicalBoardCaseId);
         return medicalBoardCase;
+    }
+
+    @Override
+    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<Long> medicalBoardCaseIds) throws UpdateMedicalBoardSlotException {
+        String errorMessage = "Failed to allocate Medical Board Cases to Medical Board Slot: ";
+
+        if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
+            MedicalBoardSlot medicalBoardSlotToUpdate = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInPresenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase());
+            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInAbsenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase());
+
+            medicalBoardCaseIds.forEach(currMbcId -> {
+                MedicalBoardCase medicalBoardCase = retrieveMedicalBoardCaseById(currMbcId);
+                medicalBoardCase.setMedicalBoardSlot(medicalBoardSlotToUpdate);
+            });
+        } else {
+            throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
+        }
     }
 
 }

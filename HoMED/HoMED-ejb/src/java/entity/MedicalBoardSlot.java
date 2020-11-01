@@ -18,10 +18,7 @@ public class MedicalBoardSlot extends Slot implements Serializable {
 
     private MedicalBoardSlotStatusEnum medicalBoardSlotStatusEnum;
 
-    private Integer numBoardInPresenceCases;
     private Integer estimatedTimeForEachBoardInPresenceCase;
-
-    private Integer numBoardInAbsenceCases;
     private Integer estimatedTimeForEachBoardInAbsenceCase;
 
     @ManyToOne(optional = true)
@@ -38,11 +35,9 @@ public class MedicalBoardSlot extends Slot implements Serializable {
 
     public MedicalBoardSlot() {
         this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNALLOCATED;
-        this.numBoardInPresenceCases = 0;
         this.estimatedTimeForEachBoardInPresenceCase = 15;
-        this.numBoardInAbsenceCases = 0;
         this.estimatedTimeForEachBoardInAbsenceCase = 3;
-        
+
         this.medicalBoardCases = new ArrayList<>();
     }
 
@@ -60,28 +55,12 @@ public class MedicalBoardSlot extends Slot implements Serializable {
         this.medicalBoardSlotStatusEnum = medicalBoardSlotStatusEnum;
     }
 
-    public Integer getNumBoardInPresenceCases() {
-        return numBoardInPresenceCases;
-    }
-
-    public void setNumBoardInPresenceCases(Integer numBoardInPresenceCases) {
-        this.numBoardInPresenceCases = numBoardInPresenceCases;
-    }
-
     public Integer getEstimatedTimeForEachBoardInPresenceCase() {
         return estimatedTimeForEachBoardInPresenceCase;
     }
 
     public void setEstimatedTimeForEachBoardInPresenceCase(Integer estimatedTimeForEachBoardInPresenceCase) {
         this.estimatedTimeForEachBoardInPresenceCase = estimatedTimeForEachBoardInPresenceCase;
-    }
-
-    public Integer getNumBoardInAbsenceCases() {
-        return numBoardInAbsenceCases;
-    }
-
-    public void setNumBoardInAbsenceCases(Integer numBoardInAbsenceCases) {
-        this.numBoardInAbsenceCases = numBoardInAbsenceCases;
     }
 
     public Integer getEstimatedTimeForEachBoardInAbsenceCase() {
