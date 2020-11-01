@@ -53,7 +53,7 @@
                             </p:column>
 
                             <p:column headerText="Role" width="7%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
-                                <h:outputText class="dt-role-badge role-#{employee.role}" value='#{employee.role.stringVal}' />
+                                <h:outputText value='#{employee.role}' />
                             </p:column>
 
                             <p:column headerText="Email" width="15%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">
