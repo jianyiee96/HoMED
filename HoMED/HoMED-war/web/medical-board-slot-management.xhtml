@@ -26,7 +26,7 @@
                                 <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />
                                 <p:ajax event="eventSelect" listener="#{medicalBoardSlotManagementManagedBean.onEventSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message rightPanel'  />
                                 <p:ajax event="eventMove" listener="#{medicalBoardSlotManagementManagedBean.onEventMove}" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
-                                <p:ajax event="eventResize" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
+                                <p:ajax event="eventResize" listener="#{medicalBoardSlotManagementManagedBean.onEventResize}" oncomplete="PF('medicalBoardSlots').update()" update="growl-message" />
                             </p:schedule>
 
                         </div>

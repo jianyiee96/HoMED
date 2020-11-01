@@ -33,6 +33,7 @@ import javax.faces.view.ViewScoped;
 import jsf.classes.MedicalBoardSlotWrapper;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.ScheduleEntryMoveEvent;
+import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
@@ -258,12 +259,20 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         for (ScheduleEvent e : existingEventModel.getEvents()) {
             Date existingEventStartDate = Date.from(e.getStartDate().atZone(ZoneId.systemDefault()).toInstant());
             Date movedEventStartDate = Date.from(movedEvent.getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+            Date movedEventEndDate = Date.from(movedEvent.getEndDate().atZone(ZoneId.systemDefault()).toInstant());
 
             if (!e.equals(movedEvent) && isSameDay(existingEventStartDate, movedEventStartDate)) {
                 addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Medical Board Slots Moved", "Multiple medical boards are not allowed on the same day!"));
                 isValid = Boolean.FALSE;
                 break;
             }
+
+            if (e.equals(movedEvent) && !isSameDay(movedEventStartDate, movedEventEndDate)) {
+                addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Medical Board Slots Moved", "Medical board is not scheduled for the same day!"));
+                isValid = Boolean.FALSE;
+                break;
+            }
+
         }
 
         // If the slot does not exist, but drag to invalid slots (past dates), revert.
@@ -275,6 +284,22 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
         if (!isValid) {
             movedEvent.setStartDate(originalStartDateTime);
             movedEvent.setEndDate(originalEndDateTime);
+        }
+    }
+
+    public void onEventResize(ScheduleEntryResizeEvent event) {
+        ScheduleEvent resizedEvent = event.getScheduleEvent();
+
+        LocalDateTime originalStartDateTime = resizedEvent.getStartDate().minus(event.getDeltaStartAsDuration());
+        LocalDateTime originalEndDateTime = resizedEvent.getEndDate().minus(event.getDeltaEndAsDuration());
+
+        Date resizedEventStartDate = Date.from(resizedEvent.getStartDate().atZone(ZoneId.systemDefault()).toInstant());
+        Date resizedEventEndDate = Date.from(resizedEvent.getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+
+        if (!isSameDay(resizedEventStartDate, resizedEventEndDate)) {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid Medical Board Slots Resized", "Medical board is not scheduled for the same day!"));
+            resizedEvent.setStartDate(originalStartDateTime);
+            resizedEvent.setEndDate(originalEndDateTime);
         }
     }
 
