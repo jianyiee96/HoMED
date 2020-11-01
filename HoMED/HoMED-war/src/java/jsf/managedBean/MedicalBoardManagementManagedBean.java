@@ -23,6 +23,7 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
@@ -37,6 +38,9 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     private List<MedicalBoardSlot> medicalBoardSlots;
 
+    private Integer filterOption;
+    private List<MedicalBoardSlot> filteredMedicalBoardSlots;
+
     private MedicalBoardSlot selectedMedicalBoardSlot;
 
     private List<MedicalBoardCase> medicalBoardInPresenceCases;
@@ -48,6 +52,9 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     public MedicalBoardManagementManagedBean() {
         this.medicalBoardSlots = new ArrayList<>();
 
+        this.filterOption = 1;
+        this.filteredMedicalBoardSlots = new ArrayList<>();
+
         this.medicalBoardInPresenceCases = new ArrayList<>();
         this.medicalBoardInAbsenceCases = new ArrayList<>();
 
@@ -57,7 +64,29 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     @PostConstruct
     public void postConstruct() {
+        doFilterMedicalBoards();
+    }
+
+    public void doFilterMedicalBoards() {
         this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+        this.filteredMedicalBoardSlots.clear();
+
+        // 0 - Past
+        // 1 - Upcoming
+        if (this.filterOption == 0) {
+            this.medicalBoardSlots.forEach(mbs -> {
+                if (mbs.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.COMPLETED || mbs.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.EXPIRED) {
+                    this.filteredMedicalBoardSlots.add(mbs);
+                }
+            });
+        } else {
+            this.medicalBoardSlots.forEach(mbs -> {
+                if (mbs.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.COMPLETED && mbs.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.EXPIRED) {
+                    this.filteredMedicalBoardSlots.add(mbs);
+                }
+            });
+        }
+
     }
 
     public void saveChanges() {
@@ -69,7 +98,7 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         try {
             medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(selectedMedicalBoardSlot, medicalBoardCaseIds);
 
-            this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+            doFilterMedicalBoards();
             revertChanges(selectedMedicalBoardSlot);
             PrimeFaces.current().ajax().update("formMedicalBoardManagement");
             addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Cases Allocated", "Medical Board Cases have been allocated successfully!"));
@@ -228,6 +257,22 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     public void setMedicalBoardSlots(List<MedicalBoardSlot> medicalBoardSlots) {
         this.medicalBoardSlots = medicalBoardSlots;
+    }
+
+    public Integer getFilterOption() {
+        return filterOption;
+    }
+
+    public void setFilterOption(Integer filterOption) {
+        this.filterOption = filterOption;
+    }
+
+    public List<MedicalBoardSlot> getFilteredMedicalBoardSlots() {
+        return filteredMedicalBoardSlots;
+    }
+
+    public void setFilteredMedicalBoardSlots(List<MedicalBoardSlot> filteredMedicalBoardSlots) {
+        this.filteredMedicalBoardSlots = filteredMedicalBoardSlots;
     }
 
     public MedicalBoardSlot getSelectedMedicalBoardSlot() {

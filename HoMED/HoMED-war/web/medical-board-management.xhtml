@@ -12,10 +12,10 @@
         <h:outputStylesheet name="crud-tables.css" library="css" />
 
         <style type="text/css">
-            body .ui-datascroller .ui-datascroller-content {
-                border: 0px; 
-                padding: 0px;
-            }
+            /*            body .ui-datascroller .ui-datascroller-content {
+                            border: 0px; 
+                            padding: 0px;
+                        }*/
 
             .icon-style {
                 text-align: center;
@@ -38,9 +38,17 @@
                     <div class="p-sm-12 p-md-4 p-lg-4">
                         <div class="card">
                             <h2>Medical Board Management Page</h2>
-                            <h3>Filter (To be done)</h3>
 
-                            <p:dataScroller value="#{medicalBoardManagementManagedBean.medicalBoardSlots}" var="medicalBoardSlot" chunkSize="5" mode="inline" scrollHeight="900">
+                            <p:dataScroller id="dataScrollerMedicalBoards" widgetVar="dataScrollerMedicalBoards"
+                                            value="#{medicalBoardManagementManagedBean.filteredMedicalBoardSlots}" var="medicalBoardSlot" chunkSize="5" mode="inline" scrollHeight="900">
+
+                                <f:facet name="header">
+                                    <p:selectOneButton value="#{medicalBoardManagementManagedBean.filterOption}" unselectable="false">
+                                        <f:selectItem itemLabel="Past" itemValue="#{0}" />
+                                        <f:selectItem itemLabel="Upcoming" itemValue="#{1}" />
+                                        <p:ajax event="change" listener="#{medicalBoardManagementManagedBean.doFilterMedicalBoards}" update="dataScrollerMedicalBoards"/>
+                                    </p:selectOneButton>
+                                </f:facet>
 
                                 <p:commandLink style="color: #{medicalBoardManagementManagedBean.getCommandLinkColour(medicalBoardSlot)}" 
                                                actionListener="#{medicalBoardManagementManagedBean.selectMedicalBoardSlot(medicalBoardSlot)}" 
@@ -269,7 +277,7 @@
                                                     <h:panelGrid columns="2" cellpadding="8">
                                                         <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
                                                         <h:outputText value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot.size()}" />
-                                                        
+
                                                         <h:outputLabel value="List of Medical Board Cases Assigned: " style="font-weight:bold;"/>
                                                         <p:outputLabel />
 

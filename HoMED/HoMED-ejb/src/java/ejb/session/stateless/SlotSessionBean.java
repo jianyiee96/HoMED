@@ -179,7 +179,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
 
     @Override
     public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
-        Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb");
+        Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb ORDER BY mb.startDateTime");
         return query.getResultList();
     }
 
