@@ -33,6 +33,8 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
     private List<MedicalBoardSlot> medicalBoardSlotsAsMedicalOfficerTwo;
 
     public MedicalOfficer() {
+        this.isChairman = Boolean.FALSE;
+        
         this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();
     }
