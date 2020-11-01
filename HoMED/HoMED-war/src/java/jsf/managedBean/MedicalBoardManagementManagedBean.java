@@ -4,12 +4,15 @@
  */
 package jsf.managedBean;
 
+import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
+import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,28 +28,32 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     @EJB(name = "SlotSessionBeanLocal")
     private SlotSessionBeanLocal slotSessionBeanLocal;
+    @EJB(name = "MedicalBoardCaseSessionBeanLocal")
+    private MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanLocal;
 
     private List<MedicalBoardSlot> medicalBoardSlots;
 
     private MedicalBoardSlot selectedMedicalBoardSlot;
 
-    private Integer numBoardInPresenceCases;
-    private Integer estimatedTimeForEachBoardInPresenceCase;
-    
-    private Integer numBoardInAbsenceCases;
-    private Integer estimatedTimeForEachBoardInAbsenceCase;
+    private List<MedicalBoardCase> medicalBoardInPresenceCases;
+    private List<MedicalBoardCase> medicalBoardInAbsenceCases;
+
+    private List<Integer> selectedMedicalBoardInPresenceCaseIds;
+    private List<Integer> selectedMedicalBoardInAbsenceCaseIds;
 
     public MedicalBoardManagementManagedBean() {
         this.medicalBoardSlots = new ArrayList<>();
-        this.numBoardInPresenceCases = 0;
-        this.estimatedTimeForEachBoardInPresenceCase = 15;
-        this.numBoardInAbsenceCases = 0;
-        this.estimatedTimeForEachBoardInAbsenceCase = 3;
+
+        this.selectedMedicalBoardInPresenceCaseIds = new ArrayList<>();
+        this.selectedMedicalBoardInAbsenceCaseIds = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
         this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+
+        this.medicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInPresenceCases();
+        this.medicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInAbsenceCases();
     }
 
     public String renderDateTime(Date date) {
@@ -108,6 +115,73 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         }
     }
 
+    public String calculateEstimatedTimeNeeded(Boolean isMBIP) {
+        Long timeNeededInMins = 0l;
+
+        if (isMBIP) {
+            timeNeededInMins = (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase() * this.selectedMedicalBoardInPresenceCaseIds.size();
+        } else {
+            timeNeededInMins = (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase() * this.selectedMedicalBoardInAbsenceCaseIds.size();
+        }
+
+        return getDuration(timeNeededInMins);
+    }
+
+    public String calculateTotalEstimatedTimeNeeded() {
+        Long timeNeededInMins = (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase() * this.selectedMedicalBoardInPresenceCaseIds.size() + (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase() * this.selectedMedicalBoardInAbsenceCaseIds.size();
+        return getDuration(timeNeededInMins);
+    }
+
+    private String getDuration(Long timeNeededInMins) {
+        Long hours = timeNeededInMins / 60;
+        Long minutes = timeNeededInMins % 60;
+
+        String duration = "";
+        if (hours != 0) {
+            duration += hours;
+            if (hours == 1) {
+                duration += " hour ";
+            } else {
+                duration += " hours ";
+            }
+        }
+
+        if (minutes != 0) {
+            duration += minutes;
+            if (minutes == 1) {
+                duration += " minute";
+            } else {
+                duration += " minutes";
+            }
+        }
+
+        if (duration.equals("")) {
+            return "N.A.";
+        }
+
+        return duration;
+    }
+
+    public Date calculateEstimatedEndDate() {
+        Long timeNeededInMins = (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase() * this.selectedMedicalBoardInPresenceCaseIds.size() + (long) this.selectedMedicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase() * this.selectedMedicalBoardInAbsenceCaseIds.size();
+
+        Long minuteInMillis = 60000l; //millisecs
+
+        Calendar date = Calendar.getInstance();
+        date.setTime(this.selectedMedicalBoardSlot.getStartDateTime());
+        Long dateInMillis = date.getTimeInMillis();
+        
+        return new Date(dateInMillis + (timeNeededInMins * minuteInMillis));
+    }
+    
+    public void saveChanges() {
+        
+    }
+    
+    public void revertChanges() {
+        
+    }
+
     public List<MedicalBoardSlot> getMedicalBoardSlots() {
         return medicalBoardSlots;
     }
@@ -124,36 +198,36 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.selectedMedicalBoardSlot = selectedMedicalBoardSlot;
     }
 
-    public Integer getNumBoardInPresenceCases() {
-        return numBoardInPresenceCases;
+    public List<MedicalBoardCase> getMedicalBoardInPresenceCases() {
+        return medicalBoardInPresenceCases;
     }
 
-    public void setNumBoardInPresenceCases(Integer numBoardInPresenceCases) {
-        this.numBoardInPresenceCases = numBoardInPresenceCases;
+    public void setMedicalBoardInPresenceCases(List<MedicalBoardCase> medicalBoardInPresenceCases) {
+        this.medicalBoardInPresenceCases = medicalBoardInPresenceCases;
     }
 
-    public Integer getNumBoardInAbsenceCases() {
-        return numBoardInAbsenceCases;
+    public List<MedicalBoardCase> getMedicalBoardInAbsenceCases() {
+        return medicalBoardInAbsenceCases;
     }
 
-    public void setNumBoardInAbsenceCases(Integer numBoardInAbsenceCases) {
-        this.numBoardInAbsenceCases = numBoardInAbsenceCases;
+    public void setMedicalBoardInAbsenceCases(List<MedicalBoardCase> medicalBoardInAbsenceCases) {
+        this.medicalBoardInAbsenceCases = medicalBoardInAbsenceCases;
     }
 
-    public Integer getEstimatedTimeForEachBoardInPresenceCase() {
-        return estimatedTimeForEachBoardInPresenceCase;
+    public List<Integer> getSelectedMedicalBoardInPresenceCaseIds() {
+        return selectedMedicalBoardInPresenceCaseIds;
     }
 
-    public void setEstimatedTimeForEachBoardInPresenceCase(Integer estimatedTimeForEachBoardInPresenceCase) {
-        this.estimatedTimeForEachBoardInPresenceCase = estimatedTimeForEachBoardInPresenceCase;
+    public void setSelectedMedicalBoardInPresenceCaseIds(List<Integer> selectedMedicalBoardInPresenceCaseIds) {
+        this.selectedMedicalBoardInPresenceCaseIds = selectedMedicalBoardInPresenceCaseIds;
     }
 
-    public Integer getEstimatedTimeForEachBoardInAbsenceCase() {
-        return estimatedTimeForEachBoardInAbsenceCase;
+    public List<Integer> getSelectedMedicalBoardInAbsenceCaseIds() {
+        return selectedMedicalBoardInAbsenceCaseIds;
     }
 
-    public void setEstimatedTimeForEachBoardInAbsenceCase(Integer estimatedTimeForEachBoardInAbsenceCase) {
-        this.estimatedTimeForEachBoardInAbsenceCase = estimatedTimeForEachBoardInAbsenceCase;
+    public void setSelectedMedicalBoardInAbsenceCaseIds(List<Integer> selectedMedicalBoardInAbsenceCaseIds) {
+        this.selectedMedicalBoardInAbsenceCaseIds = selectedMedicalBoardInAbsenceCaseIds;
     }
 
 }

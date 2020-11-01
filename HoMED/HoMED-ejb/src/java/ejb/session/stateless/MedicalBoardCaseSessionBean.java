@@ -6,10 +6,12 @@ package ejb.session.stateless;
 
 import entity.Consultation;
 import entity.MedicalBoardCase;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
 
@@ -50,6 +52,22 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
         MedicalBoardCase predecessorMedicalBoardCase = this.retrieveMedicalBoardCaseById(predecessorMedicalBoardCaseId);
 
+    }
+
+    @Override
+    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardInPresenceCases() {
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
+        query.setParameter("boardType", MedicalBoardTypeEnum.PRESENCE);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardInAbsenceCases() {
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
+        query.setParameter("boardType", MedicalBoardTypeEnum.ABSENCE);
+
+        return query.getResultList();
     }
 
     @Override
