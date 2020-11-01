@@ -11,6 +11,21 @@
     <ui:define name="content">
         <h:outputStylesheet name="crud-tables.css" library="css" />
 
+        <style type="text/css">
+            body .ui-datascroller .ui-datascroller-content {
+                border: 0px; 
+                padding: 0px;
+            }
+
+            .icon-style {
+                text-align: center;
+                width: 20px;
+                font-size: 18px !important;
+                color: black !important;
+                padding-bottom: 5px;
+            }
+        </style>
+
         <ui:fragment rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() != 0}">
             <h:form>
                 <div class="p-grid">
@@ -19,47 +34,175 @@
                             <h2>Medical Board Management Page</h2>
                             <h3>Filter (To be done)</h3>
 
-                            <p:dataScroller value="#{medicalBoardManagementManagedBean.medicalBoardSlots}" var="medicalBoardSlot" chunkSize="10" mode="inline" scrollHeight="750">
+                            <p:dataScroller value="#{medicalBoardManagementManagedBean.medicalBoardSlots}" var="medicalBoardSlot" chunkSize="5" mode="inline" scrollHeight="750">
 
-                                <div style="padding: 0.5em 0em;">
-                                    <div class="card ui-fluid" style="background-color: #f9f7f9; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
-                                        <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardSlot.medicalBoardSlotStatusEnum}" />
+                                <p:commandLink style="color: #{medicalBoardManagementManagedBean.getCommandLinkColour(medicalBoardSlot)}" update="@form" process="@this">
 
-                                        <p:outputPanel style="margin: 8px;">
-                                            <h:panelGrid columns="2" cellpadding="5">
-                                                <h:outputText value="Start Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.startDateTime)}" />
+                                    <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
 
-                                                <h:outputText value="End Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.endDateTime)}" />
+                                        <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagementManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
+                                                       style="margin-left: -10px; margin-top:-10px; position: absolute;" 
+                                                       value="Current" />
 
-                                                <h:outputText value="Chairman: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
+                                        <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
 
-                                                <h:outputText value="MO1: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
+                                            <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardSlot.medicalBoardSlotStatusEnum}" />
 
-                                                <h:outputText value="MO2: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
+                                            <p:outputPanel style="margin: 8px;">
+                                                <h:panelGrid columns="2" cellpadding="5">
+                                                    <h:outputText value="Start Date: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.startDateTime)}" />
 
-                                            </h:panelGrid>
-                                        </p:outputPanel>
+                                                    <h:outputText value="End Date: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.endDateTime)}" />
+
+                                                    <h:outputText value="Chairman: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
+
+                                                    <h:outputText value="MO1: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
+
+                                                    <h:outputText value="MO2: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
+
+                                                </h:panelGrid>
+                                            </p:outputPanel>
+                                        </div>
                                     </div>
-                                </div>
+
+                                    <f:setPropertyActionListener value="#{medicalBoardSlot}" target="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot}" />
+                                </p:commandLink>
 
                             </p:dataScroller>
                         </div>
 
                     </div>
 
+                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot != null}">
 
-                    <div class="p-sm-12 p-md-8 p-lg-8">
-                        <div class="timeline card card-w-title">
+                        <div class="p-sm-12 p-md-8 p-lg-8">
+                            <div class="timeline card card-w-title">
 
-                            <h2>Medical Board Details</h2>
+                                <h2>Medical Board Details</h2>
 
+                                <ul>
+                                    <li>
+                                        <div>
+                                            <i class="fa fa-clock-o icon-style"></i>
+                                            <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Date Information</span>
+                                        </div>
+
+                                        <h:panelGrid columns="2" cellpadding="5">
+                                            <p:outputLabel value="Date: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.renderDate(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                            <p:outputLabel value="Start Time: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                            <p:outputLabel value="End Time: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.endDateTime)}" />
+                                        </h:panelGrid>
+                                    </li>
+
+                                    <li>
+                                        <i class="fa fa-user-md icon-style"></i>
+                                        <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Team Information</span>
+
+
+                                        <h:panelGrid columns="2" cellpadding="5">
+                                            <p:outputLabel value="Chairman: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman.name}" />
+
+                                            <p:outputLabel value="Medical Officer 1: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne.name}" />
+
+                                            <p:outputLabel value="Medical Officer 2: " style="font-weight: bold" />
+                                            <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo.name}" />
+                                        </h:panelGrid>
+                                    </li>
+
+                                    <!-- 
+                                        Board In-Presence 
+                                    -->
+                                    <li>
+                                        <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'
+                                                                 or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+
+                                            <div>
+                                                <i class="fa fa-user icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases</span>
+                                            </div>
+
+                                            <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null 
+                                                                     and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null 
+                                                                     and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
+                                                abc
+                                            </ui:fragment>
+
+                                            <h:panelGrid rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null 
+                                                                     or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null 
+                                                                     or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}"
+                                                         columns="1" cellpadding="5">
+                                                <p:outputLabel style="font-size: 14px;"
+                                                               value="Please assign all the reviewing medical officers (including chairman) first in order to allocate medical board in-presence cases!" />
+                                            </h:panelGrid>
+
+                                        </ui:fragment>
+
+                                        <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED'
+                                                                 and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+
+                                            <div>
+                                                <i class="fa fa-user icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases (View Only)</span>
+                                            </div>
+
+                                        </ui:fragment>
+                                    </li>
+
+                                    <!-- 
+                                        Board In-Absence 
+                                    -->
+                                    <li>
+                                        <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'
+                                                                 or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+
+                                            <div>
+                                                <i class="fa fa-user icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases</span>
+                                            </div>
+
+                                            <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null 
+                                                                     and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null 
+                                                                     and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
+                                                def
+                                            </ui:fragment>
+
+                                            <h:panelGrid rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null 
+                                                                     or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null 
+                                                                     or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}"
+                                                         columns="1" cellpadding="5">
+                                                <p:outputLabel style="font-size: 14px;"
+                                                               value="Please assign all the reviewing medical officers (including chairman) first in order to allocate medical board in-presence cases!" />
+                                            </h:panelGrid>
+
+                                        </ui:fragment>
+
+                                        <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED'
+                                                                 and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+
+                                            <div>
+                                                <i class="fa fa-user icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases (View Only)</span>
+                                            </div>
+
+                                        </ui:fragment>
+                                    </li>
+                                </ul>
+
+                            </div>
                         </div>
-                    </div>
+                    </ui:fragment>
                 </div>
             </h:form>
         </ui:fragment>

@@ -20,7 +20,7 @@
 
                             <p:schedule id="medicalBoardSlots" widgetVar="medicalBoardSlots" value="#{medicalBoardSlotManagementManagedBean.existingEventModel}" 
                                         locale="en_GB"
-                                        timeFormat="HH:mm" slotDuration="00:30:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
+                                        timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
                                         aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
                                         draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
                                 <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />

@@ -103,10 +103,10 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                 description += "\n\nChairman: " + medicalBoardSlotOuter.getChairman().getName();
             }
             if (medicalBoardSlotOuter.getMedicalOfficerOne() != null) {
-                description += "\n\nMO1: " + medicalBoardSlotOuter.getMedicalOfficerOne().getName();
+                description += "\nMO1: " + medicalBoardSlotOuter.getMedicalOfficerOne().getName();
             }
             if (medicalBoardSlotOuter.getMedicalOfficerTwo() != null) {
-                description += "\n\nMO2: " + medicalBoardSlotOuter.getMedicalOfficerTwo().getName();
+                description += "\nMO2: " + medicalBoardSlotOuter.getMedicalOfficerTwo().getName();
             }
 
             String styleClass;
