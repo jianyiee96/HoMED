@@ -7,7 +7,10 @@ package jsf.managedBean;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.MedicalBoardSlot;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -38,6 +41,11 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     public void setMedicalBoardSlots(List<MedicalBoardSlot> medicalBoardSlots) {
         this.medicalBoardSlots = medicalBoardSlots;
+    }
+
+    public String renderDateTime(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        return dateFormat.format(date);
     }
 
 }
