@@ -108,12 +108,13 @@
             <f:viewParam name="reportToViewId"/>
         </f:metadata>
 
-        <ezcomp:pageRedirect rendered="#{manageReportManagedBean.report eq null}"
+        <ezcomp:pageRedirect rendered="#{manageReportManagedBean.report eq null}" btnValue="Report Management Page"
                              header="#{manageReportManagedBean.redirectMessage}" btnOutcome="/report-management.xhtml" btnIcon="fa fa-files-o"/>
 
         <h:form id="formReport" rendered="#{manageReportManagedBean.report ne null}">
+            <f:event type="preRenderComponent" listener="#{manageReportManagedBean.checkCreation()}"/>
             <p:focus context="panelReport" />
-            <p:confirmDialog global="true">
+            <p:confirmDialog global="true" width="500px">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
@@ -127,23 +128,43 @@
                         </h:outputText>
                         <h:outputText value="Published Date: " style="font-weight: 800" class="p-ml-4"/>
                         <h:outputText value="Not Published" rendered="#{empty manageReportManagedBean.report.datePublished}"/>
-                        <h:outputText value="#{manageReportManagedBean.report.lastModified}" rendered="#{not empty manageReportManagedBean.report.datePublished}">
+                        <h:outputText value="#{manageReportManagedBean.report.datePublished}" rendered="#{not empty manageReportManagedBean.report.datePublished}">
                             <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
                         </h:outputText>
                     </div>
                 </f:facet>
                 <f:facet name="right">
-                    <p:commandButton class="p-mr-2 warning-button" title="Print" icon="pi pi-print"/>
+                    <p:commandButton class="p-mr-2 warning-button" title="Clone" icon="fa fa-files-o"
+                                     actionListener="#{manageReportManagedBean.doClone()}"
+                                     rendered="#{not manageReportManagedBean.isEditMode}"
+                                     process="@this" update="@form"/>
                     <h:panelGroup rendered="#{not manageReportManagedBean.isViewState}">
-                        <p:commandButton class="p-mr-2 success-button" title="Publish" icon="pi pi-upload"/>
-                        <p:commandButton class="p-mr-2 danger-button" title="Delete" icon="pi pi-trash"/>
                         <p:commandButton rendered="#{manageReportManagedBean.isCreateState}" class="p-mr-2 info-button" title="Create" icon="fa fa-pencil-square-o" process="@form"
                                          value="Create" actionListener="#{manageReportManagedBean.doCreate}" update="@form"/>
                         <h:panelGroup rendered="#{not manageReportManagedBean.isCreateState}">
-                            <p:commandButton rendered="#{not manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Edit" icon="pi pi-pencil" process="@this"
-                                             value="Edit" actionListener="#{manageReportManagedBean.doEdit}" update="@form"/>
-                            <p:commandButton rendered="#{manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Done Editing" icon="pi pi-check" process="@form"
-                                             value="Done Editing" actionListener="#{manageReportManagedBean.doEdit}" update="@form" />
+                            <h:panelGroup rendered="#{not manageReportManagedBean.isEditMode}" >
+                                <p:commandButton class="p-mr-2 success-button" title="Publish" icon="pi pi-upload"
+                                                 actionListener="#{manageReportManagedBean.doPublish()}"
+                                                 rendered="#{empty manageReportManagedBean.report.datePublished}"
+                                                 process="@this" update="@form">
+                                    <p:confirm header="Publish Report" message="Confirm publish report?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton class="p-mr-2 success-button" title="Unpublish" icon="pi pi-undo"
+                                                 actionListener="#{manageReportManagedBean.doUnpublish()}"
+                                                 rendered="#{not empty manageReportManagedBean.report.datePublished}"
+                                                 process="@this" update="@form"/>
+                                <p:commandButton class="p-mr-2 danger-button" title="Delete" icon="pi pi-trash"
+                                                 actionListener="#{manageReportManagedBean.doDelete()}"
+                                                 process="@this" update="@form">
+                                    <p:confirm header="Delete Report" message="Confirm delete report?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton class="p-mr-2 info-button" title="Edit" icon="pi pi-pencil" 
+                                                 value="Edit" actionListener="#{manageReportManagedBean.doEdit}"
+                                                 process="@this" update="@form"/>
+                            </h:panelGroup>
+                            <p:commandButton rendered="#{manageReportManagedBean.isEditMode}" class="p-mr-2 info-button" title="Done Editing" icon="pi pi-check"
+                                             value="Done Editing" actionListener="#{manageReportManagedBean.doEdit}" 
+                                             process="@form" update="@form" />
                         </h:panelGroup>
                     </h:panelGroup>
                 </f:facet>
@@ -175,7 +196,11 @@
                                                      process="@this" update="formReport:dialogFilterDate"
                                                      rendered="#{manageReportManagedBean.isEditMode or manageReportManagedBean.report.filterDateType != 'NONE'}"
                                                      disabled="#{not manageReportManagedBean.isEditMode}"
-                                                     value="#{manageReportManagedBean.report.filterDateType == 'NONE' ? 'Set Global Date Filter' : manageReportManagedBean.report.filterDateString}"/>
+                                                     value="#{manageReportManagedBean.report.filterDateType == 'NONE' ? 'Set Global Date Filter' : manageReportManagedBean.report.filterDateString}">
+                                        <p:confirm disabled="#{not manageReportManagedBean.checkAnyFieldRequiresDate()}" header="Global Date Filter" escape="false"
+                                                   message="There are fields in this report that relies on a date filter, changing the current date filter will impact the fields.&lt;br/&gt;&lt;br/&gt;Proceed?"
+                                                   icon="pi pi-exclamation-triangle" />
+                                    </p:commandButton>
                                 </h:panelGroup>
                             </div>
                         </div>
@@ -404,7 +429,8 @@
                             <p:messages for="panelFilterDate"/>
                             <p:commandButton value="Confirm Selection" styleClass="ui-confirmdialog-yes" icon="pi pi-check"
                                              actionListener="#{manageReportManagedBean.doFilterDate}"
-                                             process="panelFilterDate" update="panelGroupDateFilterBtn panelFilterDate"/>
+                                             process="panelFilterDate" update="@form"/>
+                            <!--panelGroupDateFilterBtn panelFilterDate-->
                         </div>
                     </div>
                 </p:outputPanel>        

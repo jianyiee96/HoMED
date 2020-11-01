@@ -42,7 +42,10 @@ import util.enumeration.ReportDataType;
 import util.enumeration.ReportDataValue;
 import util.enumeration.ReportFieldType;
 import util.enumeration.ReportNotFoundException;
+import util.exceptions.CloneReportException;
 import util.exceptions.CreateReportException;
+import util.exceptions.DeleteReportException;
+import util.exceptions.PublishReportException;
 import util.exceptions.UpdateReportException;
 
 @Named(value = "manageReportManagedBean")
@@ -126,11 +129,6 @@ public class ManageReportManagedBean implements Serializable {
                 isCreateState = true;
                 isEditMode = true;
 
-//                Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-//                System.out.println("OBJECT: " + flash.get("createReportSuccess"));
-//                if (flash.get("createReportSuccess") != null) {
-//                    FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Report Success", "......"));
-//                }
             }
         } catch (NumberFormatException ex) {
             this.report = null;
@@ -138,6 +136,14 @@ public class ManageReportManagedBean implements Serializable {
         } catch (ReportNotFoundException ex) {
             this.report = null;
             this.redirectMessage = "Invalid Report ID! Redirecting to Report Management.";
+        }
+    }
+
+    public void checkCreation() {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        Object objStrMessage = flash.get("createReportSuccess");
+        if (objStrMessage != null) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Report Success", (String) objStrMessage));
         }
     }
 
@@ -188,6 +194,17 @@ public class ManageReportManagedBean implements Serializable {
         Collections.swap(reportFieldWrappers, initPos, initPos - 1);
     }
 
+    public Boolean checkAnyFieldRequiresDate() {
+        return this.report.getReportFields().stream()
+                .anyMatch(field -> {
+                    ReportDataGrouping reportDataGrouping = field.getReportDataGrouping();
+                    if (reportDataGrouping != null) {
+                        return reportDataGrouping.requireDate();
+                    }
+                    return false;
+                });
+    }
+
     public void doOpenDialogFilterDate() {
         this.filterDateType = this.report.getFilterDateType();
         this.filterStartDate = this.report.getFilterStartDate();
@@ -197,13 +214,39 @@ public class ManageReportManagedBean implements Serializable {
 
     public void doFilterDate() {
         this.report.setFilterDateType(this.filterDateType);
-        this.report.setFilterStartDate(filterStartDate);
+        if (filterDateType == FilterDateType.NONE) {
+            this.report.setFilterStartDate(null);
+        } else {
+            this.report.setFilterStartDate(filterStartDate);
+        }
         if (filterDateType == filterDateType.CUSTOM || filterDateType == filterDateType.WEEK) {
             this.report.setFilterEndDate(filterEndDate);
         } else {
             this.report.setFilterEndDate(null);
         }
+
         PrimeFaces.current().executeScript("PF('dialogFilterDate').hide()");
+
+        if (checkAnyFieldRequiresDate()) {
+            this.report.getReportFields().stream()
+                    .filter(field -> {
+                        ReportDataGrouping reportDataGrouping = field.getReportDataGrouping();
+                        if (reportDataGrouping != null) {
+                            return reportDataGrouping.requireDate();
+                        }
+                        return false;
+                    })
+                    .forEach(field -> {
+                        field.setFilterDateType(this.report.getFilterDateType());
+                        field.setFilterStartDate(this.report.getFilterStartDate());
+                        field.setFilterEndDate(this.report.getFilterEndDate());
+                        processField(field);
+                    });
+            reportFieldWrappers.forEach(wrapper -> {
+                wrapper.createChart();
+            });
+
+        }
     }
 
     public void selectFilterDateType() {
@@ -305,7 +348,7 @@ public class ManageReportManagedBean implements Serializable {
             if (checkAddChartDate()) {
                 if (this.report.getFilterDateType() == FilterDateType.NONE) {
                     reportField.setFilterDateType(this.filterDateType);
-                    reportField.setFilterStartDate(filterStartDate);
+                    reportField.setFilterStartDate(this.filterStartDate);
                     if (filterDateType == filterDateType.CUSTOM || filterDateType == filterDateType.WEEK) {
                         reportField.setFilterEndDate(filterEndDate);
                     } else {
@@ -316,6 +359,10 @@ public class ManageReportManagedBean implements Serializable {
                     reportField.setFilterStartDate(this.report.getFilterStartDate());
                     reportField.setFilterEndDate(this.report.getFilterEndDate());
                 }
+            } else {
+                reportField.setFilterDateType(FilterDateType.NONE);
+                reportField.setFilterStartDate(null);
+                reportField.setFilterEndDate(null);
             }
         } else if (idxAddChart == 3) {
             processField(reportField);
@@ -325,9 +372,7 @@ public class ManageReportManagedBean implements Serializable {
 
     public Boolean checkAddChartDate() {
         ReportField reportField = this.reportFieldToAddWrapper.getReportField();
-        return reportField.getReportDataGrouping() == ReportDataGrouping.S_BK
-                || reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS
-                || reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI;
+        return reportField.getReportDataGrouping().requireDate();
     }
 
     public String getAddChartbtnText() {
@@ -344,7 +389,6 @@ public class ManageReportManagedBean implements Serializable {
             this.report.getReportFields().add(this.reportFieldToAddWrapper.getReportField());
             this.reportFieldWrappers.add(this.reportFieldToAddWrapper);
         } else {
-            System.out.println("Successfully REPLACED");
             this.reportFieldWrappers.set(reportFieldToEditWrapperIdx, this.reportFieldToAddWrapper);
         }
     }
@@ -462,23 +506,29 @@ public class ManageReportManagedBean implements Serializable {
         return list;
     }
 
+    public void doDelete() {
+        try {
+            reportSessionBeanLocal.deleteReport(this.report.getReportId());
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("deleteReport", "Successfully deleted " + this.report.toString());
+            FacesContext.getCurrentInstance().getExternalContext().redirect("report-management.xhtml");
+        } catch (DeleteReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Report", ex.getMessage()));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+        }
+    }
+
     public void doCreate() {
         try {
             this.report.setLastModified(new Date());
             revProcessReport(report);
             this.report = reportSessionBeanLocal.createReport(this.report, currentEmployee.getEmployeeId());
-            processReport(this.report);
-            this.isCreateState = false;
-            this.isEditMode = false;
 
-//            String result = "Successfully created " + this.report.toString();
-//            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("createReportSuccess", true);
+            String result = "Successfully created " + this.report;
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("createReportSuccess", result);
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             String url = request.getRequestURL().toString() + "?reportToViewId=" + this.report.getReportId();
             FacesContext.getCurrentInstance().getExternalContext().redirect(url);
-
-            // I'm trying to display this on the page refresh
-//            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Create Report", "Successfully created " + this.report));
         } catch (CreateReportException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Create Report", ex.getMessage()));
         } catch (IOException ex) {
@@ -501,6 +551,40 @@ public class ManageReportManagedBean implements Serializable {
             }
         } else {
             isEditMode = true;
+        }
+    }
+
+    public void doClone() {
+        try {
+            Report report = reportSessionBeanLocal.cloneReport(this.report.getReportId(), currentEmployee.getEmployeeId());
+
+            String result = "Successfully cloned " + report;
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("createReportSuccess", result);
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            String url = request.getRequestURL().toString() + "?reportToViewId=" + report.getReportId();
+            FacesContext.getCurrentInstance().getExternalContext().redirect(url);
+        } catch (CloneReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Clone Report", ex.getMessage()));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+        }
+    }
+
+    public void doPublish() {
+        try {
+            this.report = reportSessionBeanLocal.publishReport(report.getReportId());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Publish Report", "Successfully published " + this.report));
+        } catch (PublishReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Publish Report", ex.getMessage()));
+        }
+    }
+
+    public void doUnpublish() {
+        try {
+            this.report = reportSessionBeanLocal.unpublishReport(report.getReportId());
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Unpublish Report", "Successfully unpublished " + this.report));
+        } catch (PublishReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unpublish Report", ex.getMessage()));
         }
     }
 

@@ -12,10 +12,13 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
+import util.exceptions.CloneReportException;
 import util.exceptions.DeleteReportException;
+import util.exceptions.PublishReportException;
 
 @Named(value = "reportManagementManagedBean")
 @ViewScoped
@@ -41,7 +44,15 @@ public class ReportManagementManagedBean implements Serializable {
         filterOption = 1;
         refreshData();
     }
-    
+
+    public void checkDeletion() {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        Object objStrMessage = flash.get("deleteReport");
+        if (objStrMessage != null) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Report", (String) objStrMessage));
+        }
+    }
+
     public void refreshData() {
         reports = reportSessionBeanLocal.retrieveAllReports();
         doFilter();
@@ -52,6 +63,16 @@ public class ReportManagementManagedBean implements Serializable {
             FacesContext.getCurrentInstance().getExternalContext().redirect("manage-report.xhtml");
         } catch (IOException ex) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+        }
+    }
+    
+    public void doClone(Long reportId) {
+        try {
+            Report report = reportSessionBeanLocal.cloneReport(reportId, currentEmployee.getEmployeeId());
+            refreshData();
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Clone Report", "Successfully cloned " + report));
+        } catch (CloneReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Clone Report", ex.getMessage()));
         }
     }
 
@@ -65,6 +86,26 @@ public class ReportManagementManagedBean implements Serializable {
         }
     }
 
+    public void doPublish(Long reportId) {
+        try {
+            Report report = reportSessionBeanLocal.publishReport(reportId);
+            refreshData();
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Publish Report", "Successfully published " + report));
+        } catch (PublishReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Publish Report", ex.getMessage()));
+        }
+    }
+
+    public void doUnpublish(Long reportId) {
+        try {
+            Report report = reportSessionBeanLocal.unpublishReport(reportId);
+            refreshData();
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_INFO, "Unpublish Report", "Successfully unpublished " + report));
+        } catch (PublishReportException ex) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unpublish Report", ex.getMessage()));
+        }
+    }
+
     public void doFilter() {
         // 1 - All
         // 2 - My Reports
@@ -72,7 +113,7 @@ public class ReportManagementManagedBean implements Serializable {
         filteredReports = reports.stream()
                 .filter(report -> {
                     if (filterOption == 1) {
-                        return true;
+                        return report.getEmployee().equals(currentEmployee) || (!report.getEmployee().equals(currentEmployee) && report.getDatePublished() != null);
                     } else if (filterOption == 2) {
                         return report.getEmployee().equals(currentEmployee);
                     } else if (filterOption == 3) {

@@ -4,6 +4,8 @@ import entity.Employee;
 import entity.Report;
 import entity.ReportField;
 import entity.ReportFieldGroup;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,9 +19,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.ReportNotFoundException;
+import util.exceptions.CloneReportException;
 import util.exceptions.CreateReportException;
 import util.exceptions.DeleteReportException;
 import util.exceptions.EmployeeNotFoundException;
+import util.exceptions.PublishReportException;
 import util.exceptions.UpdateReportException;
 
 @Stateless
@@ -45,6 +49,9 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
         Report report = em.find(Report.class, id);
 
         if (report != null) {
+            report.getReportFields().forEach(field -> {
+                field.getReportFieldGroups().size();
+            });
             return report;
         } else {
             throw new ReportNotFoundException("Report ID " + id + " does not exist!");
@@ -131,36 +138,131 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
                 throw new UpdateReportException(prepareReportFieldGroupInputDataValidationErrorsMessage(constraintViolationsGroups));
             }
 
+            reportToUpdate.getReportFields().forEach(field -> {
+                em.remove(field);
+            });
+            reportToUpdate.setReportFields(new ArrayList<>());
+            em.flush();
+
             report.getReportFields().forEach(field -> {
+                field.setReportFieldId(null);
                 field.getReportFieldGroups().forEach(grp -> {
+                    grp.setReportFieldGroupId(null);
                     em.persist(grp);
                     em.flush();
                 });
                 em.persist(field);
                 em.flush();
             });
-            
+
             reportToUpdate.setReportFields(report.getReportFields());
             reportToUpdate.setName(report.getName());
             reportToUpdate.setDescription(report.getDescription());
             reportToUpdate.setDateCreated(report.getDateCreated());
             reportToUpdate.setDatePublished(report.getDatePublished());
             reportToUpdate.setLastModified(report.getLastModified());
-            reportToUpdate.setReportStatus(report.getReportStatus());
             reportToUpdate.setFilterDateType(report.getFilterDateType());
             reportToUpdate.setFilterStartDate(report.getFilterStartDate());
             reportToUpdate.setFilterEndDate(report.getFilterEndDate());
-            
+
             em.flush();
 
             return report;
         } catch (UpdateReportException | ReportNotFoundException ex) {
             throw new UpdateReportException(errorMessage + ex.getMessage());
-        } 
-//        catch (Exception ex) {
-//            ex.printStackTrace();
-//            throw new UpdateReportException(generalUnexpectedErrorMessage + "creating updating report");
-//        }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new UpdateReportException(generalUnexpectedErrorMessage + "creating updating report");
+        }
+
+    }
+
+    @Override
+    public Report cloneReport(Long reportId, Long employeeId) throws CloneReportException {
+        String errorMessage = "Failed to clone Report: ";
+        try {
+            Employee employee = employeeSessionBeanLocal.retrieveEmployeeById(employeeId);
+
+            Report reportToClone = retrieveReportById(reportId);
+
+            Report report = new Report(reportToClone);
+            report.setName(report.getName() + " - Cloned");
+            report.setDateCreated(new Date());
+            report.setDatePublished(null);
+            report.setLastModified(new Date());
+
+            report.getReportFields().forEach(field -> {
+                field.setReportFieldId(null);
+                field.getReportFieldGroups().forEach(grp -> {
+                    grp.setReportFieldGroupId(null);
+                    em.persist(grp);
+                    em.flush();
+                });
+                em.persist(field);
+                em.flush();
+            });
+
+            em.persist(report);
+            report.setEmployee(employee);
+            employee.getReports().add(report);
+
+            em.flush();
+
+            return report;
+        } catch (EmployeeNotFoundException | ReportNotFoundException ex) {
+            throw new CloneReportException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new CloneReportException(generalUnexpectedErrorMessage + "creating updating report");
+        }
+
+    }
+
+    @Override
+    public Report publishReport(Long reportId) throws PublishReportException {
+        String errorMessage = "Failed to publish Report: ";
+        try {
+            Report reportToPublish = retrieveReportById(reportId);
+
+            if (reportToPublish.getReportFields().isEmpty()) {
+                throw new PublishReportException("Cannot publish a report without fields");
+            } else if (reportToPublish.getDatePublished() != null) {
+                throw new PublishReportException("report has already been published");
+            }
+
+            reportToPublish.setDatePublished(new Date());
+            em.flush();
+
+            return reportToPublish;
+        } catch (PublishReportException | ReportNotFoundException ex) {
+            throw new PublishReportException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new PublishReportException(generalUnexpectedErrorMessage + "publishing report");
+        }
+
+    }
+
+    @Override
+    public Report unpublishReport(Long reportId) throws PublishReportException {
+        String errorMessage = "Failed to unpublish Report: ";
+        try {
+            Report reportToUnpublish = retrieveReportById(reportId);
+
+            if (reportToUnpublish.getDatePublished() == null) {
+                throw new PublishReportException("Report is not currently published");
+            }
+
+            reportToUnpublish.setDatePublished(null);
+            em.flush();
+
+            return reportToUnpublish;
+        } catch (PublishReportException | ReportNotFoundException ex) {
+            throw new PublishReportException(errorMessage + ex.getMessage());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new PublishReportException(generalUnexpectedErrorMessage + "unpublishing report");
+        }
 
     }
 
@@ -171,6 +273,7 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
             Report report = retrieveReportById(reportId);
             report.getEmployee().getReports().remove(report);
             em.remove(report);
+            em.flush();
         } catch (ReportNotFoundException ex) {
             throw new DeleteReportException(errorMessage + ex.getMessage());
         }

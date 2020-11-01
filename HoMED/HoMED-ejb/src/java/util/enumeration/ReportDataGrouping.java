@@ -30,6 +30,12 @@ public enum ReportDataGrouping {
         return y_axis;
     }
 
+    public Boolean requireDate() {
+        return this == S_BK
+                || this == MO_CS
+                || this == MO_FI;
+    }
+
     public static ReportDataGrouping[] getReportDataGroupings(ReportDataType type, ReportDataValue value) {
         if (type == ReportDataType.SERVICEMAN) {
             return new ReportDataGrouping[]{S_PES, S_BT, S_BK};

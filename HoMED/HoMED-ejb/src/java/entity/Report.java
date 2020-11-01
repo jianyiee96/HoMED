@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,7 +22,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import util.enumeration.FilterDateType;
-import util.enumeration.ReportStatusEnum;
 
 @Entity
 public class Report implements Serializable {
@@ -43,7 +43,7 @@ public class Report implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date dateCreated;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = true)
     private Date datePublished;
@@ -52,11 +52,6 @@ public class Report implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date lastModified;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @NotNull(message = "Report Status must be provided")
-    private ReportStatusEnum reportStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -81,7 +76,6 @@ public class Report implements Serializable {
         this.filterDateType = FilterDateType.NONE;
         this.dateCreated = new Date();
         this.lastModified = new Date();
-        this.reportStatus = ReportStatusEnum.PERSONAL;
         this.reportFields = new ArrayList<>();
     }
 
@@ -91,6 +85,24 @@ public class Report implements Serializable {
         this.description = description;
         this.filterStartDate = filterStartDate;
         this.filterEndDate = filterEndDate;
+    }
+
+    public Report(Report another) {
+        this();
+        this.name = another.name;
+        this.description = another.description;
+        this.dateCreated = another.dateCreated != null ? new Date(another.dateCreated.getTime()) : null;
+        this.datePublished = another.datePublished != null ? new Date(another.datePublished.getTime()) : null;
+        this.lastModified = another.lastModified != null ? new Date(another.lastModified.getTime()) : null;
+        this.filterDateType = another.filterDateType;
+        this.filterStartDate = another.filterStartDate != null ? new Date(another.filterStartDate.getTime()) : null;
+        this.filterEndDate = another.filterEndDate != null ? new Date(another.filterEndDate.getTime()) : null;
+        this.reportFields = another.reportFields.stream()
+                .map(field -> {
+                    return new ReportField(field);
+                })
+                .collect(Collectors.toList());
+        this.employee = another.employee;
     }
 
     public Long getReportId() {
@@ -139,14 +151,6 @@ public class Report implements Serializable {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
-    }
-
-    public ReportStatusEnum getReportStatus() {
-        return reportStatus;
-    }
-
-    public void setReportStatus(ReportStatusEnum reportStatus) {
-        this.reportStatus = reportStatus;
     }
 
     public FilterDateType getFilterDateType() {
