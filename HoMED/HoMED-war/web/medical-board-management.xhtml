@@ -12,11 +12,6 @@
         <h:outputStylesheet name="crud-tables.css" library="css" />
 
         <style type="text/css">
-            /*            body .ui-datascroller .ui-datascroller-content {
-                            border: 0px; 
-                            padding: 0px;
-                        }*/
-
             .icon-style {
                 text-align: center;
                 width: 20px;
@@ -34,7 +29,7 @@
         <ui:fragment rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() != 0}">
 
             <h:form id="formMedicalBoardManagement">
-                <div class="p-grid">
+                <div class="p-grid crud-table">
                     <div class="p-sm-12 p-md-4 p-lg-4">
                         <div class="card">
                             <h2>Medical Board Management Page</h2>
@@ -164,14 +159,33 @@
                                                                 </p:inputNumber>
                                                             </p:inplace>
 
-                                                            <p:selectManyMenu id="selectManyMenuMedicalBoardInPresenceCases" widgetVar="selectManyMenuMedicalBoardInPresenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds}" showCheckbox="true" scrollHeight="250">
-                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="medicalBoardInPresence" itemLabel="#{medicalBoardInPresence.consultation.booking.serviceman.name} [#{medicalBoardInPresence.consultation.booking.consultationPurpose.consultationPurposeName}]" itemValue="#{medicalBoardInPresence.medicalBoardCaseId}" />
-                                                                <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary" />
-                                                            </p:selectManyMenu>
-                                                            <p:outputLabel />
+                                                        </h:panelGrid>
+
+                                                        <p:dataTable id="dataTableMedicalBoardInPresenceCases" widgetVar="dataTableMedicalBoardInPresenceCases" reflow="true"
+                                                                     value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="mbipCase"
+                                                                     selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCases}" rowKey="#{mbipCase.medicalBoardCaseId}"
+                                                                     style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                                            <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                            <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+
+                                                            <p:column selectionMode="multiple"></p:column>
+                                                            <p:column headerText="ID" width="10%">
+                                                                <h:outputText value="#{mbipCase.medicalBoardCaseId}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Name" width="45%">
+                                                                <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Purpose" width="45%">
+                                                                <h:outputText value="#{mbipCase.consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+
+                                                        <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel for="outputTextNumBoardInPresenceSelected" value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
-                                                            <h:outputText id="outputTextNumBoardInPresenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds.size()}" />
+                                                            <h:outputText id="outputTextNumBoardInPresenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCases.size()}" />
 
                                                             <p:outputLabel for="outputTextEstTimeBoardInPresence" value="Estimated Time Required: " style="font-weight: bold" />
                                                             <h:outputText id="outputTextEstTimeBoardInPresence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
@@ -188,6 +202,9 @@
                                                     </ui:fragment>
                                                 </ui:fragment>
 
+                                                <!-- 
+                                                    TO BE DONE AFTER MEDICAL BOARD IS DONE 
+                                                -->
                                                 <!-- Currently selected MBIP slot is NOT UNALLOCATED and ALLOCATED -->
                                                 <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
                                                     <div>
@@ -242,14 +259,33 @@
                                                                 </p:inputNumber>
                                                             </p:inplace>
 
-                                                            <p:selectManyMenu id="selectManyMenuMedicalBoardInAbsenceCases" widgetVar="selectManyMenuMedicalBoardInAbsenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds}" showCheckbox="true" scrollHeight="250">
-                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="medicalBoardInAbsence" itemLabel="#{medicalBoardInAbsence.consultation.booking.serviceman.name} [#{medicalBoardInAbsence.consultation.booking.consultationPurpose.consultationPurposeName}]" itemValue="#{medicalBoardInAbsence.medicalBoardCaseId}" />
-                                                                <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary" />
-                                                            </p:selectManyMenu>
-                                                            <p:outputLabel />
+                                                        </h:panelGrid>
+
+                                                        <p:dataTable id="dataTableMedicalBoardInAbsenceCases" widgetVar="dataTableMedicalBoardInAbsenceCases" reflow="true"
+                                                                     value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="mbiaCase"
+                                                                     selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCases}" rowKey="#{mbiaCase.medicalBoardCaseId}"
+                                                                     style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                                            <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                            <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+
+                                                            <p:column selectionMode="multiple"></p:column>
+                                                            <p:column headerText="ID" width="10%">
+                                                                <h:outputText value="#{mbiaCase.medicalBoardCaseId}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Name" width="45%">
+                                                                <h:outputText value="#{mbiaCase.consultation.booking.serviceman.name}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Purpose" width="45%">
+                                                                <h:outputText value="#{mbiaCase.consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+
+                                                        <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
-                                                            <h:outputText id="outputTextNumBoardInAbsenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds.size()}" />
+                                                            <h:outputText id="outputTextNumBoardInAbsenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCases.size()}" />
 
                                                             <p:outputLabel value="Estimated Time Required: " style="font-weight: bold" />
                                                             <h:outputText id="outputTextEstTimeBoardInAbsence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(false)}" />
@@ -266,6 +302,9 @@
                                                     </ui:fragment>
                                                 </ui:fragment>
 
+                                                <!-- 
+                                                    TO BE DONE AFTER MEDICAL BOARD IS DONE
+                                                -->
                                                 <!-- Currently selected MBIA slot is NOT UNALLOCATED and ALLOCATED -->
                                                 <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
 
@@ -311,10 +350,10 @@
 
                                             <h:panelGrid id="panelGridMedicalBoardSummary" columns="2" cellpadding="8">
 
-                                                <p:outputLabel value="Total Estimated Time Needed for Medical Board: " />
+                                                <p:outputLabel value="Total Estimated Time Needed for Medical Board: " style="font-weight: bold" />
                                                 <h:outputText value="#{medicalBoardManagementManagedBean.calculateTotalEstimatedTimeNeeded()}" />
 
-                                                <p:outputLabel value="Estimated End Time for Medical Board: " />
+                                                <p:outputLabel value="Estimated End Time for Medical Board: " style="font-weight: bold" />
                                                 <h:outputText value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.calculateEstimatedEndDate())}" />
 
                                             </h:panelGrid>    
