@@ -30,8 +30,18 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     private MedicalBoardSlot selectedMedicalBoardSlot;
 
+    private Integer numBoardInPresenceCases;
+    private Integer estimatedTimeForEachBoardInPresenceCase;
+    
+    private Integer numBoardInAbsenceCases;
+    private Integer estimatedTimeForEachBoardInAbsenceCase;
+
     public MedicalBoardManagementManagedBean() {
         this.medicalBoardSlots = new ArrayList<>();
+        this.numBoardInPresenceCases = 0;
+        this.estimatedTimeForEachBoardInPresenceCase = 15;
+        this.numBoardInAbsenceCases = 0;
+        this.estimatedTimeForEachBoardInAbsenceCase = 3;
     }
 
     @PostConstruct
@@ -112,6 +122,38 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     public void setSelectedMedicalBoardSlot(MedicalBoardSlot selectedMedicalBoardSlot) {
         this.selectedMedicalBoardSlot = selectedMedicalBoardSlot;
+    }
+
+    public Integer getNumBoardInPresenceCases() {
+        return numBoardInPresenceCases;
+    }
+
+    public void setNumBoardInPresenceCases(Integer numBoardInPresenceCases) {
+        this.numBoardInPresenceCases = numBoardInPresenceCases;
+    }
+
+    public Integer getNumBoardInAbsenceCases() {
+        return numBoardInAbsenceCases;
+    }
+
+    public void setNumBoardInAbsenceCases(Integer numBoardInAbsenceCases) {
+        this.numBoardInAbsenceCases = numBoardInAbsenceCases;
+    }
+
+    public Integer getEstimatedTimeForEachBoardInPresenceCase() {
+        return estimatedTimeForEachBoardInPresenceCase;
+    }
+
+    public void setEstimatedTimeForEachBoardInPresenceCase(Integer estimatedTimeForEachBoardInPresenceCase) {
+        this.estimatedTimeForEachBoardInPresenceCase = estimatedTimeForEachBoardInPresenceCase;
+    }
+
+    public Integer getEstimatedTimeForEachBoardInAbsenceCase() {
+        return estimatedTimeForEachBoardInAbsenceCase;
+    }
+
+    public void setEstimatedTimeForEachBoardInAbsenceCase(Integer estimatedTimeForEachBoardInAbsenceCase) {
+        this.estimatedTimeForEachBoardInAbsenceCase = estimatedTimeForEachBoardInAbsenceCase;
     }
 
 }
