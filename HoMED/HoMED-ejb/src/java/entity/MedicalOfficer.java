@@ -39,9 +39,11 @@ public class MedicalOfficer extends MedicalStaff implements Serializable {
         this.signedFormInstances = new ArrayList<>();
     }
 
-    public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender) {
+    public MedicalOfficer(String name, String password, String email, Address address, String phoneNumber, GenderEnum gender, Boolean isChairman) {
         super(name, password, email, address, phoneNumber, gender);
         super.role = EmployeeRoleEnum.MEDICAL_OFFICER;
+        
+        this.isChairman = isChairman;
 
         this.completedConsultations = new ArrayList<>();
         this.signedFormInstances = new ArrayList<>();

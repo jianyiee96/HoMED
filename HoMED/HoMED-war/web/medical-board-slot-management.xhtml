@@ -20,7 +20,7 @@
 
                             <p:schedule id="medicalBoardSlots" widgetVar="medicalBoardSlots" value="#{medicalBoardSlotManagementManagedBean.existingEventModel}" 
                                         locale="en_GB"
-                                        timeFormat="HH:mm" slotDuration="00:15:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
+                                        timeFormat="HH:mm" slotDuration="00:30:00" slotLabelInterval="#{medicalBoardSlotManagementManagedBean.slotLabelInterval}"
                                         aspectRatio="1.5" view="timeGridWeek" allDaySlot="false" rightHeaderTemplate="title" centerHeaderTemplate=""
                                         draggable="false" resizable="false" minTime="#{medicalBoardSlotManagementManagedBean.minTime}" maxTime="#{medicalBoardSlotManagementManagedBean.maxTime}">
                                 <p:ajax event="dateSelect" listener="#{medicalBoardSlotManagementManagedBean.onDateSelect}" oncomplete="PF('medicalBoardSlots').update()" update='growl-message' />
@@ -198,7 +198,9 @@
                                                 <div class="p-col">
 
                                                     <!-- Edit Button -->
-                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime) and !medicalBoardSlotWrapper.isEditMode}"
+                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime) 
+                                                                                 and !medicalBoardSlotWrapper.isEditMode 
+                                                                                 and medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState or medicalBoardSlotManagementManagedBean.isEditState}"
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.initEdit(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
@@ -226,7 +228,8 @@
                                                     </p:commandButton>
 
                                                     <!-- Delete Button -->
-                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}"
+                                                    <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)
+                                                                                 and medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" 
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 

@@ -109,17 +109,7 @@ public class MedicalBoardCase implements Serializable {
     }
 
     public void setMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
-        if (this.medicalBoardSlot != null) {
-            this.medicalBoardSlot.getMedicalBoardCases().remove(this);
-        }
-        
         this.medicalBoardSlot = medicalBoardSlot;
-        
-        if (this.medicalBoardSlot != null) {
-            if (!this.medicalBoardSlot.getMedicalBoardCases().contains(this)) {
-                this.medicalBoardSlot.getMedicalBoardCases().add(this);
-            }
-        }
     }
 
     @Override

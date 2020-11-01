@@ -186,6 +186,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     @Override
     public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId) {
         MedicalBoardSlot medicalBoardSlot = em.find(MedicalBoardSlot.class, medicalBoardSlotId);
+        medicalBoardSlot.getMedicalBoardCases().size();
         return medicalBoardSlot;
     }
 

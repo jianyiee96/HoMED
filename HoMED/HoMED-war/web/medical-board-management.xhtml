@@ -28,6 +28,9 @@
 
         <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
+        <ezcomp:pageRedirect rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() == 0}"
+                             header="Currently No Medical Board Slots Scheduled"/>
+
         <ui:fragment rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() != 0}">
 
             <h:form id="formMedicalBoardManagement">
@@ -154,7 +157,7 @@
                                                             </p:inplace>
 
                                                             <p:selectManyMenu id="selectManyMenuMedicalBoardInPresenceCases" widgetVar="selectManyMenuMedicalBoardInPresenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCaseIds}" showCheckbox="true" scrollHeight="250">
-                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="medicalBoardInPresence" itemLabel="#{medicalBoardInPresence.consultation.booking.serviceman.name}" itemValue="#{medicalBoardInPresence.medicalBoardCaseId}" />
+                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="medicalBoardInPresence" itemLabel="#{medicalBoardInPresence.consultation.booking.serviceman.name} [Case ID: #{medicalBoardInPresence.medicalBoardCaseId}]" itemValue="#{medicalBoardInPresence.medicalBoardCaseId}" />
                                                                 <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary" />
                                                             </p:selectManyMenu>
                                                             <p:outputLabel />
@@ -211,7 +214,7 @@
                                                             </p:inplace>
 
                                                             <p:selectManyMenu id="selectManyMenuMedicalBoardInAbsenceCases" widgetVar="selectManyMenuMedicalBoardInAbsenceCases"  value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCaseIds}" showCheckbox="true" scrollHeight="250">
-                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="medicalBoardInAbsence" itemLabel="#{medicalBoardInAbsence.consultation.booking.serviceman.name}" itemValue="#{medicalBoardInAbsence.medicalBoardCaseId}" />
+                                                                <f:selectItems value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="medicalBoardInAbsence" itemLabel="#{medicalBoardInAbsence.consultation.booking.serviceman.name} [Case ID: #{medicalBoardInAbsence.medicalBoardCaseId}]" itemValue="#{medicalBoardInAbsence.medicalBoardCaseId}" />
                                                                 <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary" />
                                                             </p:selectManyMenu>
                                                             <p:outputLabel />
@@ -271,7 +274,7 @@
                                                                  title="Save Changes" value="Save"
                                                                  update="@form" icon="fa fa-save" styleClass="success-button p-mr-3" />
 
-                                                <p:commandButton id="revertChanges" actionListener="#{medicalBoardManagementManagedBean.revertChanges()}" 
+                                                <p:commandButton id="revertChanges" actionListener="#{medicalBoardManagementManagedBean.revertChanges(medicalBoardManagementManagedBean.selectedMedicalBoardSlot)}" 
                                                                  title="Revert Changes" value="Revert"
                                                                  update="@form" icon="fa fa-undo" styleClass="help-button" />
                                             </div>

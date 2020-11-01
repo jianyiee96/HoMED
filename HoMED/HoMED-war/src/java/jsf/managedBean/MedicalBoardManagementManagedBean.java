@@ -23,7 +23,6 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import org.primefaces.PrimeFaces;
-import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
@@ -48,7 +47,7 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     public MedicalBoardManagementManagedBean() {
         this.medicalBoardSlots = new ArrayList<>();
-        
+
         this.medicalBoardInPresenceCases = new ArrayList<>();
         this.medicalBoardInAbsenceCases = new ArrayList<>();
 
@@ -59,9 +58,60 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     @PostConstruct
     public void postConstruct() {
         this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+    }
 
-//        this.medicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInPresenceCases();
-//        this.medicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardInAbsenceCases();
+    public void saveChanges() {
+        List<Long> medicalBoardCaseIds = new ArrayList<>();
+
+        medicalBoardCaseIds.addAll(selectedMedicalBoardInPresenceCaseIds);
+        medicalBoardCaseIds.addAll(selectedMedicalBoardInAbsenceCaseIds);
+
+        try {
+            medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(selectedMedicalBoardSlot, medicalBoardCaseIds);
+
+            this.medicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
+            revertChanges(selectedMedicalBoardSlot);
+            PrimeFaces.current().ajax().update("formMedicalBoardManagement");
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Cases Allocated", "Medical Board Cases have been allocated successfully!"));
+        } catch (UpdateMedicalBoardSlotException ex) {
+            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Board Management", ex.getMessage()));
+        }
+    }
+
+    public void selectMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        revertChanges(medicalBoardSlot);
+    }
+
+    public void revertChanges(MedicalBoardSlot medicalBoardSlot) {
+        this.medicalBoardInAbsenceCases.clear();
+        this.medicalBoardInPresenceCases.clear();
+
+        this.selectedMedicalBoardInAbsenceCaseIds.clear();
+        this.selectedMedicalBoardInPresenceCaseIds.clear();
+
+        if (this.selectedMedicalBoardSlot != null) {
+            this.selectedMedicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(this.selectedMedicalBoardSlot.getSlotId());
+        }
+
+        this.selectedMedicalBoardSlot = medicalBoardSlot;
+
+        // MBIA
+        List<MedicalBoardCase> selectedMedicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot);
+        selectedMedicalBoardInAbsenceCases.forEach(mbiaCase -> {
+            this.selectedMedicalBoardInAbsenceCaseIds.add(mbiaCase.getMedicalBoardCaseId());
+        });
+
+        this.medicalBoardInAbsenceCases.addAll(selectedMedicalBoardInAbsenceCases);
+        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
+
+        // MBIP
+        List<MedicalBoardCase> selectedMedicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot);
+        selectedMedicalBoardInPresenceCases.forEach(mbipCase -> {
+            this.selectedMedicalBoardInPresenceCaseIds.add(mbipCase.getMedicalBoardCaseId());
+        });
+
+        this.medicalBoardInPresenceCases.addAll(selectedMedicalBoardInPresenceCases);
+        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
     }
 
     public String renderDateTime(Date date) {
@@ -82,30 +132,7 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     public String renderDuration(Date start, Date end) {
         Long diffInMillies = Math.abs(end.getTime() - start.getTime());
         Long diffInMinutes = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-        Long hours = diffInMinutes / 60;
-        Long minutes = diffInMinutes % 60;
-
-        String duration = "";
-        if (hours != 0) {
-            duration += hours;
-            if (hours == 1) {
-                duration += " hour ";
-            } else {
-                duration += " hours ";
-            }
-        }
-
-        if (minutes != 0) {
-            duration += minutes;
-            if (minutes == 1) {
-                duration += " minute";
-            } else {
-                duration += " minutes";
-            }
-        }
-
-        return duration;
+        return getDuration(diffInMinutes);
     }
 
     public String getCommandLinkColour(MedicalBoardSlot medicalBoardSlot) {
@@ -180,44 +207,6 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         Long dateInMillis = date.getTimeInMillis();
 
         return new Date(dateInMillis + (timeNeededInMins * minuteInMillis));
-    }
-
-    public void saveChanges() {
-        List<Long> medicalBoardCaseIds = new ArrayList<>();
-        medicalBoardCaseIds.addAll(selectedMedicalBoardInPresenceCaseIds);
-        medicalBoardCaseIds.addAll(selectedMedicalBoardInAbsenceCaseIds);
-
-        try {
-            medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(selectedMedicalBoardSlot, medicalBoardCaseIds);
-
-            PrimeFaces.current().ajax().update("formMedicalBoardManagement");
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Medical Board Cases Allocated", "Medical Board Cases have been allocated successfully!"));
-        } catch (UpdateMedicalBoardSlotException ex) {
-            addMessage(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Medical Board Management", ex.getMessage()));
-        }
-    }
-
-    public void selectMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
-        revertChanges();
-
-        this.selectedMedicalBoardSlot = medicalBoardSlot;
-        
-        System.out.println("mbs:" + medicalBoardSlot);
-        
-        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot));
-        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
-
-        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot));
-        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
-    }
-
-    public void revertChanges() {
-        this.selectedMedicalBoardInAbsenceCaseIds.clear();
-        this.selectedMedicalBoardInPresenceCaseIds.clear();
-
-        if (this.selectedMedicalBoardSlot != null) {
-            this.selectedMedicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(this.selectedMedicalBoardSlot.getSlotId());
-        }
     }
 
     private void addMessage(FacesMessage message) {
