@@ -38,6 +38,7 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
 import util.exceptions.UpdateMedicalBoardSlotException;
@@ -108,30 +109,48 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
                 description += "\n\nMO2: " + medicalBoardSlotOuter.getMedicalOfficerTwo().getName();
             }
 
-            String title;
             String styleClass;
 
-            if (medicalBoardSlotOuter.getMedicalBoardCases().isEmpty()) {
-                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
-                    title = "Board Cases Unallocated";
+            switch (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum()) {
+                case UNALLOCATED:
                     styleClass = "unallocated-medical-board-slot";
-                } else {
-                    title = "Expired";
-                    styleClass = "expired-medical-board-slot";
-                }
-            } else {
-                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
-                    title = "Board Cases Allocated";
+                    break;
+                case ALLOCATED:
                     styleClass = "allocated-medical-board-slot";
-                } else if (medicalBoardSlotOuter.getStartDateTime().before(new Date()) && medicalBoardSlotOuter.getEndDateTime().after(new Date())) {
-                    title = "Board Cases Ongoing";
+                    break;
+                case ONGOING:
                     styleClass = "ongoing-medical-board-slot";
-                } else {
-                    title = "Board Cases Completed";
+                    break;
+                case COMPLETED:
                     styleClass = "completed-medical-board-slot";
-                }
+                    break;
+                default:
+                    styleClass = "expired-medical-board-slot";
+                    break;
             }
 
+            String title = medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum().getStringVal();
+
+//            if (medicalBoardSlotOuter.getMedicalBoardCases().isEmpty()) {
+//                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
+//                    title = "Board Cases Unallocated";
+//                    styleClass = "unallocated-medical-board-slot";
+//                } else {
+//                    title = "Board Expired";
+//                    styleClass = "expired-medical-board-slot";
+//                }
+//            } else {
+//                if (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.ALLOCATED) {
+//                    title = "Board Cases Allocated";
+//                    styleClass = "allocated-medical-board-slot";
+//                } else if (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.ONGOING) {
+//                    title = "Board Ongoing";
+//                    styleClass = "ongoing-medical-board-slot";
+//                } else {
+//                    title = "Board Completed";
+//                    styleClass = "completed-medical-board-slot";
+//                }
+//            }
             Integer idx = 0;
             for (MedicalBoardSlotWrapper mbsWrapper : this.selectedMedicalBoardSlotWrappersTreeSet) {
                 mbsWrapper.setIndex(++idx);
@@ -172,24 +191,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
         this.minTime = startHour + ":00:00";
         this.maxTime = endHour + ":00:00";
-    }
-
-    public String getBoardStatus(MedicalBoardSlot medicalBoardSlot) {
-        if (medicalBoardSlot.getMedicalBoardCases().isEmpty()) {
-            if (medicalBoardSlot.getStartDateTime().after(new Date())) {
-                return "Board Cases Unallocated";
-            } else {
-                return "Expired";
-            }
-        } else {
-            if (medicalBoardSlot.getStartDateTime().after(new Date())) {
-                return "Board Cases Allocated";
-            } else if (medicalBoardSlot.getStartDateTime().before(new Date()) && medicalBoardSlot.getEndDateTime().after(new Date())) {
-                return "Board Cases Ongoing";
-            } else {
-                return "Board Cases Completed";
-            }
-        }
     }
 
     public void onEventSelect(SelectEvent<ScheduleEvent> selectEvent) {

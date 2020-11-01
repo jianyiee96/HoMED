@@ -11,9 +11,12 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 
 @Entity
 public class MedicalBoardSlot extends Slot implements Serializable {
+
+    private MedicalBoardSlotStatusEnum medicalBoardSlotStatusEnum;
 
     @ManyToOne(optional = true)
     private MedicalOfficer chairman;
@@ -28,6 +31,7 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     private List<MedicalBoardCase> medicalBoardCases;
 
     public MedicalBoardSlot() {
+        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNALLOCATED;
         this.medicalBoardCases = new ArrayList<>();
     }
 
@@ -35,6 +39,14 @@ public class MedicalBoardSlot extends Slot implements Serializable {
         this();
         super.setStartDateTime(start);
         super.setEndDateTime(end);
+    }
+
+    public MedicalBoardSlotStatusEnum getMedicalBoardSlotStatusEnum() {
+        return medicalBoardSlotStatusEnum;
+    }
+
+    public void setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum medicalBoardSlotStatusEnum) {
+        this.medicalBoardSlotStatusEnum = medicalBoardSlotStatusEnum;
     }
 
     public MedicalOfficer getChairman() {
