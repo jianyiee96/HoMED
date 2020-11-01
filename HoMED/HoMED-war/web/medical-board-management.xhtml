@@ -100,7 +100,7 @@
                                                     <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Date Information</span>
                                                 </div>
 
-                                                <h:panelGrid columns="2" cellpadding="5">
+                                                <h:panelGrid columns="2" cellpadding="8">
                                                     <p:outputLabel value="Date: " style="font-weight: bold" />
                                                     <p:outputLabel value="#{medicalBoardManagementManagedBean.renderDate(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
 
@@ -116,7 +116,7 @@
                                                 <i class="fa fa-user-md icon-style"></i>
                                                 <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Team Information</span>
 
-                                                <h:panelGrid columns="2" cellpadding="5">
+                                                <h:panelGrid columns="2" cellpadding="8">
                                                     <p:outputLabel value="Chairman: " style="font-weight: bold" />
                                                     <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman.name}" />
 
@@ -147,7 +147,7 @@
 
                                                     <!-- Reviewing Medical Officers are assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
-                                                        <h:panelGrid columns="2" cellpadding="5">
+                                                        <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
                                                             <p:inplace id="inplaceEstTimeForEachBoardInPresence">
@@ -173,7 +173,7 @@
 
                                                     <!-- Reviewing Medical Officers are NOT assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}">
-                                                        <h:panelGrid columns="1" cellpadding="5">
+                                                        <h:panelGrid columns="1" cellpadding="8">
                                                             <p:outputLabel style="font-size: 14px;"
                                                                            value="Please assign all the reviewing medical officers (including chairman) first in order to allocate medical board in-presence cases!" />
                                                         </h:panelGrid>
@@ -186,6 +186,27 @@
                                                         <i class="fa fa-users icon-style"></i>
                                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases (View Only)</span>
                                                     </div>
+
+                                                    <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:outputLabel value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot.size()}" />
+
+                                                        <h:outputLabel value="List of Medical Board Cases Assigned: " style="font-weight:bold;"/>
+                                                        <p:outputLabel />
+
+                                                        <p:repeat rendered="#{not empty medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}" value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}" var="mbipCase">
+                                                            <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            <p:outputLabel />
+                                                        </p:repeat>
+
+                                                        <ui:fragment rendered="#{empty medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}">
+                                                            <h:outputText value="No Medical Board In-Presence Cases Were Assigned!" />
+                                                        </ui:fragment>
+                                                        <p:outputLabel />
+
+                                                        <p:outputLabel value="Estimated Time Taken: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+                                                    </h:panelGrid>
                                                 </ui:fragment>
                                             </h:panelGroup>
 
@@ -204,7 +225,7 @@
 
                                                     <!-- Reviewing Medical Officers are assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
-                                                        <h:panelGrid columns="2" cellpadding="5">
+                                                        <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
                                                             <p:inplace id="inplaceEstTimeForEachBoardInAbsence">
@@ -230,7 +251,7 @@
 
                                                     <!-- Reviewing Medical Officers are NOT assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}">
-                                                        <h:panelGrid columns="1" cellpadding="5">
+                                                        <h:panelGrid columns="1" cellpadding="8">
                                                             <p:outputLabel style="font-size: 14px;"
                                                                            value="Please assign all the reviewing medical officers (including chairman) first in order to allocate medical board in-absence cases!" />
                                                         </h:panelGrid>
@@ -244,6 +265,27 @@
                                                         <i class="fa fa-users icon-style"></i>
                                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases (View Only)</span>
                                                     </div>
+
+                                                    <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot.size()}" />
+                                                        
+                                                        <h:outputLabel value="List of Medical Board Cases Assigned: " style="font-weight:bold;"/>
+                                                        <p:outputLabel />
+
+                                                        <p:repeat rendered="#{not empty medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}" value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}" var="mbipCase">
+                                                            <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            <p:outputLabel />
+                                                        </p:repeat>
+
+                                                        <ui:fragment rendered="#{empty medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}">
+                                                            <h:outputText value="No Medical Board In-Absence Cases Were Assigned!" />
+                                                        </ui:fragment>
+                                                        <p:outputLabel />
+
+                                                        <p:outputLabel value="Estimated Time Taken: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+                                                    </h:panelGrid>
 
                                                 </ui:fragment>
                                             </h:panelGroup>
@@ -259,7 +301,7 @@
                                                 <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Summary</span>
                                             </div>
 
-                                            <h:panelGrid id="panelGridMedicalBoardSummary" columns="2" cellpadding="5">
+                                            <h:panelGrid id="panelGridMedicalBoardSummary" columns="2" cellpadding="8">
 
                                                 <p:outputLabel value="Total Estimated Time Needed for Medical Board: " />
                                                 <h:outputText value="#{medicalBoardManagementManagedBean.calculateTotalEstimatedTimeNeeded()}" />

@@ -114,6 +114,14 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
     }
 
+    public List<MedicalBoardCase> getMedicalBoardInPresenceCasesForSelectedMedicalBoardSlot() {
+        return medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, selectedMedicalBoardSlot);
+    }
+
+    public List<MedicalBoardCase> getMedicalBoardInAbsenceCasesForSelectedMedicalBoardSlot() {
+        return medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, selectedMedicalBoardSlot);
+    }
+
     public String renderDateTime(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
         return dateFormat.format(date);

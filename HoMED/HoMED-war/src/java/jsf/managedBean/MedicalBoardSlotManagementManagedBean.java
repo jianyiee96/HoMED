@@ -131,26 +131,6 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
 
             String title = medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum().getStringVal();
 
-//            if (medicalBoardSlotOuter.getMedicalBoardCases().isEmpty()) {
-//                if (medicalBoardSlotOuter.getStartDateTime().after(new Date())) {
-//                    title = "Board Cases Unallocated";
-//                    styleClass = "unallocated-medical-board-slot";
-//                } else {
-//                    title = "Board Expired";
-//                    styleClass = "expired-medical-board-slot";
-//                }
-//            } else {
-//                if (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.ALLOCATED) {
-//                    title = "Board Cases Allocated";
-//                    styleClass = "allocated-medical-board-slot";
-//                } else if (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.ONGOING) {
-//                    title = "Board Ongoing";
-//                    styleClass = "ongoing-medical-board-slot";
-//                } else {
-//                    title = "Board Completed";
-//                    styleClass = "completed-medical-board-slot";
-//                }
-//            }
             Integer idx = 0;
             for (MedicalBoardSlotWrapper mbsWrapper : this.selectedMedicalBoardSlotWrappersTreeSet) {
                 mbsWrapper.setIndex(++idx);
