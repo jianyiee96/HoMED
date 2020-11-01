@@ -200,8 +200,6 @@ public class NotificationResource {
 
     @Path("deleteNotification")
     @DELETE
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteNotification(@Context HttpHeaders headers, @QueryParam("notificationId") String notificationId) {
         try {
             String token = headers.getRequestHeader("Token").get(0);
@@ -232,8 +230,6 @@ public class NotificationResource {
 
     @Path("deleteAllNotification")
     @DELETE
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteAllNotification(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
         try {
             String token = headers.getRequestHeader("Token").get(0);

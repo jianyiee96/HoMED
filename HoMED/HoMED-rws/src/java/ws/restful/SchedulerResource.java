@@ -125,12 +125,9 @@ public class SchedulerResource {
             Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment(), isForReview);
             Long bookingId = booking.getBookingId();
 
-            Notification n = new Notification("Booking Created Successfully", "Your booking has been created successfully.");
-            notificationSessionBeanLocal.createNewNotification(n, scheduleBookingReq.getServicemanId(), true);
-
             return Response.status(Response.Status.OK).entity(new ScheduleBookingRsp(bookingId)).build();
 
-        } catch (CreateBookingException | CreateNotificationException ex) {
+        } catch (CreateBookingException ex) {
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
