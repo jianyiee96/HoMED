@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,6 +25,7 @@ import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FormInstanceStatusEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.exceptions.AttachFormInstancesException;
 import util.exceptions.CancelBookingException;
 import util.exceptions.ConvertBookingException;
@@ -117,7 +120,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
             }
 
-            Notification n = new Notification("Booking Created Successfully", "Your booking has been created successfully.");
+            Notification n = new Notification("Booking Created Successfully", "Your booking with Booking Id[" + newBooking.getBookingId() + "]has been created successfully.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
             notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
             return newBooking;
 
@@ -194,9 +197,11 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             }
 
             // Notification module can fire here
+            Notification n = new Notification("Booking has been created for you", "Your have a new booking with Booking Id[" + newBooking.getBookingId() + "] created for you.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
+            notificationSessionBeanLocal.createNewNotification(n, servicemanId, true);
             return newBooking;
 
-        } catch (CreateBookingException | AttachFormInstancesException ex) {
+        } catch (CreateBookingException | AttachFormInstancesException | CreateNotificationException ex) {
             throw new CreateBookingException("Failed to create booking: " + ex.getMessage());
         }
 
@@ -226,6 +231,12 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
         // Notification module can fire here
+        Notification n = new Notification("There is new required form for booking", "Your booking with Booking Id[" + booking.getBookingId() + "] has a new form attached", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
         return booking;
     }
 
@@ -275,6 +286,13 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
         } else {
             throw new MarkBookingAttendanceException("Unable to mark attandance due to unsubmitted forms: " + formInstanceNames);
+        }
+        
+        Notification n = new Notification("Your booking attendance have been marked", "Your attemdace for booking with Booking Id[" + booking.getBookingId() + "] has been marked", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
         }
 
     }

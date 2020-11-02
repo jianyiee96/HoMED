@@ -8,6 +8,7 @@ import entity.Booking;
 import entity.Consultation;
 import entity.FormInstance;
 import entity.MedicalOfficer;
+import entity.Notification;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.exceptions.CreateConsultationException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.DeferConsultationException;
 import util.exceptions.DeleteFormInstanceException;
 import util.exceptions.EndConsultationException;
@@ -30,6 +33,9 @@ import util.exceptions.StartConsultationException;
 public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
     @EJB
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
+
+    @EJB
     private BookingSessionBeanLocal bookingSessionBeanLocal;
 
     @EJB
@@ -37,6 +43,8 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
     @EJB
     private FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
+    
+    
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -119,6 +127,13 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } catch (Exception ex) {
             throw new StartConsultationException("Unknown exception: " + ex.getMessage());
         }
+        
+        Notification n = new Notification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is begging. Please proceed to consultation room", NotificationTypeEnum.CONSULTATION, consultationId);
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
     }
     
     @Override
@@ -168,6 +183,13 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             consultation.setRemarksForServiceman(remarksForServiceman);
         } catch (Exception ex) {
             throw new EndConsultationException("Unknown exception: " + ex.getMessage());
+        }
+        
+        Notification n = new Notification("Consultation completed", "Your consultation with Consultation Id[" + consultationId + "] has been completed", NotificationTypeEnum.CONSULTATION, consultationId);
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
         }
 
     }
@@ -234,6 +256,13 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             throw new InvalidateConsultationException("Unable to delete form instances linked to booking slot: " + ex.getMessage());
         } catch (Exception ex) {
             throw new InvalidateConsultationException("Failed to invalidate consultation: " + ex.getMessage());
+        }
+        
+        Notification n = new Notification("Booking marked as absent", "You did not attend your consultation with Consultation Id[" + consultationId + "]", NotificationTypeEnum.CONSULTATION, consultationId);
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
         }
 
     }

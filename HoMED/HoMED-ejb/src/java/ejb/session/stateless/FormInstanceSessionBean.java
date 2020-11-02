@@ -11,6 +11,7 @@ import entity.FormInstanceField;
 import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
 import entity.MedicalOfficer;
+import entity.Notification;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +33,9 @@ import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.exceptions.ArchiveFormInstanceException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
@@ -44,8 +47,13 @@ import util.exceptions.UpdateFormInstanceException;
 @Stateless
 public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
+    @EJB(name = "NotificationSessionBeanLocal")
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
+
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    
+    
 
     @EJB
     FormTemplateSessionBeanLocal formTemplateSessionBeanLocal;
@@ -253,6 +261,12 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
         formInstance.setDateSubmitted(new Date());
+        Notification n = new Notification("Form Submitted successfully", "Your form with Form Id[" + formInstanceId + "] has been submitted sucessfully", NotificationTypeEnum.FORM, formInstanceId);
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, formInstance.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
     }
 
     @Override
