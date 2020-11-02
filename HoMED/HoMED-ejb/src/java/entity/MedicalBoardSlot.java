@@ -5,17 +5,40 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 
 @Entity
-public class MedicalBoardSlot extends Slot implements Serializable, Comparable<MedicalBoardSlot> {
+public class MedicalBoardSlot extends Slot implements Serializable {
+
+    private MedicalBoardSlotStatusEnum medicalBoardSlotStatusEnum;
+
+    private Integer estimatedTimeForEachBoardInPresenceCase;
+    private Integer estimatedTimeForEachBoardInAbsenceCase;
 
     @ManyToOne(optional = true)
-    private MedicalBoard medicalBoard;
+    private MedicalOfficer chairman;
+
+    @ManyToOne(optional = true)
+    private MedicalOfficer medicalOfficerOne;
+
+    @ManyToOne(optional = true)
+    private MedicalOfficer medicalOfficerTwo;
+
+    @OneToMany(mappedBy = "medicalBoardSlot")
+    private List<MedicalBoardCase> medicalBoardCases;
 
     public MedicalBoardSlot() {
+        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNALLOCATED;
+        this.estimatedTimeForEachBoardInPresenceCase = 15;
+        this.estimatedTimeForEachBoardInAbsenceCase = 3;
+
+        this.medicalBoardCases = new ArrayList<>();
     }
 
     public MedicalBoardSlot(Date start, Date end) {
@@ -24,24 +47,90 @@ public class MedicalBoardSlot extends Slot implements Serializable, Comparable<M
         super.setEndDateTime(end);
     }
 
-    public MedicalBoard getMedicalBoard() {
-        return medicalBoard;
+    public MedicalBoardSlotStatusEnum getMedicalBoardSlotStatusEnum() {
+        return medicalBoardSlotStatusEnum;
     }
 
-    public void setMedicalBoard(MedicalBoard medicalBoard) {
-        this.medicalBoard = medicalBoard;
+    public void setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum medicalBoardSlotStatusEnum) {
+        this.medicalBoardSlotStatusEnum = medicalBoardSlotStatusEnum;
     }
 
-    @Override
-    public int compareTo(MedicalBoardSlot another) {
+    public Integer getEstimatedTimeForEachBoardInPresenceCase() {
+        return estimatedTimeForEachBoardInPresenceCase;
+    }
 
-        if (super.getStartDateTime().before(another.getStartDateTime())) {
-            return -1;
-        } else if (super.getStartDateTime().after(another.getStartDateTime())) {
-            return 1;
-        } else {
-            return 0;
+    public void setEstimatedTimeForEachBoardInPresenceCase(Integer estimatedTimeForEachBoardInPresenceCase) {
+        this.estimatedTimeForEachBoardInPresenceCase = estimatedTimeForEachBoardInPresenceCase;
+    }
+
+    public Integer getEstimatedTimeForEachBoardInAbsenceCase() {
+        return estimatedTimeForEachBoardInAbsenceCase;
+    }
+
+    public void setEstimatedTimeForEachBoardInAbsenceCase(Integer estimatedTimeForEachBoardInAbsenceCase) {
+        this.estimatedTimeForEachBoardInAbsenceCase = estimatedTimeForEachBoardInAbsenceCase;
+    }
+
+    public MedicalOfficer getChairman() {
+        return chairman;
+    }
+
+    public void setChairman(MedicalOfficer chairman) {
+        if (this.chairman != null) {
+            this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
         }
+
+        this.chairman = chairman;
+
+        if (this.chairman != null) {
+            if (!this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.chairman.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
+    }
+
+    public MedicalOfficer getMedicalOfficerOne() {
+        return medicalOfficerOne;
+    }
+
+    public void setMedicalOfficerOne(MedicalOfficer medicalOfficerOne) {
+        if (this.medicalOfficerOne != null) {
+            this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
+        }
+
+        this.medicalOfficerOne = medicalOfficerOne;
+
+        if (this.medicalOfficerOne != null) {
+            if (!this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.medicalOfficerOne.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
+    }
+
+    public MedicalOfficer getMedicalOfficerTwo() {
+        return medicalOfficerTwo;
+    }
+
+    public void setMedicalOfficerTwo(MedicalOfficer medicalOfficerTwo) {
+        if (this.medicalOfficerTwo != null) {
+            this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().remove(this);
+        }
+
+        this.medicalOfficerTwo = medicalOfficerTwo;
+
+        if (this.medicalOfficerTwo != null) {
+            if (!this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().contains(this)) {
+                this.medicalOfficerTwo.getMedicalBoardSlotsAsMedicalOfficerOne().add(this);
+            }
+        }
+    }
+
+    public List<MedicalBoardCase> getMedicalBoardCases() {
+        return medicalBoardCases;
+    }
+
+    public void setMedicalBoardCases(List<MedicalBoardCase> medicalBoardCases) {
+        this.medicalBoardCases = medicalBoardCases;
     }
 
     @Override

@@ -22,6 +22,8 @@ import util.enumeration.BookingStatusEnum;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ScheduleMedicalBoardSlotException;
+import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
@@ -32,6 +34,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
+    /* Booking Slots */
     @Override
     public List<BookingSlot> createBookingSlots(Long medicalCentreId, Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
         try {
@@ -43,7 +46,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             rangeEnd = roundDate15Minute(rangeEnd);
 
             if (!rangeStart.before(rangeEnd)) {
-                throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
+                throw new ScheduleBookingSlotException("Invalid Date Range: start date is not before end date");
             }
             Calendar rangeStartCalendar = Calendar.getInstance();
             rangeStartCalendar.setTime(rangeStart);
@@ -100,42 +103,6 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
-    public List<MedicalBoardSlot> createMedicalBoardSlots(Date rangeStart, Date rangeEnd) throws ScheduleBookingSlotException {
-        rangeStart = roundDate30Minute(rangeStart);
-        rangeEnd = roundDate30Minute(rangeEnd);
-
-        if (!rangeStart.before(rangeEnd)) {
-            throw new ScheduleBookingSlotException("Invalid Date Range: start not before end");
-        }
-        Calendar rangeStartCalendar = Calendar.getInstance();
-        rangeStartCalendar.setTime(rangeStart);
-        Calendar rangeEndCalendar = Calendar.getInstance();
-        rangeEndCalendar.setTime(rangeEnd);
-
-        List<MedicalBoardSlot> createdMedicalBoardSlots = new ArrayList<>();
-
-        while (rangeStartCalendar.before(rangeEndCalendar)) {
-            Date currStart = rangeStartCalendar.getTime();
-            rangeStartCalendar.add(Calendar.MINUTE, 30);
-            Date currEnd = rangeStartCalendar.getTime();
-
-            MedicalBoardSlot mbs = new MedicalBoardSlot(currStart, currEnd);
-            em.persist(mbs);
-            em.flush();
-            createdMedicalBoardSlots.add(mbs);
-        }
-
-        System.out.println("Created " + createdMedicalBoardSlots.size() + " Medical Board Slots");
-        return createdMedicalBoardSlots;
-    }
-
-    @Override
-    public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
-        Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb");
-        return query.getResultList();
-    }
-
-    @Override
     public List<BookingSlot> retrieveBookingSlotsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM BookingSlot b WHERE b.medicalCentre.medicalCentreId = :id ");
         query.setParameter("id", medicalCentreId);
@@ -175,12 +142,6 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
     }
 
     @Override
-    public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId) {
-        MedicalBoardSlot medicalBoardSlot = em.find(MedicalBoardSlot.class, medicalBoardSlotId);
-        return medicalBoardSlot;
-    }
-
-    @Override
     public void removeBookingSlot(Long bookingSlotId) throws RemoveSlotException {
         BookingSlot bookingSlot = retrieveBookingSlotById(bookingSlotId);
         if (bookingSlot.getBooking() == null) {
@@ -191,14 +152,84 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         }
     }
 
+    /* Medical Board Slots */
+    @Override
+    public MedicalBoardSlot createMedicalBoardSlot(Date startDate, Date endDate) throws ScheduleMedicalBoardSlotException {
+
+        if (!startDate.before(endDate)) {
+            throw new ScheduleMedicalBoardSlotException("Invalid Date Range: start date is not before end date");
+        }
+
+        if (!isSameDay(startDate, endDate)) {
+            throw new ScheduleMedicalBoardSlotException("Invalid Date Range: medical board slot is not scheduled for the same day");
+        }
+
+        if (startDate.getTime() < new Date().getTime()) {
+            throw new ScheduleMedicalBoardSlotException("Invalid Date Range: scheduling of medical board slot earlier than the current time");
+        }
+
+        MedicalBoardSlot mbs = new MedicalBoardSlot(startDate, endDate);
+        em.persist(mbs);
+        em.flush();
+
+        System.out.println("Created medical board slot [" + startDate + " to " + endDate + "]");
+
+        return mbs;
+    }
+
+    @Override
+    public List<MedicalBoardSlot> retrieveMedicalBoardSlots() {
+        Query query = em.createQuery("SELECT mb FROM MedicalBoardSlot mb ORDER BY mb.startDateTime");
+        return query.getResultList();
+    }
+
+    @Override
+    public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId) {
+        MedicalBoardSlot medicalBoardSlot = em.find(MedicalBoardSlot.class, medicalBoardSlotId);
+        medicalBoardSlot.getMedicalBoardCases().size();
+        return medicalBoardSlot;
+    }
+
+    @Override
+    public MedicalBoardSlot updateMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) throws UpdateMedicalBoardSlotException {
+        String errorMessage = "Failed to update Medical Board Slot: ";
+
+        if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
+            MedicalBoardSlot medicalBoardSlotToUpdate = retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+
+            if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
+                medicalBoardSlotToUpdate.setStartDateTime(medicalBoardSlot.getStartDateTime());
+                medicalBoardSlotToUpdate.setEndDateTime(medicalBoardSlot.getEndDateTime());
+                medicalBoardSlotToUpdate.setChairman(medicalBoardSlot.getChairman());
+                medicalBoardSlotToUpdate.setMedicalOfficerOne(medicalBoardSlot.getMedicalOfficerOne());
+                medicalBoardSlotToUpdate.setMedicalOfficerTwo(medicalBoardSlot.getMedicalOfficerTwo());
+
+                em.flush();
+
+                return medicalBoardSlotToUpdate;
+            } else {
+                throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board cases have been allocated!");
+            }
+        } else {
+            throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
+        }
+    }
+
     @Override
     public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException {
+        String errorMessage = "Failed to remove Medical Board Slot: ";
         MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
-        // Need to take scheduled medical board into consideration in SR4
-        if (medicalBoardSlot.getMedicalBoard() == null) {
-            em.remove(medicalBoardSlot);
+
+        if (medicalBoardSlot != null) {
+            if (medicalBoardSlot.getChairman() != null || medicalBoardSlot.getMedicalOfficerOne() != null || medicalBoardSlot.getMedicalOfficerTwo() != null) {
+                throw new RemoveSlotException(errorMessage + "Medical Board members have been assigned!");
+            } else if (!medicalBoardSlot.getMedicalBoardCases().isEmpty()) {
+                throw new RemoveSlotException(errorMessage + "Medical Board cases have been allocated!");
+            } else {
+                em.remove(medicalBoardSlot);
+            }
         } else {
-            throw new RemoveSlotException("Unable to remove Medical Board Slot: Medical Board exists!");
+            throw new RemoveSlotException(errorMessage + "Medical Board slot not found!");
         }
     }
 

@@ -11,7 +11,7 @@
     <ui:define name="content">
 
         <h:outputStylesheet name="crud-tables.css" library="css" />
-        
+
         <ezcomp:manageEmployee id="ccManageEmployee">
             <f:ajax event="dialogCloseEvent" listener="#{employeeAccountManagementManagedBean.dialogActionListener}"/>
         </ezcomp:manageEmployee>
@@ -53,7 +53,7 @@
                             </p:column>
 
                             <p:column headerText="Role" width="7%" sortBy="#{employee.role}" filterBy="#{employee.role}" filterMatchMode="contains">
-                                <h:outputText value="#{employee.role}" />
+                                <h:outputText value='#{employee.role}' />
                             </p:column>
 
                             <p:column headerText="Email" width="15%" sortBy="#{employee.email}" filterBy="#{employee.email}" filterMatchMode="contains">

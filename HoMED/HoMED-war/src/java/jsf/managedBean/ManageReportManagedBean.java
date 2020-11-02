@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import jsf.classes.ReportFieldWrapper;
 import org.primefaces.PrimeFaces;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FilterDateType;
 import util.enumeration.ReportDataGrouping;
 import util.enumeration.ReportDataType;
@@ -89,8 +90,8 @@ public class ManageReportManagedBean implements Serializable {
     private Integer idxAddChart;
 
     private List<Serviceman> servicemenData;
-    private List<Consultation> consultationsData;
     private List<MedicalOfficer> medicalOfficersData;
+    private List<Consultation> consultationsData;
 
     public ManageReportManagedBean() {
         filterRangeDates = new ArrayList<>();
@@ -394,15 +395,28 @@ public class ManageReportManagedBean implements Serializable {
     }
 
     private void processField(ReportField reportField) {
-        ReportDataType dataType = reportField.getReportDataType();
-        ReportDataValue dataValue = reportField.getReportDataValue();
-        ReportDataGrouping dataGrouping = reportField.getReportDataGrouping();
-        FilterDateType filterDateType = reportField.getFilterDateType();
-        Date startDate = reportField.getFilterStartDate();
-        Date endDate = reportField.getFilterEndDate();
-        HashMap<String, Integer> freqMap = new HashMap<>();
         List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
-        if (dataGrouping == ReportDataGrouping.S_BT) {
+
+        if (reportField.getReportDataType() == ReportDataType.SERVICEMAN) {
+            sortedResultList = processDataServiceman(reportField);
+        } else if (reportField.getReportDataType() == ReportDataType.MEDICAL_OFFICER) {
+            sortedResultList = processDataMedicalOfficer(reportField);
+        } else if (reportField.getReportDataType() == ReportDataType.CONSULTATION) {
+            sortedResultList = processDataConsultation(reportField);
+        }
+
+        List<ReportFieldGroup> groups = reportField.getReportFieldGroups();
+        groups.clear();
+
+        sortedResultList.forEach((mapEntry) -> {
+            groups.add(new ReportFieldGroup(mapEntry.getKey(), mapEntry.getValue()));
+        });
+    }
+
+    private List<Map.Entry<String, Integer>> processDataServiceman(ReportField reportField) {
+        List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
+        if (reportField.getReportDataGrouping() == ReportDataGrouping.S_BT) {
+            HashMap<String, Integer> freqMap = new HashMap<>();
             this.servicemenData.stream()
                     .map(s -> s.getBloodType().getBloodTypeString())
                     .forEach(bt -> {
@@ -410,16 +424,14 @@ public class ManageReportManagedBean implements Serializable {
                         freqMap.put(bt, count + 1);
                     });
             sortedResultList = sortByType(freqMap, "STRING");
-        } else if (dataGrouping == ReportDataGrouping.S_PES) {
-
-        } else if (dataGrouping == ReportDataGrouping.S_BK) {
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_BK) {
             HashMap<Integer, Integer> preFreqMap = new HashMap<>();
             this.servicemenData.stream()
                     .map(s -> (int) s.getBookings().stream()
                     .filter(b -> {
                         return b.getBookingStatusEnum() != BookingStatusEnum.ABSENT
                                 && b.getBookingStatusEnum() != BookingStatusEnum.CANCELLED
-                                && isWithinRange(filterDateType, startDate, endDate, b.getBookingSlot().getStartDateTime());
+                                && isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), b.getBookingSlot().getStartDateTime());
                     })
                     .count())
                     .forEach(counter -> {
@@ -437,12 +449,18 @@ public class ManageReportManagedBean implements Serializable {
                     sortedResultList.add(entry);
                 }
             }
-        } else if (dataGrouping == ReportDataGrouping.S_BK) {
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_PES) {
+            // TO IMPLEMENT
+        }
+        return sortedResultList;
+    }
 
-        } else if (dataGrouping == ReportDataGrouping.MO_CS) {
+    private List<Map.Entry<String, Integer>> processDataMedicalOfficer(ReportField reportField) {
+        List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
+        if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS) {
             HashMap<Integer, Integer> preFreqMap = new HashMap<>();
             this.medicalOfficersData.stream()
-                    .map(mo -> (int) mo.getCompletedConsultations().stream().filter(c -> isWithinRange(filterDateType, startDate, endDate, c.getStartDateTime())).count())
+                    .map(mo -> (int) mo.getCompletedConsultations().stream().filter(c -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getStartDateTime())).count())
                     .forEach(counter -> {
                         int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
                         preFreqMap.put(counter, count + 1);
@@ -458,10 +476,10 @@ public class ManageReportManagedBean implements Serializable {
                     sortedResultList.add(entry);
                 }
             }
-        } else if (dataGrouping == ReportDataGrouping.MO_FI) {
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI) {
             HashMap<Integer, Integer> preFreqMap = new HashMap<>();
             this.medicalOfficersData.stream()
-                    .map(mo -> (int) mo.getSignedFormInstances().stream().filter(fi -> isWithinRange(filterDateType, startDate, endDate, fi.getDateSubmitted())).count())
+                    .map(mo -> (int) mo.getSignedFormInstances().stream().filter(fi -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), fi.getDateSubmitted())).count())
                     .forEach(counter -> {
                         int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
                         preFreqMap.put(counter, count + 1);
@@ -477,7 +495,8 @@ public class ManageReportManagedBean implements Serializable {
                     sortedResultList.add(entry);
                 }
             }
-        } else if (dataGrouping == ReportDataGrouping.MO_MC) {
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_MC) {
+            HashMap<String, Integer> freqMap = new HashMap<>();
             this.medicalOfficersData.stream()
                     .filter(mo -> mo.getMedicalCentre() != null)
                     .map(mo -> mo.getMedicalCentre().getName())
@@ -487,16 +506,85 @@ public class ManageReportManagedBean implements Serializable {
                     });
             sortedResultList = sortByType(freqMap, "STRING");
         }
-
-        List<ReportFieldGroup> groups = reportField.getReportFieldGroups();
-        groups.clear();
-
-        sortedResultList.forEach((mapEntry) -> {
-            groups.add(new ReportFieldGroup(mapEntry.getKey(), mapEntry.getValue()));
-        });
+        return sortedResultList;
     }
 
-    public List<Map.Entry<String, Integer>> sortByType(HashMap<String, Integer> map, String type) {
+    private List<Map.Entry<String, Integer>> processDataConsultation(ReportField reportField) {
+        List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
+//        if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS) {
+//            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
+//            this.medicalOfficersData.stream()
+//                    .map(mo -> (int) mo.getCompletedConsultations().stream().filter(c -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getStartDateTime())).count())
+//                    .forEach(counter -> {
+//                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
+//                        preFreqMap.put(counter, count + 1);
+//                    });
+//            if (!preFreqMap.isEmpty()) {
+//                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
+//                for (int i = 0; i < limit; i += 5) {
+//                    int min = i == 0 ? i : i + 1;
+//                    int max = i + 5;
+//                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
+//                    String str = String.valueOf(min) + " - " + String.valueOf(max);
+//                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
+//                    sortedResultList.add(entry);
+//                }
+//            }
+//        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI) {
+//            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
+//            this.medicalOfficersData.stream()
+//                    .map(mo -> (int) mo.getSignedFormInstances().stream().filter(fi -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), fi.getDateSubmitted())).count())
+//                    .forEach(counter -> {
+//                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
+//                        preFreqMap.put(counter, count + 1);
+//                    });
+//            if (!preFreqMap.isEmpty()) {
+//                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
+//                for (int i = 0; i < limit; i += 5) {
+//                    int min = i == 0 ? i : i + 1;
+//                    int max = i + 5;
+//                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
+//                    String str = String.valueOf(min) + " - " + String.valueOf(max);
+//                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
+//                    sortedResultList.add(entry);
+//                }
+//            }
+//        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_MC) {
+//            HashMap<String, Integer> freqMap = new HashMap<>();
+//            this.medicalOfficersData.stream()
+//                    .filter(mo -> mo.getMedicalCentre() != null)
+//                    .map(mo -> mo.getMedicalCentre().getName())
+//                    .forEach(mc -> {
+//                        int count = freqMap.containsKey(mc) ? freqMap.get(mc) : 0;
+//                        freqMap.put(mc, count + 1);
+//                    });
+//            sortedResultList = sortByType(freqMap, "STRING");
+//        }
+        if (reportField.getReportDataGrouping() == ReportDataGrouping.C_Q_MC) {
+            HashMap<String, Integer> freqMap = new HashMap<>();
+            this.consultationsData.stream()
+                    .filter(c -> c.getConsultationStatusEnum() == ConsultationStatusEnum.COMPLETED)
+                    .map(c -> c.getBooking().getBookingSlot().getMedicalCentre().getName())
+                    .forEach(mc -> {
+                        int count = freqMap.containsKey(mc) ? freqMap.get(mc) : 0;
+                        freqMap.put(mc, count + 1);
+                    });
+            sortedResultList = sortByType(freqMap, "STRING");
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_Q_CP) {
+            
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_W_MC) {
+
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_W_HR) {
+
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_D_MC) {
+
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_D_CP) {
+
+        }
+        return sortedResultList;
+    }
+
+    private List<Map.Entry<String, Integer>> sortByType(HashMap<String, Integer> map, String type) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>();
         if (type.equals("STRING")) {
             list = map.entrySet().stream()

@@ -23,25 +23,19 @@
     font-family: "Courier New" !important;
 }
 
-.available-booking-slot, .available-medical-board-slot {
+.available-booking-slot, .unallocated-medical-board-slot {
     background: #4ea279 !important;
     border: 1px solid #4ea279 !important;
     font-family: "Courier New" !important;
 }
 
-.available-booking-slot, .available-medical-board-slot {
-    background: #4ea279 !important;
-    border: 1px solid #4ea279 !important;
-    font-family: "Courier New" !important;
-}
-
-.booked-booking-slot, booked-medical-board-slot {
+.booked-booking-slot, .allocated-medical-board-slot {
     background: #6b6bb8 !important;
     border: 1px solid #6b6bb8 !important;
     font-family: "Courier New" !important;
 }
 
-.past-booking-slot, .past-medical-board-slot {
+.past-booking-slot, .completed-medical-board-slot {
     background: #C0C0E1 !important;
     color: black !important;
     border: 1px solid #C0C0E1 !important;
@@ -60,7 +54,7 @@
     font-family: "Courier New" !important;
 }
 
-.absent-booking-slot {
+.absent-booking-slot, .ongoing-medical-board-slot {
     background: #C76D09 !important;
     border: 1px solid #C76D09 !important;
     font-family: "Courier New" !important;

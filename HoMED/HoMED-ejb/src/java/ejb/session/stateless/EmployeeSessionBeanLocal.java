@@ -21,6 +21,7 @@ import util.exceptions.EmployeeInvalidLoginCredentialException;
 import util.exceptions.EmployeeNotFoundException;
 import util.exceptions.ResetEmployeePasswordException;
 import util.exceptions.UpdateEmployeeException;
+import util.exceptions.UpdateMedicalOfficerChairmanStatusException;
 
 /**
  *
@@ -38,11 +39,11 @@ public interface EmployeeSessionBeanLocal {
     public Employee retrieveEmployeeById(Long id) throws EmployeeNotFoundException;
 
     public MedicalOfficer retrieveMedicalOfficerById(Long id);
-    
+
     public Employee retrieveEmployeeByEmail(String email) throws EmployeeNotFoundException;
 
     public List<MedicalStaff> retrieveUnassignedMedicalStaffAndAssignedMedicalStaffByMedicalCentreId(MedicalCentre medicalCentre);
-    
+
     public Employee updateEmployee(Employee employee) throws UpdateEmployeeException;
 
     public void deleteEmployee(Long employeeId) throws DeleteEmployeeException;
@@ -62,5 +63,11 @@ public interface EmployeeSessionBeanLocal {
     public void assignMedicalStaffToMedicalCentre(Long employeeId, Long medicalCentreId) throws AssignMedicalStaffToMedicalCentreException;
 
     public List<MedicalOfficer> retrieveAllMedicalOfficers();
+
+    public void updateMedicalOfficerChairmanStatus(Long employeeId, Boolean isMedicalOfficerChairman) throws UpdateMedicalOfficerChairmanStatusException;
+
+    public List<MedicalOfficer> retrieveMedicalOfficers();
+
+    public List<MedicalOfficer> retrieveChairmen();
 
 }

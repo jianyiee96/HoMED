@@ -3,8 +3,8 @@ package util.enumeration;
 public enum ReportDataType {
     SERVICEMAN("Serviceman"),
     MEDICAL_OFFICER("Medical Officer"),
-    MEDICAL_BOARD("Medical Board"),
     CONSULTATION("Consultation"),
+    MEDICAL_BOARD("Medical Board"),
     FORM("Form");
 
     private String text;

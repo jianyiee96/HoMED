@@ -77,6 +77,7 @@ public class SecurityFilter implements Filter {
             "/booking-slot-management.xhtml", // 10
             "/medical-board-slot-management.xhtml", // 11
             "/booking-management.xhtml", // 12
+<<<<<<< HEAD
             "/queue-management.xhtml", // 13
             "/past-consultations.xhtml", // 14
             "/serviceman-consultation-records.xhtml", // 15
@@ -84,6 +85,14 @@ public class SecurityFilter implements Filter {
             "/queue-display.xhtml", // 17
             "/report-management.xhtml", // 18
             "/manage-report.xhtml" // 19
+=======
+            "/medical-board-management.xhtml", // 13
+            "/queue-management.xhtml", // 14
+            "/past-consultations.xhtml", // 15
+            "/serviceman-consultation-records.xhtml", // 16
+            "/current-consultation.xhtml", // 17
+            "/queue-display.xhtml" // 18
+>>>>>>> 0e1866283b979d2e1fa26fcd271cfda6b653ea88
         };
 
         // Pages that all logged in users can enter
@@ -106,23 +115,24 @@ public class SecurityFilter implements Filter {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
-            if (path.equals(pathArr[13])
-                    || path.equals(pathArr[14])
+            if (path.equals(pathArr[14])
                     || path.equals(pathArr[15])
-                    || path.equals(pathArr[16])) {
+                    || path.equals(pathArr[16])
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
             if (path.equals(pathArr[10])
                     || path.equals(pathArr[12])
-                    || path.equals(pathArr[17])) {
+                    || path.equals(pathArr[18])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
             if (path.equals(pathArr[10])
                     || path.equals(pathArr[11])
                     || path.equals(pathArr[12])
-                    || path.equals(pathArr[17])) {
+                    || path.equals(pathArr[13])
+                    || path.equals(pathArr[18])) {
                 return 1;
             }
         }
