@@ -72,10 +72,15 @@ public class ReportField implements Serializable {
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReportFieldGroup> reportFieldGroups;
+    
+    // FOR LINE CHARTS ONLY
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ReportField> datasetFields;
 
     public ReportField() {
         this.filterDateType = FilterDateType.NONE;
         this.reportFieldGroups = new ArrayList<>();
+        this.datasetFields = new ArrayList<>();
     }
 
     public ReportField(String name, String description, ReportFieldType type, Date filterStartDate, Date filterEndDate, List<ReportFieldGroup> reportFieldGroups) {
@@ -108,6 +113,9 @@ public class ReportField implements Serializable {
                     newGroup.setQuantity(grp.getQuantity());
                     return newGroup;
                 })
+                .collect(Collectors.toList());
+        this.datasetFields = another.datasetFields.stream()
+                .map(field -> new ReportField(field))
                 .collect(Collectors.toList());
     }
 
@@ -215,6 +223,14 @@ public class ReportField implements Serializable {
 
     public void setReportDataGrouping(ReportDataGrouping reportDataGrouping) {
         this.reportDataGrouping = reportDataGrouping;
+    }
+
+    public List<ReportField> getDatasetFields() {
+        return datasetFields;
+    }
+
+    public void setDatasetFields(List<ReportField> datasetFields) {
+        this.datasetFields = datasetFields;
     }
 
     @Override
