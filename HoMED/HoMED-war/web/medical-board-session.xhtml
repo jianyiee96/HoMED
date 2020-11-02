@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Medical Board Session</ui:define>
+
+    <ui:define name="content">
+
+        <ui:fragment rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+
+            <h:form id="sessionForm">
+                <div class="p-grid">
+                    <div class="p-col-12">
+                        <div class="card">
+                            <h1>Medical Board Session - Start</h1>
+                            <p>Before we can start this medical board session.</p>
+                            <p>Please have MO1 and MO2 sign in to this session with their 6 digit code.</p>
+
+                            <h:panelGrid columns="2" cellpadding="5">
+                                <h:outputText value="Chair Person (#{medicalBoardSessionManagedBean.medicalBoardSlot.chairman.name}) :" style="font-weight: bold" />
+                                <h:outputText value="Log in session authenticated" />
+                                
+                                <h:outputText value="MO1 (#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalOfficerOne.name}): " style="font-weight: bold" />
+                                <p:password id="key1" value="#{medicalBoardSessionManagedBean.medicalOfficerOneKey}" />
+
+                                <h:outputText value="MO2 (#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalOfficerTwo.name}):" style="font-weight: bold" />
+                                <p:password id="key2" value="#{medicalBoardSessionManagedBean.medicalOfficerTwoKey}" />
+
+                                <p:commandButton value="Start Medical Board" actionListener="#{medicalBoardSessionManagedBean.startCurrentMedicalBoard()}"></p:commandButton>
+                            </h:panelGrid>
+
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+
+
+            <div class="p-grid">
+                <div class="p-col-12">
+                    <div class="card">
+                        <h1>Medical Board Session</h1>
+                        <p>This is a medical board session page</p>
+                        #{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum}
+                    </div>
+                </div>
+            </div>
+        </ui:fragment>
+
+    </ui:define>
+
+</ui:composition>
