@@ -281,10 +281,9 @@
                                             </div>
                                             <div class="p-formgroup-inline p-col p-lg-5 p-md-12 p-sm-12 p-mt-2">
                                                 <div class="p-field-checkbox">
-                                                    <p:selectBooleanCheckbox id="checkboxPublic" value="#{formUtilityManagedBean.newFormIsPublic}">
-                                                        <p:ajax update="editorForm formAllTemplates" listener="#{formUtilityManagedBean.updateFormPrivacy}" />
+                                                    <p:selectBooleanCheckbox id="checkboxPublic" value="#{formUtilityManagedBean.selectedForm.isPublic}">
                                                     </p:selectBooleanCheckbox>
-                                                    <p:outputLabel for="checkboxPublic" value="Public"/>
+                                                    <p:outputLabel for="checkboxPublic" value="Public" indicateRequired="false"/>
                                                 </div>
                                                 <div class="p-field-checkbox">
                                                     <p:selectBooleanCheckbox id="checkboxDeclaration" value="#{formUtilityManagedBean.selectedDeclarationFieldWrapper.declarationFieldEnabled}">

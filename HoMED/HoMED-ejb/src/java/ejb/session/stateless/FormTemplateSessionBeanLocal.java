@@ -30,8 +30,6 @@ public interface FormTemplateSessionBeanLocal {
     
     public boolean restoreFormTemplate(Long id);
 
-    public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic);
-
     public FormTemplate retrieveFormTemplate(Long id);
 
     public List<FormTemplate> retrieveAllFormTemplates();
