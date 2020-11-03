@@ -128,6 +128,7 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
             ft.setFormTemplateStatus(formTemplate.getFormTemplateStatus());
             ft.setFormTemplateName(formTemplate.getFormTemplateName());
             ft.setDeclaration(formTemplate.getDeclaration());
+            ft.setIsPublic(formTemplate.getIsPublic());
             
             List<FormField> ffs = formTemplate.getFormFields();
 
@@ -201,19 +202,6 @@ public class FormTemplateSessionBean implements FormTemplateSessionBeanLocal {
 
         if (formTemplate.getFormTemplateStatus() == FormTemplateStatusEnum.DELETED) {
             formTemplate.setFormTemplateStatus(FormTemplateStatusEnum.DRAFT);
-            em.flush();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean updateFormTemplatePrivacy(Long id, boolean newIsPublic) {
-        FormTemplate formTemplate = retrieveFormTemplate(id);
-
-        if (formTemplate.getIsPublic() != newIsPublic) {
-            formTemplate.setIsPublic(newIsPublic);
             em.flush();
             return true;
         } else {
