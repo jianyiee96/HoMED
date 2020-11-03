@@ -15,6 +15,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.exceptions.StartMedicalBoardSessionException;
 
 /**
@@ -35,15 +36,15 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     String medicalOfficerTwoKey;
 
     public MedicalBoardSessionManagedBean() {
-        medicalOfficerOneKey="";
-        medicalOfficerTwoKey="";
+        medicalOfficerOneKey = "";
+        medicalOfficerTwoKey = "";
     }
 
     @PostConstruct
     public void postConstruct() {
-        
+
         System.out.println("Session post construct called");
-        
+
         try {
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
             medicalBoardSlot = (MedicalBoardSlot) flash.get("medicalBoardSlot");
@@ -51,16 +52,21 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         } catch (NullPointerException ex) {
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
-            } catch (IOException ex2) {
-                System.out.println(ex2);
+            } catch (IOException exx) {
+                System.out.println(exx);
             }
         }
 
-        if (medicalBoardSlot == null) {
+        if (medicalBoardSlot == null
+                || medicalBoardSlot.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.ALLOCATED
+                || medicalBoardSlot.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.UNALLOCATED
+                || medicalBoardSlot.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.EXPIRED) {
+
             try {
+                System.out.println("Invalid Medical Board Slot");
                 FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
-            } catch (IOException ex2) {
-                System.out.println(ex2);
+            } catch (IOException ex) {
+                System.out.println("Fail to redirect: " + ex);
             }
         }
 
@@ -70,8 +76,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
         System.out.println(medicalOfficerOneKey);
         System.out.println(medicalOfficerTwoKey);
-        
-        
+
         try {
 
             if (medicalBoardSlot.getMedicalOfficerOneKey().equals(medicalOfficerOneKey) && medicalBoardSlot.getMedicalOfficerTwoKey().equals(medicalOfficerTwoKey)) {

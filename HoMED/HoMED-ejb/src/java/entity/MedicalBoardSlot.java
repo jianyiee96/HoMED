@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.security.CryptographicHelper;

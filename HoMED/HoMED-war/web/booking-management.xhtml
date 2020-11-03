@@ -405,7 +405,7 @@
                                 <p:selectOneRadio id="view-booking-type" value="#{bookingManagedBean.selectedBookingType}" required="true" onchange="PF('dialogCreateBooking').initPosition()">
                                     <f:selectItem itemValue="General Consultation" itemLabel="General Consultation"/>
                                     <f:selectItem itemValue="Pre-Medical Board Review" itemLabel="Pre-Medical Board Review"/>
-                                    <p:ajax event="valueChange" update="panelForms" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                    <p:ajax event="valueChange" oncomplete="PF('dialogCreateBooking').initPosition()"/>
                                 </p:selectOneRadio>
                                 <p:message class="error-message" for="view-booking-type" />
 

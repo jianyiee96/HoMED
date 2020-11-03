@@ -11,32 +11,39 @@
         <h:form id="formMedicalBoard">
 
             <div class="p-grid">
-                <div class="p-col-12">
+                <div class="p-col-6">
                     <div class="card">
                         <h1>Medical Board</h1>
 
-                        <p:dataScroller id="todayMedicalBoard" widgetVar="dataScrollerTodayMedicalBoard"
-                                        value="#{medicalBoardManagedBean.todayMedicalBoardSlots}" var="medicalBoardSlot" mode="inline">
+                        <p:dataScroller id="dataScrollerMedicalBoards" widgetVar="dataScrollerTodayMedicalBoard"
+                                        value="#{medicalBoardManagedBean.filteredMedicalBoardSlots}" var="medicalBoardSlot" mode="inline">
 
                             <f:facet name="header">
-                                <h:outputText style="font-weight: bold; font-size: 18px;" value="Today's Medical Board Session" />
+                                <p:selectOneButton value="#{medicalBoardManagedBean.filterOption}" unselectable="false">
+                                    <f:selectItem itemLabel="Today" itemValue="#{0}" />
+                                    <f:selectItem itemLabel="Upcoming" itemValue="#{1}" />
+                                    <f:selectItem itemLabel="Past" itemValue="#{2}" />
+                                    <p:ajax event="change" listener="#{medicalBoardManagedBean.doFilterMedicalBoards}" update="dataScrollerMedicalBoards"/>
+                                </p:selectOneButton>
                             </f:facet>
+
 
                             <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
 
+                                <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
+                                               style="margin-left: -10px; margin-top:-15px; position: absolute;" 
+                                               value="Selected" />
+
                                 <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
 
-                                    <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardSlot.medicalBoardSlotStatusEnum}" />
+                                    <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
 
                                     <h:panelGrid columns="3" cellpadding="5">
 
                                         <p:outputPanel style="margin: 8px;">
                                             <h:panelGrid columns="2" cellpadding="5">
-                                                <h:outputText value="Start Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderDateTime(medicalBoardSlot.startDateTime)}" />
-
-                                                <h:outputText value="End Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderDateTime(medicalBoardSlot.endDateTime)}" />
+                                                <h:outputText value="Time:  " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.renderTime(medicalBoardSlot.startDateTime)} - #{medicalBoardManagedBean.renderTime(medicalBoardSlot.endDateTime)}" />
 
                                                 <h:outputText value="Chairman: " style="font-weight: bold" />
                                                 <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
@@ -46,94 +53,12 @@
 
                                                 <h:outputText value="MO2: " style="font-weight: bold" />
                                                 <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
-
-                                            </h:panelGrid>
-
-
-                                        </p:outputPanel>
-
-                                        <p:outputPanel rendered="#{medicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED'}" style="margin: 8px;">
-                                            <h:panelGrid columns="2" cellpadding="5">
+                                                
+                                                <h:outputText value="Status:  " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}" />
+                                                
                                                 <h:outputText value="Total Cases: " style="font-weight: bold" />
                                                 <h:outputText value="#{medicalBoardSlot.medicalBoardCases.size()}" />
-
-                                                <h:outputText value="No. of board in presence: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardInPresenceCases.size()}" />
-
-                                                <h:outputText value="No. of board in absence: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardInAbsenceCases.size()}" />
-
-                                                <h:outputText value="Total estimated time: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderTotalTime(medicalBoardSlot)} minutes" />
-
-                                            </h:panelGrid>
-                                        </p:outputPanel>
-
-                                        <p:outputPanel rendered="#{medicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED'}" style="margin: 8px;">
-                                            <p:commandButton rendered="#{medicalBoardSlot.chairman != null and medicalBoardSlot.chairman == medicalBoardManagedBean.currentMedicalOfficer}" value="MEDICAL BOARD SESSION" actionListener="#{medicalBoardManagedBean.redirectMedicalBoardSession(medicalBoardSlot)}" style="font-weight: bold" />
-                                            <h:outputText rendered="#{medicalBoardSlot.medicalOfficerOne != null and medicalBoardSlot.medicalOfficerOne == medicalBoardManagedBean.currentMedicalOfficer}" value="Session Code: #{medicalBoardSlot.medicalOfficerOneKey}" style="font-weight: bold" />
-                                            <h:outputText rendered="#{medicalBoardSlot.medicalOfficerTwo != null and medicalBoardSlot.medicalOfficerTwo == medicalBoardManagedBean.currentMedicalOfficer}" value="Session Code: #{medicalBoardSlot.medicalOfficerTwoKey}" style="font-weight: bold" />
-                                        </p:outputPanel>
-
-
-                                    </h:panelGrid>
-
-
-                                </div>
-                            </div>
-
-                        </p:dataScroller>
-
-
-                        <p:dataScroller id="dataScrollerOtherMedicalBoards" widgetVar="dataScrollerMedicalBoards"
-                                        value="#{medicalBoardManagedBean.relevantMedicalBoardSlots}" var="medicalBoardSlot" mode="inline">
-
-                            <f:facet name="header">
-                                <h:outputText style="font-weight: bold; font-size: 18px;" value="Other Medical Board Sessions" />
-                            </f:facet>
-
-                            <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
-
-                                <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
-
-                                    <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardSlot.medicalBoardSlotStatusEnum}" />
-
-                                    <h:panelGrid columns="2" cellpadding="5">
-
-                                        <p:outputPanel style="margin: 8px;">
-                                            <h:panelGrid columns="2" cellpadding="5">
-                                                <h:outputText value="Start Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderDateTime(medicalBoardSlot.startDateTime)}" />
-
-                                                <h:outputText value="End Date: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderDateTime(medicalBoardSlot.endDateTime)}" />
-
-                                                <h:outputText value="Chairman: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
-
-                                                <h:outputText value="MO1: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
-
-                                                <h:outputText value="MO2: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
-
-                                            </h:panelGrid>
-
-
-                                        </p:outputPanel>
-                                        <p:outputPanel rendered="#{medicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED'}" style="margin: 8px;">
-                                            <h:panelGrid columns="2" cellpadding="5">
-                                                <h:outputText value="Total Cases: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardCases.size()}" />
-
-                                                <h:outputText value="No. of board in presence: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardInPresenceCases.size()}" />
-
-                                                <h:outputText value="No. of board in absence: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardInAbsenceCases.size()}" />
-
-                                                <h:outputText value="Total estimated time: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderTotalTime(medicalBoardSlot)} minutes" />
 
                                             </h:panelGrid>
 
@@ -146,9 +71,17 @@
                                 </div>
                             </div>
 
-
                         </p:dataScroller>
 
+
+
+                    </div>
+                </div>
+                <div class="p-col-6">
+                    <div class="card">
+                        
+                        Test
+                        
                     </div>
                 </div>
             </div>

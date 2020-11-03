@@ -33,7 +33,7 @@ public interface SlotSessionBeanLocal {
     public MedicalBoardSlot createMedicalBoardSlot(Date startDate, Date endDate) throws ScheduleMedicalBoardSlotException;
 
     public List<MedicalBoardSlot> retrieveMedicalBoardSlots();
-    
+
     public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId);
 
     public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException;

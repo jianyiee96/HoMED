@@ -26,6 +26,7 @@ import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
 import util.exceptions.StartMedicalBoardSessionException;
 import util.exceptions.UpdateMedicalBoardSlotException;
+import util.security.CryptographicHelper;
 
 @Stateless
 public class SlotSessionBean implements SlotSessionBeanLocal {
@@ -205,6 +206,8 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 medicalBoardSlotToUpdate.setChairman(medicalBoardSlot.getChairman());
                 medicalBoardSlotToUpdate.setMedicalOfficerOne(medicalBoardSlot.getMedicalOfficerOne());
                 medicalBoardSlotToUpdate.setMedicalOfficerTwo(medicalBoardSlot.getMedicalOfficerTwo());
+                medicalBoardSlotToUpdate.setMedicalOfficerOneKey(CryptographicHelper.getInstance().generateRandomDigitString(6));
+                medicalBoardSlotToUpdate.setMedicalOfficerTwoKey(CryptographicHelper.getInstance().generateRandomDigitString(6));
 
                 em.flush();
 

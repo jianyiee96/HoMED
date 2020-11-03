@@ -24,6 +24,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 
 @Named(value = "medicalBoardManagedBean")
 @ViewScoped
@@ -35,18 +36,24 @@ public class MedicalBoardManagedBean implements Serializable {
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
+    private MedicalBoardSlot selectedMedicalBoardSlot;
+
     private List<MedicalBoardSlot> allMedicalBoardSlots;
 
-    private List<MedicalBoardSlot> todayMedicalBoardSlots;
+    private List<MedicalBoardSlot> filteredMedicalBoardSlots;
 
     private List<MedicalBoardSlot> relevantMedicalBoardSlots;
 
     private MedicalOfficer currentMedicalOfficer;
 
+    private Integer filterOption;
+
+    private Calendar now;
+
     public MedicalBoardManagedBean() {
         this.allMedicalBoardSlots = new ArrayList<>();
         this.relevantMedicalBoardSlots = new ArrayList<>();
-        this.todayMedicalBoardSlots = new ArrayList<>();
+        this.filteredMedicalBoardSlots = new ArrayList<>();
     }
 
     @PostConstruct
@@ -57,7 +64,8 @@ public class MedicalBoardManagedBean implements Serializable {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
         }
 
-        Calendar now = Calendar.getInstance();
+        filterOption = 0;
+        now = Calendar.getInstance();
         now.setTime(new Date());
 
         this.allMedicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
@@ -71,17 +79,29 @@ public class MedicalBoardManagedBean implements Serializable {
                         && mbsTime.get(Calendar.YEAR) == now.get(Calendar.YEAR);
 
                 if (sameDay) {
-                    todayMedicalBoardSlots.add(mbs);
-                } else {
-                    relevantMedicalBoardSlots.add(mbs);
+                    filteredMedicalBoardSlots.add(mbs);
                 }
+
+                relevantMedicalBoardSlots.add(mbs);
+
             }
         }
 
-        System.out.println(allMedicalBoardSlots);
-        System.out.println(relevantMedicalBoardSlots);
+        this.doFilterMedicalBoards();
 
-        System.out.println("Current medical officer: " + currentMedicalOfficer.getName());
+        if (this.filteredMedicalBoardSlots.isEmpty()) {
+            this.filterOption = 1;
+            this.doFilterMedicalBoards();
+
+            if (this.filteredMedicalBoardSlots.isEmpty()) {
+                this.filterOption = 2;
+                this.doFilterMedicalBoards();
+            }
+
+        } else {
+            this.selectedMedicalBoardSlot = this.filteredMedicalBoardSlots.get(0);
+        }
+
     }
 
     public void redirectMedicalBoardSession(MedicalBoardSlot medicalBoardSlot) {
@@ -105,6 +125,50 @@ public class MedicalBoardManagedBean implements Serializable {
 
     }
 
+    public void doFilterMedicalBoards() {
+        this.filteredMedicalBoardSlots.clear();
+
+        if (this.filterOption == 0) { //Today
+            this.relevantMedicalBoardSlots.forEach(mbs -> {
+
+                Calendar mbsTime = Calendar.getInstance();
+                mbsTime.setTime(mbs.getStartDateTime());
+                boolean sameDay = mbsTime.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+                        && mbsTime.get(Calendar.YEAR) == now.get(Calendar.YEAR);
+
+                if (sameDay) {
+                    this.filteredMedicalBoardSlots.add(mbs);
+                }
+
+            });
+        } else if (this.filterOption == 1) { //Past
+
+            this.relevantMedicalBoardSlots.forEach(mbs -> {
+                if (mbs.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.COMPLETED && mbs.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.EXPIRED) {
+                    this.filteredMedicalBoardSlots.add(mbs);
+                }
+            });
+        } else { //Upcoming
+
+            this.relevantMedicalBoardSlots.forEach(mbs -> {
+
+                if (mbs.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.COMPLETED || mbs.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.EXPIRED) {
+                    this.filteredMedicalBoardSlots.add(mbs);
+                }
+
+            });
+        }
+
+    }
+
+    public MedicalBoardSlot getSelectedMedicalBoardSlot() {
+        return selectedMedicalBoardSlot;
+    }
+
+    public void setSelectedMedicalBoardSlot(MedicalBoardSlot selectedMedicalBoardSlot) {
+        this.selectedMedicalBoardSlot = selectedMedicalBoardSlot;
+    }
+
     public MedicalOfficer getCurrentMedicalOfficer() {
         return currentMedicalOfficer;
     }
@@ -121,17 +185,47 @@ public class MedicalBoardManagedBean implements Serializable {
         this.relevantMedicalBoardSlots = relevantMedicalBoardSlots;
     }
 
-    public List<MedicalBoardSlot> getTodayMedicalBoardSlots() {
-        return todayMedicalBoardSlots;
+    public List<MedicalBoardSlot> getFilteredMedicalBoardSlots() {
+        return filteredMedicalBoardSlots;
     }
 
-    public void setTodayMedicalBoardSlots(List<MedicalBoardSlot> todayMedicalBoardSlots) {
-        this.todayMedicalBoardSlots = todayMedicalBoardSlots;
+    public void setFilteredMedicalBoardSlots(List<MedicalBoardSlot> filteredMedicalBoardSlots) {
+        this.filteredMedicalBoardSlots = filteredMedicalBoardSlots;
+    }
+
+    public Integer getFilterOption() {
+        return filterOption;
+    }
+
+    public void setFilterOption(Integer filterOption) {
+        this.filterOption = filterOption;
     }
 
     public String renderDateTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
         return dateFormat.format(date);
+    }
+
+    public String renderDate(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return dateFormat.format(date);
+    }
+
+    public String renderTime(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("kk:mm");
+        return dateFormat.format(date);
+    }
+
+    public String getMedicalOfficerRole(MedicalBoardSlot mbs) {
+
+        if (mbs.getChairman().equals(currentMedicalOfficer)) {
+            return "Chairman";
+        } else if (mbs.getMedicalOfficerOne().equals(currentMedicalOfficer)) {
+            return "Medical Officer 2";
+        } else {
+            return "Medical Officer 1";
+        }
+
     }
 
     public int renderTotalTime(MedicalBoardSlot mbs) {
