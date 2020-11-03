@@ -21,6 +21,7 @@ import util.exceptions.ResetServicemanPasswordException;
 import util.exceptions.ServicemanInvalidLoginCredentialException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.UpdateServicemanException;
+import ws.datamodel.AssignFcmTokenReq;
 import ws.datamodel.ErrorRsp;
 import ws.datamodel.ServicemanActivateAccountReq;
 import ws.datamodel.ServicemanChangePassReq;
@@ -29,6 +30,7 @@ import ws.datamodel.ServicemanLoginRsp;
 import ws.datamodel.ServicemanResetPassReq;
 import ws.datamodel.ServicemanUpdateReq;
 import ws.datamodel.ServicemanUpdateRsp;
+import ws.datamodel.UnassignFcmTokenReq;
 
 /**
  * REST Web Service
@@ -237,4 +239,69 @@ public class ServicemanResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
     }
+
+    @Path("assignFcmToken")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response assignFcmToken(@Context HttpHeaders headers, AssignFcmTokenReq assignFcmTokenReq) {
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+        try {
+            if (assignFcmTokenReq != null) {
+                servicemanSessionBeanLocal.assignFcmToken(assignFcmTokenReq.getServicemanId(), assignFcmTokenReq.getFcmToken());
+                return Response.status(Response.Status.OK).build();
+            } else {
+                throw new Exception("Empty FCM Token given.");
+            }
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
+    }
+
+    @Path("unassignFcmToken")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response unassignFcmToken(@Context HttpHeaders headers, UnassignFcmTokenReq unassignFcmTokenReq) {
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+        try {
+            if (unassignFcmTokenReq != null) {
+                servicemanSessionBeanLocal.unassignFcmToken(unassignFcmTokenReq.getServicemanId());
+                return Response.status(Response.Status.OK).build();
+            } else {
+                throw new Exception("Empty servicemanId given.");
+            }
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+        }
+    }
+
 }
