@@ -49,11 +49,15 @@ public interface ServicemanSessionBeanLocal {
     public Serviceman resetServicemanPasswordBySuperUser(Serviceman currentServiceman) throws ResetServicemanPasswordException;
 
     public Serviceman updateServicemanMatchingAccount(Employee employee, String newEmail, String hashPassword, Boolean isActivated);
-    
+
     public Boolean verifyToken(Long id, String token);
 
     public List<Serviceman> retrieveAllServicemenWithPastConsultations();
 
     public Long createServicemanByInit(Serviceman newServiceman) throws CreateServicemanException;
+
+    public void assignFcmToken(Long id, String fcmToken);
+
+    public void unassignFcmToken(Long id);
 
 }

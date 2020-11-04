@@ -61,10 +61,10 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
     public List<Serviceman> retrieveAllServicemenWithPastConsultations() {
         Query query = em.createQuery("SELECT DISTINCT s FROM Serviceman s JOIN s.bookings b JOIN b.consultation c WHERE c.consultationStatusEnum = :consultationStatus ORDER BY s.servicemanId");
         query.setParameter("consultationStatus", ConsultationStatusEnum.COMPLETED);
-        
+
         return query.getResultList();
     }
-    
+
     @Override
     public Long createServicemanByInit(Serviceman newServiceman) throws CreateServicemanException {
         String errorMessage = "Failed to create Serviceman: ";
@@ -75,7 +75,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
                 newServiceman.setIsActivated(true);
                 em.persist(newServiceman);
                 em.flush();
-                
+
                 return newServiceman.getServicemanId();
             } else {
                 throw new CreateServicemanException(prepareInputDataValidationErrorsMessage(constraintViolations));
@@ -89,7 +89,7 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             throw new CreateServicemanException(generalUnexpectedErrorMessage + "creating serviceman account");
         }
     }
-    
+
     @Override
     public String createServiceman(Serviceman newServiceman) throws CreateServicemanException {
         String errorMessage = "Failed to create Serviceman: ";
@@ -422,6 +422,28 @@ public class ServicemanSessionBean implements ServicemanSessionBeanLocal {
             }
         } catch (Exception ex) {
             return false;
+        }
+    }
+
+    @Override
+    public void assignFcmToken(Long id, String fcmToken) {
+
+        try {
+            Serviceman serviceman = retrieveServicemanById(id);
+            serviceman.setFcmToken(fcmToken);
+        } catch (Exception ex) {
+            return;
+        }
+    }
+
+    @Override
+    public void unassignFcmToken(Long id) {
+
+        try {
+            Serviceman serviceman = retrieveServicemanById(id);
+            serviceman.setFcmToken(null);
+        } catch (Exception ex) {
+            return;
         }
     }
 

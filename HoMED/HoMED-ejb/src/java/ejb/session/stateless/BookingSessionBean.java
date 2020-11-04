@@ -57,7 +57,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
-    
+
     @EJB
     private NotificationSessionBeanLocal notificationSessionBeanLocal;
 
@@ -122,6 +122,8 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
 
             Notification n = new Notification("Booking Created Successfully", "Your booking with Booking Id[" + newBooking.getBookingId() + "] at " + newBooking.getBookingSlot().getStartDateTime() + "has been <br>created successfully. <br> Hoora hoorah <br> nice!!" , NotificationTypeEnum.BOOKING, newBooking.getBookingId());
             notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification("Booking Created Successfully", "Your booking has been created successfully.", serviceman.getFcmToken());
+
             return newBooking;
 
         } catch (ServicemanNotFoundException | CreateNotificationException ex) {
@@ -493,9 +495,9 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         if (booking == null) {
             throw new ConvertBookingException("Invalid Booking id");
         }
-        
+
         booking.setIsForReview(Boolean.TRUE);
-        
+
     }
 
 }
