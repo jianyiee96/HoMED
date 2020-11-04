@@ -13,8 +13,12 @@ import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearTicks;
 import org.primefaces.model.charts.bar.BarChartDataSet;
 import org.primefaces.model.charts.bar.BarChartModel;
 import org.primefaces.model.charts.bar.BarChartOptions;
+import org.primefaces.model.charts.line.LineChartDataSet;
+import org.primefaces.model.charts.line.LineChartModel;
+import org.primefaces.model.charts.line.LineChartOptions;
 import org.primefaces.model.charts.optionconfig.legend.Legend;
 import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
+import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
 import util.enumeration.ReportFieldType;
@@ -52,7 +56,7 @@ public class ReportFieldWrapper {
         this();
         this.reportField = reportField;
     }
-    
+
     public ReportFieldWrapper(ReportFieldWrapper another) {
         this();
         this.reportField = new ReportField(another.getReportField());
@@ -81,7 +85,7 @@ public class ReportFieldWrapper {
         } else if (reportField.getType() == ReportFieldType.BAR) {
             chart = createBarModel();
         } else if (reportField.getType() == ReportFieldType.LINE) {
-
+            chart = createLineModel();
         }
     }
 
@@ -163,6 +167,43 @@ public class ReportFieldWrapper {
 
         barModel.setOptions(options);
         return barModel;
+    }
+
+    private LineChartModel createLineModel() {
+        LineChartModel lineModel = new LineChartModel();
+        ChartData data = new ChartData();
+
+        List<String> labels = new ArrayList<>();
+        List<ReportField> datasets = reportField.getDatasetFields();
+        for (int i = 0; i < datasets.size(); i++) {
+            LineChartDataSet dataSet = new LineChartDataSet();
+            List<Object> values = new ArrayList<>();
+            ReportField reportFieldDataSet = datasets.get(i);
+            for (ReportFieldGroup group : reportFieldDataSet.getReportFieldGroups()) {
+                values.add(group.getQuantity());
+                if (i == 0) {
+                    labels.add(group.getName());
+                }
+            }
+            dataSet.setData(values);
+            dataSet.setFill(false);
+            dataSet.setLabel(reportFieldDataSet.getName());
+            dataSet.setBorderColor(this.borderColors[i % this.borderColors.length]);
+            dataSet.setLineTension(0.1);
+            data.addChartDataSet(dataSet);
+        }
+        data.setLabels(labels);
+
+        //Options
+        LineChartOptions options = new LineChartOptions();
+        Title title = new Title();
+        title.setDisplay(true);
+//        title.setText("Line Chart");
+//        options.setTitle(title);
+
+        lineModel.setOptions(options);
+        lineModel.setData(data);
+        return lineModel;
     }
 
 }

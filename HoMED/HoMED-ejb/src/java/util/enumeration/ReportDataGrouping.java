@@ -7,8 +7,8 @@ public enum ReportDataGrouping {
     MO_CS("Consultations", "Number of Consultations", "Number of Medical Officers"),
     MO_FI("Forms Signed", "Number of Forms Signed", "Number of Medical Officers"),
     MO_MC("Medical Centre", "Medical Centre", "Number of Medical Officers"),
-    C_Q_MC("Medical Centre", "", ""),
-    C_Q_CP("Consultaiton Purpose", "", ""),
+    C_Q_MC("Medical Centre", "Medical Centre", "Number of Consultations"),
+    C_Q_CP("Consultation Purpose", "Consultation Purpose", "Number of Consultations"),
     C_W_MC("Medical Centre", "", ""),
     C_W_HR("Hour Of Day", "", ""),
     C_D_MC("Medical Centre", "", ""),
@@ -43,8 +43,9 @@ public enum ReportDataGrouping {
                 || this == MO_CS
                 || this == MO_FI
                 || this == C_Q_MC
-                || this == C_QT_MC
                 || this == C_Q_CP
+                || this == C_QT_MC
+                || this == C_QT_CP
                 || this == C_W_MC
                 || this == C_W_HR
                 || this == C_D_MC

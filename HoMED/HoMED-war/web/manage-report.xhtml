@@ -641,6 +641,7 @@
 
                                                     </div>
                                                 </ui:fragment>
+                                                <p:lineChart model="#{manageReportManagedBean.reportFieldToAddWrapper.chart}" rendered="#{manageReportManagedBean.reportFieldToAddWrapper.reportField.type == 'LINE'}"/>
                                             </div>
                                             <div class="p-col-12 p-mt-2">
                                                 <h:outputText class="total-quantity-font" value="Total Quantity: #{manageReportManagedBean.getTotalNumberOfData(manageReportManagedBean.reportFieldToAddWrapper.reportField)}"/>

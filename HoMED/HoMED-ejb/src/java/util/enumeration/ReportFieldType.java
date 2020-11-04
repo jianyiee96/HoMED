@@ -22,7 +22,9 @@ public enum ReportFieldType {
                 || reportDataGrouping == ReportDataGrouping.S_BK
                 || reportDataGrouping == ReportDataGrouping.MO_CS
                 || reportDataGrouping == ReportDataGrouping.MO_FI
-                || reportDataGrouping == ReportDataGrouping.MO_MC) {
+                || reportDataGrouping == ReportDataGrouping.MO_MC
+                || reportDataGrouping == ReportDataGrouping.C_Q_MC
+                || reportDataGrouping == ReportDataGrouping.C_Q_CP) {
             return new ReportFieldType[]{BAR, PIE};
         } else if (reportDataGrouping == ReportDataGrouping.C_QT_MC
                 || reportDataGrouping == ReportDataGrouping.C_QT_CP) {
