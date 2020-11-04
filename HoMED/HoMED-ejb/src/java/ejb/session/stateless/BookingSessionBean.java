@@ -120,7 +120,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
             }
 
-            Notification n = new Notification("Booking Created Successfully", "Your booking with Booking Id[" + newBooking.getBookingId() + "]has been created successfully.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
+            Notification n = new Notification("Booking Created Successfully", "Your booking with Booking Id[" + newBooking.getBookingId() + "] at " + newBooking.getBookingSlot().getStartDateTime() + "has been <br>created successfully. <br> Hoora hoorah <br> nice!!" , NotificationTypeEnum.BOOKING, newBooking.getBookingId());
             notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
             return newBooking;
 
@@ -197,7 +197,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             }
 
             // Notification module can fire here
-            Notification n = new Notification("Booking has been created for you", "Your have a new booking with Booking Id[" + newBooking.getBookingId() + "] created for you.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
+            Notification n = new Notification("Booking has been created for you", "You have a new booking with Booking Id[" + newBooking.getBookingId() + "] created for you.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
             notificationSessionBeanLocal.createNewNotification(n, servicemanId, true);
             return newBooking;
 
@@ -231,7 +231,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
         // Notification module can fire here
-        Notification n = new Notification("There is new required form for booking", "Your booking with Booking Id[" + booking.getBookingId() + "] has a new form attached", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        Notification n = new Notification("There is new required form for booking", "Your booking with Booking Id[" + booking.getBookingId() + "] has new form attached", NotificationTypeEnum.BOOKING, booking.getBookingId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
         } catch (CreateNotificationException ex) {
@@ -288,7 +288,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             throw new MarkBookingAttendanceException("Unable to mark attandance due to unsubmitted forms: " + formInstanceNames);
         }
         
-        Notification n = new Notification("Your booking attendance have been marked", "Your attemdace for booking with Booking Id[" + booking.getBookingId() + "] has been marked", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        Notification n = new Notification("Your booking attendance have been marked", "Your attendace for booking with Booking Id[" + booking.getBookingId() + "] has been marked", NotificationTypeEnum.BOOKING, booking.getBookingId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
         } catch (CreateNotificationException ex) {
@@ -355,6 +355,13 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         } else {
             throw new CancelBookingException("Invalid Booking Id");
         }
+        
+        Notification n = new Notification("Booking Cancelled Successfully", "Your booking with Booking Id[" + booking.getBookingId() + " has been cancelled successfully", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
 
     }
 
@@ -401,6 +408,13 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         } else {
             throw new CancelBookingException("Invalid Booking Id");
         }
+        
+        Notification n = new Notification("Your Booking have been cancelled", "Your booking with Booking Id[" + booking.getBookingId() + " has been cancelled for you", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
 
     }
 
@@ -435,6 +449,13 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
             } else {
                 throw new MarkBookingAbsentException("Invalid Booking Status: Booking has no upcoming status");
             }
+        }
+        
+        Notification n = new Notification("You missed your booking", "Your booking with Booking Id[" + booking.getBookingId() + " have been missed", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
         }
     }
 
