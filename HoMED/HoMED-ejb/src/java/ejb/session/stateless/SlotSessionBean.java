@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
@@ -204,6 +205,12 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 medicalBoardSlotToUpdate.setMedicalOfficerOne(medicalBoardSlot.getMedicalOfficerOne());
                 medicalBoardSlotToUpdate.setMedicalOfficerTwo(medicalBoardSlot.getMedicalOfficerTwo());
 
+                if (medicalBoardSlotToUpdate.getChairman() != null && medicalBoardSlotToUpdate.getMedicalOfficerOne() != null && medicalBoardSlotToUpdate.getMedicalOfficerTwo() != null) {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ASSIGNED);
+                } else {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.UNASSIGNED);
+                }
+                
                 em.flush();
 
                 return medicalBoardSlotToUpdate;
