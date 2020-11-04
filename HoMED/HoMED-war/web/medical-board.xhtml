@@ -3,89 +3,228 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="template/template.xhtml">
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
 
     <ui:define name="title">Medical Board</ui:define>
 
     <ui:define name="content">
+
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .icon-style {
+                text-align: center;
+                width: 20px;
+                font-size: 18px !important;
+                color: black !important;
+                padding-bottom: 5px;
+            }
+        </style>
+
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <ezcomp:pageRedirect rendered="#{medicalBoardManagedBean.relevantMedicalBoardSlots.size() == 0}"
+                             header="There Are No Medical Board Assigned To You"/>
         <h:form id="formMedicalBoard">
-
             <div class="p-grid">
-                <div class="p-col-6">
-                    <div class="card">
-                        <h1>Medical Board</h1>
 
-                        <p:dataScroller id="dataScrollerMedicalBoards" widgetVar="dataScrollerTodayMedicalBoard"
-                                        value="#{medicalBoardManagedBean.filteredMedicalBoardSlots}" var="medicalBoardSlot" mode="inline">
-
-                            <f:facet name="header">
-                                <p:selectOneButton value="#{medicalBoardManagedBean.filterOption}" unselectable="false">
-                                    <f:selectItem itemLabel="Today" itemValue="#{0}" />
-                                    <f:selectItem itemLabel="Upcoming" itemValue="#{1}" />
-                                    <f:selectItem itemLabel="Past" itemValue="#{2}" />
-                                    <p:ajax event="change" listener="#{medicalBoardManagedBean.doFilterMedicalBoards}" update="dataScrollerMedicalBoards"/>
-                                </p:selectOneButton>
-                            </f:facet>
+                <ui:fragment rendered="#{medicalBoardManagedBean.relevantMedicalBoardSlots.size() != 0}">
 
 
-                            <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
+                    <div class="p-col-6">
+                        <div class="card">
+                            <h1>Medical Board</h1>
 
-                                <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
-                                               style="margin-left: -10px; margin-top:-15px; position: absolute;" 
-                                               value="Selected" />
+                            <p:dataScroller id="dataScrollerMedicalBoards" widgetVar="dataScrollerTodayMedicalBoard"
+                                            value="#{medicalBoardManagedBean.filteredMedicalBoardSlots}" var="medicalBoardSlot" mode="inline">
 
-                                <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
 
-                                    <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
 
-                                    <h:panelGrid columns="3" cellpadding="5">
+                                <f:facet name="header">
+                                    <p:selectOneButton value="#{medicalBoardManagedBean.filterOption}" unselectable="false">
+                                        <f:selectItem itemLabel="Today" itemValue="#{0}" />
+                                        <f:selectItem itemLabel="Upcoming" itemValue="#{1}" />
+                                        <f:selectItem itemLabel="Past" itemValue="#{2}" />
+                                        <p:ajax event="change" listener="#{medicalBoardManagedBean.doFilterMedicalBoards}" update="dataScrollerMedicalBoards"/>
+                                    </p:selectOneButton>
+                                </f:facet>
 
-                                        <p:outputPanel style="margin: 8px;">
-                                            <h:panelGrid columns="2" cellpadding="5">
-                                                <h:outputText value="Time:  " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.renderTime(medicalBoardSlot.startDateTime)} - #{medicalBoardManagedBean.renderTime(medicalBoardSlot.endDateTime)}" />
+                                <p:commandLink style="color: #000000" 
+                                               actionListener="#{medicalBoardManagedBean.selectMedicalBoardSlot(medicalBoardSlot)}" 
+                                               update="@form" process="@this">
 
-                                                <h:outputText value="Chairman: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
+                                    <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
 
-                                                <h:outputText value="MO1: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
+                                        <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
+                                                       style="margin-left: -10px; margin-top:-15px; position: absolute;" 
+                                                       value="Selected" />
 
-                                                <h:outputText value="MO2: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
-                                                
-                                                <h:outputText value="Status:  " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}" />
-                                                
-                                                <h:outputText value="Total Cases: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardSlot.medicalBoardCases.size()}" />
+                                        <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
+
+                                            <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardManagedBean.renderDate(medicalBoardSlot.startDateTime)}" />
+
+                                            <h:panelGrid columns="3" cellpadding="5">
+
+                                                <p:outputPanel style="margin: 8px;">
+                                                    <h:panelGrid columns="2" cellpadding="5">
+                                                        <h:outputText value="Scheduled Time:  " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagedBean.renderTime(medicalBoardSlot.startDateTime)} - #{medicalBoardManagedBean.renderTime(medicalBoardSlot.endDateTime)}" />
+
+                                                        <h:outputText value="Medical Board Status:  " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}" />
+
+                                                        <h:outputText value="Total Cases: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardSlot.medicalBoardCases.size()}" />
+
+                                                    </h:panelGrid>
+                                                </p:outputPanel>
+                                                <p:outputPanel style="margin: 8px;">
+                                                    <h:panelGrid columns="2" cellpadding="5">
+                                                        <h:outputText value="Chairman: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
+
+                                                        <h:outputText value="MO1: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
+
+                                                        <h:outputText value="MO2: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
+                                                    </h:panelGrid>
+
+
+                                                </p:outputPanel>
 
                                             </h:panelGrid>
 
 
-                                        </p:outputPanel>
-
-                                    </h:panelGrid>
-
-
-                                </div>
-                            </div>
-
-                        </p:dataScroller>
+                                        </div>
+                                    </div>
+                                </p:commandLink>
+                            </p:dataScroller>
 
 
+                        </div>
 
                     </div>
-                </div>
-                <div class="p-col-6">
-                    <div class="card">
-                        
-                        Test
-                        
+                </ui:fragment>
+
+                <ui:fragment rendered="#{medicalBoardManagedBean.selectedMedicalBoardSlot != null}">
+
+                    <div class="p-col-6">
+                        <div class="timeline card card-w-title">
+                            <h2>Medical Board Details</h2>
+                            <ul>
+                                <li>
+                                    <p:panelGrid columns="2" layout="flex">
+                                        <h:panelGroup>
+                                            <div>
+                                                <i class="fa fa-clock-o icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Date Information</span>
+                                            </div>
+
+                                            <h:panelGrid columns="2" cellpadding="2">
+                                                <p:outputLabel value="Date: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.renderDate(medicalBoardManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                                <p:outputLabel value="Scheduled Start Time: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.renderTime(medicalBoardManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                                <p:outputLabel value="Scheduled End Time: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.renderTime(medicalBoardManagedBean.selectedMedicalBoardSlot.endDateTime)}" />
+
+                                                <p:outputLabel value="Actual Start Time: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.renderTime(medicalBoardManagedBean.selectedMedicalBoardSlot.actualStartDateTime)}" />
+
+                                                <p:outputLabel value="Actual End Time: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.renderTime(medicalBoardManagedBean.selectedMedicalBoardSlot.actualEndDateTime)}" />
+
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup>
+                                            <i class="fa fa-user-md icon-style"></i>
+                                            <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Members</span>
+
+                                            <h:panelGrid columns="2" cellpadding="2">
+                                                <p:outputLabel value="Chairman: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.chairman == null ? 'N.A.' : medicalBoardManagedBean.selectedMedicalBoardSlot.chairman.name}" />
+
+                                                <p:outputLabel value="Medical Officer 1: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerOne.name}" />
+
+                                                <p:outputLabel value="Medical Officer 2: " style="font-weight: bold" />
+                                                <p:outputLabel value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo.name}" />
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </li>
+
+                                <li>
+                                    <p:panelGrid columns="2" layout="flex">
+                                        <h:panelGroup>
+
+                                            <div>
+                                                <i class="fa fa-user icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Cases</span>
+                                            </div>
+
+                                            <h:panelGrid columns="2" cellpadding="2">
+                                                <h:outputText value="Total Cases: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases.size()}" />
+
+                                                <h:outputText value="In Presence Cases: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardInPresenceCases.size()}" />
+
+                                                <h:outputText value="In Absence Cases: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardInAbsenceCases.size()}" />
+                                            </h:panelGrid>
+
+                                        </h:panelGroup>
+                                        
+                                        <h:panelGroup>
+                                             <div>
+                                                <i class="fa fa-book icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Summary</span>
+                                            </div>
+                                             <h:panelGrid columns="2" cellpadding="2">
+                                                <h:outputText value="Total Estimated Time Needed: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases.size()}" />
+
+                                            </h:panelGrid>
+                                            
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                    
+                                    <p:dataTable id="dataTableMedicalBoardCases" widgetVar="dataTableMedicalBoardCases" reflow="true"
+                                                 value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases}" var="case" rowKey="#{case.medicalBoardCaseId}"
+                                                 style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                        <p:column headerText="ID" width="10%">
+                                            <h:outputText value="#{case.medicalBoardCaseId}" />
+                                        </p:column>
+
+                                        <p:column headerText="Name">
+                                            <h:outputText value="#{case.consultation.booking.serviceman.name}" />
+                                        </p:column>
+
+                                        <p:column headerText="Type">
+                                            <h:outputText value="#{case.medicalBoardType.stringVal}" />
+                                        </p:column>
+
+                                        <p:column headerText="PMB Review Date">
+                                            <h:outputText value="#{medicalBoardManagedBean.renderDate(case.consultation.endDateTime)}" />
+                                        </p:column>
+                                    </p:dataTable>
+
+                                </li>
+                            </ul>
+
+                        </div>
                     </div>
-                </div>
+                </ui:fragment>
             </div>
+
         </h:form>
+
     </ui:define>
 
 </ui:composition>

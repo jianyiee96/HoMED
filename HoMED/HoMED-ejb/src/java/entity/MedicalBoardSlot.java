@@ -178,11 +178,11 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     }
 
     public List<MedicalBoardCase> getMedicalBoardInPresenceCases() {
-        return medicalBoardCases.stream().filter(mbs -> mbs.getMedicalBoardType() == MedicalBoardTypeEnum.PRESENCE).collect(toList());
+        return medicalBoardCases.stream().filter(mbs -> mbs.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE).collect(toList());
     }
 
     public List<MedicalBoardCase> getMedicalBoardInAbsenceCases() {
-        return medicalBoardCases.stream().filter(mbs -> mbs.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE).collect(toList());
+        return medicalBoardCases.stream().filter(mbs -> mbs.getMedicalBoardType() == MedicalBoardTypeEnum.PRESENCE).collect(toList());
     }
 
     public String getMedicalOfficerOneKey() {

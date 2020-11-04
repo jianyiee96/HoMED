@@ -7,6 +7,7 @@ package jsf.managedBean;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.Employee;
+import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import entity.MedicalOfficer;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -25,6 +28,7 @@ import javax.faces.context.Flash;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
+import util.enumeration.MedicalBoardTypeEnum;
 
 @Named(value = "medicalBoardManagedBean")
 @ViewScoped
@@ -72,13 +76,7 @@ public class MedicalBoardManagedBean implements Serializable {
         for (MedicalBoardSlot mbs : allMedicalBoardSlots) {
             if (mbs.getMembersOfBoard().contains(currentMedicalOfficer)) {
 
-                Calendar mbsTime = Calendar.getInstance();
-                mbsTime.setTime(mbs.getStartDateTime());
-
-                boolean sameDay = mbsTime.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
-                        && mbsTime.get(Calendar.YEAR) == now.get(Calendar.YEAR);
-
-                if (sameDay) {
+                if (isToday(mbs.getStartDateTime())) {
                     filteredMedicalBoardSlots.add(mbs);
                 }
 
@@ -99,8 +97,29 @@ public class MedicalBoardManagedBean implements Serializable {
             }
 
         } else {
-            this.selectedMedicalBoardSlot = this.filteredMedicalBoardSlots.get(0);
+            this.selectMedicalBoardSlot(this.filteredMedicalBoardSlots.get(0));
         }
+
+    }
+
+    public void selectMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
+        this.selectedMedicalBoardSlot = medicalBoardSlot;
+        Comparator<MedicalBoardCase> sortByTypeThenDate = ((c1, c2) -> {
+            if(c1.getMedicalBoardType() == c2.getMedicalBoardType()) {
+                
+                if(c1.getConsultation().getEndDateTime().before(c2.getConsultation().getEndDateTime())) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+                
+            } else if(c1.getMedicalBoardType() == MedicalBoardTypeEnum.PRESENCE) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        Collections.sort(this.selectedMedicalBoardSlot.getMedicalBoardCases(), sortByTypeThenDate);
 
     }
 
@@ -131,12 +150,7 @@ public class MedicalBoardManagedBean implements Serializable {
         if (this.filterOption == 0) { //Today
             this.relevantMedicalBoardSlots.forEach(mbs -> {
 
-                Calendar mbsTime = Calendar.getInstance();
-                mbsTime.setTime(mbs.getStartDateTime());
-                boolean sameDay = mbsTime.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
-                        && mbsTime.get(Calendar.YEAR) == now.get(Calendar.YEAR);
-
-                if (sameDay) {
+                if (isToday(mbs.getStartDateTime())) {
                     this.filteredMedicalBoardSlots.add(mbs);
                 }
 
@@ -202,18 +216,37 @@ public class MedicalBoardManagedBean implements Serializable {
     }
 
     public String renderDateTime(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
         return dateFormat.format(date);
     }
 
     public String renderDate(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return dateFormat.format(date);
     }
 
     public String renderTime(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
         DateFormat dateFormat = new SimpleDateFormat("kk:mm");
         return dateFormat.format(date);
+    }
+
+    public boolean isToday(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return c.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+                && c.get(Calendar.YEAR) == now.get(Calendar.YEAR);
     }
 
     public String getMedicalOfficerRole(MedicalBoardSlot mbs) {
