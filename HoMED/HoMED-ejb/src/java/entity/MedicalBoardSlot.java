@@ -57,7 +57,7 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     private Date actualEndDateTime;
 
     public MedicalBoardSlot() {
-        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNALLOCATED;
+        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNASSIGNED;
         this.estimatedTimeForEachBoardInPresenceCase = 15;
         this.estimatedTimeForEachBoardInAbsenceCase = 3;
         this.medicalOfficerOneKey = CryptographicHelper.getInstance().generateRandomDigitString(6);

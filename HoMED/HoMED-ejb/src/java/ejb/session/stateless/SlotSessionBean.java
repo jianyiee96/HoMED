@@ -209,6 +209,12 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 medicalBoardSlotToUpdate.setMedicalOfficerOneKey(CryptographicHelper.getInstance().generateRandomDigitString(6));
                 medicalBoardSlotToUpdate.setMedicalOfficerTwoKey(CryptographicHelper.getInstance().generateRandomDigitString(6));
 
+                if (medicalBoardSlotToUpdate.getChairman() != null && medicalBoardSlotToUpdate.getMedicalOfficerOne() != null && medicalBoardSlotToUpdate.getMedicalOfficerTwo() != null) {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ASSIGNED);
+                } else {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.UNASSIGNED);
+                }
+                
                 em.flush();
 
                 return medicalBoardSlotToUpdate;
