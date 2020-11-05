@@ -206,20 +206,22 @@
                                     <p:dataTable id="dataTableMedicalBoardCases" widgetVar="dataTableMedicalBoardCases" reflow="true"
                                                  value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases}" var="case" rowKey="#{case.medicalBoardCaseId}"
                                                  scrollHeight="190" >
-                                        <p:column headerText="ID" width="10%">
+                                        <p:column headerText="Case ID" width="10%">
                                             <h:outputText value="#{case.medicalBoardCaseId}" />
                                         </p:column>
 
-                                        <p:column headerText="Name">
+                                        <p:column headerText="Serviceman Name">
                                             <h:outputText value="#{case.consultation.booking.serviceman.name}" />
                                         </p:column>
 
-                                        <p:column headerText="Type">
+                                        <p:column headerText="Board Type">
                                             <h:outputText value="#{case.medicalBoardType.stringVal}" />
                                         </p:column>
 
                                         <p:column headerText="PMB Review Date">
-                                            <h:outputText value="#{medicalBoardManagedBean.renderDate(case.consultation.endDateTime)}" />
+                                            <h:outputText value="#{case.consultation.endDateTime}">
+                                                <f:convertDateTime pattern="dd-MM-yyyy HH:mm"/>
+                                            </h:outputText>
                                         </p:column>
                                     </p:dataTable>
 

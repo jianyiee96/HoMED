@@ -17,6 +17,7 @@ import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
+import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
@@ -58,6 +59,25 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public void createMedicalBoardCaseByBoard(Long predecessorMedicalBoardCaseId, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) throws CreateMedicalBoardCaseException {
         
         MedicalBoardCase predecessorMedicalBoardCase = this.retrieveMedicalBoardCaseById(predecessorMedicalBoardCaseId);
+        
+    }
+    
+    @Override
+    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings) throws SignMedicalBoardCaseException {
+        
+        MedicalBoardCase medicalBoardCase = retrieveMedicalBoardCaseById(medicalBoardCaseId);
+        
+        if(medicalBoardCase == null) {
+            throw new SignMedicalBoardCaseException("Invalid Medical Board Case Id");
+        } else if (medicalBoardCase.getIsSigned()) {
+            throw new SignMedicalBoardCaseException("Unable to sign medical board case: Case is signed already");
+        } else if (boardFindings == null || boardFindings.isEmpty()) {
+            throw new SignMedicalBoardCaseException("Unable to sign medical board case: Please include board findings.");
+        }
+        
+        medicalBoardCase.setIsSigned(Boolean.TRUE);
+        medicalBoardCase.setBoardFindings(boardFindings);
+        
         
     }
     

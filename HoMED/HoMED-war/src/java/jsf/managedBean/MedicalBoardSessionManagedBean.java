@@ -4,19 +4,30 @@
  */
 package jsf.managedBean;
 
+import ejb.session.stateless.MedicalBoardCaseSessionBean;
+import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
+import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
-import util.exceptions.StartMedicalBoardSessionException;
+import util.enumeration.MedicalBoardTypeEnum;
+import util.exceptions.SignMedicalBoardCaseException;
 
 /**
  *
@@ -29,21 +40,18 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     @EJB
     SlotSessionBeanLocal slotSessionBeanLocal;
 
+    @EJB
+    MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanLocal;
+
     MedicalBoardSlot medicalBoardSlot;
 
-    String medicalOfficerOneKey;
-
-    String medicalOfficerTwoKey;
+    MedicalBoardCase selectedCase;
 
     public MedicalBoardSessionManagedBean() {
-        medicalOfficerOneKey = "";
-        medicalOfficerTwoKey = "";
     }
 
     @PostConstruct
     public void postConstruct() {
-
-        System.out.println("Session post construct called");
 
         try {
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
@@ -69,27 +77,73 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             } catch (IOException ex) {
                 System.out.println("Fail to redirect: " + ex);
             }
+        } else {
+            sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
+            if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
+                selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
+            }
         }
 
     }
 
-    public void startCurrentMedicalBoard() {
+    public void sortMedicalBoardCases(List<MedicalBoardCase> mbs) {
+        Comparator<MedicalBoardCase> comp = ((m1, m2) -> {
 
-        System.out.println(medicalOfficerOneKey);
-        System.out.println(medicalOfficerTwoKey);
+            if (!Objects.equals(m1.getIsSigned(), m2.getIsSigned())) {
 
-        try {
+                if (m1.getIsSigned()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
 
-            if (medicalBoardSlot.getMedicalOfficerOneKey().equals(medicalOfficerOneKey) && medicalBoardSlot.getMedicalOfficerTwoKey().equals(medicalOfficerTwoKey)) {
-                System.out.println("Able to start session");
-                slotSessionBeanLocal.startMedicalBoardSession(medicalBoardSlot.getSlotId());
-                medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+            } else if (m1.getMedicalBoardType() != m2.getMedicalBoardType()) {
+
+                if (m1.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+
             } else {
-                System.out.println("Unable to start session");
+                return m1.getConsultation().getEndDateTime().before(m2.getConsultation().getEndDateTime()) ? -1 : 1;
             }
-        } catch (StartMedicalBoardSessionException ex) {
-            System.out.println("Unable to start: " + ex);
+
+        });
+        Collections.sort(mbs, comp);
+
+    }
+
+    public void signSelectedCase() {
+
+        if (selectedCase.getBoardFindings() == null) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", "Please ensure board findings is not empty."));
+        } else {
+
+            try {
+                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings());
+                medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+                medicalBoardSlot.getMedicalBoardCases().forEach(mbc -> {
+                    if (mbc.equals(selectedCase)) {
+                        selectedCase = mbc;
+                    }
+                });
+                sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
+            } catch (SignMedicalBoardCaseException ex) {
+                FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", ex.getMessage()));
+
+            }
         }
+    }
+
+    public String backgroundStyle(MedicalBoardCase mbc) {
+
+        if (mbc.equals(selectedCase)) {
+            return "x";
+        } else {
+            return mbc.getIsSigned() ? "sign-true" : "sign-false";
+        }
+
     }
 
     public MedicalBoardSlot getMedicalBoardSlot() {
@@ -100,20 +154,38 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         this.medicalBoardSlot = medicalBoardSlot;
     }
 
-    public String getMedicalOfficerOneKey() {
-        return medicalOfficerOneKey;
+    public MedicalBoardCase getSelectedCase() {
+        return selectedCase;
     }
 
-    public void setMedicalOfficerOneKey(String medicalOfficerOneKey) {
-        this.medicalOfficerOneKey = medicalOfficerOneKey;
+    public void setSelectedCase(MedicalBoardCase selectedCase) {
+        this.selectedCase = selectedCase;
     }
 
-    public String getMedicalOfficerTwoKey() {
-        return medicalOfficerTwoKey;
+    public String renderDateTime(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
+        return dateFormat.format(date);
     }
 
-    public void setMedicalOfficerTwoKey(String medicalOfficerTwoKey) {
-        this.medicalOfficerTwoKey = medicalOfficerTwoKey;
+    public String renderDate(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return dateFormat.format(date);
     }
 
+    public String renderTime(Date date) {
+        if (date == null) {
+            return "N.A.";
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat("kk:mm");
+        return dateFormat.format(date);
+    }
 }

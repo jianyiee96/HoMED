@@ -90,7 +90,7 @@
                                 <p:column headerText="Consultation Purpose" width="20%" sortBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
                                     <h:outputText value="#{slot.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
-                                
+
                                 <p:column headerText="Consultation Type" width="15%" sortBy="#{slot.booking.isForReview}">
                                     <h:outputText value="#{slot.booking.isForReview? 'REVIEW' : 'GENERAL' }"/>
                                 </p:column>

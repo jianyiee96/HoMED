@@ -47,9 +47,12 @@ public class MedicalBoardCase implements Serializable {
 
     @OneToOne(optional = true)
     private MedicalBoardCase previousMedicalBoardCase;
+    
+    private Boolean isSigned;
 
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
+        this.isSigned = Boolean.FALSE;
     }
 
     public MedicalBoardCase(Consultation consultation, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
@@ -128,6 +131,14 @@ public class MedicalBoardCase implements Serializable {
 
     public void setPreviousMedicalBoardCase(MedicalBoardCase previousMedicalBoardCase) {
         this.previousMedicalBoardCase = previousMedicalBoardCase;
+    }
+
+    public Boolean getIsSigned() {
+        return isSigned;
+    }
+
+    public void setIsSigned(Boolean isSigned) {
+        this.isSigned = isSigned;
     }
 
     @Override
