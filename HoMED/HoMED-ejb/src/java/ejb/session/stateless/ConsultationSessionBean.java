@@ -43,8 +43,6 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
     @EJB
     private FormInstanceSessionBeanLocal formInstanceSessionBeanLocal;
-    
-    
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -92,11 +90,19 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             consultation.setConsultationStatusEnum(ConsultationStatusEnum.ONGOING);
             consultation.setMedicalOfficer(medicalOfficer);
             medicalOfficer.setCurrentConsultation(consultation);
+
+            String queueNumber = String.format("%03d", consultation.getBooking().getBookingId() % 1000);
+            String title = "Your consultation [Queue No. " + queueNumber + "] is ready";
+            String body = "Please proceed to the consultation room immediately.";
+
+            Notification n = new Notification(title, body, NotificationTypeEnum.CONSULTATION, consultationId);
+            notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, consultation.getBooking().getServiceman().getFcmToken());
         } catch (Exception ex) {
             throw new StartConsultationException("Unknown exception: " + ex.getMessage());
         }
     }
-    
+
     @Override
     public void startConsultationByInit(Long consultationId, Long medicalOfficerId, Date startDate) throws StartConsultationException {
 
@@ -127,15 +133,17 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } catch (Exception ex) {
             throw new StartConsultationException("Unknown exception: " + ex.getMessage());
         }
-        
-        Notification n = new Notification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is begging. Please proceed to consultation room", NotificationTypeEnum.CONSULTATION, consultationId);
+
+        Notification n = new Notification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is beginning. Please proceed to consultation room", NotificationTypeEnum.CONSULTATION, consultationId);
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is beginning. Please proceed to consultation room", consultation.getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
     }
-    
+
     @Override
     public void deferConsultation(Long consultationId, String remarks, String remarksForServiceman) throws DeferConsultationException {
         Consultation consultation = retrieveConsultationById(consultationId);
@@ -144,7 +152,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } else if (consultation.getConsultationStatusEnum() != ConsultationStatusEnum.ONGOING) {
             throw new DeferConsultationException("Invalid Consultation Status: Consultation is not in ONGOING status");
         }
-        
+
         try {
             consultation.setConsultationStatusEnum(ConsultationStatusEnum.WAITING);
             consultation.setStartDateTime(null);
@@ -184,16 +192,17 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } catch (Exception ex) {
             throw new EndConsultationException("Unknown exception: " + ex.getMessage());
         }
-        
+
         Notification n = new Notification("Consultation completed", "Your consultation with Consultation Id[" + consultationId + "] has been completed", NotificationTypeEnum.CONSULTATION, consultationId);
         try {
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification("Consultation completed", "Your consultation with Consultation Id[" + consultationId + "] has been completed", consultation.getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
 
     }
-    
+
     @Override
     public void endConsultationByInit(Long consultationId, String remarks, String remarksForServiceman, Date endDate) throws EndConsultationException {
         Consultation consultation = retrieveConsultationById(consultationId);
@@ -257,10 +266,15 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
         } catch (Exception ex) {
             throw new InvalidateConsultationException("Failed to invalidate consultation: " + ex.getMessage());
         }
-        
-        Notification n = new Notification("Booking marked as absent", "You did not attend your consultation with Consultation Id[" + consultationId + "]", NotificationTypeEnum.CONSULTATION, consultationId);
+
+        String title = "Marked Absent for Booking [ID: " + consultation.getBooking().getBookingId() + "]";
+        String body = "You did not attend your consultation which you marked attendance for.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, consultation.getBooking().getBookingId());
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, consultation.getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
@@ -301,7 +315,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
         return query.getResultList();
     }
-    
+
     @Override
     public List<Consultation> retrieveAllConsultations() {
         Query query = em.createQuery("SELECT c FROM Consultation c GROUP BY c.medicalOfficer ORDER BY c.startDateTime ASC");

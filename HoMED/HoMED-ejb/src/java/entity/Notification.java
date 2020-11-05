@@ -59,26 +59,26 @@ public class Notification implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Serviceman serviceman;
-    
+
     @Column(nullable = true)
-    private Long dynamicId; 
-    
+    private Long dynamicId;
+
     @Enumerated(EnumType.STRING)
     @Column
     private NotificationTypeEnum notificationTypeEnum;
-    
+
     public Notification() {
         this.notificationDate = new Date();
         this.isRead = false;
         this.isFetched = false;
     }
 
-    public Notification(String title, String message, NotificationTypeEnum notificationTypeEnum, Long dynamincId) {
+    public Notification(String title, String message, NotificationTypeEnum notificationTypeEnum, Long dynamicId) {
         this();
         this.title = title;
         this.message = message;
         this.notificationTypeEnum = notificationTypeEnum;
-        this.dynamicId = dynamincId;
+        this.dynamicId = dynamicId;
     }
 
     public Long getNotificationId() {
@@ -152,8 +152,6 @@ public class Notification implements Serializable {
     public void setNotificationTypeEnum(NotificationTypeEnum notificationTypeEnum) {
         this.notificationTypeEnum = notificationTypeEnum;
     }
-    
-    
 
     @Override
     public int hashCode() {

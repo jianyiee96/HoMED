@@ -9,6 +9,7 @@ package util.enumeration;
  * @author sunag
  */
 public enum NotificationTypeEnum {
+    GENERAL,
     BOOKING,
     CONSULTATION,
     FORM

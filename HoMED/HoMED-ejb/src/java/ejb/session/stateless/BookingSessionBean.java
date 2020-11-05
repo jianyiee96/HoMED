@@ -11,12 +11,11 @@ import entity.FormInstance;
 import entity.FormTemplate;
 import entity.Notification;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -64,6 +63,9 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
+    String pattern = "EEEE, d MMM yyyy HH:mm";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
     @Override
     public List<Booking> retrieveQueueBookingsByMedicalCentre(Long medicalCentreId) {
         Query query = em.createQuery("SELECT b FROM Booking b "
@@ -76,7 +78,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     }
 
     @Override
-    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview) throws CreateBookingException {
+    public Booking createBooking(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, String bookingComment, Boolean isForReview, Boolean sendNotification) throws CreateBookingException {
 
         try {
 
@@ -120,9 +122,16 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 }
             }
 
-            Notification n = new Notification("Booking Created Successfully", "Your booking with Booking Id[" + newBooking.getBookingId() + "] at " + newBooking.getBookingSlot().getStartDateTime() + "has been <br>created successfully. <br> Hoora hoorah <br> nice!!" , NotificationTypeEnum.BOOKING, newBooking.getBookingId());
-            notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
-            notificationSessionBeanLocal.sendPushNotification("Booking Created Successfully", "Your booking has been created successfully.", serviceman.getFcmToken());
+            if (sendNotification) {
+                String date = simpleDateFormat.format(newBooking.getBookingSlot().getStartDateTime());
+
+                String title = "Booking Created Successfully";
+                String body = "Your booking [ID: " + newBooking.getBookingId() + "] for " + date + ", has been created successfully.\n\nDo remember to come early for your consultation.";
+
+                Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, newBooking.getBookingId());
+                notificationSessionBeanLocal.createNewNotification(n, serviceman.getServicemanId(), true);
+                notificationSessionBeanLocal.sendPushNotification(title, body, serviceman.getFcmToken());
+            }
 
             return newBooking;
 
@@ -193,17 +202,26 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
     public Booking createBookingByClerk(Long servicemanId, Long consultationPurposeId, Long bookingSlotId, List<Long> additionalFormTemplateIds, String bookingComment, Boolean isForReview) throws CreateBookingException {
 
         try {
-            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment, isForReview);
+            Booking newBooking = createBooking(servicemanId, consultationPurposeId, bookingSlotId, bookingComment, isForReview, false);
             if (!additionalFormTemplateIds.isEmpty()) {
                 attachFormInstancesByClerk(newBooking.getBookingSlot().getSlotId(), additionalFormTemplateIds);
             }
 
+            Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(servicemanId);
+
             // Notification module can fire here
-            Notification n = new Notification("Booking has been created for you", "You have a new booking with Booking Id[" + newBooking.getBookingId() + "] created for you.", NotificationTypeEnum.BOOKING, newBooking.getBookingId());
+            String date = simpleDateFormat.format(newBooking.getBookingSlot().getStartDateTime());
+
+            String title = "Booking has been created for you";
+            String body = "Your booking [ID: " + newBooking.getBookingId() + "] for " + date + " has been created successfully by a medical staff member.\n\nDo remember to come early for your consultation.";
+
+            Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, newBooking.getBookingId());
             notificationSessionBeanLocal.createNewNotification(n, servicemanId, true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, serviceman.getFcmToken());
+
             return newBooking;
 
-        } catch (CreateBookingException | AttachFormInstancesException | CreateNotificationException ex) {
+        } catch (CreateBookingException | CreateNotificationException | AttachFormInstancesException | ServicemanNotFoundException ex) {
             throw new CreateBookingException("Failed to create booking: " + ex.getMessage());
         }
 
@@ -233,12 +251,20 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         }
 
         // Notification module can fire here
-        Notification n = new Notification("There is new required form for booking", "Your booking with Booking Id[" + booking.getBookingId() + "] has new form attached", NotificationTypeEnum.BOOKING, booking.getBookingId());
+        String date = simpleDateFormat.format(booking.getBookingSlot().getStartDateTime());
+
+        String title = "Booking Updated";
+        String body = "Your booking [ID: " + booking.getBookingId() + "] for " + date + "  has been updated, please access it to view the latest updates to comments and forms.\n\nNote that it is mandatory for you to fill up all required forms before attending your consultation.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, booking.getBookingId());
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, booking.getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
+
         return booking;
     }
 
@@ -289,10 +315,15 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         } else {
             throw new MarkBookingAttendanceException("Unable to mark attandance due to unsubmitted forms: " + formInstanceNames);
         }
-        
-        Notification n = new Notification("Your booking attendance have been marked", "Your attendace for booking with Booking Id[" + booking.getBookingId() + "] has been marked", NotificationTypeEnum.BOOKING, booking.getBookingId());
+
+        String title = "Attendance Marked for Booking [ID: " + booking.getBookingId() + "]";
+        String body = "Please view the queue display at the medical centre or enable push notifications to be informed when your consultation is ready.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, booking.getBookingId());
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, booking.getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
@@ -357,10 +388,17 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         } else {
             throw new CancelBookingException("Invalid Booking Id");
         }
-        
-        Notification n = new Notification("Booking Cancelled Successfully", "Your booking with Booking Id[" + booking.getBookingId() + " has been cancelled successfully", NotificationTypeEnum.BOOKING, booking.getBookingId());
+
+        String date = simpleDateFormat.format(booking.getBookingSlot().getStartDateTime());
+
+        String title = "Booking Cancelled Successfully";
+        String body = "Your booking [ID: " + booking.getBookingId() + "] for " + date + " has been cancelled successfully.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, booking.getBookingId());
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, booking.getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
@@ -410,10 +448,17 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         } else {
             throw new CancelBookingException("Invalid Booking Id");
         }
-        
-        Notification n = new Notification("Your Booking have been cancelled", "Your booking with Booking Id[" + booking.getBookingId() + " has been cancelled for you", NotificationTypeEnum.BOOKING, booking.getBookingId());
+
+        String date = simpleDateFormat.format(booking.getBookingSlot().getStartDateTime());
+
+        String title = "Booking has been cancelled for you";
+        String body = "Your booking [ID: " + booking.getBookingId() + "] for " + date + " has been cancelled successfully by a medical staff member.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, booking.getBookingId());
+
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, booking.getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
@@ -452,7 +497,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
                 throw new MarkBookingAbsentException("Invalid Booking Status: Booking has no upcoming status");
             }
         }
-        
+
         Notification n = new Notification("You missed your booking", "Your booking with Booking Id[" + booking.getBookingId() + " have been missed", NotificationTypeEnum.BOOKING, booking.getBookingId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);
