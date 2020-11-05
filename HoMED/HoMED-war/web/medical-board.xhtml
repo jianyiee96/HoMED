@@ -22,11 +22,11 @@
             }
         </style>
 
-        <p:growl id="growl-message" for="growl-message" showDetail="true" />
 
         <ezcomp:pageRedirect rendered="#{medicalBoardManagedBean.relevantMedicalBoardSlots.size() == 0}"
                              header="There Are No Medical Board Assigned To You"/>
         <h:form id="formMedicalBoard">
+            <p:growl id="growl" globalOnly="true" showDetail="true" />
             <div class="p-grid">
 
                 <ui:fragment rendered="#{medicalBoardManagedBean.relevantMedicalBoardSlots.size() != 0}">
@@ -180,24 +180,32 @@
                                             </h:panelGrid>
 
                                         </h:panelGroup>
-                                        
+
                                         <h:panelGroup>
-                                             <div>
+                                            <div>
                                                 <i class="fa fa-book icon-style"></i>
                                                 <span style="font-size: 1.25rem; font-weight: bold;">Summary</span>
                                             </div>
-                                             <h:panelGrid columns="2" cellpadding="2">
+                                            <h:panelGrid columns="2" cellpadding="2">
+
+
                                                 <h:outputText value="Total Estimated Time Needed: " style="font-weight: bold" />
-                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases.size()}" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.totalEstimatedTime} mins" />
+                                                <h:outputText value="Estimated Time Needed for MBIP: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInPresenceCase} mins" />
+                                                <h:outputText value="Estimated Time Needed for MBIA: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInAbsenceCase} mins" />
+
+
 
                                             </h:panelGrid>
-                                            
+
                                         </h:panelGroup>
                                     </p:panelGrid>
-                                    
+
                                     <p:dataTable id="dataTableMedicalBoardCases" widgetVar="dataTableMedicalBoardCases" reflow="true"
                                                  value="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardCases}" var="case" rowKey="#{case.medicalBoardCaseId}"
-                                                 style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                                 scrollHeight="190" >
                                         <p:column headerText="ID" width="10%">
                                             <h:outputText value="#{case.medicalBoardCaseId}" />
                                         </p:column>
@@ -214,6 +222,90 @@
                                             <h:outputText value="#{medicalBoardManagedBean.renderDate(case.consultation.endDateTime)}" />
                                         </p:column>
                                     </p:dataTable>
+
+                                </li>
+
+                                <li>
+
+                                    <ui:fragment rendered="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' 
+                                                             or medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                        <p:panelGrid columns="1" layout="flex">
+                                            <h:panelGroup rendered="#{medicalBoardManagedBean.chairmanView}">
+                                                <div>
+                                                    <i class="fa fa-key icon-style"></i>
+                                                    <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Session</span>
+                                                </div>
+                                                <h:panelGrid rendered="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' }" columns="1" cellpadding="8">
+
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Status: " style="font-weight: bold" /><span class="form-status-badge consultation-badge">#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}</span>
+                                                    </h:panelGroup>                 
+
+                                                    <h:outputText value="Members of the board has been assigned but there are no cases allocated for this medical board session. " />
+                                                </h:panelGrid>
+
+                                                <h:panelGrid rendered="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED' }" columns="1" cellpadding="8">
+
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Status: " style="font-weight: bold"/><span class="form-status-badge consultation-badge">#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}</span>
+                                                    </h:panelGroup>     
+
+                                                    <h:outputText value="To start a medical board, please supply both medical officer's session code. " style="font-weight: bold" />
+
+                                                    <h:panelGrid columns="2">
+
+                                                        <h:outputText value="MO1 Key: " style="font-weight: bold" />
+                                                        <p:password value="#{medicalBoardManagedBean.mo1keyInput}"/>
+                                                        <h:outputText value="MO2 Key: " style="font-weight: bold" />
+                                                        <p:password value="#{medicalBoardManagedBean.mo2keyInput}"/>
+                                                    </h:panelGrid>
+                                                    <p:commandButton value="Start Medical Board" process="formMedicalBoard" update="formMedicalBoard" actionListener="#{medicalBoardManagedBean.startSelectedMedicalBoard()}"></p:commandButton>
+
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup rendered="#{not medicalBoardManagedBean.chairmanView }">
+
+                                                <div>
+                                                    <i class="fa fa-key icon-style"></i>
+                                                    <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Session</span>
+                                                </div>
+
+                                                <h:panelGrid columns="1" cellpadding="8">
+
+                                                    <h:panelGroup>
+                                                        <h:outputText value="Status: " style="font-weight: bold"/><span class="form-status-badge consultation-badge">#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}</span>
+                                                    </h:panelGroup>     
+
+                                                    <h:outputText value="To start a medical board, the chairman must be logged in, and supply both medical officer's session code. " style="font-weight: bold" />
+                                                    <h:outputText value="Please supply your 6 digit session code to the chairman of the board when starting a medical board session. " />
+                                                    <h:outputText rendered="#{medicalBoardManagedBean.mo1View}" value="Session Code: #{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerOneKey}" style="font-weight: bold" />
+                                                    <h:outputText rendered="#{medicalBoardManagedBean.mo2View}" value="Session Code: #{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalOfficerTwoKey}" style="font-weight: bold" />
+                                                </h:panelGrid>
+
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+
+
+                                    </ui:fragment>
+
+                                    <ui:fragment rendered="#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ONGOING' 
+                                                             or medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'COMPLETED'}">
+                                        <p:panelGrid columns="1" layout="flex">
+                                            <div>
+                                                <i class="fa fa-key icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Session</span>
+                                            </div>
+
+                                            <h:panelGroup>
+                                                <h:outputText value="Status: " style="font-weight: bold" /><span class="form-status-badge consultation-badge">#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}</span>
+                                            </h:panelGroup>     
+                                            <p:commandButton value="Open Medical Board Session" actionListener="#{medicalBoardManagedBean.redirectMedicalBoardSession(medicalBoardManagedBean.selectedMedicalBoardSlot)}" />
+                                        </p:panelGrid>
+
+
+                                    </ui:fragment>
+
 
                                 </li>
                             </ul>

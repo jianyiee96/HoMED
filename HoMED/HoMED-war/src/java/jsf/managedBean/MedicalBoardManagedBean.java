@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.exceptions.StartMedicalBoardSessionException;
 
 @Named(value = "medicalBoardManagedBean")
 @ViewScoped
@@ -54,6 +55,13 @@ public class MedicalBoardManagedBean implements Serializable {
 
     private Calendar now;
 
+    private Boolean chairmanView;
+    private Boolean mo1View;
+    private Boolean mo2View;
+
+    private String mo1keyInput;
+    private String mo2keyInput;
+
     public MedicalBoardManagedBean() {
         this.allMedicalBoardSlots = new ArrayList<>();
         this.relevantMedicalBoardSlots = new ArrayList<>();
@@ -68,13 +76,12 @@ public class MedicalBoardManagedBean implements Serializable {
             currentMedicalOfficer = employeeSessionBeanLocal.retrieveMedicalOfficerById(currentEmployee.getEmployeeId());
         }
 
-        filterOption = 0;
         now = Calendar.getInstance();
         now.setTime(new Date());
 
         this.allMedicalBoardSlots = slotSessionBeanLocal.retrieveMedicalBoardSlots();
         for (MedicalBoardSlot mbs : allMedicalBoardSlots) {
-            if (mbs.getMembersOfBoard().contains(currentMedicalOfficer)) {
+            if (mbs.getMembersOfBoard().contains(currentMedicalOfficer) && mbs.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.UNASSIGNED) {
 
                 if (isToday(mbs.getStartDateTime())) {
                     filteredMedicalBoardSlots.add(mbs);
@@ -85,6 +92,7 @@ public class MedicalBoardManagedBean implements Serializable {
             }
         }
 
+        this.filterOption = 0;
         this.doFilterMedicalBoards();
 
         if (this.filteredMedicalBoardSlots.isEmpty()) {
@@ -104,16 +112,31 @@ public class MedicalBoardManagedBean implements Serializable {
 
     public void selectMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
         this.selectedMedicalBoardSlot = medicalBoardSlot;
+
+        mo1keyInput = "";
+        mo2keyInput = "";
+        chairmanView = false;
+        mo1View = false;
+        mo2View = false;
+
+        if (medicalBoardSlot.getChairman().equals(this.currentMedicalOfficer)) {
+            chairmanView = true;
+        } else if (medicalBoardSlot.getMedicalOfficerOne().equals(this.currentMedicalOfficer)) {
+            mo1View = true;
+        } else if (medicalBoardSlot.getMedicalOfficerTwo().equals(this.currentMedicalOfficer)) {
+            mo2View = true;
+        }
+
         Comparator<MedicalBoardCase> sortByTypeThenDate = ((c1, c2) -> {
-            if(c1.getMedicalBoardType() == c2.getMedicalBoardType()) {
-                
-                if(c1.getConsultation().getEndDateTime().before(c2.getConsultation().getEndDateTime())) {
+            if (c1.getMedicalBoardType() == c2.getMedicalBoardType()) {
+
+                if (c1.getConsultation().getEndDateTime().before(c2.getConsultation().getEndDateTime())) {
                     return -1;
                 } else {
                     return 1;
                 }
-                
-            } else if(c1.getMedicalBoardType() == MedicalBoardTypeEnum.PRESENCE) {
+
+            } else if (c1.getMedicalBoardType() == MedicalBoardTypeEnum.PRESENCE) {
                 return 1;
             } else {
                 return -1;
@@ -121,6 +144,31 @@ public class MedicalBoardManagedBean implements Serializable {
         });
         Collections.sort(this.selectedMedicalBoardSlot.getMedicalBoardCases(), sortByTypeThenDate);
 
+    }
+
+    public void startSelectedMedicalBoard() {
+
+        if (mo1keyInput == null || mo1keyInput.isEmpty() || mo2keyInput == null || mo2keyInput.isEmpty()) {
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start medical board", "Please supply both MO1 and MO2 keys"));
+        } else if (this.selectedMedicalBoardSlot.getMedicalOfficerOneKey().equals(mo1keyInput)
+                && this.selectedMedicalBoardSlot.getMedicalOfficerTwoKey().equals(mo2keyInput)) {
+
+            try {
+
+                slotSessionBeanLocal.startMedicalBoardSession(this.selectedMedicalBoardSlot.getSlotId());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started Medical Board!", "Medical board has started!"));
+
+            } catch (StartMedicalBoardSessionException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start medical board", ex.getMessage()));
+
+            }
+
+        } else {
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start medical board", "Invalid keys supplied"));
+
+        }
     }
 
     public void redirectMedicalBoardSession(MedicalBoardSlot medicalBoardSlot) {
@@ -213,6 +261,46 @@ public class MedicalBoardManagedBean implements Serializable {
 
     public void setFilterOption(Integer filterOption) {
         this.filterOption = filterOption;
+    }
+
+    public Boolean getChairmanView() {
+        return chairmanView;
+    }
+
+    public void setChairmanView(Boolean chairmanView) {
+        this.chairmanView = chairmanView;
+    }
+
+    public Boolean getMo1View() {
+        return mo1View;
+    }
+
+    public void setMo1View(Boolean mo1View) {
+        this.mo1View = mo1View;
+    }
+
+    public Boolean getMo2View() {
+        return mo2View;
+    }
+
+    public void setMo2View(Boolean mo2View) {
+        this.mo2View = mo2View;
+    }
+
+    public String getMo1keyInput() {
+        return mo1keyInput;
+    }
+
+    public void setMo1keyInput(String mo1keyInput) {
+        this.mo1keyInput = mo1keyInput;
+    }
+
+    public String getMo2keyInput() {
+        return mo2keyInput;
+    }
+
+    public void setMo2keyInput(String mo2keyInput) {
+        this.mo2keyInput = mo2keyInput;
     }
 
     public String renderDateTime(Date date) {
