@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.BookingSlot;
+import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import entity.MedicalCentre;
 import java.text.SimpleDateFormat;
@@ -19,7 +20,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.BookingStatusEnum;
+import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
+import util.exceptions.EndMedicalBoardSessionException;
 import util.exceptions.MedicalCentreNotFoundException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
@@ -214,7 +217,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
                 } else {
                     medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.UNASSIGNED);
                 }
-                
+
                 em.flush();
 
                 return medicalBoardSlotToUpdate;
@@ -259,6 +262,47 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         medicalBoardSlot.setActualStartDateTime(new Date());
         System.out.println("Session bean start session called");
 
+    }
+
+    @Override
+    public void endMedicalBoardSession(Long medicalBoardSlotId) throws EndMedicalBoardSessionException {
+
+        MedicalBoardSlot medicalBoardSlot = retrieveMedicalBoardSlotById(medicalBoardSlotId);
+
+        if (medicalBoardSlot == null) {
+            throw new EndMedicalBoardSessionException("Invalid Medical Board Slot Id");
+        } else if (medicalBoardSlot.getMedicalBoardSlotStatusEnum() != MedicalBoardSlotStatusEnum.ONGOING) {
+            throw new EndMedicalBoardSessionException("Invalid Status: Status has to be allocated");
+        }
+        
+        medicalBoardSlot.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.COMPLETED);
+        medicalBoardSlot.setActualEndDateTime(new Date());
+        
+        List<MedicalBoardCase> signedCase = new ArrayList<MedicalBoardCase>();
+        List<MedicalBoardCase> unsignedCase = new ArrayList<MedicalBoardCase>();
+        
+        medicalBoardSlot.getMedicalBoardCases().forEach(mbs -> {
+            if(mbs.getIsSigned()) {
+                signedCase.add(mbs);
+            } else {
+                unsignedCase.add(mbs);
+            }
+        });
+        
+        for(MedicalBoardCase mbc : unsignedCase) {
+            
+            mbc.getMedicalBoardSlot().getMedicalBoardCases().remove(mbc);
+            mbc.setMedicalBoardSlot(null);
+            mbc.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.WAITING);
+            
+        }
+        
+        for(MedicalBoardCase mbc : signedCase) {
+            mbc.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.COMPLETED);
+        }
+        
+        
+        
     }
 
     // Helper functions.

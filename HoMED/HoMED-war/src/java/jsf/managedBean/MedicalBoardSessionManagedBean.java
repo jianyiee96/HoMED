@@ -27,6 +27,8 @@ import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
+import util.exceptions.EndMedicalBoardSessionException;
 import util.exceptions.SignMedicalBoardCaseException;
 
 /**
@@ -46,6 +48,8 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     MedicalBoardSlot medicalBoardSlot;
 
     MedicalBoardCase selectedCase;
+
+    PesStatusEnum newPesStatus;
 
     public MedicalBoardSessionManagedBean() {
     }
@@ -121,7 +125,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         } else {
 
             try {
-                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings());
+                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), newPesStatus);
                 medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
                 medicalBoardSlot.getMedicalBoardCases().forEach(mbc -> {
                     if (mbc.equals(selectedCase)) {
@@ -134,6 +138,50 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
             }
         }
+    }
+
+    public Boolean hasUnsignedCase() {
+
+        if (medicalBoardSlot == null) {
+            return false;
+        }
+
+        boolean result = false;
+
+        for (MedicalBoardCase m : medicalBoardSlot.getMedicalBoardCases()) {
+            if (!m.getIsSigned()) {
+                result = true;
+            }
+        }
+
+        sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
+        return result;
+
+    }
+
+    public void nextCase() {
+        sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
+        if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
+            selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
+        }
+    }
+
+    public void endSession() {
+
+        try {
+
+            slotSessionBeanLocal.endMedicalBoardSession(medicalBoardSlot.getSlotId());
+            FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
+
+        } catch (EndMedicalBoardSessionException | IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "An Error Has Occured!", ex.getMessage()));
+
+        }
+
+    }
+
+    public void rowSelectListener() {
+        newPesStatus = null;
     }
 
     public String backgroundStyle(MedicalBoardCase mbc) {

@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
 import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
@@ -63,7 +64,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     }
     
     @Override
-    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings) throws SignMedicalBoardCaseException {
+    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings, PesStatusEnum newPesStatus) throws SignMedicalBoardCaseException {
         
         MedicalBoardCase medicalBoardCase = retrieveMedicalBoardCaseById(medicalBoardCaseId);
         

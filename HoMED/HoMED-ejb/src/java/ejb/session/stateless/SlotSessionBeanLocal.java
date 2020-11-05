@@ -9,6 +9,7 @@ import entity.MedicalBoardSlot;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.EndMedicalBoardSessionException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
@@ -42,4 +43,6 @@ public interface SlotSessionBeanLocal {
 
     public void startMedicalBoardSession(Long medicalBoardSlotId) throws StartMedicalBoardSessionException;
 
+    public void endMedicalBoardSession(Long medicalBoardSlotId) throws EndMedicalBoardSessionException;
+    
 }

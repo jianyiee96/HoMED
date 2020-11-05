@@ -25,6 +25,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.enumeration.PesStatusEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.security.CryptographicHelper;
 
@@ -100,6 +101,11 @@ public class Serviceman implements Serializable {
     @NotNull(message = "Role must be provided")
     protected ServicemanRoleEnum role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "Pes status must be provided")
+    protected PesStatusEnum pesStatus;
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     private String salt;
@@ -138,13 +144,14 @@ public class Serviceman implements Serializable {
         this.salt = another.salt;
     }
 
-    public Serviceman(String name, String password, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
+    public Serviceman(String name, String password, String email, String phoneNumber, ServicemanRoleEnum role, PesStatusEnum pesStatus, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.pesStatus = pesStatus;
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
@@ -152,12 +159,13 @@ public class Serviceman implements Serializable {
         setPassword(password);
     }
 
-    public Serviceman(String name, String email, String phoneNumber, ServicemanRoleEnum role, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
+    public Serviceman(String name, String email, String phoneNumber, ServicemanRoleEnum role, PesStatusEnum pesStatus, Date ord, GenderEnum gender, BloodTypeEnum bloodType, Address address) {
         this();
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.pesStatus = pesStatus;
         this.rod = ord;
         this.gender = gender;
         this.bloodType = bloodType;
@@ -310,6 +318,14 @@ public class Serviceman implements Serializable {
 
     public void setRole(ServicemanRoleEnum role) {
         this.role = role;
+    }
+
+    public PesStatusEnum getPesStatus() {
+        return pesStatus;
+    }
+
+    public void setPesStatus(PesStatusEnum pesStatus) {
+        this.pesStatus = pesStatus;
     }
 
     public String getToken() {

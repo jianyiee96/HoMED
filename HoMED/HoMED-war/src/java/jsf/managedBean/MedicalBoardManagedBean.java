@@ -159,6 +159,8 @@ public class MedicalBoardManagedBean implements Serializable {
                 slotSessionBeanLocal.startMedicalBoardSession(this.selectedMedicalBoardSlot.getSlotId());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started Medical Board!", "Medical board has started!"));
 
+                redirectMedicalBoardSession(this.selectedMedicalBoardSlot);
+
             } catch (StartMedicalBoardSessionException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start medical board", ex.getMessage()));
 

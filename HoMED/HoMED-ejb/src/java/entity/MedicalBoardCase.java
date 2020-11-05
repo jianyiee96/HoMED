@@ -49,6 +49,8 @@ public class MedicalBoardCase implements Serializable {
     private MedicalBoardCase previousMedicalBoardCase;
     
     private Boolean isSigned;
+    
+    private Boolean pesChange;
 
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
@@ -139,6 +141,14 @@ public class MedicalBoardCase implements Serializable {
 
     public void setIsSigned(Boolean isSigned) {
         this.isSigned = isSigned;
+    }
+
+    public Boolean getPesChange() {
+        return pesChange;
+    }
+
+    public void setPesChange(Boolean pesChange) {
+        this.pesChange = pesChange;
     }
 
     @Override

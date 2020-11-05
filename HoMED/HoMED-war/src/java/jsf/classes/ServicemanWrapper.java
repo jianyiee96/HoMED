@@ -25,7 +25,7 @@ public class ServicemanWrapper {
 
     public ServicemanWrapper() {
         this.errorMessages = new ArrayList<>();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 13; i++) {
             this.errorMessages.add(null);
         }
         this.isValid = Boolean.TRUE;

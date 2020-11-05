@@ -9,6 +9,7 @@ import entity.MedicalBoardSlot;
 import java.util.List;
 import javax.ejb.Local;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
 import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
@@ -24,7 +25,7 @@ public interface MedicalBoardCaseSessionBeanLocal {
 
     public void createMedicalBoardCaseByBoard(Long consultationId, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) throws CreateMedicalBoardCaseException;
 
-    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings) throws SignMedicalBoardCaseException;
+    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings, PesStatusEnum newPesStatus) throws SignMedicalBoardCaseException;
 
     public MedicalBoardCase retrieveMedicalBoardCaseById(Long medicalBoardCaseId);
 

@@ -302,7 +302,7 @@
                                             <h:panelGroup>
                                                 <h:outputText value="Status: " style="font-weight: bold" /><span class="form-status-badge consultation-badge">#{medicalBoardManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}</span>
                                             </h:panelGroup>     
-                                            <p:commandButton value="Open Medical Board Session" actionListener="#{medicalBoardManagedBean.redirectMedicalBoardSession(medicalBoardManagedBean.selectedMedicalBoardSlot)}" />
+                                            <p:commandButton rendered="#{medicalBoardManagedBean.chairmanView}" value="Open Medical Board Session" actionListener="#{medicalBoardManagedBean.redirectMedicalBoardSession(medicalBoardManagedBean.selectedMedicalBoardSlot)}" />
                                         </p:panelGrid>
 
 

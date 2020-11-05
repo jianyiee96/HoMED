@@ -336,12 +336,17 @@
                                             <div class="card ui-fluid">
                                                 <h5>Other Information</h5>
                                                 <div class="p-formgrid p-grid">
-                                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
                                                         <i class="fa fa-tint p-mr-2 p-ml-2"/>
                                                         <p:outputLabel value="Blood Type" />
                                                         <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.bloodType.bloodTypeString}" class="view-text" />
                                                     </div>
-                                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                                        <i class="fa fa-sort-alpha-asc p-mr-2 p-ml-2"/>
+                                                        <p:outputLabel value="Pes Status" />
+                                                        <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.pesStatus}" class="view-text" />
+                                                    </div>
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
                                                         <i class="fa fa-calendar p-mr-2 p-ml-2"/>
                                                         <p:outputLabel value="ROD" />
                                                         <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.rod}" class="view-text" >
