@@ -136,11 +136,11 @@ public class ConsultationResource {
 
         try {
             List<Consultation> consultations = consultationSessionBeanLocal.retrieveAllServicemanConsultations(Long.parseLong(servicemanId));
-
+            
             for (Consultation c : consultations) {
-
-                c.getMedicalBoardCase().setConsultation(null);
-
+                if (c.getMedicalBoardCase() != null) {
+                    c.getMedicalBoardCase().setConsultation(null);
+                }
                 Booking b = c.getBooking();
 
                 BookingSlot bs = b.getBookingSlot();
@@ -181,11 +181,10 @@ public class ConsultationResource {
                 }
 
             }
-
+            
             return Response.status(Response.Status.OK).entity(new RetrieveConsultationsRsp(consultations)).build();
         } catch (Exception ex) {
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
-
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
         }
 

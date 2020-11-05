@@ -15,7 +15,9 @@ import util.exceptions.CreateNotificationException;
  */
 @Local
 public interface NotificationSessionBeanLocal {
-
+    
+    public void sendPushNotification(String title, String body, String svcmanFCMToken);
+    
     public Long createNewNotification(Notification newNotification, Long servicemanId, Boolean sendEmail) throws CreateNotificationException;
 
     public List<Notification> retrieveAllNotificationsByServicemanId(Long servicemanId, Boolean markAsFetched);
