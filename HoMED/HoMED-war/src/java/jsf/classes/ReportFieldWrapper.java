@@ -21,6 +21,7 @@ import org.primefaces.model.charts.optionconfig.legend.LegendLabel;
 import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.charts.pie.PieChartDataSet;
 import org.primefaces.model.charts.pie.PieChartModel;
+import util.enumeration.ReportDataGrouping;
 import util.enumeration.ReportFieldType;
 
 public class ReportFieldWrapper {
@@ -196,11 +197,11 @@ public class ReportFieldWrapper {
 
         //Options
         LineChartOptions options = new LineChartOptions();
-        Title title = new Title();
-        title.setDisplay(true);
-//        title.setText("Line Chart");
-//        options.setTitle(title);
-
+        if (reportField.getReportDataGrouping() == ReportDataGrouping.C_W_HR) {
+            Legend legend = new Legend();
+            legend.setDisplay(false);
+            options.setLegend(legend);
+        }
         lineModel.setOptions(options);
         lineModel.setData(data);
         return lineModel;

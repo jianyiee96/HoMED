@@ -79,6 +79,9 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
                 field.getReportFieldGroups().forEach(grp -> {
                     constraintViolationsGroups.addAll(validator.validate(grp));
                 });
+                field.getDatasetFields().forEach(dataset -> {
+                    constraintViolationsFields.addAll(validator.validate(dataset));
+                });
             });
 
             if (!constraintViolations.isEmpty()) {
@@ -92,6 +95,14 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
             report.getReportFields().forEach(field -> {
                 field.getReportFieldGroups().forEach(grp -> {
                     em.persist(grp);
+                    em.flush();
+                });
+                field.getDatasetFields().forEach(dataset -> {
+                    dataset.getReportFieldGroups().forEach(grp -> {
+                        em.persist(grp);
+                        em.flush();
+                    });
+                    em.persist(dataset);
                     em.flush();
                 });
                 em.persist(field);
@@ -128,6 +139,9 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
                 field.getReportFieldGroups().forEach(grp -> {
                     constraintViolationsGroups.addAll(validator.validate(grp));
                 });
+                field.getDatasetFields().forEach(dataset -> {
+                    constraintViolationsFields.addAll(validator.validate(dataset));
+                });
             });
 
             if (!constraintViolations.isEmpty()) {
@@ -149,6 +163,15 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
                 field.getReportFieldGroups().forEach(grp -> {
                     grp.setReportFieldGroupId(null);
                     em.persist(grp);
+                    em.flush();
+                });
+                field.getDatasetFields().forEach(dataset -> {
+                    dataset.setReportFieldId(null);
+                    dataset.getReportFieldGroups().forEach(grp -> {
+                        em.persist(grp);
+                        em.flush();
+                    });
+                    em.persist(dataset);
                     em.flush();
                 });
                 em.persist(field);
@@ -196,6 +219,15 @@ public class ReportSessionBean implements ReportSessionBeanLocal {
                 field.getReportFieldGroups().forEach(grp -> {
                     grp.setReportFieldGroupId(null);
                     em.persist(grp);
+                    em.flush();
+                });
+                field.getDatasetFields().forEach(dataset -> {
+                    dataset.setReportFieldId(null);
+                    dataset.getReportFieldGroups().forEach(grp -> {
+                        em.persist(grp);
+                        em.flush();
+                    });
+                    em.persist(dataset);
                     em.flush();
                 });
                 em.persist(field);

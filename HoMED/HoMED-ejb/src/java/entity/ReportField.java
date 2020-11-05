@@ -70,9 +70,18 @@ public class ReportField implements Serializable {
     @Column(nullable = true)
     private ReportDataGrouping reportDataGrouping;
 
+    @Column(nullable = true)
+    private String x_axis;
+
+    @Column(nullable = true)
+    private String y_axis;
+
+    @Column(nullable = true)
+    private String aggregateString;
+
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReportFieldGroup> reportFieldGroups;
-    
+
     // FOR LINE CHARTS ONLY
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReportField> datasetFields;
@@ -105,6 +114,9 @@ public class ReportField implements Serializable {
         this.reportDataType = another.getReportDataType();
         this.reportDataValue = another.getReportDataValue();
         this.reportDataGrouping = another.getReportDataGrouping();
+        this.x_axis = another.x_axis;
+        this.y_axis = another.y_axis;
+        this.aggregateString = another.aggregateString;
         this.reportFieldGroups = another.reportFieldGroups.stream()
                 .map(grp -> {
                     ReportFieldGroup newGroup = new ReportFieldGroup();
@@ -231,6 +243,30 @@ public class ReportField implements Serializable {
 
     public void setDatasetFields(List<ReportField> datasetFields) {
         this.datasetFields = datasetFields;
+    }
+
+    public String getX_axis() {
+        return x_axis;
+    }
+
+    public void setX_axis(String x_axis) {
+        this.x_axis = x_axis;
+    }
+
+    public String getY_axis() {
+        return y_axis;
+    }
+
+    public void setY_axis(String y_axis) {
+        this.y_axis = y_axis;
+    }
+
+    public String getAggregateString() {
+        return aggregateString;
+    }
+
+    public void setAggregateString(String aggregateString) {
+        this.aggregateString = aggregateString;
     }
 
     @Override

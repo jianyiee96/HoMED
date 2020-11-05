@@ -1,41 +1,29 @@
 package util.enumeration;
 
 public enum ReportDataGrouping {
-    S_BT("Blood Type", "Blood Type", "Number of Serviceman"),
-    S_BK("Bookings", "Number of Bookings", "Number of Serviceman"),
-    S_PES("PES Status", "Pes Status", "Number of Serviceman"),
-    MO_CS("Consultations", "Number of Consultations", "Number of Medical Officers"),
-    MO_FI("Forms Signed", "Number of Forms Signed", "Number of Medical Officers"),
-    MO_MC("Medical Centre", "Medical Centre", "Number of Medical Officers"),
-    C_Q_MC("Medical Centre", "Medical Centre", "Number of Consultations"),
-    C_Q_CP("Consultation Purpose", "Consultation Purpose", "Number of Consultations"),
-    C_W_MC("Medical Centre", "", ""),
-    C_W_HR("Hour Of Day", "", ""),
-    C_D_MC("Medical Centre", "", ""),
-    C_D_CP("Consultation Purpose", "", ""),
-    C_QT_MC("Medical Centre", "", ""),
-    C_QT_CP("Consultaiton Purpose", "", "");
+    S_BT("Blood Type"),
+    S_BK("Bookings"),
+    S_PES("PES Status"),
+    MO_CS("Consultations"),
+    MO_FI("Forms Signed"),
+    MO_MC("Medical Centre"),
+    C_Q_MC("Medical Centre"),
+    C_Q_CP("Consultation Purpose"),
+    C_W_MC("Medical Centre"),
+    C_W_HR("Hour Of Day"),
+    C_D_MC("Medical Centre"),
+    C_D_CP("Consultation Purpose"),
+    C_QT_MC("Medical Centre"),
+    C_QT_CP("Consultation Purpose");
 
     private String text;
-    private String x_axis;
-    private String y_axis;
 
-    private ReportDataGrouping(String text, String x_axis, String y_axis) {
+    private ReportDataGrouping(String text) {
         this.text = text;
-        this.x_axis = x_axis;
-        this.y_axis = y_axis;
     }
 
     public String getText() {
         return text;
-    }
-
-    public String getX_axis() {
-        return x_axis;
-    }
-
-    public String getY_axis() {
-        return y_axis;
     }
 
     public Boolean requireDate() {
