@@ -31,7 +31,6 @@
                             <p:panelGrid columns="2" layout="flex">
                                 <h:panelGroup>
                                     <div>
-                                        <i class="fa fa-clock-o icon-style"></i>
                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Date Information</span>
                                     </div>
 
@@ -54,7 +53,6 @@
                                     </h:panelGrid>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <i class="fa fa-user-md icon-style"></i>
                                     <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Members</span>
                                     <h:panelGrid columns="2" cellpadding="5">
 
@@ -84,7 +82,10 @@
 
                                         <span>
 
-                                            <p:commandButton rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ONGOING'}" update="sessionForm" actionListener="#{medicalBoardSessionManagedBean.endSession()}" value="End Medical Board Session" class="danger-button p-ml-2" icon="pi pi-check-square">
+                                            <p:commandButton actionListener="#{medicalBoardSessionManagedBean.back()}" value="Back" icon="pi pi-arrow-circle-left" >
+                                            </p:commandButton>
+
+                                            <p:commandButton rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ONGOING'}" update="sessionForm" actionListener="#{medicalBoardSessionManagedBean.endSession()}" value="End Medical Board Session" class="danger-button p-ml-4 p-mr-4" icon="pi pi-check-square">
                                                 <p:confirm header="Confirmation" message="Confirm End Medical Board Session? Any cases that are not signed will be put back into the waiting list." icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
 
@@ -138,11 +139,14 @@
                                                     <p:outputLabel value="Gender: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.gender}" class="display-text"/>
 
+                                                    <p:outputLabel value="Role: " />
+                                                    <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.role.stringVal}" class="display-text"/>
+
                                                     <p:outputLabel value="Blood type: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
 
-                                                    <p:outputLabel value="Role: " />
-                                                    <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.role.stringVal}" class="display-text"/>
+                                                    <p:outputLabel value="Pes status: " />
+                                                    <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.pesStatus}" class="display-text"/>
 
                                                     <p:outputLabel value="ROD date: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.rod}" class="display-text">
@@ -184,7 +188,7 @@
                                             </h:panelGrid>
                                             <p:textEditor rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}"
                                                           widgetVar="text-editor" value="#{medicalBoardSessionManagedBean.selectedCase.boardFindings}" 
-                                                          height="200" style="margin-bottom:5px; ">
+                                                          height="200" style="margin-bottom:5px; margin-top: -30px">
                                                 <f:facet name="toolbar">
                                                     <span class="ql-formats">
                                                         <button class="ql-bold"></button>
@@ -215,6 +219,117 @@
                                         </p:panelGrid>
 
 
+
+                                    </li>
+                                    <li>
+                                        <p:panelGrid columns="1" layout="flex">
+                                            <h5>Medical Board Results</h5>
+
+                                            <h:panelGroup>
+                                                <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" style="margin-top: -30px" columns="2" cellpadding="5">
+                                                    <p:outputLabel value="New Pes Status: " />
+                                                    <p:selectOneMenu value="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus}" style="width:125px">
+                                                        <f:selectItem value="#{null}" itemLabel="No Change" />
+                                                        <f:selectItems value="#{medicalBoardSessionManagedBean.pesStatuses}" var="pesStatus" itemLabel="#{pesStatus}" />
+                                                    </p:selectOneMenu>
+                                                </h:panelGrid>
+                                                <h:panelGrid rendered="#{medicalBoardSessionManagedBean.selectedCase.isSigned}" style="margin-top: -30px" columns="2" cellpadding="5">
+                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus != null}" value="New Pes Status: #{medicalBoardSessionManagedBean.selectedCase.newPesStatus}" />
+                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus == null}" value="No change in Pes Status" />
+                                                </h:panelGrid>
+                                                <h:panelGrid>
+                                                    <p:dataTable rendered="#{medicalBoardSessionManagedBean.selectedCase.isSigned}" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="status" value="#{medicalBoardSessionManagedBean.selectedCase.conditionStatuses}">
+
+                                                        <p:column headerText="New Status Description">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output">
+                                                                    <h:outputText rendered="#{status.description != null}" value="#{status.description}" />
+                                                                    <h:outputText rendered="#{status.description == null}" value="-" />
+                                                                </f:facet>
+                                                                <f:facet name="input">
+                                                                    <p:inputText id="modelInput" value="#{status.description}" style="width:100%"/>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column style="width: 300px" headerText="Status End Date (Optional)">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output">
+                                                                    <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
+                                                                        <f:convertDateTime pattern="dd-MM-yyyy" />
+                                                                    </h:outputText>
+                                                                    <h:outputText rendered="#{status.statusEndDate == null}"  value="- Permanent Status -"/>
+                                                                </f:facet>
+                                                                <f:facet name="input">
+                                                                    <f:facet name="input">
+                                                                        <p:datePicker value="#{status.statusEndDate}"  mindate="#{medicalBoardSessionManagedBean.selectedCase.medicalBoardSlot.actualStartDateTime}"  showIcon="true" />
+                                                                    </f:facet>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+
+
+                                                    </p:dataTable>
+
+                                                    <p:dataTable rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" 
+                                                                 id="statusDT" widgetVar="statusDT" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" 
+                                                                 var="status" value="#{medicalBoardSessionManagedBean.selectedCase.conditionStatuses}"  editable="true">
+
+                                                        <p:column headerText="New Status Description">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output">
+                                                                    <h:outputText rendered="#{status.description != null}" value="#{status.description}" />
+                                                                    <h:outputText rendered="#{status.description == null}" value="-" />
+                                                                </f:facet>
+                                                                <f:facet name="input">
+                                                                    <p:inputText id="modelInput" value="#{status.description}" style="width:100%"/>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column style="width: 300px" headerText="Status End Date (Optional)">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output">
+                                                                    <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
+                                                                        <f:convertDateTime pattern="dd-MM-yyyy" />
+                                                                    </h:outputText>
+                                                                    <h:outputText rendered="#{status.statusEndDate == null}"  value="- Permanent Status -"/>
+                                                                </f:facet>
+                                                                <f:facet name="input">
+                                                                    <f:facet name="input">
+                                                                        <p:datePicker value="#{status.statusEndDate}"  mindate="#{medicalBoardSessionManagedBean.selectedCase.medicalBoardSlot.actualStartDateTime}"  showIcon="true" />
+                                                                    </f:facet>
+                                                                </f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+
+                                                        <p:column style="width:59px">
+                                                            <p:rowEditor />
+                                                        </p:column>
+
+                                                        <p:column style="width:31px">
+                                                            <p:commandButton class="rounded-button outlined-button danger-button" update="statusDT"  icon="pi pi-trash" title="Remove Status" actionListener="#{medicalBoardSessionManagedBean.removeConditionStatus}">
+                                                                <f:attribute name="statusToDelete" value="#{status}" />
+                                                            </p:commandButton>
+                                                        </p:column>
+
+
+                                                    </p:dataTable>
+
+
+                                                </h:panelGrid>
+                                                <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2">
+                                                    <p:commandButton value="Add Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.addConditionStatus()}"></p:commandButton>
+                                                    <p:commandButton value="Clear All Empty Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.clearEmptyConditionStatus()}"></p:commandButton>
+                                                </h:panelGrid>
+
+
+                                            </h:panelGroup>
+
+
+                                        </p:panelGrid>
 
                                     </li>
                                     <li>

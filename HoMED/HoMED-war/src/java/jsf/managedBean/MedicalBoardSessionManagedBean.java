@@ -7,6 +7,7 @@ package jsf.managedBean;
 import ejb.session.stateless.MedicalBoardCaseSessionBean;
 import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
+import entity.ConditionStatus;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import javax.faces.application.FacesMessage;
 import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
@@ -48,8 +50,6 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     MedicalBoardSlot medicalBoardSlot;
 
     MedicalBoardCase selectedCase;
-
-    PesStatusEnum newPesStatus;
 
     public MedicalBoardSessionManagedBean() {
     }
@@ -76,7 +76,6 @@ public class MedicalBoardSessionManagedBean implements Serializable {
                 || medicalBoardSlot.getMedicalBoardSlotStatusEnum() == MedicalBoardSlotStatusEnum.EXPIRED) {
 
             try {
-                System.out.println("Invalid Medical Board Slot");
                 FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
             } catch (IOException ex) {
                 System.out.println("Fail to redirect: " + ex);
@@ -86,6 +85,15 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
                 selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
             }
+        }
+
+    }
+
+    public void back() {
+        try {
+            FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
+        } catch (IOException ex) {
+            System.out.println("Fail to redirect: " + ex);
         }
 
     }
@@ -123,9 +131,9 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         if (selectedCase.getBoardFindings() == null) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", "Please ensure board findings is not empty."));
         } else {
-
             try {
-                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), newPesStatus);
+                clearEmptyConditionStatus();
+                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), selectedCase.getNewPesStatus(), selectedCase.getConditionStatuses());
                 medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
                 medicalBoardSlot.getMedicalBoardCases().forEach(mbc -> {
                     if (mbc.equals(selectedCase)) {
@@ -138,6 +146,46 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
             }
         }
+    }
+
+    public void addConditionStatus() {
+        this.selectedCase.getConditionStatuses().add(new ConditionStatus());
+    }
+
+    public void clearEmptyConditionStatus() {
+        boolean removed = true;
+        while (removed) {
+            removed = false;
+
+            for (int x = 0; x < this.selectedCase.getConditionStatuses().size(); x++) {
+                ConditionStatus condition = this.selectedCase.getConditionStatuses().get(x);
+
+                if (condition.getDescription() == null) {
+                    this.selectedCase.getConditionStatuses().remove(x);
+                    removed = true;
+                }
+            }
+
+        }
+
+    }
+
+    public void removeConditionStatus(ActionEvent event) {
+        ConditionStatus cs = (ConditionStatus) event.getComponent().getAttributes().get("statusToDelete");
+        for (int x = 0; x < this.selectedCase.getConditionStatuses().size(); x++) {
+            ConditionStatus condition = this.selectedCase.getConditionStatuses().get(x);
+            if (((condition.getDescription() == null && cs.getDescription() == null)
+                    || condition.getDescription().equals(cs.getDescription()))
+                    && ((condition.getStatusEndDate() == null && cs.getStatusEndDate() == null)
+                    || condition.getStatusEndDate().equals(cs.getStatusEndDate()))) {
+                this.selectedCase.getConditionStatuses().remove(x);
+                break;
+            }
+        }
+    }
+
+    public void rowSelectListener() {
+
     }
 
     public Boolean hasUnsignedCase() {
@@ -180,10 +228,6 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     }
 
-    public void rowSelectListener() {
-        newPesStatus = null;
-    }
-
     public String backgroundStyle(MedicalBoardCase mbc) {
 
         if (mbc.equals(selectedCase)) {
@@ -208,6 +252,10 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void setSelectedCase(MedicalBoardCase selectedCase) {
         this.selectedCase = selectedCase;
+    }
+
+    public PesStatusEnum[] getPesStatuses() {
+        return PesStatusEnum.values();
     }
 
     public String renderDateTime(Date date) {

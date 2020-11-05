@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.ConditionStatus;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface MedicalBoardCaseSessionBeanLocal {
 
     public void createMedicalBoardCaseByBoard(Long consultationId, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) throws CreateMedicalBoardCaseException;
 
-    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings, PesStatusEnum newPesStatus) throws SignMedicalBoardCaseException;
+    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings, PesStatusEnum newPesStatus, List<ConditionStatus> conditionStatuses) throws SignMedicalBoardCaseException;
 
     public MedicalBoardCase retrieveMedicalBoardCaseById(Long medicalBoardCaseId);
 

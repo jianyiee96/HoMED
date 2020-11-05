@@ -157,9 +157,10 @@ public class MedicalBoardManagedBean implements Serializable {
             try {
 
                 slotSessionBeanLocal.startMedicalBoardSession(this.selectedMedicalBoardSlot.getSlotId());
+                MedicalBoardSlot mbs = slotSessionBeanLocal.retrieveMedicalBoardSlotById(this.selectedMedicalBoardSlot.getSlotId());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Started Medical Board!", "Medical board has started!"));
 
-                redirectMedicalBoardSession(this.selectedMedicalBoardSlot);
+                redirectMedicalBoardSession(mbs);
 
             } catch (StartMedicalBoardSessionException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to start medical board", ex.getMessage()));
@@ -184,7 +185,7 @@ public class MedicalBoardManagedBean implements Serializable {
         flash.put("medicalBoardSlot", medicalBoardSlot);
 
         try {
-
+            System.out.println("Redirecting...");
             FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board-session.xhtml");
 
         } catch (IOException ex) {

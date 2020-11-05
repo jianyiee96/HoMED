@@ -87,6 +87,9 @@ public class Serviceman implements Serializable {
     @OneToMany
     private List<Notification> notifications;
 
+    @OneToMany
+    private List<ConditionStatus> conditionStatuses;
+
     @Embedded
     @Column(nullable = false)
     @NotNull(message = "Address must be provided")
@@ -126,6 +129,7 @@ public class Serviceman implements Serializable {
         this.formInstances = new ArrayList<>();
         this.bookings = new ArrayList<>();
         this.notifications = new ArrayList<>();
+        this.conditionStatuses = new ArrayList<>();
     }
 
     // Cloning
@@ -290,6 +294,14 @@ public class Serviceman implements Serializable {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
+    }
+
+    public List<ConditionStatus> getConditionStatuses() {
+        return conditionStatuses;
+    }
+
+    public void setConditionStatuses(List<ConditionStatus> conditionStatuses) {
+        this.conditionStatuses = conditionStatuses;
     }
 
     @Override
