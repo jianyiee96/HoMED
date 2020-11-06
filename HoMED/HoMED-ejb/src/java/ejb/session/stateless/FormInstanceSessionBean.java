@@ -11,7 +11,9 @@ import entity.FormInstanceField;
 import entity.FormInstanceFieldValue;
 import entity.FormTemplate;
 import entity.MedicalOfficer;
+import entity.Notification;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,11 +30,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
-import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.FormInstanceStatusEnum;
 import util.enumeration.FormTemplateStatusEnum;
 import util.enumeration.InputTypeEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.exceptions.ArchiveFormInstanceException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.GenerateFormInstanceException;
 import util.exceptions.SubmitFormInstanceException;
 import util.exceptions.UpdateFormInstanceException;
@@ -43,6 +46,9 @@ import util.exceptions.UpdateFormInstanceException;
  */
 @Stateless
 public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
+
+    @EJB(name = "NotificationSessionBeanLocal")
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
@@ -59,6 +65,9 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     private final String generalUnexpectedErrorMessage = "An unexpected error has occurred while ";
+    
+    String pattern = "EEEE, d MMM yyyy HH:mm";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
     public FormInstanceSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -253,6 +262,20 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
 
         formInstance.setFormInstanceStatusEnum(FormInstanceStatusEnum.SUBMITTED);
         formInstance.setDateSubmitted(new Date());
+        
+        String date = simpleDateFormat.format(formInstance.getDateSubmitted());
+        
+        String title = "Form Submitted Successfully";
+        String body = "Form [ " + formInstance.getFormTemplateMapping().getFormTemplateName() + " ] has been submitted successfully on " + date + ".";
+        
+        Notification n = new Notification(title, body, NotificationTypeEnum.FORM, formInstanceId);
+        
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, formInstance.getServiceman().getServicemanId(), true);
+            notificationSessionBeanLocal.sendPushNotification(title, body, formInstance.getServiceman().getFcmToken());
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
+        }
     }
 
     @Override
@@ -303,7 +326,7 @@ public class FormInstanceSessionBean implements FormInstanceSessionBeanLocal {
         if (!validationSuccess) {
             throw new SubmitFormInstanceException(validationMessage);
         }
-        
+
     }
 
     @Override

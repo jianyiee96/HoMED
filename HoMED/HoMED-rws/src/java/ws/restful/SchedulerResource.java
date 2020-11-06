@@ -122,7 +122,7 @@ public class SchedulerResource {
                 isForReview = scheduleBookingReq.getIsForReview();
             }
 
-            Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment(), isForReview);
+            Booking booking = bookingSessionBeanLocal.createBooking(scheduleBookingReq.getServicemanId(), scheduleBookingReq.getConsultationPurposeId(), scheduleBookingReq.getBookingSlotId(), scheduleBookingReq.getBookingComment(), isForReview, true);
             Long bookingId = booking.getBookingId();
 
             return Response.status(Response.Status.OK).entity(new ScheduleBookingRsp(bookingId)).build();
