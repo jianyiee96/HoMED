@@ -9,9 +9,11 @@ import entity.MedicalBoardSlot;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exceptions.EndMedicalBoardSessionException;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleBookingSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
+import util.exceptions.StartMedicalBoardSessionException;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Local
@@ -32,12 +34,15 @@ public interface SlotSessionBeanLocal {
     public MedicalBoardSlot createMedicalBoardSlot(Date startDate, Date endDate) throws ScheduleMedicalBoardSlotException;
 
     public List<MedicalBoardSlot> retrieveMedicalBoardSlots();
-    
+
     public MedicalBoardSlot retrieveMedicalBoardSlotById(Long medicalBoardSlotId);
 
     public void removeMedicalBoardSlot(Long medicalBoardSlotId) throws RemoveSlotException;
 
     public MedicalBoardSlot updateMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) throws UpdateMedicalBoardSlotException;
 
+    public void startMedicalBoardSession(Long medicalBoardSlotId) throws StartMedicalBoardSessionException;
 
+    public void endMedicalBoardSession(Long medicalBoardSlotId) throws EndMedicalBoardSessionException;
+    
 }

@@ -86,16 +86,19 @@
 
                                             <p:outputLabel value="Email " />
                                             <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.email}" class="display-text"/>
+                                            
+                                            <p:outputLabel value="Gender: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.gender}" class="display-text"/>
 
                                             <p:outputLabel value="Role " />
                                             <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.role}" class="display-text"/>
 
-                                            <p:outputLabel value="Gender: " />
-                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.gender}" class="display-text"/>
-
                                             <p:outputLabel value="Blood type: " />
                                             <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.bloodType.bloodTypeString}" class="display-text"/>
 
+                                            <p:outputLabel value="Pes status: " />
+                                            <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.pesStatus}" class="display-text"/>
+                                            
                                             <p:outputLabel value="ROD date: " />
                                             <p:outputLabel value="#{pastConsultationsManagedBean.selectedPastConsultation.booking.serviceman.rod}" class="display-text">
                                                 <f:convertDateTime pattern="dd/MM/yyyy"/>

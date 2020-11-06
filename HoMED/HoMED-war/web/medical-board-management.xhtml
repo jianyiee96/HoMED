@@ -53,7 +53,7 @@
 
                                         <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagementManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
                                                        style="margin-left: -10px; margin-top:-15px; position: absolute;" 
-                                                       value="Current" />
+                                                       value="SELECTED" />
 
                                         <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
 
@@ -140,8 +140,8 @@
                                                 <!-- 
                                                     Medical Board In-Presence 
                                                 -->
-                                                <!-- Currently selected MBIP slot is UNALLOCATED or ALLOCATED -->
-                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                                <!-- Currently selected MBIP slot is ASSIGNED (All 3 MOs are assigned) or ALLOCATED (ASSIGNED + Cases allocated) -->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
 
                                                     <div>
                                                         <i class="fa fa-user icon-style"></i>
@@ -149,7 +149,7 @@
                                                     </div>
 
                                                     <!-- Reviewing Medical Officers are assigned -->
-                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
                                                         <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
@@ -177,8 +177,8 @@
                                                                 <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
                                                             </p:column>
 
-                                                            <p:column headerText="Purpose" width="45%">
-                                                                <h:outputText value="#{mbipCase.consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                                            <p:column headerText="Case Creation Date" width="45%">
+                                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(mbipCase.consultation.endDateTime)}" />
                                                             </p:column>
                                                         </p:dataTable>
 
@@ -194,7 +194,7 @@
                                                     </ui:fragment>
 
                                                     <!-- Reviewing Medical Officers are NOT assigned -->
-                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}">
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED'}">
                                                         <h:panelGrid columns="1" cellpadding="8">
                                                             <p:outputLabel style="font-size: 14px;"
                                                                            value="Please assign all the reviewing medical officers to start allocating medical board in-presence cases!" />
@@ -205,8 +205,8 @@
                                                 <!-- 
                                                     TO BE DONE AFTER MEDICAL BOARD IS DONE 
                                                 -->
-                                                <!-- Currently selected MBIP slot is NOT UNALLOCATED and ALLOCATED -->
-                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+                                                <!-- Currently selected MBIP slot is ONGOING or COMPLETED or EXPIRED-->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
                                                     <div>
                                                         <i class="fa fa-users icon-style"></i>
                                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases (View Only)</span>
@@ -240,8 +240,8 @@
                                                 <!-- 
                                                     Medical Board In-Absence 
                                                 -->
-                                                <!-- Currently selected MBIA slot is UNALLOCATED or ALLOCATED -->
-                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                                <!-- Currently selected MBIA slot is ASSIGNED or ALLOCATED  -->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
 
                                                     <div>
                                                         <i class="fa fa-users icon-style"></i>
@@ -249,7 +249,7 @@
                                                     </div>
 
                                                     <!-- Reviewing Medical Officers are assigned -->
-                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
                                                         <h:panelGrid columns="2" cellpadding="8">
 
                                                             <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
@@ -277,8 +277,8 @@
                                                                 <h:outputText value="#{mbiaCase.consultation.booking.serviceman.name}" />
                                                             </p:column>
 
-                                                            <p:column headerText="Purpose" width="45%">
-                                                                <h:outputText value="#{mbiaCase.consultation.booking.consultationPurpose.consultationPurposeName}" />
+                                                            <p:column headerText="Case Creation Time" width="45%">
+                                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(mbiaCase.consultation.endDateTime)}" />
                                                             </p:column>
                                                         </p:dataTable>
 
@@ -294,7 +294,7 @@
                                                     </ui:fragment>
 
                                                     <!-- Reviewing Medical Officers are NOT assigned -->
-                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null}">
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED'}">
                                                         <h:panelGrid columns="1" cellpadding="8">
                                                             <p:outputLabel style="font-size: 14px;"
                                                                            value="Please assign all the reviewing medical officers to start allocating medical board in-absence cases!" />
@@ -305,8 +305,8 @@
                                                 <!-- 
                                                     TO BE DONE AFTER MEDICAL BOARD IS DONE
                                                 -->
-                                                <!-- Currently selected MBIA slot is NOT UNALLOCATED and ALLOCATED -->
-                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNALLOCATED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+                                                <!-- Currently selected MBIP slot is ONGOING or COMPLETED or EXPIRED-->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
 
                                                     <div>
                                                         <i class="fa fa-users icon-style"></i>
@@ -341,7 +341,7 @@
                                     </li>
 
                                     <!-- Medical Board Summary only shows up when the reviewing medical officers are assigned -->
-                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne != null and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo != null}">
+                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
                                         <li>
                                             <div>
                                                 <i class="fa fa-book icon-style"></i>

@@ -1,11 +1,14 @@
 package jsf.managedBean;
 
+import com.oracle.jrockit.jfr.DataType;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ReportSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Consultation;
+import entity.ConsultationPurpose;
 import entity.Employee;
+import entity.MedicalCentre;
 import entity.MedicalOfficer;
 import entity.Report;
 import entity.ReportField;
@@ -13,6 +16,7 @@ import entity.ReportFieldGroup;
 import entity.Serviceman;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,7 +27,12 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -92,6 +101,9 @@ public class ManageReportManagedBean implements Serializable {
     private List<Serviceman> servicemenData;
     private List<MedicalOfficer> medicalOfficersData;
     private List<Consultation> consultationsData;
+
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
+    private final SimpleDateFormat monthFormat = new SimpleDateFormat("MMM");
 
     public ManageReportManagedBean() {
         filterRangeDates = new ArrayList<>();
@@ -305,6 +317,9 @@ public class ManageReportManagedBean implements Serializable {
             c.setTime(filterStartDate);
             c.add(Calendar.DATE, add);
             Date end = c.getTime();
+            if (end.after(new Date())) {
+                end = getFloorDay(new Date());
+            }
             filterStartDate = start;
             filterEndDate = end;
             filterRangeDates.clear();
@@ -405,6 +420,9 @@ public class ManageReportManagedBean implements Serializable {
             sortedResultList = processDataConsultation(reportField);
         }
 
+    }
+
+    private void processSortedListIntoField(ReportField reportField, List<Map.Entry<String, Integer>> sortedResultList) {
         List<ReportFieldGroup> groups = reportField.getReportFieldGroups();
         groups.clear();
 
@@ -416,182 +434,377 @@ public class ManageReportManagedBean implements Serializable {
     private List<Map.Entry<String, Integer>> processDataServiceman(ReportField reportField) {
         List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
         if (reportField.getReportDataGrouping() == ReportDataGrouping.S_BT) {
-            HashMap<String, Integer> freqMap = new HashMap<>();
-            this.servicemenData.stream()
-                    .map(s -> s.getBloodType().getBloodTypeString())
-                    .forEach(bt -> {
-                        int count = freqMap.containsKey(bt) ? freqMap.get(bt) : 0;
-                        freqMap.put(bt, count + 1);
-                    });
-            sortedResultList = sortByType(freqMap, "STRING");
+            sortedResultList = transformIntoCategorizationList(servicemenData, (Serviceman s) -> s.getBloodType().getBloodTypeString(), (Serviceman s) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Blood Type");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_BK) {
-            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
-            this.servicemenData.stream()
-                    .map(s -> (int) s.getBookings().stream()
+            Function<Serviceman, Integer> serivcemanBookingCounter = s -> (int) s.getBookings().stream()
                     .filter(b -> {
                         return b.getBookingStatusEnum() != BookingStatusEnum.ABSENT
                                 && b.getBookingStatusEnum() != BookingStatusEnum.CANCELLED
                                 && isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), b.getBookingSlot().getStartDateTime());
-                    })
-                    .count())
-                    .forEach(counter -> {
-                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
-                        preFreqMap.put(counter, count + 1);
-                    });
-            if (!preFreqMap.isEmpty()) {
-                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Integer::compare).get() / 5.0) * 5;
-                for (int i = 0; i < limit; i += 5) {
-                    int min = i == 0 ? i : i + 1;
-                    int max = i + 5;
-                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
-                    String str = String.valueOf(min) + " - " + String.valueOf(max);
-                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
-                    sortedResultList.add(entry);
-                }
-            }
+                    }).count();
+            sortedResultList = transformIntoCounterList(servicemenData, serivcemanBookingCounter, 5);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Number of Bookings");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_PES) {
             // TO IMPLEMENT
+            reportField.setX_axis("PES Status");
         }
+        reportField.setY_axis("Number of Serviceman");
         return sortedResultList;
     }
 
     private List<Map.Entry<String, Integer>> processDataMedicalOfficer(ReportField reportField) {
         List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
         if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS) {
-            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
-            this.medicalOfficersData.stream()
-                    .map(mo -> (int) mo.getCompletedConsultations().stream().filter(c -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getStartDateTime())).count())
-                    .forEach(counter -> {
-                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
-                        preFreqMap.put(counter, count + 1);
-                    });
-            if (!preFreqMap.isEmpty()) {
-                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
-                for (int i = 0; i < limit; i += 5) {
-                    int min = i == 0 ? i : i + 1;
-                    int max = i + 5;
-                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
-                    String str = String.valueOf(min) + " - " + String.valueOf(max);
-                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
-                    sortedResultList.add(entry);
-                }
-            }
+            Function<MedicalOfficer, Integer> medicalOfficerConsultationsCounter = mo -> (int) mo.getCompletedConsultations().stream()
+                    .filter(c -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getStartDateTime()))
+                    .count();
+            sortedResultList = transformIntoCounterList(medicalOfficersData, medicalOfficerConsultationsCounter, 5);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Number of Consultations");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI) {
-            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
-            this.medicalOfficersData.stream()
-                    .map(mo -> (int) mo.getSignedFormInstances().stream().filter(fi -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), fi.getDateSubmitted())).count())
-                    .forEach(counter -> {
-                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
-                        preFreqMap.put(counter, count + 1);
-                    });
-            if (!preFreqMap.isEmpty()) {
-                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
-                for (int i = 0; i < limit; i += 5) {
-                    int min = i == 0 ? i : i + 1;
-                    int max = i + 5;
-                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
-                    String str = String.valueOf(min) + " - " + String.valueOf(max);
-                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
-                    sortedResultList.add(entry);
-                }
-            }
+            Function<MedicalOfficer, Integer> medicalOfficerConsultationsFormsSignedCounter = mo -> (int) mo.getSignedFormInstances().stream()
+                    .filter(fi -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), fi.getDateSubmitted()))
+                    .count();
+            sortedResultList = transformIntoCounterList(medicalOfficersData, medicalOfficerConsultationsFormsSignedCounter, 5);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Number of Forms Signed");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_MC) {
-            HashMap<String, Integer> freqMap = new HashMap<>();
-            this.medicalOfficersData.stream()
-                    .filter(mo -> mo.getMedicalCentre() != null)
-                    .map(mo -> mo.getMedicalCentre().getName())
-                    .forEach(mc -> {
-                        int count = freqMap.containsKey(mc) ? freqMap.get(mc) : 0;
-                        freqMap.put(mc, count + 1);
-                    });
-            sortedResultList = sortByType(freqMap, "STRING");
+            sortedResultList = transformIntoCategorizationList(medicalOfficersData, (MedicalOfficer mo) -> mo.getMedicalCentre().getName(), (MedicalOfficer mo) -> mo.getMedicalCentre() != null);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Medical Centre");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         }
+
+        reportField.setY_axis("Number of Medical Officers");
         return sortedResultList;
     }
 
     private List<Map.Entry<String, Integer>> processDataConsultation(ReportField reportField) {
         List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
-//        if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_CS) {
-//            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
-//            this.medicalOfficersData.stream()
-//                    .map(mo -> (int) mo.getCompletedConsultations().stream().filter(c -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getStartDateTime())).count())
-//                    .forEach(counter -> {
-//                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
-//                        preFreqMap.put(counter, count + 1);
-//                    });
-//            if (!preFreqMap.isEmpty()) {
-//                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
-//                for (int i = 0; i < limit; i += 5) {
-//                    int min = i == 0 ? i : i + 1;
-//                    int max = i + 5;
-//                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
-//                    String str = String.valueOf(min) + " - " + String.valueOf(max);
-//                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
-//                    sortedResultList.add(entry);
-//                }
-//            }
-//        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_FI) {
-//            HashMap<Integer, Integer> preFreqMap = new HashMap<>();
-//            this.medicalOfficersData.stream()
-//                    .map(mo -> (int) mo.getSignedFormInstances().stream().filter(fi -> isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), fi.getDateSubmitted())).count())
-//                    .forEach(counter -> {
-//                        int count = preFreqMap.containsKey(counter) ? preFreqMap.get(counter) : 0;
-//                        preFreqMap.put(counter, count + 1);
-//                    });
-//            if (!preFreqMap.isEmpty()) {
-//                int limit = (int) Math.ceil(preFreqMap.keySet().stream().max(Long::compare).get() / 5.0) * 5;
-//                for (int i = 0; i < limit; i += 5) {
-//                    int min = i == 0 ? i : i + 1;
-//                    int max = i + 5;
-//                    Integer count = preFreqMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
-//                    String str = String.valueOf(min) + " - " + String.valueOf(max);
-//                    Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
-//                    sortedResultList.add(entry);
-//                }
-//            }
-//        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MO_MC) {
-//            HashMap<String, Integer> freqMap = new HashMap<>();
-//            this.medicalOfficersData.stream()
-//                    .filter(mo -> mo.getMedicalCentre() != null)
-//                    .map(mo -> mo.getMedicalCentre().getName())
-//                    .forEach(mc -> {
-//                        int count = freqMap.containsKey(mc) ? freqMap.get(mc) : 0;
-//                        freqMap.put(mc, count + 1);
-//                    });
-//            sortedResultList = sortByType(freqMap, "STRING");
-//        }
+        List<Consultation> dateFilteredConsultations = this.consultationsData.stream()
+                .filter(c -> c.getConsultationStatusEnum() == ConsultationStatusEnum.COMPLETED && isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), c.getEndDateTime()))
+                .collect(Collectors.toList());
+
         if (reportField.getReportDataGrouping() == ReportDataGrouping.C_Q_MC) {
-            HashMap<String, Integer> freqMap = new HashMap<>();
-            this.consultationsData.stream()
-                    .filter(c -> c.getConsultationStatusEnum() == ConsultationStatusEnum.COMPLETED)
-                    .map(c -> c.getBooking().getBookingSlot().getMedicalCentre().getName())
-                    .forEach(mc -> {
-                        int count = freqMap.containsKey(mc) ? freqMap.get(mc) : 0;
-                        freqMap.put(mc, count + 1);
-                    });
-            sortedResultList = sortByType(freqMap, "STRING");
+            sortedResultList = transformIntoCategorizationList(dateFilteredConsultations, (Consultation c) -> c.getBooking().getBookingSlot().getMedicalCentre().getName(), (Consultation c) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Medical Centre");
+            reportField.setY_axis("Number of Consultations");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_Q_CP) {
-            
+            sortedResultList = transformIntoCategorizationList(dateFilteredConsultations, (Consultation c) -> c.getBooking().getConsultationPurpose().getConsultationPurposeName(), (Consultation c) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Consultation Purpose");
+            reportField.setY_axis("Number of Consultations");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_W_MC) {
-
+            ToIntFunction<Consultation> queueWaitingTime = c -> {
+                return (int) ((c.getStartDateTime().getTime() - c.getJoinQueueDateTime().getTime()) / (1000 * 60)) % 60;
+            };
+            sortedResultList = transformIntoCategorizationAverageList(dateFilteredConsultations, (Consultation c) -> c.getBooking().getBookingSlot().getMedicalCentre().getName(), queueWaitingTime);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Medical Centre");
+            reportField.setY_axis("Queue Waiting Time (mins)");
+            reportField.setAggregateString("Average Queue Waiting Time(mins): " + getAverageData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_W_HR) {
+            ToIntFunction<Consultation> queueWaitingTime = c -> {
+                return (int) ((c.getStartDateTime().getTime() - c.getJoinQueueDateTime().getTime()) / (1000 * 60)) % 60;
+            };
 
+            List<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+            for (int i = 0; i < 24; i++) {
+                String key = String.format("%02d", i);
+                Integer hourChecker = i;
+                Integer count = (int) dateFilteredConsultations.stream()
+                        .filter(c -> c.getJoinQueueDateTime().getHours() == hourChecker)
+                        .mapToInt(queueWaitingTime)
+                        .average()
+                        .orElse(0);
+                sortedList.add(new AbstractMap.SimpleEntry<String, Integer>(key, count));
+            }
+            ReportField rf = new ReportField();
+            rf.setName("Dataset");
+            processSortedListIntoField(rf, sortedList);
+            reportField.getDatasetFields().clear();
+            reportField.getDatasetFields().add(rf);
+            reportField.setX_axis("Hour Of Day");
+            reportField.setY_axis("Queue Waiting Time (mins)");
+            reportField.setAggregateString("Average Queue Waiting Time(mins): " + getAverageData(rf));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_D_MC) {
-
+            ToIntFunction<Consultation> consultationDuration = c -> {
+                return (int) ((c.getEndDateTime().getTime() - c.getStartDateTime().getTime()) / (1000 * 60)) % 60;
+            };
+            sortedResultList = transformIntoCategorizationAverageList(dateFilteredConsultations, (Consultation c) -> c.getBooking().getBookingSlot().getMedicalCentre().getName(), consultationDuration);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Medical Centre");
+            reportField.setY_axis("Consultation Duration(mins)");
+            reportField.setAggregateString("Average Consultation Duration(mins): " + getAverageData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_D_CP) {
+            ToIntFunction<Consultation> consultationDuration = c -> {
+                return (int) ((c.getEndDateTime().getTime() - c.getStartDateTime().getTime()) / (1000 * 60)) % 60;
+            };
+            sortedResultList = transformIntoCategorizationAverageList(dateFilteredConsultations, (Consultation c) -> c.getBooking().getConsultationPurpose().getConsultationPurposeName(), consultationDuration);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Consultation Purpose");
+            reportField.setY_axis("Consultation Duration(mins)");
+            reportField.setAggregateString("Average Consultation Duration(mins): " + getAverageData(reportField));
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_QT_MC) {
+            transformTrendField(reportField, dateFilteredConsultations, (Consultation c) -> c.getEndDateTime(), (Consultation c) -> c.getBooking().getBookingSlot().getMedicalCentre().getName());
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+            reportField.setY_axis("Number of Consultations");
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.C_QT_CP) {
+            transformTrendField(reportField, dateFilteredConsultations, (Consultation c) -> c.getEndDateTime(), (Consultation c) -> c.getBooking().getConsultationPurpose().getConsultationPurposeName());
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+            reportField.setY_axis("Number of Consultations");
+        }
 
+        return sortedResultList;
+    }
+
+    // USED FOR PRE-PROCESSING INTO COUNTER (Number of forms signed)
+    private <T> List<Map.Entry<String, Integer>> transformIntoCounterList(List<T> list, Function<T, Integer> mapperToInt, Integer step) {
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        list.stream()
+                .map(mapperToInt)
+                .forEach(counter -> {
+                    int count = hashMap.containsKey(counter) ? hashMap.get(counter) : 0;
+                    hashMap.put(counter, count + 1);
+                });
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+        if (!hashMap.isEmpty()) {
+            int limit = (int) Math.ceil(hashMap.keySet().stream().max(Integer::compare).get() / (double) step) * step;
+            for (int i = 0; i < limit; i += step) {
+                int min = i == 0 ? i : i + 1;
+                int max = i + step;
+                Integer count = hashMap.entrySet().stream().filter(entry -> entry.getKey() >= min && entry.getKey() <= max).map(entry -> entry.getValue()).reduce(0, (x, y) -> x + y);
+                String str = String.valueOf(min) + " - " + String.valueOf(max);
+                Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(str, count);
+                sortedList.add(entry);
+            }
+        }
+        return sortedList;
+    }
+
+    // USED FOR CATEGORIZING INTO SPECIFIC ENTITIES (Average Waiting Time, Averaege Consultation Time)
+    private <T> List<Map.Entry<String, Integer>> transformIntoCategorizationAverageList(List<T> list, Function<T, String> mapperToGrouping, ToIntFunction<T> mapperToInt) {
+        Map<String, List<T>> groupings = list.stream()
+                .collect(Collectors.groupingBy(mapperToGrouping, Collectors.toList()));
+
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+
+        for (Map.Entry<String, List<T>> entry : groupings.entrySet()) {
+            IntStream streamOfQueueTime = entry.getValue().stream().mapToInt(mapperToInt);
+            sortedList.add(new AbstractMap.SimpleEntry<String, Integer>(entry.getKey(), (int) streamOfQueueTime.average().orElse(0)));
+        }
+        return sortedList;
+    }
+
+    // USED FOR CATEGORIZING INTO SPECIFIC ENTITIES (Consultation Purpose, Medical Centre)
+    private <T> List<Map.Entry<String, Integer>> transformIntoCategorizationList(List<T> list, Function<T, String> keyItemFunction, Predicate<T> check) {
+        HashMap<String, Integer> freqMap = new HashMap<>();
+        list.stream()
+                .filter(check)
+                .map(keyItemFunction)
+                .forEach(item -> {
+                    int count = freqMap.containsKey(item) ? freqMap.get(item) : 0;
+                    freqMap.put(item, count + 1);
+                });
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+        sortedList = freqMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(String::toString)))
+                .collect(Collectors.toList());
+        return sortedList;
+    }
+
+    // USED FOR TREND LINE CHARTS
+    private <T> void transformTrendField(ReportField reportField, List<T> list, Function<T, Date> mapperToDate, Function<T, String> mapperToGrouping) {
+        reportField.getDatasetFields().clear();
+
+        if (!list.isEmpty()) {
+            List<Date> dates = list.stream()
+                    .map(mapperToDate)
+                    .collect(Collectors.toList());
+
+            Integer dateType = identifyDateType(reportField, dates);
+            setDateAxisLabelForField(reportField, dateType);
+            List<String> baseDateAxes = generateBaseDateAxes(dateType, reportField, dates);
+
+            // Processing by Consultatiton Purpose
+            Map<String, List<T>> groupings = list.stream()
+                    .collect(Collectors.groupingBy(mapperToGrouping, Collectors.toList()));
+            for (Map.Entry<String, List<T>> entry : groupings.entrySet()) {
+                List<Date> dateValues = entry.getValue().stream()
+                        .map(mapperToDate)
+                        .collect(Collectors.toList());
+
+                List<Map.Entry<String, Integer>> datasetEntry = generateTrendDataset(dateValues, baseDateAxes, dateType);
+                ReportField datasetField = new ReportField();
+                datasetField.setType(ReportFieldType.DATASET);
+                datasetField.setName(entry.getKey());
+                datasetEntry.forEach((mapEntry) -> {
+                    datasetField.getReportFieldGroups().add(new ReportFieldGroup(mapEntry.getKey(), mapEntry.getValue()));
+                });
+                reportField.getDatasetFields().add(datasetField);
+            }
+        }
+    }
+
+    private List<Map.Entry<String, Integer>> generateTrendDataset(List<Date> dates, List<String> baseDateAxes, Integer dateType) {
+        List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
+
+        Function<Date, String> functionDateString = x -> {
+            if (dateType == 0) {
+                return String.format("%02d", x.getHours());
+            } else if (dateType == 1) {
+                return dateFormat.format(x);
+            } else if (dateType == 2) {
+                return String.valueOf(x.getDate());
+            } else if (dateType == 3) {
+                return monthFormat.format(x);
+            }
+            return "";
+        };
+        for (String baseAxes : baseDateAxes) {
+            Integer count = (int) dates.stream().map(functionDateString).filter(x -> x.equals(baseAxes)).count();
+            Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(baseAxes, count);
+            sortedResultList.add(entry);
         }
         return sortedResultList;
     }
 
-    private List<Map.Entry<String, Integer>> sortByType(HashMap<String, Integer> map, String type) {
-        List<Map.Entry<String, Integer>> list = new ArrayList<>();
-        if (type.equals("STRING")) {
-            list = map.entrySet().stream()
-                    .sorted(Map.Entry.comparingByKey(Comparator.comparing(String::toString)))
-                    .collect(Collectors.toList());
+    // Return an integer type to be able to know which factor of each date field to be used (HR[00-23], DATE[dd/MM], DayInMonth[1-31], MONTH[MMM])
+    private Integer identifyDateType(ReportField reportField, List<Date> dates) {
+        // 0 - Hour
+        // 1 - Date
+        // 2 - DayInMonth
+        // 3 - Month
+        if (reportField.getFilterDateType() == FilterDateType.NONE || reportField.getFilterDateType() == FilterDateType.CUSTOM) {
+            Date minDate;
+            Date maxDate;
+            if (reportField.getFilterDateType() == FilterDateType.NONE) {
+                // NONE
+                minDate = dates.stream().min((x, y) -> x.compareTo(y)).get();
+                maxDate = dates.stream().max((x, y) -> x.compareTo(y)).get();
+            } else {
+                // CUSTOM
+                minDate = reportField.getFilterStartDate();
+                maxDate = reportField.getFilterEndDate();
+            }
+            long diff = maxDate.getTime() - minDate.getTime();
+            int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
+            if (diff > 60) {
+                return 3;
+            } else {
+                return 1;
+            }
+        } else if (reportField.getFilterDateType() == FilterDateType.DAY) {
+            return 0;
+        } else if (reportField.getFilterDateType() == FilterDateType.WEEK) {
+            return 1;
+        } else if (reportField.getFilterDateType() == FilterDateType.MONTH) {
+            return 2;
+        } else if (reportField.getFilterDateType() == FilterDateType.YEAR) {
+            return 3;
         }
-        return list;
+        return -1;
+    }
+
+    private void setDateAxisLabelForField(ReportField reportField, Integer dateType) {
+        // 0 - Hour
+        // 1 - Date
+        // 2 - DayInMonth
+        // 3 - Month
+        if (dateType == 0) {
+            reportField.setX_axis("Hour");
+        } else if (dateType == 1) {
+            reportField.setX_axis("Date");
+        } else if (dateType == 2) {
+            reportField.setX_axis("Day In Month");
+        } else if (dateType == 3) {
+            reportField.setX_axis("Month");
+        }
+
+    }
+
+    private List<String> generateBaseDateAxes(Integer dateType, ReportField reportField, List<Date> dates) {
+        List<String> dateAxes = new ArrayList<>();
+        Date minDate = new Date();
+        Date maxDate = new Date();
+        if (reportField.getFilterDateType() == FilterDateType.NONE) {
+            minDate = dates.stream().min((x, y) -> x.compareTo(y)).get();
+            maxDate = dates.stream().max((x, y) -> x.compareTo(y)).get();
+        } else {
+//             if (reportField.getFilterDateType() == FilterDateType.CUSTOM || reportField.getFilterDateType() == FilterDateType.WEEK)
+            minDate = reportField.getFilterStartDate();
+            maxDate = reportField.getFilterEndDate();
+        }
+
+        if (dateType == 0) {
+            for (int i = 0; i < 24; i++) {
+                dateAxes.add(String.format("%02d", i));
+            }
+        } else if (dateType == 1) {
+            Calendar indexCal = new GregorianCalendar();
+            indexCal.setTime(minDate);
+            while (!indexCal.getTime().after(maxDate)) {
+                dateAxes.add(dateFormat.format(indexCal.getTime()));
+                indexCal.add(Calendar.DATE, 1);
+            }
+        } else if (dateType == 2) {
+            Calendar indexCal = new GregorianCalendar();
+            indexCal.setTime(minDate);
+            Integer numberOfDays = indexCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            for (int i = 1; i <= numberOfDays; i++) {
+                dateAxes.add(String.valueOf(i));
+            }
+        } else if (dateType == 3) {
+            Calendar indexCal = new GregorianCalendar();
+            if (reportField.getFilterDateType() == FilterDateType.YEAR) {
+                indexCal.setTime(minDate);
+                for (int i = 1; i <= 12; i++) {
+                    dateAxes.add(monthFormat.format(indexCal.getTime()));
+                    indexCal.add(Calendar.MONTH, 1);
+                }
+            } else {
+                Integer m1 = minDate.getYear() * 12 + minDate.getMonth();
+                Integer m2 = maxDate.getYear() * 12 + maxDate.getMonth();
+                Integer monthDifference = m2 - m1 + 1;
+                indexCal.setTime(minDate);
+                for (int i = 0; i < monthDifference; i++) {
+                    dateAxes.add(monthFormat.format(indexCal.getTime()));
+                    indexCal.add(Calendar.MONTH, 1);
+                }
+            }
+        }
+
+        return dateAxes;
+    }
+
+    public Integer getAverageData(ReportField reportField) {
+        return (int) reportField.getReportFieldGroups().stream()
+                .mapToInt(grp -> grp.getQuantity())
+                .filter(x -> x != 0)
+                .average()
+                .orElse(0);
+    }
+
+    public Integer getTotalNumberOfData(ReportField reportField) {
+        if (reportField.getType() == ReportFieldType.LINE) {
+            return reportField.getDatasetFields().stream()
+                    .flatMap(field -> field.getReportFieldGroups().stream())
+                    .map(grp -> grp.getQuantity())
+                    .reduce(0, (x, y) -> x + y);
+        }
+        return reportField.getReportFieldGroups().stream()
+                .map(grp -> grp.getQuantity())
+                .reduce(0, (x, y) -> x + y);
     }
 
     public void doDelete() {
@@ -826,12 +1039,6 @@ public class ManageReportManagedBean implements Serializable {
 
     public String getDialogHeaderAddChart() {
         return dialogHeaderAddChart;
-    }
-
-    public Integer getTotalNumberOfData(ReportField reportField) {
-        return reportField.getReportFieldGroups().stream()
-                .map(grp -> grp.getQuantity())
-                .reduce(0, (x, y) -> x + y);
     }
 
     public ReportFieldWrapper getReportFieldToAddWrapper() {

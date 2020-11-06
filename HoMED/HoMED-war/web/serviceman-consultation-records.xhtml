@@ -113,15 +113,18 @@
 
                                 <p:outputLabel value="Email " />
                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.email}" class="display-text"/>
+                                
+                                <p:outputLabel value="Gender: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.gender}" class="display-text"/>
 
                                 <p:outputLabel value="Role " />
                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.role}" class="display-text"/>
 
-                                <p:outputLabel value="Gender: " />
-                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.gender}" class="display-text"/>
-
                                 <p:outputLabel value="Blood type: " />
                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.bloodType.bloodTypeString}" class="display-text"/>
+
+                                <p:outputLabel value="Pes status: " />
+                                <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.pesStatus}" class="display-text"/>
 
                                 <p:outputLabel value="ROD date: " />
                                 <p:outputLabel value="#{servicemanConsultationRecordsManagedBean.selectedServiceman.rod}" class="display-text">
@@ -266,7 +269,7 @@
                                             <p:outputLabel rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase != null}" value="Proceeded with #{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase.medicalBoardType.stringVal}" />
                                             <p:outputLabel rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase == null}" value="Did not proceed with Medical Board" />
                                         </h:panelGrid>
-                                        
+
                                         <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation.medicalBoardCase != null}">
                                             <div style="padding: 5px; margin-top: 5px">
                                                 <h6>Statement of Case:</h6>
@@ -275,7 +278,7 @@
                                                 </h:panelGrid>
                                             </div>
                                         </ui:fragment>
-                                        
+
                                     </li>
                                 </ui:fragment>
                             </ul>

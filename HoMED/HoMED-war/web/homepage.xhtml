@@ -6,19 +6,336 @@
                 template="template/template.xhtml">
 
     <ui:define name="title">Home Page</ui:define>
-    <ui:define name="viewname">
-        <li>Pages</li>
-        <li>/</li>
-        <li><p:link outcome="/login">Empty</p:link></li>
-    </ui:define>
 
     <ui:define name="content">
+
+        <style>
+            .landing-body .landing-wrapper .landing-pricing {
+                padding: 10px 10px 10px 10px;
+                border-top: 16px solid #{themeCustomiser.colorRgb};
+            }
+            .landing-body .landing-wrapper .landing-pricing {
+                padding: 10px 10px 10px 10px;
+                border-top: 0px solid;
+            }
+            .landing-body .landing-wrapper .landing-pricing .pricing-box {
+                border-radius: 2px;
+                border-top: 10px solid #{themeCustomiser.colorRgb};
+                height: 200px;
+                max-height: 200px !important;
+            }
+            .landing-body .landing-wrapper .landing-pricing .pricing-box .pricing-box-header h2 {
+                color: #252529;
+            }
+            .pricing-box-header {
+                height: 100%;
+            }
+            .landing-body .landing-wrapper .landing-pricing .pricing-box .pricing-box-content {
+                padding: 0 18px 24px 18px;
+                position: relative;
+                min-height: 0px !important;
+                padding: 0;
+                -moz-border-radius: 2px;
+                -webkit-border-radius: 2px;
+                border-radius: 2px;
+                border: 2px solid #ebebef;
+                border-top: 0;
+                text-align: center;
+                color: #{themeCustomiser.colorRgb};
+                font-size: 14px;
+            }
+            .landing-body .landing-wrapper .landing-pricing .pricing-box .pricing-box-header {
+                text-align: center;
+            }
+        </style>
+
+
         <div class="p-grid">
             <div class="p-col-12">
                 <div class="card">
-                    <h1>Home Page</h1>
-                    <p>This is a temporary home page.</p>
-                    <p:button outcome="login" value="Index" style="display:inline-block;margin-top:6px" icon="pi pi-home"/>
+                    <div class="landing-body">
+                        <div class="landing-wrapper">
+                            <div class="landing-pricing p-grid">
+
+                                <ui:fragment>
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-centre-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-hospital-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>#{currentEmployee.role == 'SUPER_USER' ? 'Medical Center Management' : 'Medical Centers'}</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="employee-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-user-md p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Employee Account Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="serviceman-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-user p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Serviceman Account Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment>
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="report-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-files-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Report Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="form-util.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-file-code-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>E-Form Utility</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="consultation-util.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-file-code-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Consultation Utility</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="booking-slot-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-calendar p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Booking Slot Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-board-slot-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-calendar-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Medical Board Slot Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-board-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-group p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Medical Board Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="booking-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="pi pi-calendar p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Booking Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="queue-display.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="pi pi-desktop p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Queue Display</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="past-consultations.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-user-md p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Past Consultations</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="serviceman-consultation-records.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-users p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Service Consultation Records</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="queue-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-rocket" style="font-size: 3rem"></i>
+                                                        <h2>Queue Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="current-consultation.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-stethoscope" style="font-size: 3rem"></i>
+                                                        <h2>Current Consultation</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-board.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-clipboard" style="font-size: 3rem"></i>
+                                                        <h2>Medical Board</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -23,9 +23,15 @@
     font-family: "Courier New" !important;
 }
 
-.available-booking-slot, .unallocated-medical-board-slot {
+.available-booking-slot, .unassigned-medical-board-slot {
     background: #4ea279 !important;
     border: 1px solid #4ea279 !important;
+    font-family: "Courier New" !important;
+}
+
+.assigned-medical-board-slot {
+    background: #0d6e63 !important;
+    border: 1px solid #0d6e63 !important;
     font-family: "Courier New" !important;
 }
 

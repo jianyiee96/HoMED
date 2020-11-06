@@ -126,12 +126,12 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         // MBIA
         this.selectedMedicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot);
         this.medicalBoardInAbsenceCases.addAll(selectedMedicalBoardInAbsenceCases);
-        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
+        this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
 
         // MBIP
         this.selectedMedicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot);
         this.medicalBoardInPresenceCases.addAll(selectedMedicalBoardInPresenceCases);
-        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
+        this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
     }
 
     public List<MedicalBoardCase> getMedicalBoardInPresenceCasesForSelectedMedicalBoardSlot() {
@@ -143,12 +143,12 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     }
 
     public String renderDateTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
         return dateFormat.format(date);
     }
 
     public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return dateFormat.format(date);
     }
 
@@ -165,8 +165,10 @@ public class MedicalBoardManagementManagedBean implements Serializable {
 
     public String getCommandLinkColour(MedicalBoardSlot medicalBoardSlot) {
         switch (medicalBoardSlot.getMedicalBoardSlotStatusEnum()) {
-            case UNALLOCATED:
+            case UNASSIGNED:
                 return "#4ea279";
+            case ASSIGNED:
+                return "#0d6e63";
             case ALLOCATED:
                 return "#6b6bb8";
             case ONGOING:

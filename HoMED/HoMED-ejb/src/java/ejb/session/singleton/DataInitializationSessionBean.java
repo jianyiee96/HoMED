@@ -56,6 +56,7 @@ import util.enumeration.DayOfWeekEnum;
 import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.InputTypeEnum;
+import util.enumeration.PesStatusEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.CreateBookingException;
@@ -727,10 +728,10 @@ public class DataInitializationSessionBean {
 
     private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
-        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("513 Serangoon Road", "#04-01", "", "Singapore", "218154"));
+        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, PesStatusEnum.B4, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("513 Serangoon Road", "#04-01", "", "Singapore", "218154"));
         Long serviceman1Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman1);
         Long serviceman2Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman2);
         Long serviceman3Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman3);
@@ -747,8 +748,8 @@ public class DataInitializationSessionBean {
         System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber());
         System.out.println("Successfully created servicemen by init\n");
 
-        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("Enterprise one", "#01-40", "", "Singapore", "415934"));
-        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("2 Geylang East Avenue 2", "#04-109", "", "Singapore", "389754"));
+        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("Enterprise one", "#01-40", "", "Singapore", "415934"));
+        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, PesStatusEnum.C9, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("2 Geylang East Avenue 2", "#04-109", "", "Singapore", "389754"));
         String servicemanOtp1 = servicemanSessionBeanLocal.createServiceman(serviceman1Otp);
         String servicemanOtp2 = servicemanSessionBeanLocal.createServiceman(serviceman2Otp);
 
@@ -860,9 +861,50 @@ public class DataInitializationSessionBean {
 
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
+
+        MedicalCentre newMedicalCentre2 = new MedicalCentre();
+        newMedicalCentre2.setName("Ang Mo Kio - Family Medicine Clinic");
+        newMedicalCentre2.setPhone("65541133");
+        // Street Name, Unit Number, Building Name, Country, Postal Code
+        newMedicalCentre2.setAddress(new Address("4190 Ang Mo Kio Ave 6", "#03-01", "Broadway Plaza", "Singapore", "569841"));
+
+        medicalCentreOperatingHours = new ArrayList<>();
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(13, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.FALSE, null, null));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.FALSE, null, null));
+
+        newMedicalCentre2.setOperatingHours(medicalCentreOperatingHours);
+        Long medicalCentreId2 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre2);
+
+        MedicalCentre newMedicalCentre3 = new MedicalCentre();
+        newMedicalCentre3.setName("Bukit Panjang Plaza - Shenton Medical Group");
+        newMedicalCentre3.setPhone("67697863");
+        // Street Name, Unit Number, Building Name, Country, Postal Code
+        newMedicalCentre3.setAddress(new Address("No.1 Jelebu Road", "#03-02", "Bukit Panjang Plaza", "Singapore", "677743"));
+
+        medicalCentreOperatingHours = new ArrayList<>();
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.TRUE, LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.FALSE, null, null));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.FALSE, null, null));
+
+        newMedicalCentre3.setOperatingHours(medicalCentreOperatingHours);
+        Long medicalCentreId3 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre3);
+
         System.out.println("Successfully created medical centres\n");
 
         medicalCentres.add(newMedicalCentre);
+//        medicalCentres.add(newMedicalCentre2);
+//        medicalCentres.add(newMedicalCentre3);
         return medicalCentres;
     }
 

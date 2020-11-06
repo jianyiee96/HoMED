@@ -200,7 +200,7 @@
                                                     <!-- Edit Button -->
                                                     <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime) 
                                                                                  and !medicalBoardSlotWrapper.isEditMode 
-                                                                                 and medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'}"
+                                                                                 and (medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED')}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState or medicalBoardSlotManagementManagedBean.isEditState}"
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.initEdit(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 
@@ -229,7 +229,7 @@
 
                                                     <!-- Delete Button -->
                                                     <p:commandButton rendered="#{!medicalBoardSlotManagementManagedBean.beforeNow(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)
-                                                                                 and medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNALLOCATED'}"
+                                                                                 and (medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED')}"
                                                                      disabled="#{medicalBoardSlotManagementManagedBean.isScheduleState}" 
                                                                      actionListener="#{medicalBoardSlotManagementManagedBean.deleteSelectedMedicalBoardSlot(medicalBoardSlotWrapper)}"
                                                                      oncomplete="PF('medicalBoardSlots').update()" update="formSchedule:rightPanel" 

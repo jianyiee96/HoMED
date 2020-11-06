@@ -132,15 +132,22 @@ public class EmployeeLoginManagedBean implements Serializable {
         if (role == EmployeeRoleEnum.SUPER_USER) {
             themeCustomiser.setComponentTheme("blbluegreyue");
             themeCustomiser.setTopbarColor("bluegrey");
+            themeCustomiser.setColorRgb("#406E7E");
         } else if (role == EmployeeRoleEnum.CLERK) {
             themeCustomiser.setComponentTheme("teal");
             themeCustomiser.setTopbarColor("teal");
+            themeCustomiser.setColorRgb("#337E59");
+
         } else if (role == EmployeeRoleEnum.MEDICAL_OFFICER) {
             themeCustomiser.setComponentTheme("blue");
             themeCustomiser.setTopbarColor("blue");
+            themeCustomiser.setColorRgb("#0772B3");
+
         } else if (role == EmployeeRoleEnum.MB_ADMIN) {
             themeCustomiser.setComponentTheme("brown");
             themeCustomiser.setTopbarColor("brown");
+            themeCustomiser.setColorRgb("#794F36");
+
         }
     }
 
