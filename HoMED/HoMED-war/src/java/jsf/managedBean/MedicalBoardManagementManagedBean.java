@@ -86,7 +86,6 @@ public class MedicalBoardManagementManagedBean implements Serializable {
                 }
             });
         }
-
     }
 
     public void saveChanges() {
@@ -127,11 +126,11 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.selectedMedicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot);
         this.medicalBoardInAbsenceCases.addAll(selectedMedicalBoardInAbsenceCases);
         this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
-
         // MBIP
         this.selectedMedicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot);
         this.medicalBoardInPresenceCases.addAll(selectedMedicalBoardInPresenceCases);
         this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
+
     }
 
     public List<MedicalBoardCase> getMedicalBoardInPresenceCasesForSelectedMedicalBoardSlot() {
