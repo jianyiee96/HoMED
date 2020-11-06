@@ -40,11 +40,6 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="pi pi-cog"></i><span>Settings</span>
-                                    </a>
-                                </li>
-                                <li>
                                     <p:commandLink actionListener="#{employeeLoginManagedBean.logout}">
                                         <i class="fa fa-sign-out"></i><span>Sign Out</span>
                                     </p:commandLink>
@@ -85,6 +80,7 @@
                             <p:menuitem value="Serviceman Consultation Records" icon="fa fa-users" outcome="/serviceman-consultation-records" />
                         </p:submenu>
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Medical Board" icon="fa fa-clipboard" outcome="/medical-board" />
+                        <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Notification Blast" icon="fa fa-bullhorn" outcome="/notification-blast" />
                     </po:menu>
                 </h:form>
                 <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">

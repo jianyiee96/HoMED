@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
+import util.enumeration.NotificationTypeEnum;
 import util.exceptions.CreateNotificationException;
 import util.exceptions.ServicemanNotFoundException;
 
@@ -49,12 +50,34 @@ public class NotificationSessionBean implements NotificationSessionBeanLocal {
     }
 
     @Override
+    public void broadcastMessage(String title, String messsage) {
+
+        List<Serviceman> servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
+        for (Serviceman s : servicemen) {
+
+            try {
+
+                if (s.getFcmToken() != null) {
+                    sendPushNotification(title, messsage, s.getFcmToken());
+                }
+                
+                createNewNotification(new Notification(title, messsage, NotificationTypeEnum.GENERAL, null), s.getServicemanId(), Boolean.TRUE);
+
+            } catch (Exception ex) {
+
+            }
+
+        }
+
+    }
+
+    @Override
     public void sendPushNotification(String title, String body, String svcmanFCMToken) {
-        
-        if(svcmanFCMToken == null) {
+
+        if (svcmanFCMToken == null) {
             return;
         }
-        
+
         try {
             HttpPost post = new HttpPost("https://fcm.googleapis.com/fcm/send");
             post.setHeader("Content-type", "application/json");
