@@ -4,21 +4,27 @@
  */
 package jsf.managedBean;
 
+import ejb.session.stateless.ConditionStatusSessionBeanLocal;
 import ejb.session.stateless.MedicalBoardCaseSessionBean;
 import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
+import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.ConditionStatus;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
+import entity.PreDefinedConditionStatus;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -47,11 +53,21 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     @EJB
     MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanLocal;
 
+    @EJB
+    ConditionStatusSessionBeanLocal conditionStatusSessionBeanLocal;
+
     MedicalBoardSlot medicalBoardSlot;
 
     MedicalBoardCase selectedCase;
 
+    List<ConditionStatus> servicemanCurrentConditionStatuses;
+
+    List<PreDefinedConditionStatus> preDefinedConditionStatuses;
+
+    String newPreDefinedConditionStatus;
+
     public MedicalBoardSessionManagedBean() {
+        servicemanCurrentConditionStatuses = new ArrayList<>();
     }
 
     @PostConstruct
@@ -81,9 +97,13 @@ public class MedicalBoardSessionManagedBean implements Serializable {
                 System.out.println("Fail to redirect: " + ex);
             }
         } else {
+
+            this.preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
             sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
             if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
                 selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
+                servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
+
             }
         }
 
@@ -133,7 +153,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         } else {
             try {
                 clearEmptyConditionStatus();
-                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), selectedCase.getNewPesStatus(), selectedCase.getConditionStatuses());
+                medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), selectedCase.getFinalPesStatus(), selectedCase.getConditionStatuses());
                 medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
                 medicalBoardSlot.getMedicalBoardCases().forEach(mbc -> {
                     if (mbc.equals(selectedCase)) {
@@ -151,6 +171,46 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     public void addConditionStatus() {
         this.selectedCase.getConditionStatuses().add(new ConditionStatus());
     }
+
+    public void doChangeDate(ConditionStatus conditionStatus, Integer duration) {
+
+        if (duration != null) {
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.add(Calendar.MONTH, duration);
+            conditionStatus.setStatusEndDate(c.getTime());
+        } else {
+            conditionStatus.setStatusEndDate(null);
+        }
+    }
+
+    public void copyCurrentConditionStatus() {
+
+        List<ConditionStatus> copy = new ArrayList();
+
+        for (ConditionStatus cs : this.servicemanCurrentConditionStatuses) {
+
+            ConditionStatus newCs = new ConditionStatus();
+            newCs.setDescription(cs.getDescription());
+            newCs.setStatusEndDate(cs.getStatusEndDate());
+
+            copy.add(newCs);
+
+        }
+        this.selectedCase.setConditionStatuses(copy);
+
+    }
+
+    public String getNewPreDefinedConditionStatus() {
+        return newPreDefinedConditionStatus;
+    }
+
+    public void setNewPreDefinedConditionStatus(String newPreDefinedConditionStatus) {
+        this.newPreDefinedConditionStatus = newPreDefinedConditionStatus;
+    }
+    
+    
 
     public void clearEmptyConditionStatus() {
         boolean removed = true;
@@ -184,7 +244,25 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         }
     }
 
+    public void removePreDefinedConditionStatus(ActionEvent event) {
+        PreDefinedConditionStatus cs = (PreDefinedConditionStatus) event.getComponent().getAttributes().get("statusToDelete");
+        conditionStatusSessionBeanLocal.removePreDefinedConditionStatus(cs.getPreDefinedConditionStatusId());
+        preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
+    }
+
+    public void addPreDefinedConditionStatus() {
+
+        if (newPreDefinedConditionStatus != null && !newPreDefinedConditionStatus.isEmpty()) {
+            conditionStatusSessionBeanLocal.addPreDefinedConditionStatus(newPreDefinedConditionStatus);
+            newPreDefinedConditionStatus = "";
+            preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
+
+        }
+
+    }
+
     public void rowSelectListener() {
+        servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
 
     }
 
@@ -211,6 +289,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
         if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
             selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
+            servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
         }
     }
 
@@ -238,6 +317,18 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     }
 
+    public List<String> autoComplete(String status) {
+
+        String queryLowerCase = status.toLowerCase();
+        return preDefinedConditionStatuses.stream()
+                .map(s -> s.getDescription())
+                .filter(s -> {
+                    return s.toLowerCase().contains(queryLowerCase);
+                })
+                .collect(Collectors.toList());
+
+    }
+
     public MedicalBoardSlot getMedicalBoardSlot() {
         return medicalBoardSlot;
     }
@@ -252,6 +343,22 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void setSelectedCase(MedicalBoardCase selectedCase) {
         this.selectedCase = selectedCase;
+    }
+
+    public List<ConditionStatus> getServicemanCurrentConditionStatuses() {
+        return servicemanCurrentConditionStatuses;
+    }
+
+    public void setServicemanCurrentConditionStatuses(List<ConditionStatus> servicemanCurrentConditionStatuses) {
+        this.servicemanCurrentConditionStatuses = servicemanCurrentConditionStatuses;
+    }
+
+    public List<PreDefinedConditionStatus> getPreDefinedConditionStatuses() {
+        return preDefinedConditionStatuses;
+    }
+
+    public void setPreDefinedConditionStatuses(List<PreDefinedConditionStatus> preDefinedConditionStatuses) {
+        this.preDefinedConditionStatuses = preDefinedConditionStatuses;
     }
 
     public PesStatusEnum[] getPesStatuses() {

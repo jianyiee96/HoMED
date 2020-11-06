@@ -19,6 +19,12 @@
             .display-text {
                 font-weight: bold;
             }
+            .ui-autocomplete {
+                width: 100%;
+            }
+            .ui-autocomplete-input {
+                width: 100%;
+            }
         </style>
 
         <ui:fragment rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
@@ -227,102 +233,140 @@
 
                                             <h:panelGroup>
                                                 <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" style="margin-top: -30px" columns="2" cellpadding="5">
-                                                    <p:outputLabel value="New Pes Status: " />
-                                                    <p:selectOneMenu value="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus}" style="width:125px">
+                                                    <p:outputLabel value="Final Pes Status: " />
+                                                    <p:selectOneMenu value="#{medicalBoardSessionManagedBean.selectedCase.finalPesStatus}" style="width:125px">
                                                         <f:selectItem value="#{null}" itemLabel="No Change" />
                                                         <f:selectItems value="#{medicalBoardSessionManagedBean.pesStatuses}" var="pesStatus" itemLabel="#{pesStatus}" />
                                                     </p:selectOneMenu>
                                                 </h:panelGrid>
                                                 <h:panelGrid rendered="#{medicalBoardSessionManagedBean.selectedCase.isSigned}" style="margin-top: -30px" columns="2" cellpadding="5">
-                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus != null}" value="New Pes Status: #{medicalBoardSessionManagedBean.selectedCase.newPesStatus}" />
-                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.newPesStatus == null}" value="No change in Pes Status" />
+                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.finalPesStatus != null}" value="Final Pes Status: #{medicalBoardSessionManagedBean.selectedCase.finalPesStatus}" />
+                                                    <p:outputLabel rendered="#{medicalBoardSessionManagedBean.selectedCase.finalPesStatus == null}" value="No change in Pes Status" />
                                                 </h:panelGrid>
                                                 <h:panelGrid>
+
                                                     <p:dataTable rendered="#{medicalBoardSessionManagedBean.selectedCase.isSigned}" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="status" value="#{medicalBoardSessionManagedBean.selectedCase.conditionStatuses}">
 
-                                                        <p:column headerText="New Status Description">
-                                                            <p:cellEditor>
-                                                                <f:facet name="output">
-                                                                    <h:outputText rendered="#{status.description != null}" value="#{status.description}" />
-                                                                    <h:outputText rendered="#{status.description == null}" value="-" />
-                                                                </f:facet>
-                                                                <f:facet name="input">
-                                                                    <p:inputText id="modelInput" value="#{status.description}" style="width:100%"/>
-                                                                </f:facet>
-                                                            </p:cellEditor>
+                                                        <p:column headerText="New/Updated Status">
+                                                            <h:outputText rendered="#{status.description != null}" value="#{status.description}" />
                                                         </p:column>
 
                                                         <p:column style="width: 300px" headerText="Status End Date (Optional)">
-                                                            <p:cellEditor>
-                                                                <f:facet name="output">
-                                                                    <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
-                                                                        <f:convertDateTime pattern="dd-MM-yyyy" />
-                                                                    </h:outputText>
-                                                                    <h:outputText rendered="#{status.statusEndDate == null}"  value="- Permanent Status -"/>
-                                                                </f:facet>
-                                                                <f:facet name="input">
-                                                                    <f:facet name="input">
-                                                                        <p:datePicker value="#{status.statusEndDate}"  mindate="#{medicalBoardSessionManagedBean.selectedCase.medicalBoardSlot.actualStartDateTime}"  showIcon="true" />
-                                                                    </f:facet>
-                                                                </f:facet>
-                                                            </p:cellEditor>
+
+                                                            <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
+                                                                <f:convertDateTime pattern="dd-MM-yyyy" />
+                                                            </h:outputText>
+                                                            <h:outputText rendered="#{status.statusEndDate == null}"  value="Permanent Status"/>
+
                                                         </p:column>
 
 
 
                                                     </p:dataTable>
 
+
+
+                                                    <p:dataTable rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned and medicalBoardSessionManagedBean.servicemanCurrentConditionStatuses.size() != 0}" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="status" value="#{medicalBoardSessionManagedBean.servicemanCurrentConditionStatuses}">
+
+                                                        <p:column headerText="Current Status">
+                                                            <h:outputText value="#{status.description}" />
+                                                        </p:column>
+
+                                                        <p:column style="width: 300px" headerText="Status End Date">
+
+                                                            <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
+                                                                <f:convertDateTime pattern="dd-MM-yyyy" />
+                                                            </h:outputText>
+                                                            <h:outputText rendered="#{status.statusEndDate == null}"  value="Permanent Status"/>
+
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+
+                                                    <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned and medicalBoardSessionManagedBean.servicemanCurrentConditionStatuses.size() != 0}">
+                                                        <p:commandButton value="Copy Current Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.copyCurrentConditionStatus()}"></p:commandButton>
+                                                    </h:panelGrid>
+
+
                                                     <p:dataTable rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" 
                                                                  id="statusDT" widgetVar="statusDT" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" 
-                                                                 var="status" value="#{medicalBoardSessionManagedBean.selectedCase.conditionStatuses}"  editable="true">
+                                                                 var="status" value="#{medicalBoardSessionManagedBean.selectedCase.conditionStatuses}"  editable="true" rowIndexVar="rowIndex">
 
-                                                        <p:column headerText="New Status Description">
+                                                        <p:column headerText="New/Updated Status">
                                                             <p:cellEditor>
                                                                 <f:facet name="output">
                                                                     <h:outputText rendered="#{status.description != null}" value="#{status.description}" />
                                                                     <h:outputText rendered="#{status.description == null}" value="-" />
                                                                 </f:facet>
                                                                 <f:facet name="input">
-                                                                    <p:inputText id="modelInput" value="#{status.description}" style="width:100%"/>
+                                                                    <p:autoComplete id="modelInput" value="#{status.description}" completeMethod="#{medicalBoardSessionManagedBean.autoComplete}"/>
                                                                 </f:facet>
                                                             </p:cellEditor>
                                                         </p:column>
 
-                                                        <p:column style="width: 300px" headerText="Status End Date (Optional)">
+                                                        <p:column style="width: 200px" headerText="Status End Date (Optional)">
                                                             <p:cellEditor>
                                                                 <f:facet name="output">
-                                                                    <h:outputText rendered="#{status.statusEndDate != null}" value="#{status.statusEndDate}">
+                                                                    <h:outputText rendered="#{status.statusEndDate != null and status.description != null}" value="#{status.statusEndDate}">
                                                                         <f:convertDateTime pattern="dd-MM-yyyy" />
                                                                     </h:outputText>
-                                                                    <h:outputText rendered="#{status.statusEndDate == null}"  value="- Permanent Status -"/>
+                                                                    <h:outputText rendered="#{status.description == null}"  value="-"/>
+                                                                    <h:outputText rendered="#{status.statusEndDate == null and status.description != null }"  value="Permanent Status"/>
                                                                 </f:facet>
                                                                 <f:facet name="input">
-                                                                    <f:facet name="input">
-                                                                        <p:datePicker value="#{status.statusEndDate}"  mindate="#{medicalBoardSessionManagedBean.selectedCase.medicalBoardSlot.actualStartDateTime}"  showIcon="true" />
-                                                                    </f:facet>
+                                                                    <p:datePicker value="#{status.statusEndDate}"  mindate="#{medicalBoardSessionManagedBean.selectedCase.medicalBoardSlot.actualStartDateTime}"  showIcon="true" />
                                                                 </f:facet>
                                                             </p:cellEditor>
                                                         </p:column>
+
+                                                        <p:column style="width: 80px">
+                                                            <p:commandButton id="date-trigger" icon="pi pi-clock" class=" p-mx-2 warning-button rounded-button">
+                                                            </p:commandButton>
+                                                            <p:menu overlay="true" trigger="date-trigger" my="left top" at="left bottom">
+                                                                <p:submenu label="Status Duration">
+                                                                    <p:menuitem value="3 months" actionListener="#{medicalBoardSessionManagedBean.doChangeDate(status, 3)}"
+                                                                                process="@this" update="@form:statusDT:@row(#{rowIndex})">
+                                                                    </p:menuitem>
+                                                                    <p:menuitem value="6 months" actionListener="#{medicalBoardSessionManagedBean.doChangeDate(status, 6)}"
+                                                                                process="@this" update="@form:statusDT:@row(#{rowIndex})">
+                                                                    </p:menuitem>
+                                                                    <p:menuitem value="9 months" actionListener="#{medicalBoardSessionManagedBean.doChangeDate(status, 9)}"
+                                                                                process="@this" update="@form:statusDT:@row(#{rowIndex})">
+                                                                    </p:menuitem>
+                                                                    <p:menuitem value="12 months" actionListener="#{medicalBoardSessionManagedBean.doChangeDate(status, 12)}"
+                                                                                process="@this" update="@form:statusDT:@row(#{rowIndex})">
+                                                                    </p:menuitem>
+                                                                    <p:menuitem value="Permanent Status" actionListener="#{medicalBoardSessionManagedBean.doChangeDate(status, null)}"
+                                                                                process="@this" update="@form:statusDT:@row(#{rowIndex})">
+                                                                    </p:menuitem>
+                                                                </p:submenu>
+                                                            </p:menu>
+
+                                                            <p:commandButton class="rounded-button danger-button" update="statusDT"  icon="pi pi-trash" title="Remove Status" actionListener="#{medicalBoardSessionManagedBean.removeConditionStatus}">
+                                                                <f:attribute name="statusToDelete" value="#{status}" />
+                                                            </p:commandButton>
+                                                        </p:column>
+
 
 
                                                         <p:column style="width:59px">
                                                             <p:rowEditor />
                                                         </p:column>
 
-                                                        <p:column style="width:31px">
-                                                            <p:commandButton class="rounded-button outlined-button danger-button" update="statusDT"  icon="pi pi-trash" title="Remove Status" actionListener="#{medicalBoardSessionManagedBean.removeConditionStatus}">
-                                                                <f:attribute name="statusToDelete" value="#{status}" />
-                                                            </p:commandButton>
-                                                        </p:column>
-
 
                                                     </p:dataTable>
+                                                    <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2" width="100%">
+                                                        <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2">
+                                                            <p:commandButton value="Add Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.addConditionStatus()}"></p:commandButton>
+                                                            <p:commandButton value="Clear All Empty Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.clearEmptyConditionStatus()}"></p:commandButton>
+                                                        </h:panelGrid>
+                                                        <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" style="float: right" columns="2">
+                                                            <p:commandButton value="Pre Defined Condition Statuses" update="statusDT"
+                                                                             oncomplete="PF('dialogManagePreDefinedStatus').show()" actionListener="#{medicalBoardSessionManagedBean.manageStatus()}"></p:commandButton>
+                                                        </h:panelGrid>
+                                                    </h:panelGrid>
 
-
-                                                </h:panelGrid>
-                                                <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2">
-                                                    <p:commandButton value="Add Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.addConditionStatus()}"></p:commandButton>
-                                                    <p:commandButton value="Clear All Empty Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.clearEmptyConditionStatus()}"></p:commandButton>
                                                 </h:panelGrid>
 
 
@@ -369,6 +413,44 @@
                 <p:growl id="growl-message" for="growl-message" showDetail="true">
                     <p:autoUpdate/>
                 </p:growl>
+
+
+
+                <p:dialog id="dialogManagePreDefinedStatus" widgetVar="dialogManagePreDefinedStatus" header="Pre Defined Condition Status" showEffect="fade"
+                          draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManagePreDefinedStatus').initPosition()"
+                          minWidth="500" width="500">
+
+
+
+                    <p:dataTable id="pdsDT" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="preDefStatus" value="#{medicalBoardSessionManagedBean.preDefinedConditionStatuses}">
+
+                        <p:column headerText="Status">
+                            <h:outputText value="#{preDefStatus.description}" />
+                        </p:column>
+
+                        <p:column style="width: 30px">
+
+                            <p:commandButton class="rounded-button danger-button" icon="pi pi-trash" title="Remove Status" update="pdsDT" actionListener="#{medicalBoardSessionManagedBean.removePreDefinedConditionStatus}">
+                                <f:attribute name="statusToDelete" value="#{preDefStatus}" />
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <div class="p-field" style="margin-top: 1rem;">
+
+                        <p:inputText style="width: 90%; margin-right: 8px;" id="newPDS" value="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatus}" placeholder="New Pre Defined Condition Status" >
+                            <p:ajax event="keyup" update="create"/>
+                        </p:inputText>
+                        <p:commandButton id="create" style="width: 30px;" icon="pi pi-plus" update="pdsDT newPDS" action="#{medicalBoardSessionManagedBean.addPreDefinedConditionStatus()}" disabled="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatus == null || medicalBoardSessionManagedBean.newPreDefinedConditionStatus == ''}" >
+                        </p:commandButton>
+
+                    </div>
+
+                </p:dialog>
+
+
+
 
             </h:form>
         </ui:fragment>

@@ -56,7 +56,7 @@ public class MedicalBoardCase implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private PesStatusEnum newPesStatus;
+    private PesStatusEnum finalPesStatus;
 
     @OneToMany
     private List<ConditionStatus> conditionStatuses;
@@ -153,12 +153,12 @@ public class MedicalBoardCase implements Serializable {
         this.isSigned = isSigned;
     }
 
-    public PesStatusEnum getNewPesStatus() {
-        return newPesStatus;
+    public PesStatusEnum getFinalPesStatus() {
+        return finalPesStatus;
     }
 
-    public void setNewPesStatus(PesStatusEnum newPesStatus) {
-        this.newPesStatus = newPesStatus;
+    public void setFinalPesStatus(PesStatusEnum finalPesStatus) {
+        this.finalPesStatus = finalPesStatus;
     }
 
     public List<ConditionStatus> getConditionStatuses() {
