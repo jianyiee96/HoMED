@@ -37,7 +37,7 @@ public class MedicalBoardCase implements Serializable {
     @Column
     private MedicalBoardCaseStatusEnum medicalBoardCaseStatus;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = true)
     private Consultation consultation;
 
     @Column(length = 6000)
@@ -51,6 +51,9 @@ public class MedicalBoardCase implements Serializable {
 
     @OneToOne(optional = true)
     private MedicalBoardCase previousMedicalBoardCase;
+
+    @OneToOne(optional = true, mappedBy = "previousMedicalBoardCase")
+    private MedicalBoardCase followUpMedicalBoardCase;
 
     private Boolean isSigned;
 
@@ -70,6 +73,13 @@ public class MedicalBoardCase implements Serializable {
     public MedicalBoardCase(Consultation consultation, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
         this();
         this.consultation = consultation;
+        this.medicalBoardType = medicalBoardType;
+        this.statementOfCase = statementOfCase;
+    }
+    
+    public MedicalBoardCase(MedicalBoardCase previousMedicalBoardCase, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
+        this();
+        this.previousMedicalBoardCase = previousMedicalBoardCase;
         this.medicalBoardType = medicalBoardType;
         this.statementOfCase = statementOfCase;
     }
@@ -143,6 +153,14 @@ public class MedicalBoardCase implements Serializable {
 
     public void setPreviousMedicalBoardCase(MedicalBoardCase previousMedicalBoardCase) {
         this.previousMedicalBoardCase = previousMedicalBoardCase;
+    }
+
+    public MedicalBoardCase getFollowUpMedicalBoardCase() {
+        return followUpMedicalBoardCase;
+    }
+
+    public void setFollowUpMedicalBoardCase(MedicalBoardCase followUpMedicalBoardCase) {
+        this.followUpMedicalBoardCase = followUpMedicalBoardCase;
     }
 
     public Boolean getIsSigned() {

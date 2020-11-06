@@ -36,6 +36,7 @@ import javax.faces.view.ViewScoped;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
 import util.enumeration.PesStatusEnum;
+import util.exceptions.CreateMedicalBoardCaseException;
 import util.exceptions.EndMedicalBoardSessionException;
 import util.exceptions.SignMedicalBoardCaseException;
 
@@ -65,6 +66,12 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     List<PreDefinedConditionStatus> preDefinedConditionStatuses;
 
     String newPreDefinedConditionStatus;
+
+    Boolean hasFollowUp;
+
+    String currentFollowUpAction;
+
+    String followUpStatement;
 
     public MedicalBoardSessionManagedBean() {
         servicemanCurrentConditionStatuses = new ArrayList<>();
@@ -101,6 +108,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             this.preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
             sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
             if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
+                hasFollowUp = false;
                 selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
                 servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
 
@@ -150,9 +158,21 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
         if (selectedCase.getBoardFindings() == null) {
             FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", "Please ensure board findings is not empty."));
+        } else if (hasFollowUp && (followUpStatement == null || followUpStatement.equals(""))) {
+            FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", "Follow up medical board is specified. Please ensure follow up statement of case is not empty."));
+
         } else {
             try {
                 clearEmptyConditionStatus();
+
+                if (hasFollowUp) {
+                    if (this.currentFollowUpAction.equals("MBIP")) {
+                        medicalBoardCaseSessionBeanLocal.createMedicalBoardCaseByBoard(selectedCase.getMedicalBoardCaseId(), MedicalBoardTypeEnum.PRESENCE, followUpStatement);
+                    } else if (this.currentFollowUpAction.equals("MBIA")) {
+                        medicalBoardCaseSessionBeanLocal.createMedicalBoardCaseByBoard(selectedCase.getMedicalBoardCaseId(), MedicalBoardTypeEnum.ABSENCE, followUpStatement);
+                    }
+                }
+
                 medicalBoardCaseSessionBeanLocal.signMedicalBoardCase(selectedCase.getMedicalBoardCaseId(), selectedCase.getBoardFindings(), selectedCase.getFinalPesStatus(), selectedCase.getConditionStatuses());
                 medicalBoardSlot = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
                 medicalBoardSlot.getMedicalBoardCases().forEach(mbc -> {
@@ -161,7 +181,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
                     }
                 });
                 sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
-            } catch (SignMedicalBoardCaseException ex) {
+            } catch (SignMedicalBoardCaseException | CreateMedicalBoardCaseException ex) {
                 FacesContext.getCurrentInstance().addMessage("growl-message", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sign current case", ex.getMessage()));
 
             }
@@ -202,6 +222,16 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     }
 
+    public void toggleFollowUpAction() {
+        this.hasFollowUp = !this.hasFollowUp;
+
+        if (this.hasFollowUp) {
+            followUpStatement = this.selectedCase.getStatementOfCase();
+            currentFollowUpAction = "MBIP";
+        }
+
+    }
+
     public String getNewPreDefinedConditionStatus() {
         return newPreDefinedConditionStatus;
     }
@@ -209,8 +239,22 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     public void setNewPreDefinedConditionStatus(String newPreDefinedConditionStatus) {
         this.newPreDefinedConditionStatus = newPreDefinedConditionStatus;
     }
-    
-    
+
+    public String getFollowUpStatement() {
+        return followUpStatement;
+    }
+
+    public void setFollowUpStatement(String followUpStatement) {
+        this.followUpStatement = followUpStatement;
+    }
+
+    public Boolean getHasFollowUp() {
+        return hasFollowUp;
+    }
+
+    public void setHasFollowUp(Boolean hasFollowUp) {
+        this.hasFollowUp = hasFollowUp;
+    }
 
     public void clearEmptyConditionStatus() {
         boolean removed = true;
@@ -263,7 +307,8 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void rowSelectListener() {
         servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
-
+        this.followUpStatement = "";
+        this.hasFollowUp = false;
     }
 
     public Boolean hasUnsignedCase() {
@@ -288,6 +333,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
     public void nextCase() {
         sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
         if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
+            hasFollowUp = false;
             selectedCase = medicalBoardSlot.getMedicalBoardCases().get(0);
             servicemanCurrentConditionStatuses = conditionStatusSessionBeanLocal.retrieveActiveConditionStatusByServiceman(this.selectedCase.getConsultation().getBooking().getServiceman().getServicemanId());
         }
@@ -363,6 +409,14 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public PesStatusEnum[] getPesStatuses() {
         return PesStatusEnum.values();
+    }
+
+    public String getCurrentFollowUpAction() {
+        return currentFollowUpAction;
+    }
+
+    public void setCurrentFollowUpAction(String currentFollowUpAction) {
+        this.currentFollowUpAction = currentFollowUpAction;
     }
 
     public String renderDateTime(Date date) {

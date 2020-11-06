@@ -365,6 +365,12 @@
                                                             <p:commandButton value="Pre Defined Condition Statuses" update="statusDT"
                                                                              oncomplete="PF('dialogManagePreDefinedStatus').show()" actionListener="#{medicalBoardSessionManagedBean.manageStatus()}"></p:commandButton>
                                                         </h:panelGrid>
+                                                        <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="1">
+
+                                                            <p:commandButton actionListener="#{medicalBoardSessionManagedBean.toggleFollowUpAction()}" update="sessionForm" rendered="#{not medicalBoardSessionManagedBean.hasFollowUp}" value="Create Follow Up Medical Board" styleClass="" class="outlined-button secondary-button" icon="pi pi-plus" />
+                                                            <p:commandButton actionListener="#{medicalBoardSessionManagedBean.toggleFollowUpAction()}" update="sessionForm" rendered="#{medicalBoardSessionManagedBean.hasFollowUp }" value="Cancel Create Follow Up Medical Board" class="secondary-button" icon="pi pi-times" />
+                                                        </h:panelGrid>
+
                                                     </h:panelGrid>
 
                                                 </h:panelGrid>
@@ -376,6 +382,60 @@
                                         </p:panelGrid>
 
                                     </li>
+
+                                    <ui:fragment rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned and medicalBoardSessionManagedBean.hasFollowUp}">
+                                        <li>
+
+                                            <p:panelGrid columns="1" layout="flex">
+                                                <h5>Follow Up Medical Board</h5>
+
+
+                                                <h:panelGrid style="margin-top: -30px" columns="1" cellpadding="5" width="100%">
+                                                    <p:selectOneButton unselectable="false" class="board-button-set" value="#{medicalBoardSessionManagedBean.currentFollowUpAction}">
+                                                        <f:selectItem itemLabel="Medical Board in Presence" itemValue="MBIP" />
+                                                        <f:selectItem itemLabel="Medical Board in Absence" itemValue="MBIA" />
+                                                    </p:selectOneButton>
+
+                                                    <p:outputLabel value="Statement of Case (follow up): " />
+                                                    <p:textEditor widgetVar="text-editor" value="#{medicalBoardSessionManagedBean.followUpStatement}" 
+                                                                  height="200" style="margin-bottom:5px">
+                                                        <f:facet name="toolbar">
+                                                            <span class="ql-formats">
+                                                                <button class="ql-bold"></button>
+                                                                <button class="ql-italic"></button>
+                                                                <button class="ql-underline"></button>
+                                                                <button class="ql-strike"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-header" value="1"></button>
+                                                                <button class="ql-header" value="2"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-list" value="ordered"></button>
+                                                                <button class="ql-list" value="bullet"></button>
+                                                                <button class="ql-indent" value="-1"></button>
+                                                                <button class="ql-indent" value="+1"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <select class="ql-color"></select>
+                                                                <select class="ql-background"></select>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                                <button class="ql-clean"></button>
+                                                            </span>
+                                                        </f:facet>
+                                                        <p:ajax event="keyup" process="@this"/>
+                                                    </p:textEditor>
+                                                </h:panelGrid>
+
+
+                                            </p:panelGrid>
+
+
+                                        </li>
+                                    </ui:fragment>
+
+
                                     <li>
 
                                         <ui:fragment rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}">
@@ -391,6 +451,11 @@
 
                                         <ui:fragment rendered="#{medicalBoardSessionManagedBean.selectedCase.isSigned}">
                                             <h5>This Case Is Signed and is on view only mode.</h5>
+
+
+                                            <h:outputText rendered="#{medicalBoardSessionManagedBean.selectedCase.followUpMedicalBoardCase != null}" value="A Medical Board In #{medicalBoardSessionManagedBean.selectedCase.followUpMedicalBoardCase.medicalBoardType} Case has been created from this case." style="font-weight: bold" />
+
+
                                         </ui:fragment>
 
                                     </li>

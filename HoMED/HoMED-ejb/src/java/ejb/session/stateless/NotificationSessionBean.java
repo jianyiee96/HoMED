@@ -50,6 +50,11 @@ public class NotificationSessionBean implements NotificationSessionBeanLocal {
 
     @Override
     public void sendPushNotification(String title, String body, String svcmanFCMToken) {
+        
+        if(svcmanFCMToken == null) {
+            return;
+        }
+        
         try {
             HttpPost post = new HttpPost("https://fcm.googleapis.com/fcm/send");
             post.setHeader("Content-type", "application/json");

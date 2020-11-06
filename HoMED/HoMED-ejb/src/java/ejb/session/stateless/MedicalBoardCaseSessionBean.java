@@ -63,6 +63,20 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
         MedicalBoardCase predecessorMedicalBoardCase = this.retrieveMedicalBoardCaseById(predecessorMedicalBoardCaseId);
 
+        if (predecessorMedicalBoardCase == null) {
+            throw new CreateMedicalBoardCaseException("Invalid Medical Board Id");
+        } else if (statementOfCase == null || statementOfCase.isEmpty()) {
+            throw new CreateMedicalBoardCaseException("Unable to create Medical Board Case: Please supply a statement of case");
+        } else if (predecessorMedicalBoardCase.getFollowUpMedicalBoardCase() != null) {
+            throw new CreateMedicalBoardCaseException("Unable to create Medical Board Case: Current Medical Board is already tied to an existing follow up medical board case");
+        }
+
+        MedicalBoardCase medicalBoardCase = new MedicalBoardCase(predecessorMedicalBoardCase, medicalBoardType, statementOfCase);
+        predecessorMedicalBoardCase.setFollowUpMedicalBoardCase(medicalBoardCase);
+
+        em.persist(medicalBoardCase);
+        em.flush();
+
     }
 
     @Override
@@ -90,8 +104,8 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
             } else if (newPesStatus == null) {
                 medicalBoardCase.setFinalPesStatus(serviceman.getPesStatus());
             }
-            
-            for(ConditionStatus cs : serviceman.getConditionStatuses()) {
+
+            for (ConditionStatus cs : serviceman.getConditionStatuses()) {
                 cs.setIsActive(Boolean.FALSE);
             }
 
@@ -112,7 +126,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
     @Override
     public List<MedicalBoardCase> retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum medicalBoardTypeEnum) {
-        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType");
         query.setParameter("boardType", medicalBoardTypeEnum);
 
         return query.getResultList();
@@ -121,7 +135,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     @Override
     public List<MedicalBoardCase> retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum medicalBoardTypeEnum, MedicalBoardSlot medicalBoardSlot) {
 
-        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot = :boardSlot AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot = :boardSlot AND mbc.medicalBoardType = :boardType");
         query.setParameter("boardSlot", medicalBoardSlot);
         query.setParameter("boardType", medicalBoardTypeEnum);
 
