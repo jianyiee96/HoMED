@@ -94,6 +94,26 @@ public class CryptographicHelper {
             return null;
         }
     }
+    
+        public String generateRandomDigitString(int length) {
+        String password = "";
+
+        try {
+            SecureRandom wheel = SecureRandom.getInstance(DEFAULT_SECURE_RANDOM_ALGORITHM_NAME);
+
+            char[] digits = new char[]{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
+
+            for (int i = 0; i < length; i++) {
+                int random = wheel.nextInt(digits.length);
+                password += digits[random];
+            }
+
+            return password;
+        } catch (NoSuchAlgorithmException ex) {
+            System.err.println("********** Exception: " + ex);
+            return null;
+        }
+    }
 
     public UUID generateUUID() {
         return UUID.randomUUID();

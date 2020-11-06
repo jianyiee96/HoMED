@@ -6,8 +6,9 @@ package util.enumeration;
 
 public enum MedicalBoardSlotStatusEnum {
 
+    UNASSIGNED("Board Members Not Assigned"),
     // No cases have been allocated yet
-    UNALLOCATED("Board Cases Unallocated"),
+    ASSIGNED("Board Members Assigned"),
     // Cases have been allocated
     ALLOCATED("Board Cases Allocated"),
     // Board is currently ongoing

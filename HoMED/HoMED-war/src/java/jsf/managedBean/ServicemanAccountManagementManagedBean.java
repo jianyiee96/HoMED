@@ -34,6 +34,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import util.enumeration.BloodTypeEnum;
 import util.enumeration.GenderEnum;
+import util.enumeration.PesStatusEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.CreateServicemanException;
 import util.exceptions.EmployeeNotFoundException;
@@ -152,6 +153,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         String bloodType = serviceman[9];
         String rod = serviceman[10];
         String role = serviceman[11];
+        String pes = serviceman[12];
 
         Serviceman newServiceman = new Serviceman();
         newServiceman.setName(name);
@@ -162,6 +164,11 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         }
         if (role.toUpperCase().equals("NSF") || role.toUpperCase().equals("NSMEN") || role.toUpperCase().equals("REGULAR") || role.toUpperCase().equals("OTHERS")) {
             newServiceman.setRole(ServicemanRoleEnum.valueOf(role.toUpperCase()));
+        }
+        if (pes.toUpperCase().equals("A") || pes.toUpperCase().equals("B1") || pes.toUpperCase().equals("B2") || pes.toUpperCase().equals("B3")
+                || pes.toUpperCase().equals("B4") || pes.toUpperCase().equals("BP") || pes.toUpperCase().equals("C2") || pes.toUpperCase().equals("C9")
+                || pes.toUpperCase().equals("E1") || pes.toUpperCase().equals("E9") || pes.toUpperCase().equals("F")) {
+            newServiceman.setPesStatus(PesStatusEnum.valueOf(pes.toUpperCase()));
         }
         if (BloodTypeEnum.valueOfLabel(bloodType) != null) {
             newServiceman.setBloodType(BloodTypeEnum.valueOfLabel(bloodType));
@@ -203,6 +210,9 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
                     servicemanWrapper.setIsValid(Boolean.FALSE);
                 } else if (errorMsg.contains("Role")) {
                     addErrorMessage(validationErrorMessages, 11, "role", role, "Please change it to REGULAR/NSF/NSMEN/OTHERS");
+                    servicemanWrapper.setIsValid(Boolean.FALSE);
+                } else if (errorMsg.contains("Pes")) {
+                    addErrorMessage(validationErrorMessages, 12, "pes status", pes, "Please change it to A/B1/B2/B3/B4/BP/C2/C9/E1/E9/F");
                     servicemanWrapper.setIsValid(Boolean.FALSE);
                 }
             }
@@ -345,7 +355,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
         removeErrorMessagesByEdit(servicemanWrapper);
         Serviceman serviceman = servicemanWrapper.getNewServiceman();
         Employee employee = servicemanWrapper.getExistingEmployee();
-        
+
         serviceman.setName(employee.getName());
         serviceman.setGender(employee.getGender());
         serviceman.setPhoneNumber(employee.getPhoneNumber());
@@ -450,7 +460,7 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
     }
 
     private void printUnexpectedErrorMessage(String errorMessage) {
-        FacesContext.getCurrentInstance().addMessage(null, 
+        FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Bulk Import",
                         "An unexpected error has occurred while importing servicemen in bulk. " + errorMessage
@@ -516,6 +526,10 @@ public class ServicemanAccountManagementManagedBean implements Serializable {
 
     public BloodTypeEnum[] getBloodTypes() {
         return BloodTypeEnum.values();
+    }
+
+    public PesStatusEnum[] getPesStatuses() {
+        return PesStatusEnum.values();
     }
 
     public Boolean getIsUploaded() {

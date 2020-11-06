@@ -4,19 +4,23 @@
  */
 package ejb.session.stateless;
 
+import entity.ConditionStatus;
 import entity.Consultation;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
-import java.util.ArrayList;
+import entity.Serviceman;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
+import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
@@ -62,7 +66,46 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     }
 
     @Override
-    public List<MedicalBoardCase> retrieveUnassignedMedicalBoardCases(MedicalBoardTypeEnum medicalBoardTypeEnum) {
+    public void signMedicalBoardCase(Long medicalBoardCaseId, String boardFindings, PesStatusEnum newPesStatus, List<ConditionStatus> conditionStatuses) throws SignMedicalBoardCaseException {
+
+        MedicalBoardCase medicalBoardCase = retrieveMedicalBoardCaseById(medicalBoardCaseId);
+
+        if (medicalBoardCase == null) {
+            throw new SignMedicalBoardCaseException("Invalid Medical Board Case Id");
+        } else if (medicalBoardCase.getIsSigned()) {
+            throw new SignMedicalBoardCaseException("Unable to sign medical board case: Case is signed already");
+        } else if (boardFindings == null || boardFindings.isEmpty()) {
+            throw new SignMedicalBoardCaseException("Unable to sign medical board case: Please include board findings.");
+        }
+
+        try {
+            medicalBoardCase.setIsSigned(Boolean.TRUE);
+            medicalBoardCase.setBoardFindings(boardFindings);
+
+            Serviceman serviceman = medicalBoardCase.getConsultation().getBooking().getServiceman();
+
+            if (newPesStatus != null && newPesStatus != serviceman.getPesStatus()) {
+                medicalBoardCase.setNewPesStatus(newPesStatus);
+                serviceman.setPesStatus(newPesStatus);
+            }
+
+            for (ConditionStatus cs : conditionStatuses) {
+                em.persist(cs);
+                cs.setServiceman(serviceman);
+                serviceman.getConditionStatuses().add(cs);
+                cs.setMedicalBoardCase(medicalBoardCase);
+                medicalBoardCase.getConditionStatuses().add(cs);
+                em.flush();
+            }
+
+        } catch (Exception ex) {
+            throw new SignMedicalBoardCaseException("Unable to sign medical board case: " + ex.getMessage());
+        }
+
+    }
+
+    @Override
+    public List<MedicalBoardCase> retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum medicalBoardTypeEnum) {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardSlot IS NULL AND mbc.medicalBoardType = :boardType ORDER BY mbc.consultation.endDateTime ASC");
         query.setParameter("boardType", medicalBoardTypeEnum);
 
@@ -98,22 +141,20 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
             // To reset all the relationship
             for (int i = 0; i < medicalBoardSlotToUpdate.getMedicalBoardCases().size(); i++) {
                 medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardSlot(null);
+                medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.WAITING);
             }
             medicalBoardSlotToUpdate.getMedicalBoardCases().clear();
 
-            System.out.println("====");
-            medicalBoardCases.forEach(mbc -> System.out.print(mbc.getMedicalBoardCaseId()));
-            System.out.println("====");
-            
             medicalBoardCases.forEach(mbc -> {
                 MedicalBoardCase medicalBoardCaseToUpdate = retrieveMedicalBoardCaseById(mbc.getMedicalBoardCaseId());
-                
+                medicalBoardCaseToUpdate.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.SCHEDULED);
+
                 medicalBoardCaseToUpdate.setMedicalBoardSlot(medicalBoardSlotToUpdate);
                 medicalBoardSlotToUpdate.getMedicalBoardCases().add(medicalBoardCaseToUpdate);
             });
 
             if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
-                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.UNALLOCATED);
+                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ASSIGNED);
             } else {
                 medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ALLOCATED);
             }
@@ -121,37 +162,4 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
             throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
         }
     }
-
-//    @Override
-//    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<Long> medicalBoardCaseIds) throws UpdateMedicalBoardSlotException {
-//        String errorMessage = "Failed to allocate Medical Board Cases to Medical Board Slot: ";
-//
-//        if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
-//            MedicalBoardSlot medicalBoardSlotToUpdate = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
-//
-//            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInPresenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase());
-//            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInAbsenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase());
-//
-//            for (int i = 0; i < medicalBoardSlotToUpdate.getMedicalBoardCases().size(); i++) {
-//                medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardSlot(null);
-//            }
-//
-//            medicalBoardSlotToUpdate.getMedicalBoardCases().clear();
-//
-//            medicalBoardCaseIds.forEach(currMbcId -> {
-//                MedicalBoardCase medicalBoardCase = retrieveMedicalBoardCaseById(currMbcId);
-//                medicalBoardCase.setMedicalBoardSlot(medicalBoardSlotToUpdate);
-//
-//                medicalBoardSlotToUpdate.getMedicalBoardCases().add(medicalBoardCase);
-//            });
-//
-//            if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
-//                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.UNALLOCATED);
-//            } else {
-//                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ALLOCATED);
-//            }
-//        } else {
-//            throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
-//        }
-//    }
 }
