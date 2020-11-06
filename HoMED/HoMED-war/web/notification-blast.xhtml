@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml">
+
+    <ui:define name="title">Notification Blast</ui:define>
+
+    <ui:define name="content">
+
+
+        <style type="text/css">
+
+            .title-field, .title-field.ui-inputfield {
+                font-weight: 300;
+                font-size: 30px;
+                width: 100%;
+            }
+
+            .message-field, .message-field.ui-inputfield {
+                font-size: 20px;
+                width: 100%;
+                height: 400px;
+            }
+
+            .button-field, .button-field.ui-inputfield {
+                width: 30%;
+            }
+
+        </style>
+        <h:form id="notificationForm">
+
+            <p:growl id="growl" globalOnly="true" showDetail="true" />
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+
+            <div class="p-grid">               
+                <div class="p-col-2"></div>
+
+                <div class="p-col-8">
+                    <div class="card">
+                        <h2>Notification Blast</h2>
+
+
+                        <p:inputText  class="title-field" value="#{notificationBlastManagedBean.title}" placeholder="Title">
+                        </p:inputText>
+                        <p:separator/>
+                        <p:inputTextarea class="message-field" value="#{notificationBlastManagedBean.message}" placeholder="Enter Message Description">
+                        </p:inputTextarea>
+                        <p:separator/>
+                        <div align="Center">
+                            <p:commandButton actionListener="#{notificationBlastManagedBean.send()}" update="@form" class="button-field" value="Send" >
+                                <p:confirm header="Send" message="This notification will be sent to all serviceman accounts. Continue?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-col-2"></div>
+
+            </div>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

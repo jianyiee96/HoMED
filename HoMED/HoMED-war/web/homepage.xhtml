@@ -285,7 +285,7 @@
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
                                                     <div>
-                                                        <i class="fa fa-rocket" style="font-size: 3rem"></i>
+                                                        <i class="fa fa-rocket p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Queue Management</h2>
                                                     </div>
                                                 </div>
@@ -303,7 +303,7 @@
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
                                                     <div>
-                                                        <i class="fa fa-stethoscope" style="font-size: 3rem"></i>
+                                                        <i class="fa fa-stethoscope p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Current Consultation</h2>
                                                     </div>
                                                 </div>
@@ -320,7 +320,7 @@
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
                                                     <div>
-                                                        <i class="fa fa-clipboard" style="font-size: 3rem"></i>
+                                                        <i class="fa fa-clipboard p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Medical Board</h2>
                                                     </div>
                                                 </div>
@@ -331,6 +331,22 @@
                                     </div>
                                 </ui:fragment>
 
+                                <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="notification-blast.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-bullhorn p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Notification Blast</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
 
 
                             </div>
