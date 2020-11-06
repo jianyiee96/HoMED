@@ -69,6 +69,7 @@ import util.exceptions.EndConsultationException;
 import util.exceptions.MarkBookingAttendanceException;
 import util.exceptions.RelinkFormTemplatesException;
 import util.exceptions.ScheduleBookingSlotException;
+import util.exceptions.ScheduleMedicalBoardSlotException;
 import util.exceptions.ServicemanNotFoundException;
 import util.exceptions.StartConsultationException;
 import util.exceptions.SubmitFormInstanceException;
@@ -136,7 +137,8 @@ public class DataInitializationSessionBean {
 
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
-//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+
             fillForms(bookings, RATE_OF_FILLING_FORMS);
             Date today = new Date();
             List<Booking> pastBookings = bookings.stream()
@@ -150,7 +152,8 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException | ServicemanNotFoundException
+                | ScheduleBookingSlotException | ScheduleMedicalBoardSlotException
+                | ServicemanNotFoundException
                 | MarkBookingAttendanceException | StartConsultationException
                 | SubmitFormInstanceException | EndConsultationException ex) {
             System.out.println(ex.getMessage());
@@ -311,7 +314,7 @@ public class DataInitializationSessionBean {
 //          && isAfterToday
             if (Math.random() <= rate) {
                 Serviceman serviceman = servicemen.get(randServicemanIdx);
-                Boolean isForReview = getRandomNumber(0,10) % 2 == 0 ? Boolean.TRUE : Boolean.FALSE;
+                Boolean isForReview = getRandomNumber(0, 10) % 2 == 0 ? Boolean.TRUE : Boolean.FALSE;
                 Booking booking = bookingSessionBeanLocal.createBookingByInit(serviceman.getServicemanId(), consultationPurposes.get(randCpIdx).getConsultationPurposeId(), bs.getSlotId(), "Created by data init.", isForReview);
                 bookings.add(booking);
 
@@ -439,10 +442,11 @@ public class DataInitializationSessionBean {
         return bookingSlots;
     }
 
-    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleBookingSlotException {
+    private List<MedicalBoardSlot> initializeMedicalBoardSlots() throws ScheduleMedicalBoardSlotException {
         System.out.println("Creating Medical Board Slots...");
+
+        int numOfDaysToCreate = 3;
         List<MedicalBoardSlot> medicalBoardSlots = new ArrayList<>();
-        int numOfDaysToCreate = 5;
 
         for (int day = 0; day < numOfDaysToCreate; day++) {
             Calendar date = Calendar.getInstance();
@@ -455,16 +459,13 @@ public class DataInitializationSessionBean {
             start.setTime(date.getTime());
             end.setTime(date.getTime());
 
-            start.set(Calendar.HOUR_OF_DAY, 12);
+            start.set(Calendar.HOUR_OF_DAY, 14);
             start.set(Calendar.MINUTE, 30);
             end.set(Calendar.HOUR_OF_DAY, 17);
             end.set(Calendar.MINUTE, 30);
 
-            if (start.getTime().before(new Date())) {
-                start.setTime(new Date());
-            }
-            if (start.getTime().before(end.getTime())) {
-                medicalBoardSlots.addAll(slotSessionBeanLocal.createMedicalBoardSlots(start.getTime(), end.getTime()));
+            if (start.after(Calendar.getInstance())) {
+                medicalBoardSlots.add(slotSessionBeanLocal.createMedicalBoardSlot(start.getTime(), end.getTime()));
             }
         }
 
@@ -596,7 +597,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Who is your favaourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
         formFields.add(new FormField("Who is your favourite serviceman?", 4, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.MO, null));
         formFields.add(new FormField("Who is your favourite chairman?", 5, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN_MO, null));
-        
+
         otherFormTemplate.setFormFields(formFields);
         formTemplateSessionBeanLocal.saveFormTemplate(otherFormTemplate);
         formTemplateSessionBeanLocal.publishFormTemplate(otherFormTemplate.getFormTemplateId());
@@ -777,13 +778,13 @@ public class DataInitializationSessionBean {
         List<Employee> employees = new ArrayList<>();
 
         Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("16 Raffles Quay", "#01-00", "Hong Leong Building", "Singapore", "048581"), "98765432", GenderEnum.MALE);
-        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("115A Commonwealth Drive", "#02-14", "", "Singapore", "149596"), "81234567", GenderEnum.FEMALE);
+        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("115A Commonwealth Drive", "#02-14", "", "Singapore", "149596"), "81234567", GenderEnum.FEMALE, Boolean.TRUE);
         Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 Orchard Road", "#07-02", "Wheelock Place", "Singapore", "238880"), "92675567", GenderEnum.MALE);
         Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("woodlands east industrial estate 06-30", "06-30", "", "Singapore", "738733"), "88831888", GenderEnum.MALE);
         Employee emp5 = new Clerk("2 Way Account", "password", "dummyemailx5@hotmail.com", new Address("101 Eunos Avenue 3 EUNOS INDUSTRIAL ESTATE", "", "", "Singapore", "409835"), "87241222", GenderEnum.MALE);
 
         // NO Medical Centre Staff
-        Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("9 Penang Road", "#10-05", "", "Singapore", "238459"), "91758375", GenderEnum.MALE);
+        Employee emp6 = new MedicalOfficer("MedicalOfficer No MC", "password", "dummyemailx6@hotmail.com", new Address("9 Penang Road", "#10-05", "", "Singapore", "238459"), "91758375", GenderEnum.MALE, Boolean.FALSE);
         Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("141 Market Street", "#01-00", "INTERNATIONAL FACTORS BUILDING", "Singapore", "048944"), "91758375", GenderEnum.MALE);
         Long empId1 = employeeSessionBeanLocal.createEmployeeByInit(emp1);
         Long empId2 = employeeSessionBeanLocal.createEmployeeByInit(emp2);

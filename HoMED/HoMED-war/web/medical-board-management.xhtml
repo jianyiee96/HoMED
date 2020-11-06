@@ -1,0 +1,382 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Medical Board Management</ui:define>
+
+    <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+
+        <style type="text/css">
+            .icon-style {
+                text-align: center;
+                width: 20px;
+                font-size: 18px !important;
+                color: black !important;
+                padding-bottom: 5px;
+            }
+        </style>
+
+        <p:growl id="growl-message" for="growl-message" showDetail="true" />
+
+        <ezcomp:pageRedirect rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() == 0}"
+                             header="Currently No Medical Board Slots Scheduled"/>
+
+        <ui:fragment rendered="#{medicalBoardManagementManagedBean.medicalBoardSlots.size() != 0}">
+
+            <h:form id="formMedicalBoardManagement">
+                <div class="p-grid crud-table">
+                    <div class="p-sm-12 p-md-4 p-lg-4">
+                        <div class="card">
+                            <h2>Medical Board Management Page</h2>
+
+                            <p:dataScroller id="dataScrollerMedicalBoards" widgetVar="dataScrollerMedicalBoards"
+                                            value="#{medicalBoardManagementManagedBean.filteredMedicalBoardSlots}" var="medicalBoardSlot" chunkSize="5" mode="inline" scrollHeight="900">
+
+                                <f:facet name="header">
+                                    <p:selectOneButton value="#{medicalBoardManagementManagedBean.filterOption}" unselectable="false">
+                                        <f:selectItem itemLabel="Past" itemValue="#{0}" />
+                                        <f:selectItem itemLabel="Upcoming" itemValue="#{1}" />
+                                        <p:ajax event="change" listener="#{medicalBoardManagementManagedBean.doFilterMedicalBoards}" update="dataScrollerMedicalBoards"/>
+                                    </p:selectOneButton>
+                                </f:facet>
+
+                                <p:commandLink style="color: #{medicalBoardManagementManagedBean.getCommandLinkColour(medicalBoardSlot)}" 
+                                               actionListener="#{medicalBoardManagementManagedBean.selectMedicalBoardSlot(medicalBoardSlot)}" 
+                                               update="@form" process="@this">
+
+                                    <div style="padding: 1.0em 1.0em 1.0em 0.75em; position: relative;">
+
+                                        <p:outputLabel rendered="#{medicalBoardSlot eq medicalBoardManagementManagedBean.selectedMedicalBoardSlot}" class="form-status-badge slot-badge" 
+                                                       style="margin-left: -10px; margin-top:-15px; position: absolute;" 
+                                                       value="SELECTED" />
+
+                                        <div class="card ui-fluid" style="background-color: #fcfcfc; width: 100%; border-style: solid; border-width: 1px; padding-bottom: 0;">
+
+                                            <h:outputText style="font-weight: bold; font-size: 18px;" value="#{medicalBoardSlot.medicalBoardSlotStatusEnum}" />
+
+                                            <p:outputPanel style="margin: 8px;">
+                                                <h:panelGrid columns="2" cellpadding="5">
+                                                    <h:outputText value="Start Date: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.startDateTime)}" />
+
+                                                    <h:outputText value="End Date: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(medicalBoardSlot.endDateTime)}" />
+
+                                                    <h:outputText value="Chairman: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.chairman != null ? medicalBoardSlot.chairman.name : 'N.A.'}" />
+
+                                                    <h:outputText value="MO1: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.medicalOfficerOne != null ? medicalBoardSlot.medicalOfficerOne.name : 'N.A.'}" />
+
+                                                    <h:outputText value="MO2: " style="font-weight: bold" />
+                                                    <h:outputText value="#{medicalBoardSlot.medicalOfficerTwo != null ? medicalBoardSlot.medicalOfficerTwo.name : 'N.A.'}" />
+
+                                                </h:panelGrid>
+                                            </p:outputPanel>
+                                        </div>
+                                    </div>
+
+                                    <f:setPropertyActionListener value="#{medicalBoardSlot}" target="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot}" />
+                                </p:commandLink>
+
+                            </p:dataScroller>
+                        </div>
+
+                    </div>
+
+                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot != null}">
+
+                        <div class="p-sm-12 p-md-8 p-lg-8">
+                            <div class="timeline card card-w-title">
+                                <h2>Medical Board Details</h2>
+                                <ul>
+                                    <li>
+                                        <p:panelGrid columns="2" layout="flex">
+                                            <h:panelGroup>
+                                                <div>
+                                                    <i class="fa fa-clock-o icon-style"></i>
+                                                    <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Date Information</span>
+                                                </div>
+
+                                                <h:panelGrid columns="2" cellpadding="8">
+                                                    <p:outputLabel value="Date: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.renderDate(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                                    <p:outputLabel value="Start Time: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.startDateTime)}" />
+
+                                                    <p:outputLabel value="End Time: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.selectedMedicalBoardSlot.endDateTime)}" />
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <i class="fa fa-user-md icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Team Information</span>
+
+                                                <h:panelGrid columns="2" cellpadding="8">
+                                                    <p:outputLabel value="Chairman: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.chairman.name}" />
+
+                                                    <p:outputLabel value="Medical Officer 1: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerOne.name}" />
+
+                                                    <p:outputLabel value="Medical Officer 2: " style="font-weight: bold" />
+                                                    <p:outputLabel value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo == null ? 'N.A.' : medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalOfficerTwo.name}" />
+                                                </h:panelGrid>
+                                            </h:panelGroup>
+                                        </p:panelGrid>
+                                    </li>
+
+                                    <li>
+                                        <p:panelGrid columns="2" layout="flex">
+
+                                            <h:panelGroup>
+                                                <!-- 
+                                                    Medical Board In-Presence 
+                                                -->
+                                                <!-- Currently selected MBIP slot is ASSIGNED (All 3 MOs are assigned) or ALLOCATED (ASSIGNED + Cases allocated) -->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+
+                                                    <div>
+                                                        <i class="fa fa-user icon-style"></i>
+                                                        <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases</span>
+                                                    </div>
+
+                                                    <!-- Reviewing Medical Officers are assigned -->
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                                        <h:panelGrid columns="2" cellpadding="8">
+
+                                                            <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
+                                                            <p:inplace id="inplaceEstTimeForEachBoardInPresence">
+                                                                <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInPresenceCase}" size="3">
+                                                                    <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInPresence" />
+                                                                </p:inputNumber>
+                                                            </p:inplace>
+
+                                                        </h:panelGrid>
+
+                                                        <p:dataTable id="dataTableMedicalBoardInPresenceCases" widgetVar="dataTableMedicalBoardInPresenceCases" reflow="true"
+                                                                     value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="mbipCase"
+                                                                     selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCases}" rowKey="#{mbipCase.medicalBoardCaseId}"
+                                                                     style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                                            <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                            <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+
+                                                            <p:column selectionMode="multiple"></p:column>
+                                                            <p:column headerText="ID" width="10%">
+                                                                <h:outputText value="#{mbipCase.medicalBoardCaseId}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Name" width="45%">
+                                                                <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Case Creation Date" width="45%">
+                                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(mbipCase.consultation.endDateTime)}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+
+                                                        <h:panelGrid columns="2" cellpadding="8">
+
+                                                            <p:outputLabel for="outputTextNumBoardInPresenceSelected" value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextNumBoardInPresenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCases.size()}" />
+
+                                                            <p:outputLabel for="outputTextEstTimeBoardInPresence" value="Estimated Time Required: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextEstTimeBoardInPresence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+
+                                                        </h:panelGrid>
+                                                    </ui:fragment>
+
+                                                    <!-- Reviewing Medical Officers are NOT assigned -->
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED'}">
+                                                        <h:panelGrid columns="1" cellpadding="8">
+                                                            <p:outputLabel style="font-size: 14px;"
+                                                                           value="Please assign all the reviewing medical officers to start allocating medical board in-presence cases!" />
+                                                        </h:panelGrid>
+                                                    </ui:fragment>
+                                                </ui:fragment>
+
+                                                <!-- 
+                                                    TO BE DONE AFTER MEDICAL BOARD IS DONE 
+                                                -->
+                                                <!-- Currently selected MBIP slot is ONGOING or COMPLETED or EXPIRED-->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+                                                    <div>
+                                                        <i class="fa fa-users icon-style"></i>
+                                                        <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases (View Only)</span>
+                                                    </div>
+
+                                                    <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:outputLabel value="Number of Board In-Presence Cases Selected: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot.size()}" />
+
+                                                        <h:outputLabel value="List of Medical Board Cases Assigned: " style="font-weight:bold;"/>
+                                                        <p:outputLabel />
+
+                                                        <p:repeat rendered="#{not empty medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}" value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}" var="mbipCase">
+                                                            <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            <p:outputLabel />
+                                                        </p:repeat>
+
+                                                        <ui:fragment rendered="#{empty medicalBoardManagementManagedBean.medicalBoardInPresenceCasesForSelectedMedicalBoardSlot}">
+                                                            <h:outputText value="No Medical Board In-Presence Cases Were Assigned!" />
+                                                        </ui:fragment>
+                                                        <p:outputLabel />
+
+                                                        <p:outputLabel value="Estimated Time Taken: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+                                                    </h:panelGrid>
+                                                </ui:fragment>
+                                            </h:panelGroup>
+
+
+                                            <h:panelGroup>
+                                                <!-- 
+                                                    Medical Board In-Absence 
+                                                -->
+                                                <!-- Currently selected MBIA slot is ASSIGNED or ALLOCATED  -->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+
+                                                    <div>
+                                                        <i class="fa fa-users icon-style"></i>
+                                                        <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases</span>
+                                                    </div>
+
+                                                    <!-- Reviewing Medical Officers are assigned -->
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                                        <h:panelGrid columns="2" cellpadding="8">
+
+                                                            <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
+                                                            <p:inplace id="inplaceEstTimeForEachBoardInAbsence">
+                                                                <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInAbsenceCase}" size="3">
+                                                                    <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInAbsence" />
+                                                                </p:inputNumber>
+                                                            </p:inplace>
+
+                                                        </h:panelGrid>
+
+                                                        <p:dataTable id="dataTableMedicalBoardInAbsenceCases" widgetVar="dataTableMedicalBoardInAbsenceCases" reflow="true"
+                                                                     value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCases}" var="mbiaCase"
+                                                                     selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCases}" rowKey="#{mbiaCase.medicalBoardCaseId}"
+                                                                     style="height: 250px;" scrollHeight="250"  rowSelectMode="add">
+                                                            <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                            <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+
+                                                            <p:column selectionMode="multiple"></p:column>
+                                                            <p:column headerText="ID" width="10%">
+                                                                <h:outputText value="#{mbiaCase.medicalBoardCaseId}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Name" width="45%">
+                                                                <h:outputText value="#{mbiaCase.consultation.booking.serviceman.name}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Case Creation Time" width="45%">
+                                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderDateTime(mbiaCase.consultation.endDateTime)}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+
+                                                        <h:panelGrid columns="2" cellpadding="8">
+
+                                                            <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextNumBoardInAbsenceSelected" value="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCases.size()}" />
+
+                                                            <p:outputLabel value="Estimated Time Required: " style="font-weight: bold" />
+                                                            <h:outputText id="outputTextEstTimeBoardInAbsence" value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(false)}" />
+
+                                                        </h:panelGrid>           
+                                                    </ui:fragment>
+
+                                                    <!-- Reviewing Medical Officers are NOT assigned -->
+                                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED'}">
+                                                        <h:panelGrid columns="1" cellpadding="8">
+                                                            <p:outputLabel style="font-size: 14px;"
+                                                                           value="Please assign all the reviewing medical officers to start allocating medical board in-absence cases!" />
+                                                        </h:panelGrid>
+                                                    </ui:fragment>
+                                                </ui:fragment>
+
+                                                <!-- 
+                                                    TO BE DONE AFTER MEDICAL BOARD IS DONE
+                                                -->
+                                                <!-- Currently selected MBIP slot is ONGOING or COMPLETED or EXPIRED-->
+                                                <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'UNASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ASSIGNED' and medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
+
+                                                    <div>
+                                                        <i class="fa fa-users icon-style"></i>
+                                                        <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases (View Only)</span>
+                                                    </div>
+
+                                                    <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:outputLabel value="Number of Board In-Absence Cases Selected: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot.size()}" />
+
+                                                        <h:outputLabel value="List of Medical Board Cases Assigned: " style="font-weight:bold;"/>
+                                                        <p:outputLabel />
+
+                                                        <p:repeat rendered="#{not empty medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}" value="#{medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}" var="mbipCase">
+                                                            <h:outputText value="#{mbipCase.consultation.booking.serviceman.name}" />
+                                                            <p:outputLabel />
+                                                        </p:repeat>
+
+                                                        <ui:fragment rendered="#{empty medicalBoardManagementManagedBean.medicalBoardInAbsenceCasesForSelectedMedicalBoardSlot}">
+                                                            <h:outputText value="No Medical Board In-Absence Cases Were Assigned!" />
+                                                        </ui:fragment>
+                                                        <p:outputLabel />
+
+                                                        <p:outputLabel value="Estimated Time Taken: " style="font-weight: bold" />
+                                                        <h:outputText value="#{medicalBoardManagementManagedBean.calculateEstimatedTimeNeeded(true)}" />
+                                                    </h:panelGrid>
+
+                                                </ui:fragment>
+                                            </h:panelGroup>
+
+                                        </p:panelGrid>
+                                    </li>
+
+                                    <!-- Medical Board Summary only shows up when the reviewing medical officers are assigned -->
+                                    <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
+                                        <li>
+                                            <div>
+                                                <i class="fa fa-book icon-style"></i>
+                                                <span style="font-size: 1.25rem; font-weight: bold;">Medical Board Summary</span>
+                                            </div>
+
+                                            <h:panelGrid id="panelGridMedicalBoardSummary" columns="2" cellpadding="8">
+
+                                                <p:outputLabel value="Total Estimated Time Needed for Medical Board: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagementManagedBean.calculateTotalEstimatedTimeNeeded()}" />
+
+                                                <p:outputLabel value="Estimated End Time for Medical Board: " style="font-weight: bold" />
+                                                <h:outputText value="#{medicalBoardManagementManagedBean.renderTime(medicalBoardManagementManagedBean.calculateEstimatedEndDate())}" />
+
+                                            </h:panelGrid>    
+
+                                            <div style="text-align: right;">
+                                                <p:commandButton id="saveChanges" actionListener="#{medicalBoardManagementManagedBean.saveChanges()}" 
+                                                                 title="Save Changes" value="Save"
+                                                                 update="@form" icon="fa fa-save" styleClass="success-button p-mr-3" />
+
+                                                <p:commandButton id="revertChanges" actionListener="#{medicalBoardManagementManagedBean.revertChanges(medicalBoardManagementManagedBean.selectedMedicalBoardSlot)}" 
+                                                                 title="Revert Changes" value="Revert"
+                                                                 update="@form" icon="fa fa-undo" styleClass="help-button" />
+                                            </div>
+                                        </li>
+                                    </ui:fragment>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </ui:fragment>
+                </div>
+            </h:form>
+        </ui:fragment>
+
+    </ui:define>
+</ui:composition>
