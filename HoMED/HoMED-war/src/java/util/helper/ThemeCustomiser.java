@@ -10,6 +10,7 @@ public class ThemeCustomiser implements Serializable {
 
     private String componentTheme = "cyan";
     private String topbarColor = "cyan";
+    private String colorRgb = "";
 
     private final String menuMode = "layout-overlay";
     private final String menuColor = "light";
@@ -42,6 +43,14 @@ public class ThemeCustomiser implements Serializable {
 
     public boolean isLightLogo() {
         return lightLogo;
+    }
+
+    public String getColorRgb() {
+        return colorRgb;
+    }
+
+    public void setColorRgb(String colorRgb) {
+        this.colorRgb = colorRgb;
     }
 
     public String getInputStyle() {
