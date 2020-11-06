@@ -59,5 +59,5 @@ public interface ServicemanSessionBeanLocal {
     public void assignFcmToken(Long id, String fcmToken);
 
     public void unassignFcmToken(Long id);
-
+    
 }

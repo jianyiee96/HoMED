@@ -41,7 +41,13 @@ public class ConditionStatus implements Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date statusEndDate;
+    
+    private Boolean isActive;
 
+    public ConditionStatus(){
+        this.isActive = Boolean.TRUE;
+    }
+    
     public Long getConditionStatusId() {
         return conditionStatusId;
     }
@@ -80,6 +86,14 @@ public class ConditionStatus implements Serializable {
 
     public void setMedicalBoardCase(MedicalBoardCase medicalBoardCase) {
         this.medicalBoardCase = medicalBoardCase;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override

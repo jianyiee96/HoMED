@@ -1,6 +1,7 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.BookingSessionBeanLocal;
+import ejb.session.stateless.ConditionStatusSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
@@ -28,6 +29,7 @@ import entity.MedicalCentre;
 import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.MedicalStaff;
+import entity.PreDefinedConditionStatus;
 import entity.Serviceman;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -103,6 +105,8 @@ public class DataInitializationSessionBean {
     private BookingSessionBeanLocal bookingSessionBeanLocal;
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
+    @EJB
+    private ConditionStatusSessionBeanLocal conditionStatusSessionBeanLocal;
 
     final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
@@ -139,7 +143,9 @@ public class DataInitializationSessionBean {
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
             List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
-
+            
+            initializePreDefinedConditionStatuses();
+            
             fillForms(bookings, RATE_OF_FILLING_FORMS);
             Date today = new Date();
             List<Booking> pastBookings = bookings.stream()
@@ -160,6 +166,17 @@ public class DataInitializationSessionBean {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
+    }
+
+    private void initializePreDefinedConditionStatuses() {
+
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running, Marching and Jumping");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Fire arms");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Sunlight");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running and ");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Spicy Food");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Guard Duty");
+
     }
 
     private void executeConsultationsForPastBookings(List<Booking> pastBookings) throws MarkBookingAttendanceException, StartConsultationException, SubmitFormInstanceException, EndConsultationException {
