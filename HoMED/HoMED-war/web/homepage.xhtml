@@ -108,6 +108,23 @@
                                     </div>
                                 </ui:fragment>
 
+                                <ui:fragment>
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="report-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-files-o p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Report Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
                                 <ui:fragment rendered="#{currentEmployee.role == 'SUPER_USER'}">
                                     <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
                                         <p:link outcome="form-util.xhtml">
@@ -159,7 +176,7 @@
                                     </div>
                                 </ui:fragment>
 
-                                <ui:fragment rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}">
+                                <ui:fragment rendered="#{currentEmployee.role == 'MB_ADMIN'}">
                                     <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
                                         <p:link outcome="medical-board-slot-management.xhtml">
                                             <div class="pricing-box">
@@ -167,6 +184,23 @@
                                                     <div>
                                                         <i class="fa fa-calendar-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Medical Board Slot Management</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MB_ADMIN'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-board-management.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-group p-mb-3" style="font-size: 3rem"></i>
+                                                        <h2>Medical Board Management</h2>
                                                     </div>
                                                 </div>
                                                 <div class="pricing-box-content">
@@ -271,6 +305,23 @@
                                                     <div>
                                                         <i class="fa fa-stethoscope" style="font-size: 3rem"></i>
                                                         <h2>Current Consultation</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="pricing-box-content">
+                                                </div>
+                                            </div>
+                                        </p:link>
+                                    </div>
+                                </ui:fragment>
+
+                                <ui:fragment rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}">
+                                    <div class="p-col-12 p-lg-3" style="margin-bottom: 10px">
+                                        <p:link outcome="medical-board.xhtml">
+                                            <div class="pricing-box">
+                                                <div class="pricing-box-header">
+                                                    <div>
+                                                        <i class="fa fa-clipboard" style="font-size: 3rem"></i>
+                                                        <h2>Medical Board</h2>
                                                     </div>
                                                 </div>
                                                 <div class="pricing-box-content">

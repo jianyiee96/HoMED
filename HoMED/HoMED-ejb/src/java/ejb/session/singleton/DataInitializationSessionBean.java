@@ -193,7 +193,7 @@ public class DataInitializationSessionBean {
         // STARTING AND ENDING CONSULT
         for (Booking booking : pastBookings) {
             List<MedicalOfficer> medicalOfficers = booking.getBookingSlot().getMedicalCentre().getMedicalStaffList().stream()
-                    .filter(ms -> ms instanceof MedicalOfficer)
+                    .filter(ms -> ms instanceof MedicalOfficer && ms.getMedicalCentre() != null)
                     .map(ms -> (MedicalOfficer) ms)
                     .collect(Collectors.toList());
             Collections.shuffle(medicalOfficers);
@@ -861,9 +861,50 @@ public class DataInitializationSessionBean {
 
         newMedicalCentre.setOperatingHours(medicalCentreOperatingHours);
         Long medicalCentreId1 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre);
+
+        MedicalCentre newMedicalCentre2 = new MedicalCentre();
+        newMedicalCentre2.setName("Ang Mo Kio - Family Medicine Clinic");
+        newMedicalCentre2.setPhone("65541133");
+        // Street Name, Unit Number, Building Name, Country, Postal Code
+        newMedicalCentre2.setAddress(new Address("4190 Ang Mo Kio Ave 6", "#03-01", "Broadway Plaza", "Singapore", "569841"));
+
+        medicalCentreOperatingHours = new ArrayList<>();
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(17, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.TRUE, LocalTime.of(8, 0), LocalTime.of(13, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.FALSE, null, null));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.FALSE, null, null));
+
+        newMedicalCentre2.setOperatingHours(medicalCentreOperatingHours);
+        Long medicalCentreId2 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre2);
+
+        MedicalCentre newMedicalCentre3 = new MedicalCentre();
+        newMedicalCentre3.setName("Bukit Panjang Plaza - Shenton Medical Group");
+        newMedicalCentre3.setPhone("67697863");
+        // Street Name, Unit Number, Building Name, Country, Postal Code
+        newMedicalCentre3.setAddress(new Address("No.1 Jelebu Road", "#03-02", "Bukit Panjang Plaza", "Singapore", "677743"));
+
+        medicalCentreOperatingHours = new ArrayList<>();
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.MONDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.TUESDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.WEDNESDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.THURSDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.FRIDAY, Boolean.TRUE, LocalTime.of(8, 30), LocalTime.of(17, 30)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SATURDAY, Boolean.TRUE, LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.SUNDAY, Boolean.FALSE, null, null));
+        medicalCentreOperatingHours.add(new OperatingHours(DayOfWeekEnum.HOLIDAY, Boolean.FALSE, null, null));
+
+        newMedicalCentre3.setOperatingHours(medicalCentreOperatingHours);
+        Long medicalCentreId3 = medicalCentreSessionBeanLocal.createNewMedicalCentre(newMedicalCentre3);
+
         System.out.println("Successfully created medical centres\n");
 
         medicalCentres.add(newMedicalCentre);
+//        medicalCentres.add(newMedicalCentre2);
+//        medicalCentres.add(newMedicalCentre3);
         return medicalCentres;
     }
 

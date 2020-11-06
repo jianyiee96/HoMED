@@ -50,5 +50,7 @@ public interface ConsultationSessionBeanLocal {
 
     public void endConsultationByInit(Long consultationId, String remarks, String remarksForServiceman, Date endDate) throws EndConsultationException;
 
+    public List<Consultation> retrieveAllConsultations();
+
 
 }

@@ -3,6 +3,10 @@
     display:block !important;
 }
 
+.display-text {
+    font-weight: bold;
+}
+
 .view-text {
     margin: 0.1rem 0rem 0.7rem 0.5rem;
     font-size: 1rem;

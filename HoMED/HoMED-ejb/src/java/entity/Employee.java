@@ -1,6 +1,9 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -69,7 +73,10 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     @NotNull(message = "Role must be provided")
     protected EmployeeRoleEnum role;
-    
+
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Report> reports;
+
     @Column(columnDefinition = "CHAR(32) NOT NULL")
     @NotNull
     protected String salt;
@@ -80,6 +87,7 @@ public class Employee implements Serializable {
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
 
         this.address = new Address();
+        this.reports = new ArrayList<>();
     }
 
     public Employee(String name, String password, String email, Address address, String phoneNumber, GenderEnum genderEnum) {
@@ -189,6 +197,14 @@ public class Employee implements Serializable {
 
     public void setRole(EmployeeRoleEnum role) {
         this.role = role;
+    }
+
+    public List<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
     }
 
     @Override

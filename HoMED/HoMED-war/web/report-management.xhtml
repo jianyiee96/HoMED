@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="template/template.xhtml"
+                xmlns:ezcomp="http://xmlns.jcp.org/jsf/composite/ezcomp">
+
+    <ui:define name="title">Report Management</ui:define>
+
+
+    <ui:define name="content">
+        <h:outputStylesheet name="crud-tables.css" library="css" />
+        <style type="text/css">
+            body .filter-button-set.ui-selectonebutton .ui-button {
+                width: 150px;
+            }
+        </style>
+
+        <h:form id="formReports">
+            <f:event type="preRenderComponent" listener="#{reportManagementManagedBean.checkDeletion()}"/>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+            <p:growl id="growl-message" for="growl-message" showDetail="true" />
+            <div class="p-grid crud-table">
+                <div class="p-col-12">
+                    <div class="card">
+                        <div class="buttonbar">
+                            <p:commandButton value="New" icon="pi pi-plus" styleClass="success-button" title="Create" actionListener="#{reportManagementManagedBean.doCreateReport}"/>
+                        </div>
+                        <p:dataTable id="dataTableReports" widgetVar="dataTableReports" var="report" value="#{reportManagementManagedBean.filteredReports}" sortBy="#{report.lastModified}" sortOrder="descending"
+                                     styleClass="crud-management-table" rowKey="#{report.reportId}" paginator="true" rows="10" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="crud-table-header">
+                                    <span style="font-weight: bold; width: 400px">Reports</span>
+                                    <span>
+                                        <p:selectOneButton value="#{reportManagementManagedBean.filterOption}" unselectable="false" class="filter-button-set">
+                                            <f:selectItem itemLabel="All" itemValue="#{1}" />
+                                            <f:selectItem itemLabel="My Reports" itemValue="#{2}" />
+                                            <f:selectItem itemLabel="By Others" itemValue="#{3}" />
+                                            <p:ajax event="change" listener="#{reportManagementManagedBean.doFilter}" update="dataTableReports"/>
+                                        </p:selectOneButton>
+                                    </span>
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('dataTableReports').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="ID" width="10%" sortBy="#{report.reportId}" filterBy="#{report.reportId}" filterMatchMode="contains">
+                                <h:outputText value="#{report.reportId}" />
+                            </p:column>
+
+                            <p:column headerText="Report Name" width="30%" sortBy="#{report.name}" filterBy="#{report.name}" filterMatchMode="contains">
+                                <h:outputText value="#{report.name}" />
+                            </p:column>
+
+                            <p:column headerText="No Of Fields" width="10%" sortBy="#{report.reportFields.size()}" filterBy="#{report.reportFields.size()}" filterMatchMode="contains">
+                                <h:outputText value="#{report.reportFields.size()}" />
+                            </p:column>
+
+                            <p:column headerText="Date Created" width="12%" sortBy="#{report.dateCreated}" filterBy="#{report.dateCreated}" filterMatchMode="contains">
+                                <h:outputText value="#{report.dateCreated}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Last Modified" width="12%" sortBy="#{report.lastModified}" filterBy="#{report.lastModified}" filterMatchMode="contains">
+                                <h:outputText value="#{report.lastModified}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Published" width="12%" sortBy="#{report.datePublished}" filterBy="#{report.datePublished}" filterMatchMode="contains">
+                                <h:outputText value="-" rendered="#{empty report.datePublished}"/>
+                                <h:outputText value="#{report.datePublished}" rendered="#{not empty report.datePublished}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Owner" width="12%" sortBy="#{report.employee.name}" filterBy="#{report.employee.name}" filterMatchMode="contains">
+                                <h:outputText value="#{report.employee.name}" />
+                                <h:outputText value=" (me)" rendered="#{currentEmployee eq report.employee}"/>
+                            </p:column>
+
+                            <p:column headerText="Action" width="20%">
+                                <p:button class="rounded-button info-button p-mr-2 p-mb-2" icon="pi pi-search" title="View" outcome="manage-report.xhtml" includeViewParams="true">
+                                    <f:param name="reportToViewId" value="#{report.reportId}" />
+                                </p:button>
+                                <p:commandButton class="rounded-button warning-button p-mr-2 p-mb-2" icon="fa fa-files-o" title="Clone"
+                                                 actionListener="#{reportManagementManagedBean.doClone(report.reportId)}"
+                                                 update="@form" process="@this"/>
+                                <p:commandButton class="rounded-button success-button p-mr-2 p-mb-2" icon="pi pi-upload" title="Publish"
+                                                 actionListener="#{reportManagementManagedBean.doPublish(report.reportId)}"
+                                                 rendered="#{empty report.datePublished and currentEmployee eq report.employee}"
+                                                 update="@form" process="@this">
+                                    <p:confirm header="Publish Report" message="Confirm publish #{report}" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton class="rounded-button success-button p-mr-2 p-mb-2" icon="pi pi-undo" title="Unpublish"
+                                                 actionListener="#{reportManagementManagedBean.doUnpublish(report.reportId)}"
+                                                 rendered="#{not empty report.datePublished and currentEmployee eq report.employee}"
+                                                 update="@form" process="@this"/>
+                                <p:commandButton class="rounded-button danger-button p-mr-2 p-mb-2" icon="pi pi-trash" title="Delete"
+                                                 actionListener="#{reportManagementManagedBean.doDeleteReport(report.reportId)}"
+                                                 rendered="#{currentEmployee eq report.employee}"
+                                                 update="@form" process="@this">
+                                    <p:confirm header="Delete Report" message="Confirm delete #{report}" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

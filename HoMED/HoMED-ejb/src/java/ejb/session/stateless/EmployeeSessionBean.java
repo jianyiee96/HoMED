@@ -68,6 +68,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanLocal {
     }
 
     @Override
+    public List<MedicalOfficer> retrieveAllMedicalOfficers() {
+        Query query = em.createQuery("SELECT mo FROM MedicalOfficer mo");
+
+        return query.getResultList();
+    }
+
+    @Override
     public Long createEmployeeByInit(Employee employee) throws CreateEmployeeException {
         String errorMessage = "Failed to create Employee: ";
         try {
