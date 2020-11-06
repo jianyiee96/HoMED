@@ -126,12 +126,10 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.selectedMedicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot);
         this.medicalBoardInAbsenceCases.addAll(selectedMedicalBoardInAbsenceCases);
         this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
-        System.out.println(selectedMedicalBoardInAbsenceCases);
         // MBIP
         this.selectedMedicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot);
         this.medicalBoardInPresenceCases.addAll(selectedMedicalBoardInPresenceCases);
         this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
-        System.out.println(selectedMedicalBoardInPresenceCases);
 
     }
 
