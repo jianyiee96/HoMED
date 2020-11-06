@@ -64,7 +64,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     List<PreDefinedConditionStatus> preDefinedConditionStatuses;
 
-    String newPredefinedConditionStatus;
+    String newPreDefinedConditionStatus;
 
     public MedicalBoardSessionManagedBean() {
         servicemanCurrentConditionStatuses = new ArrayList<>();
@@ -172,10 +172,6 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         this.selectedCase.getConditionStatuses().add(new ConditionStatus());
     }
 
-    public void manageStatus() {
-
-    }
-
     public void doChangeDate(ConditionStatus conditionStatus, Integer duration) {
 
         if (duration != null) {
@@ -206,12 +202,12 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     }
 
-    public String getNewPredefinedConditionStatus() {
-        return newPredefinedConditionStatus;
+    public String getNewPreDefinedConditionStatus() {
+        return newPreDefinedConditionStatus;
     }
 
-    public void setNewPredefinedConditionStatus(String newPredefinedConditionStatus) {
-        this.newPredefinedConditionStatus = newPredefinedConditionStatus;
+    public void setNewPreDefinedConditionStatus(String newPreDefinedConditionStatus) {
+        this.newPreDefinedConditionStatus = newPreDefinedConditionStatus;
     }
     
     
@@ -250,15 +246,15 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void removePreDefinedConditionStatus(ActionEvent event) {
         PreDefinedConditionStatus cs = (PreDefinedConditionStatus) event.getComponent().getAttributes().get("statusToDelete");
-        conditionStatusSessionBeanLocal.removePredefinedConditionStatus(cs.getPreDefinedConditionStatusId());
+        conditionStatusSessionBeanLocal.removePreDefinedConditionStatus(cs.getPreDefinedConditionStatusId());
         preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
     }
 
     public void addPreDefinedConditionStatus() {
 
-        if (newPredefinedConditionStatus != null && !newPredefinedConditionStatus.isEmpty()) {
-            conditionStatusSessionBeanLocal.addPreDefinedConditionStatus(newPredefinedConditionStatus);
-            newPredefinedConditionStatus = "";
+        if (newPreDefinedConditionStatus != null && !newPreDefinedConditionStatus.isEmpty()) {
+            conditionStatusSessionBeanLocal.addPreDefinedConditionStatus(newPreDefinedConditionStatus);
+            newPreDefinedConditionStatus = "";
             preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
 
         }

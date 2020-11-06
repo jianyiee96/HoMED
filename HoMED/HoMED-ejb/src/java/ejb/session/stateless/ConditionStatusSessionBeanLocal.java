@@ -22,6 +22,6 @@ public interface ConditionStatusSessionBeanLocal {
     
     public void addPreDefinedConditionStatus(String description);
     
-    public void removePredefinedConditionStatus(Long preDefinedConditionStatusId);
+    public void removePreDefinedConditionStatus(Long preDefinedConditionStatusId);
     
 }

@@ -439,10 +439,10 @@
 
                     <div class="p-field" style="margin-top: 1rem;">
 
-                        <p:inputText style="width: 90%; margin-right: 8px;" id="newPDS" value="#{medicalBoardSessionManagedBean.newPredefinedConditionStatus}" placeholder="New Pre Defined Condition Status" >
+                        <p:inputText style="width: 90%; margin-right: 8px;" id="newPDS" value="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatus}" placeholder="New Pre Defined Condition Status" >
                             <p:ajax event="keyup" update="create"/>
                         </p:inputText>
-                        <p:commandButton id="create" style="width: 30px;" icon="pi pi-plus" update="pdsDT newPDS" action="#{medicalBoardSessionManagedBean.addPreDefinedConditionStatus()}" disabled="#{medicalBoardSessionManagedBean.newPredefinedConditionStatus == null || medicalBoardSessionManagedBean.newPredefinedConditionStatus == ''}" >
+                        <p:commandButton id="create" style="width: 30px;" icon="pi pi-plus" update="pdsDT newPDS" action="#{medicalBoardSessionManagedBean.addPreDefinedConditionStatus()}" disabled="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatus == null || medicalBoardSessionManagedBean.newPreDefinedConditionStatus == ''}" >
                         </p:commandButton>
 
                     </div>

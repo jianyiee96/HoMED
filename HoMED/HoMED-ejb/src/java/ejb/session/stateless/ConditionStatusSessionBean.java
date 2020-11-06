@@ -50,7 +50,7 @@ public class ConditionStatusSessionBean implements ConditionStatusSessionBeanLoc
     }
 
     @Override
-    public void removePredefinedConditionStatus(Long preDefinedConditionStatusId) {
+    public void removePreDefinedConditionStatus(Long preDefinedConditionStatusId) {
         PreDefinedConditionStatus pdcs = em.find(PreDefinedConditionStatus.class, preDefinedConditionStatusId);
         if(pdcs != null) {
             em.remove(pdcs);
