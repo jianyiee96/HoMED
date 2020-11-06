@@ -39,7 +39,6 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
-import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.exceptions.RemoveSlotException;
 import util.exceptions.ScheduleMedicalBoardSlotException;
 import util.exceptions.UpdateMedicalBoardSlotException;
@@ -113,8 +112,11 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             String styleClass;
 
             switch (medicalBoardSlotOuter.getMedicalBoardSlotStatusEnum()) {
-                case UNALLOCATED:
-                    styleClass = "unallocated-medical-board-slot";
+                case UNASSIGNED:
+                    styleClass = "unassigned-medical-board-slot";
+                    break;
+                case ASSIGNED:
+                    styleClass = "assigned-medical-board-slot";
                     break;
                 case ALLOCATED:
                     styleClass = "allocated-medical-board-slot";

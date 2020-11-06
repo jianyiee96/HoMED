@@ -34,7 +34,7 @@ public class MedicalBoardSlot extends Slot implements Serializable {
     private List<MedicalBoardCase> medicalBoardCases;
 
     public MedicalBoardSlot() {
-        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNALLOCATED;
+        this.medicalBoardSlotStatusEnum = MedicalBoardSlotStatusEnum.UNASSIGNED;
         this.estimatedTimeForEachBoardInPresenceCase = 15;
         this.estimatedTimeForEachBoardInAbsenceCase = 3;
 

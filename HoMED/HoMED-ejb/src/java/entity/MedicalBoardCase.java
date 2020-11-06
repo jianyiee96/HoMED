@@ -45,6 +45,9 @@ public class MedicalBoardCase implements Serializable {
     @ManyToOne(optional = true)
     private MedicalBoardSlot medicalBoardSlot;
 
+    @OneToOne(optional = true)
+    private MedicalBoardCase previousMedicalBoardCase;
+
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
     }
@@ -81,7 +84,14 @@ public class MedicalBoardCase implements Serializable {
     }
 
     public Consultation getConsultation() {
-        return consultation;
+        return getConsultationRec(this);
+    }
+
+    private Consultation getConsultationRec(MedicalBoardCase medicalBoardCase) {
+        if (medicalBoardCase.consultation == null) {
+            return getConsultationRec(medicalBoardCase.previousMedicalBoardCase);
+        }
+        return medicalBoardCase.consultation;
     }
 
     public void setConsultation(Consultation consultation) {
@@ -110,6 +120,14 @@ public class MedicalBoardCase implements Serializable {
 
     public void setMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot) {
         this.medicalBoardSlot = medicalBoardSlot;
+    }
+
+    public MedicalBoardCase getPreviousMedicalBoardCase() {
+        return previousMedicalBoardCase;
+    }
+
+    public void setPreviousMedicalBoardCase(MedicalBoardCase previousMedicalBoardCase) {
+        this.previousMedicalBoardCase = previousMedicalBoardCase;
     }
 
     @Override
