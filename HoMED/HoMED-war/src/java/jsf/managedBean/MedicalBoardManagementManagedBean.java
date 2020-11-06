@@ -143,12 +143,12 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     }
 
     public String renderDateTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
         return dateFormat.format(date);
     }
 
     public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return dateFormat.format(date);
     }
 

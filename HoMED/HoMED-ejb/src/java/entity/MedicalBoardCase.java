@@ -5,6 +5,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,9 +15,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
 
 @Entity
 public class MedicalBoardCase implements Serializable {
@@ -48,8 +52,19 @@ public class MedicalBoardCase implements Serializable {
     @OneToOne(optional = true)
     private MedicalBoardCase previousMedicalBoardCase;
 
+    private Boolean isSigned;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PesStatusEnum newPesStatus;
+
+    @OneToMany
+    private List<ConditionStatus> conditionStatuses;
+
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
+        this.isSigned = Boolean.FALSE;
+        this.conditionStatuses = new ArrayList<>();
     }
 
     public MedicalBoardCase(Consultation consultation, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
@@ -128,6 +143,30 @@ public class MedicalBoardCase implements Serializable {
 
     public void setPreviousMedicalBoardCase(MedicalBoardCase previousMedicalBoardCase) {
         this.previousMedicalBoardCase = previousMedicalBoardCase;
+    }
+
+    public Boolean getIsSigned() {
+        return isSigned;
+    }
+
+    public void setIsSigned(Boolean isSigned) {
+        this.isSigned = isSigned;
+    }
+
+    public PesStatusEnum getNewPesStatus() {
+        return newPesStatus;
+    }
+
+    public void setNewPesStatus(PesStatusEnum newPesStatus) {
+        this.newPesStatus = newPesStatus;
+    }
+
+    public List<ConditionStatus> getConditionStatuses() {
+        return conditionStatuses;
+    }
+
+    public void setConditionStatuses(List<ConditionStatus> conditionStatuses) {
+        this.conditionStatuses = conditionStatuses;
     }
 
     @Override

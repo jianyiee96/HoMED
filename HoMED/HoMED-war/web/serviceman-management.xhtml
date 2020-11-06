@@ -672,6 +672,37 @@
                                                                         </p:selectOneMenu>
                                                                     </div>
                                                                 </div>
+                                                                
+                                                                <!-- Pes Status -->
+                                                                <div class="p-formgrid p-grid">
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.pesStatus ne servicemanWrapper.newServiceman.pesStatus ? 'modified-label-existing-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Pes Status</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.existingServiceman ne null 
+                                                                           and servicemanWrapper.existingServiceman.pesStatus ne servicemanWrapper.newServiceman.pesStatus ? 'modified-output-message-existing-serviceman' : null}">
+                                                                        <h:outputText value="#{servicemanWrapper.existingServiceman.pesStatus}" />
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-2
+                                                                         #{servicemanWrapper.errorMessages.get(12) ne null ? 'error-label' : null}
+                                                                         #{servicemanWrapper.existingServiceman.pesStatus ne servicemanWrapper.newServiceman.pesStatus ? 'modified-label-new-serviceman' : null}">
+                                                                        <p:outputLabel class="label">Pes Status</p:outputLabel>
+                                                                    </div>
+
+                                                                    <div class="p-field p-col-4
+                                                                         #{servicemanWrapper.errorMessages.get(12) ne null ? 'error-output-message' : null}
+                                                                         #{servicemanWrapper.existingServiceman.pesStatus ne servicemanWrapper.newServiceman.pesStatus ? 'modified-output-message-new-serviceman' : null}">
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(12) eq null}" value="#{servicemanWrapper.newServiceman.pesStatus}" />
+                                                                        <h:outputText rendered="#{not servicemanWrapper.isEditMode and servicemanWrapper.errorMessages.get(12) ne null}" value="#{servicemanWrapper.errorMessages.get(12)}" />
+                                                                        <p:selectOneMenu rendered="#{servicemanWrapper.isEditMode}" value="#{servicemanWrapper.newServiceman.pesStatus}">
+                                                                            <f:selectItems value="#{servicemanAccountManagementManagedBean.pesStatuses}" var="pesStatus" itemLabel="#{pesStatus}" />
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                </div>
 
                                                                 <!-- ROD -->
                                                                 <div class="p-formgrid p-grid">

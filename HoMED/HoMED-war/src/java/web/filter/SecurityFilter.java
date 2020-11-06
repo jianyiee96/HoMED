@@ -82,7 +82,9 @@ public class SecurityFilter implements Filter {
             "/past-consultations.xhtml", // 15
             "/serviceman-consultation-records.xhtml", // 16
             "/current-consultation.xhtml", // 17
-            "/queue-display.xhtml" // 18
+            "/queue-display.xhtml", // 18
+            "/medical-board.xhtml", // 19
+            "/medical-board-session.xhtml" // 20
         };
 
         // Pages that all logged in users can enter
@@ -106,7 +108,9 @@ public class SecurityFilter implements Filter {
             if (path.equals(pathArr[14])
                     || path.equals(pathArr[15])
                     || path.equals(pathArr[16])
-                    || path.equals(pathArr[17])) {
+                    || path.equals(pathArr[17])
+                    || path.equals(pathArr[19])
+                    || path.equals(pathArr[20])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {

@@ -5,8 +5,8 @@
 package util.enumeration;
 
 public enum MedicalBoardTypeEnum {
-    ABSENCE("Medical Board In Presence"),
-    PRESENCE("Medical Board In Absence");
+    ABSENCE("Medical Board In Absence"),
+    PRESENCE("Medical Board In Presence");
 
     private String stringVal;
 
