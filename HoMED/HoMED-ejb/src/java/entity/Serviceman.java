@@ -110,6 +110,9 @@ public class Serviceman implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date tokenExp;
 
+    @Column(unique = true)
+    private String fcmToken;
+
     public Serviceman() {
         this.isActivated = false;
         this.salt = CryptographicHelper.getInstance().generateRandomString(32);
@@ -323,6 +326,14 @@ public class Serviceman implements Serializable {
 
     public void setTokenExp(Date tokenExp) {
         this.tokenExp = tokenExp;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     @Override

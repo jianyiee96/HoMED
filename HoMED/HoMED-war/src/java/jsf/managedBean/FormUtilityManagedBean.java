@@ -349,13 +349,6 @@ public class FormUtilityManagedBean implements Serializable {
         this.newFormIsPublic = newFormIsPublic;
     }
 
-    public void updateFormPrivacy() {
-        formTemplateSessionBeanLocal.updateFormTemplatePrivacy(selectedForm.getFormTemplateId(), newFormIsPublic);
-        selectedForm.setIsPublic(newFormIsPublic);
-        formTemplates = formTemplateSessionBeanLocal.retrieveAllFormTemplates();
-
-    }
-
     public void setSelectedForm(FormTemplate selectedForm) {
         this.selectedForm = formTemplateSessionBeanLocal.retrieveFormTemplate(selectedForm.getFormTemplateId());
         this.newFormName = selectedForm.getFormTemplateName();
