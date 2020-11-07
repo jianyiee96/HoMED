@@ -48,7 +48,7 @@ public class NotificationBlastManagedBean implements Serializable {
             title = "";
             message = "";
         } else {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sent notification", "Ensure title and message is not empty"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unable to sent notification", "Ensure title and message is not empty"));
 
         }
 
