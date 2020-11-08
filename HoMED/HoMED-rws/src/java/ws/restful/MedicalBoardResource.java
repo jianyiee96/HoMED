@@ -32,7 +32,14 @@ public class MedicalBoardResource {
 
     // To implement:   
     // retrieveAllServicemanStatuses (GET)
+    // -> need to consume retrieveActiveConditionStatusByServiceman in ConditionStatusSessionBeanLocal
+    // -> create a method to lookup the session bean  (refer to notification resource)
+    //
     // retrieveAllServicemanMedicalBoardCases (GET)
-    // 
+    // -> need to create and consume a retrieveMedicalBoardCasesByServiceman in MedicalBoardCaseSessionBean
+    // -> create a method to lookup the session bean (refet to notification resource)
+    //
+    //
     // Suggestion to refer to NotificationResource for GET methods
+    
 }
