@@ -4,7 +4,7 @@
  */
 package ws.datamodel;
 
-import entity.ConditionStatus;
+import ws.wrapper.ConditionStatusWrapper;
 import java.util.List;
 
 /**
@@ -13,20 +13,20 @@ import java.util.List;
  */
 public class RetrieveAllServicemanStatusesRsp {
     
-    private List<ConditionStatus> conditionStatuses;
+    private List<ConditionStatusWrapper> conditionStatuses;
 
     public RetrieveAllServicemanStatusesRsp() {
     }
 
-    public RetrieveAllServicemanStatusesRsp(List<ConditionStatus> conditionStatuses) {
+    public RetrieveAllServicemanStatusesRsp(List<ConditionStatusWrapper> conditionStatuses) {
         this.conditionStatuses = conditionStatuses;
     }
 
-    public List<ConditionStatus> getConditionStatuses() {
+    public List<ConditionStatusWrapper> getConditionStatuses() {
         return conditionStatuses;
     }
 
-    public void setConditionStatuses(List<ConditionStatus> conditionStatuses) {
+    public void setConditionStatuses(List<ConditionStatusWrapper> conditionStatuses) {
         this.conditionStatuses = conditionStatuses;
     }
     

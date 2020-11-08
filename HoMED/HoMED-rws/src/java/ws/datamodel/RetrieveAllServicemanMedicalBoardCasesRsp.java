@@ -4,8 +4,8 @@
  */
 package ws.datamodel;
 
-import entity.MedicalBoardCase;
 import java.util.List;
+import ws.wrapper.MedicalBoardCaseWrapper;
 
 /**
  *
@@ -13,20 +13,20 @@ import java.util.List;
  */
 public class RetrieveAllServicemanMedicalBoardCasesRsp {
     
-    private List<MedicalBoardCase> medicalBoardCases;
+    private List<MedicalBoardCaseWrapper> medicalBoardCases;
 
     public RetrieveAllServicemanMedicalBoardCasesRsp() {
     }
 
-    public RetrieveAllServicemanMedicalBoardCasesRsp(List<MedicalBoardCase> medicalBoardCases) {
+    public RetrieveAllServicemanMedicalBoardCasesRsp(List<MedicalBoardCaseWrapper> medicalBoardCases) {
         this.medicalBoardCases = medicalBoardCases;
     }
 
-    public List<MedicalBoardCase> getMedicalBoardCases() {
+    public List<MedicalBoardCaseWrapper> getMedicalBoardCases() {
         return medicalBoardCases;
     }
 
-    public void setMedicalBoardCases(List<MedicalBoardCase> medicalBoardCases) {
+    public void setMedicalBoardCases(List<MedicalBoardCaseWrapper> medicalBoardCases) {
         this.medicalBoardCases = medicalBoardCases;
     }
     
