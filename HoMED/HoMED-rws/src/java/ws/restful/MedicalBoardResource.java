@@ -127,11 +127,8 @@ public class MedicalBoardResource {
             for (MedicalBoardCase mbc : medicalBoardCases) {
 
                 Date scheduledStartDate = mbc.getMedicalBoardSlot().getStartDateTime();
-
                 Date scheduledEndDate = mbc.getMedicalBoardSlot().getEndDateTime();
-
                 String chairman = mbc.getMedicalBoardSlot().getChairman().getName();
-
                 List<ConditionStatusWrapper> conditionStatusWrappers = new ArrayList<>();
 
                 for (ConditionStatus cs : mbc.getConditionStatuses()) {
