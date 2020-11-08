@@ -1,11 +1,13 @@
 package ws.restful;
 
 import ejb.session.stateless.BookingSessionBeanLocal;
+import ejb.session.stateless.ConditionStatusSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.FormInstanceSessionBeanLocal;
 import ejb.session.stateless.FormTemplateSessionBeanLocal;
+import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import ejb.session.stateless.MedicalCentreSessionBeanLocal;
 import ejb.session.stateless.NotificationSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
@@ -122,5 +124,27 @@ public class SessionBeanLookup {
             throw new RuntimeException(ne);
         }
     }
+    
+    public ConditionStatusSessionBeanLocal lookupConditionStatusSessionBeanLocal() {
+        try {
+            javax.naming.Context c = new InitialContext();
+            return (ConditionStatusSessionBeanLocal) c.lookup(ejbModuleJndiPath + "ConditionStatusSessionBean!ejb.session.stateless.ConditionStatusSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+    
+    public MedicalBoardCaseSessionBeanLocal lookupMedicalBoardCaseSessionBeanLocal() {
+        try {
+            javax.naming.Context c = new InitialContext();
+            return (MedicalBoardCaseSessionBeanLocal) c.lookup(ejbModuleJndiPath + "MedicalBoardCaseSessionBean!ejb.session.stateless.MedicalBoardCaseSessionBeanLocal");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
+    }
+    
+    
 
 }

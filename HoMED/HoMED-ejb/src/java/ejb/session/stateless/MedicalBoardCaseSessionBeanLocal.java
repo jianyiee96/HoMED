@@ -36,5 +36,8 @@ public interface MedicalBoardCaseSessionBeanLocal {
 
     public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<MedicalBoardCase> medicalBoardCases) throws UpdateMedicalBoardSlotException;
 //    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<Long> medicalBoardCaseIds) throws UpdateMedicalBoardSlotException;
+    public List<MedicalBoardCase> retrieveAllMedicalBoardCases();
+    
+    public List<MedicalBoardCase> retrieveMedicalBoardCasesByServiceman(Long servicemanId);
 
 }
