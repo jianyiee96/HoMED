@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1069,30 +1070,25 @@ public class ManageReportManagedBean implements Serializable {
 
     public ReportDataValue[] getReportDataValues() {
         ReportDataType reportDataType = this.reportFieldToAddWrapper.getReportField().getReportDataType();
-        if (reportDataType == null) {
-            return ReportDataValue.values();
-        } else {
-            return ReportDataValue.getReportDataTypeValues(reportDataType);
+        ReportDataValue reportDataValue = this.reportFieldToAddWrapper.getReportField().getReportDataValue();
+        System.out.println("");
+        ReportDataValue[] values = ReportDataValue.getReportDataTypeValues(reportDataType);
+        Boolean contains = Arrays.stream(values).anyMatch(x -> x.equals(reportDataValue));
+        if (!contains) {
+            this.reportFieldToAddWrapper.getReportField().setReportDataValue(values[0]);
         }
+        return ReportDataValue.getReportDataTypeValues(reportDataType);
     }
 
     public ReportDataGrouping[] getReportDataGroupings() {
         ReportDataType reportDataType = this.reportFieldToAddWrapper.getReportField().getReportDataType();
         ReportDataValue reportDataValue = this.reportFieldToAddWrapper.getReportField().getReportDataValue();
-        if (reportDataType == null) {
-            return null;
-        } else {
-            return ReportDataGrouping.getReportDataGroupings(reportDataType, reportDataValue);
-        }
+        return ReportDataGrouping.getReportDataGroupings(reportDataType, reportDataValue);
     }
 
     public ReportFieldType[] getReportFieldTypes() {
         ReportDataGrouping reportDataGrouping = this.reportFieldToAddWrapper.getReportField().getReportDataGrouping();
-        if (reportDataGrouping == null) {
-            return ReportFieldType.values();
-        } else {
-            return ReportFieldType.getReportFieldTypes(reportDataGrouping);
-        }
+        return ReportFieldType.getReportFieldTypes(reportDataGrouping);
     }
 
     public String getDialogHeaderAddChart() {
