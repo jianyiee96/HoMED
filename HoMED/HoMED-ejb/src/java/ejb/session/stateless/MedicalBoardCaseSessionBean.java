@@ -32,9 +32,6 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
-    
-    @EJB
-    private MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -186,28 +183,28 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
             throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
         }
     }
-    
+
     @Override
     public List<MedicalBoardCase> retrieveAllMedicalBoardCases() {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc");
 
         return query.getResultList();
     }
-    
+
     @Override
     public List<MedicalBoardCase> retrieveMedicalBoardCasesByServiceman(Long servicemanId) {
-        
+
         List<MedicalBoardCase> allMedicalBoardCases = retrieveAllMedicalBoardCases();
 
         List<MedicalBoardCase> servicemanMbc = new ArrayList<>();
-        
-        for(MedicalBoardCase mbc : allMedicalBoardCases) {
+
+        for (MedicalBoardCase mbc : allMedicalBoardCases) {
             if (mbc.getConsultation().getBooking().getServiceman().getServicemanId().equals(servicemanId)) {
                 servicemanMbc.add(mbc);
-            }           
+            }
         }
-        
+
         return servicemanMbc;
 
-    } 
+    }
 }
