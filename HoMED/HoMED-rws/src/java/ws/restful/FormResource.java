@@ -142,6 +142,9 @@ public class FormResource {
                     fi.getSignedBy().setCurrentConsultation(null);
                     fi.getSignedBy().setCompletedConsultations(null);
                     fi.getSignedBy().setMedicalCentre(null);
+                    fi.getSignedBy().setMedicalBoardSlotsAsChairman(null);
+                    fi.getSignedBy().setMedicalBoardSlotsAsMedicalOfficerOne(null);
+                    fi.getSignedBy().setMedicalBoardSlotsAsMedicalOfficerTwo(null);
                 }
             }
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanFormInstancesRsp(formInstances)).build();

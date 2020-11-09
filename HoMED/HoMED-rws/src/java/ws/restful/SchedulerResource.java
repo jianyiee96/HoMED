@@ -200,6 +200,9 @@ public class SchedulerResource {
                     fi.getSignedBy().setCurrentConsultation(null);
                     fi.getSignedBy().setCompletedConsultations(null);
                     fi.getSignedBy().setMedicalCentreToNull();
+                    fi.getSignedBy().setMedicalBoardSlotsAsChairman(null);
+                    fi.getSignedBy().setMedicalBoardSlotsAsMedicalOfficerOne(null);
+                    fi.getSignedBy().setMedicalBoardSlotsAsMedicalOfficerTwo(null);
                 }
                 fi.setServiceman(null);
                 fi.setBooking(null);
