@@ -23,6 +23,8 @@ public enum ReportDataValue {
             return new ReportDataValue[]{QTY};
         } else if (type == ReportDataType.CONSULTATION) {
             return new ReportDataValue[]{QTY, QWT, DC, TREND};
+        } else if (type == ReportDataType.MEDICAL_BOARD) {
+            return new ReportDataValue[]{QTY, TREND};
         }
         return new ReportDataValue[]{};
     }

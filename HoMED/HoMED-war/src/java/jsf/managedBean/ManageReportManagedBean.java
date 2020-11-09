@@ -1,14 +1,13 @@
 package jsf.managedBean;
 
-import com.oracle.jrockit.jfr.DataType;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
 import ejb.session.stateless.ReportSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Consultation;
-import entity.ConsultationPurpose;
 import entity.Employee;
-import entity.MedicalCentre;
+import entity.MedicalBoardCase;
 import entity.MedicalOfficer;
 import entity.Report;
 import entity.ReportField;
@@ -27,7 +26,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -47,6 +45,7 @@ import org.primefaces.PrimeFaces;
 import util.enumeration.BookingStatusEnum;
 import util.enumeration.ConsultationStatusEnum;
 import util.enumeration.FilterDateType;
+import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.ReportDataGrouping;
 import util.enumeration.ReportDataType;
 import util.enumeration.ReportDataValue;
@@ -61,6 +60,9 @@ import util.exceptions.UpdateReportException;
 @Named(value = "manageReportManagedBean")
 @ViewScoped
 public class ManageReportManagedBean implements Serializable {
+
+    @EJB(name = "MedicalBoardCaseSessionBeanLocal")
+    private MedicalBoardCaseSessionBeanLocal medicalBoardCaseSessionBeanLocal;
 
     @EJB(name = "ReportSessionBeanLocal")
     private ReportSessionBeanLocal reportSessionBeanLocal;
@@ -101,6 +103,7 @@ public class ManageReportManagedBean implements Serializable {
     private List<Serviceman> servicemenData;
     private List<MedicalOfficer> medicalOfficersData;
     private List<Consultation> consultationsData;
+    private List<MedicalBoardCase> medicalBoardCasesData;
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
     private final SimpleDateFormat monthFormat = new SimpleDateFormat("MMM");
@@ -164,6 +167,7 @@ public class ManageReportManagedBean implements Serializable {
         this.servicemenData = servicemanSessionBeanLocal.retrieveAllServicemen();
         this.consultationsData = consultationSessionBeanLocal.retrieveAllConsultations();
         this.medicalOfficersData = employeeSessionBeanLocal.retrieveAllMedicalOfficers();
+        this.medicalBoardCasesData = medicalBoardCaseSessionBeanLocal.retrieveAllMedicalBoardCases();
     }
 
     public void processReport(Report report) {
@@ -418,6 +422,8 @@ public class ManageReportManagedBean implements Serializable {
             sortedResultList = processDataMedicalOfficer(reportField);
         } else if (reportField.getReportDataType() == ReportDataType.CONSULTATION) {
             sortedResultList = processDataConsultation(reportField);
+        } else if (reportField.getReportDataType() == ReportDataType.MEDICAL_BOARD) {
+            sortedResultList = processDataMedicalBoard(reportField);
         }
 
     }
@@ -449,9 +455,16 @@ public class ManageReportManagedBean implements Serializable {
             processSortedListIntoField(reportField, sortedResultList);
             reportField.setX_axis("Number of Bookings");
             reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_ROLE) {
+            sortedResultList = transformIntoCategorizationList(servicemenData, (Serviceman s) -> s.getRole().getStringVal(), (Serviceman s) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Serviceman Role");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         } else if (reportField.getReportDataGrouping() == ReportDataGrouping.S_PES) {
-            // TO IMPLEMENT
+            sortedResultList = transformIntoCategorizationList(servicemenData, (Serviceman s) -> s.getPesStatus().toString(), (Serviceman s) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
             reportField.setX_axis("PES Status");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
         }
         reportField.setY_axis("Number of Serviceman");
         return sortedResultList;
@@ -568,6 +581,34 @@ public class ManageReportManagedBean implements Serializable {
         return sortedResultList;
     }
 
+    private List<Map.Entry<String, Integer>> processDataMedicalBoard(ReportField reportField) {
+        List<Map.Entry<String, Integer>> sortedResultList = new ArrayList<>();
+        List<MedicalBoardCase> dateFilteredMedicalBoardCases = this.medicalBoardCasesData.stream()
+                .filter(mb -> mb.getMedicalBoardCaseStatus() != MedicalBoardCaseStatusEnum.WAITING && isWithinRange(reportField.getFilterDateType(), reportField.getFilterStartDate(), reportField.getFilterEndDate(), mb.getMedicalBoardSlot().getStartDateTime()))
+                .collect(Collectors.toList());
+
+        if (reportField.getReportDataGrouping() == ReportDataGrouping.MB_Q_C) {
+            Function<MedicalBoardCase, Stream<String>> function = (MedicalBoardCase mb) -> mb.getConditionStatuses().stream().map(c -> c.getDescription());
+            sortedResultList = transformIntoFlatCategorizationList(dateFilteredMedicalBoardCases, function, (MedicalBoardCase mb) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Diagnosed Conditions");
+            reportField.setY_axis("Number of Medical Board Cases");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MB_Q_T) {
+            sortedResultList = transformIntoCategorizationList(dateFilteredMedicalBoardCases, (MedicalBoardCase c) -> c.getMedicalBoardType().toString(), (MedicalBoardCase mb) -> true);
+            processSortedListIntoField(reportField, sortedResultList);
+            reportField.setX_axis("Medical Board Type");
+            reportField.setY_axis("Number of Medical Board Cases");
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+        } else if (reportField.getReportDataGrouping() == ReportDataGrouping.MB_QT_T) {
+            transformTrendField(reportField, dateFilteredMedicalBoardCases, (MedicalBoardCase c) -> c.getMedicalBoardSlot().getActualStartDateTime(), (MedicalBoardCase c) -> c.getMedicalBoardType().toString());
+            reportField.setAggregateString("Total Quantity: " + getTotalNumberOfData(reportField));
+            reportField.setY_axis("Number of Medical Board Cases");
+        }
+
+        return sortedResultList;
+    }
+
     // USED FOR PRE-PROCESSING INTO COUNTER (Number of forms signed)
     private <T> List<Map.Entry<String, Integer>> transformIntoCounterList(List<T> list, Function<T, Integer> mapperToInt, Integer step) {
         HashMap<Integer, Integer> hashMap = new HashMap<>();
@@ -612,6 +653,23 @@ public class ManageReportManagedBean implements Serializable {
         list.stream()
                 .filter(check)
                 .map(keyItemFunction)
+                .forEach(item -> {
+                    int count = freqMap.containsKey(item) ? freqMap.get(item) : 0;
+                    freqMap.put(item, count + 1);
+                });
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>();
+        sortedList = freqMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(String::toString)))
+                .collect(Collectors.toList());
+        return sortedList;
+    }
+
+    // USED FOR CATEGORIZING INTO SPECIFIC ENTITIES (Consultation Purpose, Medical Centre)
+    private <T> List<Map.Entry<String, Integer>> transformIntoFlatCategorizationList(List<T> list, Function<T, Stream<String>> keyItemFunction, Predicate<T> check) {
+        HashMap<String, Integer> freqMap = new HashMap<>();
+        list.stream()
+                .filter(check)
+                .flatMap(keyItemFunction)
                 .forEach(item -> {
                     int count = freqMap.containsKey(item) ? freqMap.get(item) : 0;
                     freqMap.put(item, count + 1);
