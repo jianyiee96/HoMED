@@ -12,14 +12,11 @@ import entity.MedicalBoardCase;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -120,15 +117,21 @@ public class MedicalBoardResource {
         }
 
         try {
+            System.out.println("jkkjwr");
             List<MedicalBoardCase> medicalBoardCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesByServiceman(Long.parseLong(servicemanId));
 
             List<MedicalBoardCaseWrapper> medicalBoardCaseWrappers = new ArrayList<>();
 
             for (MedicalBoardCase mbc : medicalBoardCases) {
 
-                Date scheduledStartDate = mbc.getMedicalBoardSlot().getStartDateTime();
-                Date scheduledEndDate = mbc.getMedicalBoardSlot().getEndDateTime();
-                String chairman = mbc.getMedicalBoardSlot().getChairman().getName();
+                Date scheduledStartDate = null;
+                Date scheduledEndDate = null;
+                String chairman = null;
+                if (mbc.getMedicalBoardSlot() != null) {
+                    scheduledStartDate = mbc.getMedicalBoardSlot().getStartDateTime();
+                    scheduledEndDate = mbc.getMedicalBoardSlot().getEndDateTime();
+                    chairman = mbc.getMedicalBoardSlot().getChairman().getName();
+                }
                 List<ConditionStatusWrapper> conditionStatusWrappers = new ArrayList<>();
 
                 for (ConditionStatus cs : mbc.getConditionStatuses()) {
@@ -146,14 +149,15 @@ public class MedicalBoardResource {
                 mbc.setMedicalBoardSlot(null);
                 mbc.setConsultation(null);
                 mbc.setConditionStatuses(null);
-                
+
                 medicalBoardCaseWrappers.add(new MedicalBoardCaseWrapper(mbc, scheduledStartDate, scheduledEndDate, chairman, conditionStatusWrappers));
-                
+
             }
 
             return Response.status(Response.Status.OK).entity(new RetrieveAllServicemanMedicalBoardCasesRsp(medicalBoardCaseWrappers)).build();
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
