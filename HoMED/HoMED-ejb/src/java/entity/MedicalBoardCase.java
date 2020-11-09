@@ -76,7 +76,7 @@ public class MedicalBoardCase implements Serializable {
         this.medicalBoardType = medicalBoardType;
         this.statementOfCase = statementOfCase;
     }
-    
+
     public MedicalBoardCase(MedicalBoardCase previousMedicalBoardCase, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
         this();
         this.previousMedicalBoardCase = previousMedicalBoardCase;
@@ -109,14 +109,24 @@ public class MedicalBoardCase implements Serializable {
     }
 
     public Consultation getConsultation() {
-        return getConsultationRec(this);
+        try {
+            return consultationRec(this);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public Consultation getConsultationStrict() {
+        return this.consultation;
     }
 
-    private Consultation getConsultationRec(MedicalBoardCase medicalBoardCase) {
-        if (medicalBoardCase.consultation == null) {
-            return getConsultationRec(medicalBoardCase.previousMedicalBoardCase);
+    private Consultation consultationRec(MedicalBoardCase medicalBoardCase) {
+        if (medicalBoardCase.getConsultationStrict() != null) {
+            return medicalBoardCase.getConsultationStrict();
+        } else {
+            medicalBoardCase = medicalBoardCase.getPreviousMedicalBoardCase();
+            return consultationRec(medicalBoardCase);
         }
-        return medicalBoardCase.consultation;
     }
 
     public void setConsultation(Consultation consultation) {

@@ -70,6 +70,7 @@ public class ServicemanResource {
                 serviceman.setSalt(null);
                 serviceman.setPassword(null);
                 serviceman.setNotifications(null);
+                serviceman.setConditionStatuses(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
             } catch (ServicemanInvalidLoginCredentialException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
@@ -190,6 +191,7 @@ public class ServicemanResource {
                 updatedServiceman.setSalt(null);
                 updatedServiceman.setPassword(null);
                 updatedServiceman.setNotifications(null);
+                updatedServiceman.setConditionStatuses(null);
                 return Response.status(Response.Status.OK).entity(new ServicemanUpdateRsp(updatedServiceman)).build();
             } catch (UpdateServicemanException ex) {
                 ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());

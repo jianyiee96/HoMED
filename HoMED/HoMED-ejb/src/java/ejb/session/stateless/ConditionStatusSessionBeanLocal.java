@@ -18,6 +18,8 @@ public interface ConditionStatusSessionBeanLocal {
     
     public List<ConditionStatus> retrieveActiveConditionStatusByServiceman(Long servicemanId);
     
+    public List<ConditionStatus> retrieveConditionStatusByServiceman(Long servicemanId);
+    
     public List<PreDefinedConditionStatus> retrieveAllPreDefinedConditionStatus();
     
     public void addPreDefinedConditionStatus(String description);
