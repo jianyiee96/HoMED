@@ -138,9 +138,7 @@ public class ConsultationResource {
             List<Consultation> consultations = consultationSessionBeanLocal.retrieveAllServicemanConsultations(Long.parseLong(servicemanId));
             
             for (Consultation c : consultations) {
-                if (c.getMedicalBoardCase() != null) {
-                    c.getMedicalBoardCase().setConsultation(null);
-                }
+                c.setMedicalBoardCase(null);
                 Booking b = c.getBooking();
 
                 BookingSlot bs = b.getBookingSlot();
