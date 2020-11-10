@@ -45,7 +45,7 @@ public class BookingExpiryManager {
         String timeStamp = df.format(now);
 
         System.out.println("============================================================================");
-        System.out.println("- ExpiryManager: Timeout at " + timeStamp);
+        System.out.println("- BookingExpiryManager: Timeout at " + timeStamp);
 
         Calendar c = Calendar.getInstance();
         c.setTime(now);
@@ -55,7 +55,7 @@ public class BookingExpiryManager {
 //        c.add(Calendar.DATE, 1);
         Date floorToday = c.getTime();
 
-        System.out.println("- ExpiryManager: Marking bookings absent if start time is before " + df.format(floorToday));
+        System.out.println("- BookingExpiryManager: Marking bookings absent if start time is before " + df.format(floorToday));
 
         List<Booking> upcomingBookings = bookingSessionBeanLocal.retrieveAllUpcomingBookings();
 
