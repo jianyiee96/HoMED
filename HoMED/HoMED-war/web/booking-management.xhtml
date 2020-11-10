@@ -90,7 +90,7 @@
                                 <p:column headerText="Consultation Purpose" width="20%" sortBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterBy="#{slot.booking.consultationPurpose.consultationPurposeName}" filterMatchMode="contains">
                                     <h:outputText value="#{slot.booking.consultationPurpose.consultationPurposeName}" />
                                 </p:column>
-                                
+
                                 <p:column headerText="Consultation Type" width="15%" sortBy="#{slot.booking.isForReview}">
                                     <h:outputText value="#{slot.booking.isForReview? 'REVIEW' : 'GENERAL' }"/>
                                 </p:column>
@@ -336,12 +336,17 @@
                                             <div class="card ui-fluid">
                                                 <h5>Other Information</h5>
                                                 <div class="p-formgrid p-grid">
-                                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
                                                         <i class="fa fa-tint p-mr-2 p-ml-2"/>
                                                         <p:outputLabel value="Blood Type" />
                                                         <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.bloodType.bloodTypeString}" class="view-text" />
                                                     </div>
-                                                    <div class="p-field p-col-12 p-md-6 p-sm-12">
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
+                                                        <i class="fa fa-sort-alpha-asc p-mr-2 p-ml-2"/>
+                                                        <p:outputLabel value="Pes Status" />
+                                                        <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.pesStatus}" class="view-text" />
+                                                    </div>
+                                                    <div class="p-field p-col-12 p-md-4 p-sm-12">
                                                         <i class="fa fa-calendar p-mr-2 p-ml-2"/>
                                                         <p:outputLabel value="ROD" />
                                                         <h:outputText value="#{bookingManagedBean.servicemanToCreateBooking.rod}" class="view-text" >
@@ -405,7 +410,7 @@
                                 <p:selectOneRadio id="view-booking-type" value="#{bookingManagedBean.selectedBookingType}" required="true" onchange="PF('dialogCreateBooking').initPosition()">
                                     <f:selectItem itemValue="General Consultation" itemLabel="General Consultation"/>
                                     <f:selectItem itemValue="Pre-Medical Board Review" itemLabel="Pre-Medical Board Review"/>
-                                    <p:ajax event="valueChange" update="panelForms" oncomplete="PF('dialogCreateBooking').initPosition()"/>
+                                    <p:ajax event="valueChange" oncomplete="PF('dialogCreateBooking').initPosition()"/>
                                 </p:selectOneRadio>
                                 <p:message class="error-message" for="view-booking-type" />
 

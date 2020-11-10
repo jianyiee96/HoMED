@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import util.enumeration.NotificationTypeEnum;
 
 /**
  *
@@ -57,16 +60,25 @@ public class Notification implements Serializable {
     @JoinColumn(nullable = false)
     private Serviceman serviceman;
 
+    @Column(nullable = true)
+    private Long dynamicId;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private NotificationTypeEnum notificationTypeEnum;
+
     public Notification() {
         this.notificationDate = new Date();
         this.isRead = false;
         this.isFetched = false;
     }
 
-    public Notification(String title, String message) {
+    public Notification(String title, String message, NotificationTypeEnum notificationTypeEnum, Long dynamicId) {
         this();
         this.title = title;
         this.message = message;
+        this.notificationTypeEnum = notificationTypeEnum;
+        this.dynamicId = dynamicId;
     }
 
     public Long getNotificationId() {
@@ -123,6 +135,22 @@ public class Notification implements Serializable {
 
     public void setServiceman(Serviceman serviceman) {
         this.serviceman = serviceman;
+    }
+
+    public Long getDynamicId() {
+        return dynamicId;
+    }
+
+    public void setDynamicId(Long dynamicId) {
+        this.dynamicId = dynamicId;
+    }
+
+    public NotificationTypeEnum getNotificationTypeEnum() {
+        return notificationTypeEnum;
+    }
+
+    public void setNotificationTypeEnum(NotificationTypeEnum notificationTypeEnum) {
+        this.notificationTypeEnum = notificationTypeEnum;
     }
 
     @Override

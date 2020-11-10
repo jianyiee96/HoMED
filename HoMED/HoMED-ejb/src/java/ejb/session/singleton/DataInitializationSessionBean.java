@@ -1,6 +1,7 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.BookingSessionBeanLocal;
+import ejb.session.stateless.ConditionStatusSessionBeanLocal;
 import ejb.session.stateless.ConsultationPurposeSessionBeanLocal;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
@@ -28,6 +29,7 @@ import entity.MedicalCentre;
 import entity.OperatingHours;
 import entity.MedicalOfficer;
 import entity.MedicalStaff;
+import entity.PreDefinedConditionStatus;
 import entity.Serviceman;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,6 +58,7 @@ import util.enumeration.DayOfWeekEnum;
 import util.enumeration.FormFieldAccessEnum;
 import util.enumeration.GenderEnum;
 import util.enumeration.InputTypeEnum;
+import util.enumeration.PesStatusEnum;
 import util.enumeration.ServicemanRoleEnum;
 import util.exceptions.AssignMedicalStaffToMedicalCentreException;
 import util.exceptions.CreateBookingException;
@@ -102,6 +105,8 @@ public class DataInitializationSessionBean {
     private BookingSessionBeanLocal bookingSessionBeanLocal;
     @EJB
     private SlotSessionBeanLocal slotSessionBeanLocal;
+    @EJB
+    private ConditionStatusSessionBeanLocal conditionStatusSessionBeanLocal;
 
     final SimpleDateFormat JSON_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
@@ -138,7 +143,9 @@ public class DataInitializationSessionBean {
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
             List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
-
+            
+            initializePreDefinedConditionStatuses();
+            
             fillForms(bookings, RATE_OF_FILLING_FORMS);
             Date today = new Date();
             List<Booking> pastBookings = bookings.stream()
@@ -159,6 +166,17 @@ public class DataInitializationSessionBean {
             System.out.println(ex.getMessage());
             System.out.println("====================== Failed to complete DATA INIT ======================");
         }
+    }
+
+    private void initializePreDefinedConditionStatuses() {
+
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running, Marching and Jumping");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Fire arms");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Sunlight");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running and ");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Spicy Food");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Guard Duty");
+
     }
 
     private void executeConsultationsForPastBookings(List<Booking> pastBookings) throws MarkBookingAttendanceException, StartConsultationException, SubmitFormInstanceException, EndConsultationException {
@@ -727,10 +745,10 @@ public class DataInitializationSessionBean {
 
     private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
-        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("513 Serangoon Road", "#04-01", "", "Singapore", "218154"));
+        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
+        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, PesStatusEnum.B4, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
+        Serviceman serviceman4 = new Serviceman("2 Way Account", "password", "dummyemailx5@hotmail.com", "87241222", ServicemanRoleEnum.NSF, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("513 Serangoon Road", "#04-01", "", "Singapore", "218154"));
         Long serviceman1Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman1);
         Long serviceman2Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman2);
         Long serviceman3Id = servicemanSessionBeanLocal.createServicemanByInit(serviceman3);
@@ -747,8 +765,8 @@ public class DataInitializationSessionBean {
         System.out.println("Email: " + serviceman4.getEmail() + "\tPhone: " + serviceman4.getPhoneNumber());
         System.out.println("Successfully created servicemen by init\n");
 
-        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("Enterprise one", "#01-40", "", "Singapore", "415934"));
-        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("2 Geylang East Avenue 2", "#04-109", "", "Singapore", "389754"));
+        Serviceman serviceman1Otp = new Serviceman("Serviceman Activate 1", "serviceman_activate1@hotmail.com", "92856031", ServicemanRoleEnum.NSMEN, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.B_POSITIVE, new Address("Enterprise one", "#01-40", "", "Singapore", "415934"));
+        Serviceman serviceman2Otp = new Serviceman("Serviceman Activate 2", "serviceman_activate2@hotmail.com", "97439534", ServicemanRoleEnum.OTHERS, PesStatusEnum.C9, new Date(), GenderEnum.MALE, BloodTypeEnum.B_NEGATIVE, new Address("2 Geylang East Avenue 2", "#04-109", "", "Singapore", "389754"));
         String servicemanOtp1 = servicemanSessionBeanLocal.createServiceman(serviceman1Otp);
         String servicemanOtp2 = servicemanSessionBeanLocal.createServiceman(serviceman2Otp);
 

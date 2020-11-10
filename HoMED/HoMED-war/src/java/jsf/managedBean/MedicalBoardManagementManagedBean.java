@@ -86,7 +86,6 @@ public class MedicalBoardManagementManagedBean implements Serializable {
                 }
             });
         }
-
     }
 
     public void saveChanges() {
@@ -127,11 +126,11 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         this.selectedMedicalBoardInAbsenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.ABSENCE, medicalBoardSlot);
         this.medicalBoardInAbsenceCases.addAll(selectedMedicalBoardInAbsenceCases);
         this.medicalBoardInAbsenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.ABSENCE));
-
         // MBIP
         this.selectedMedicalBoardInPresenceCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesForSelectedMedicalBoardSlot(MedicalBoardTypeEnum.PRESENCE, medicalBoardSlot);
         this.medicalBoardInPresenceCases.addAll(selectedMedicalBoardInPresenceCases);
         this.medicalBoardInPresenceCases.addAll(medicalBoardCaseSessionBeanLocal.retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum.PRESENCE));
+
     }
 
     public List<MedicalBoardCase> getMedicalBoardInPresenceCasesForSelectedMedicalBoardSlot() {
@@ -143,12 +142,12 @@ public class MedicalBoardManagementManagedBean implements Serializable {
     }
 
     public String renderDateTime(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy kk:mm");
         return dateFormat.format(date);
     }
 
     public String renderDate(Date date) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         return dateFormat.format(date);
     }
 

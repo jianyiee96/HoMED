@@ -5,6 +5,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,9 +15,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.PesStatusEnum;
 
 @Entity
 public class MedicalBoardCase implements Serializable {
@@ -33,7 +37,7 @@ public class MedicalBoardCase implements Serializable {
     @Column
     private MedicalBoardCaseStatusEnum medicalBoardCaseStatus;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = true)
     private Consultation consultation;
 
     @Column(length = 6000)
@@ -48,13 +52,34 @@ public class MedicalBoardCase implements Serializable {
     @OneToOne(optional = true)
     private MedicalBoardCase previousMedicalBoardCase;
 
+    @OneToOne(optional = true, mappedBy = "previousMedicalBoardCase")
+    private MedicalBoardCase followUpMedicalBoardCase;
+
+    private Boolean isSigned;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PesStatusEnum finalPesStatus;
+
+    @OneToMany
+    private List<ConditionStatus> conditionStatuses;
+
     public MedicalBoardCase() {
         this.medicalBoardCaseStatus = MedicalBoardCaseStatusEnum.WAITING;
+        this.isSigned = Boolean.FALSE;
+        this.conditionStatuses = new ArrayList<>();
     }
 
     public MedicalBoardCase(Consultation consultation, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
         this();
         this.consultation = consultation;
+        this.medicalBoardType = medicalBoardType;
+        this.statementOfCase = statementOfCase;
+    }
+
+    public MedicalBoardCase(MedicalBoardCase previousMedicalBoardCase, MedicalBoardTypeEnum medicalBoardType, String statementOfCase) {
+        this();
+        this.previousMedicalBoardCase = previousMedicalBoardCase;
         this.medicalBoardType = medicalBoardType;
         this.statementOfCase = statementOfCase;
     }
@@ -84,14 +109,24 @@ public class MedicalBoardCase implements Serializable {
     }
 
     public Consultation getConsultation() {
-        return getConsultationRec(this);
+        try {
+            return consultationRec(this);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public Consultation getConsultationStrict() {
+        return this.consultation;
     }
 
-    private Consultation getConsultationRec(MedicalBoardCase medicalBoardCase) {
-        if (medicalBoardCase.consultation == null) {
-            return getConsultationRec(medicalBoardCase.previousMedicalBoardCase);
+    private Consultation consultationRec(MedicalBoardCase medicalBoardCase) {
+        if (medicalBoardCase.getConsultationStrict() != null) {
+            return medicalBoardCase.getConsultationStrict();
+        } else {
+            medicalBoardCase = medicalBoardCase.getPreviousMedicalBoardCase();
+            return consultationRec(medicalBoardCase);
         }
-        return medicalBoardCase.consultation;
     }
 
     public void setConsultation(Consultation consultation) {
@@ -128,6 +163,38 @@ public class MedicalBoardCase implements Serializable {
 
     public void setPreviousMedicalBoardCase(MedicalBoardCase previousMedicalBoardCase) {
         this.previousMedicalBoardCase = previousMedicalBoardCase;
+    }
+
+    public MedicalBoardCase getFollowUpMedicalBoardCase() {
+        return followUpMedicalBoardCase;
+    }
+
+    public void setFollowUpMedicalBoardCase(MedicalBoardCase followUpMedicalBoardCase) {
+        this.followUpMedicalBoardCase = followUpMedicalBoardCase;
+    }
+
+    public Boolean getIsSigned() {
+        return isSigned;
+    }
+
+    public void setIsSigned(Boolean isSigned) {
+        this.isSigned = isSigned;
+    }
+
+    public PesStatusEnum getFinalPesStatus() {
+        return finalPesStatus;
+    }
+
+    public void setFinalPesStatus(PesStatusEnum finalPesStatus) {
+        this.finalPesStatus = finalPesStatus;
+    }
+
+    public List<ConditionStatus> getConditionStatuses() {
+        return conditionStatuses;
+    }
+
+    public void setConditionStatuses(List<ConditionStatus> conditionStatuses) {
+        this.conditionStatuses = conditionStatuses;
     }
 
     @Override
