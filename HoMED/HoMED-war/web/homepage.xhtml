@@ -47,6 +47,13 @@
             .landing-body .landing-wrapper .landing-pricing .pricing-box .pricing-box-header {
                 text-align: center;
             }
+            .pricing-box:hover > .pricing-box-header .inner {
+                transform: scale(1.1);
+
+            }
+            .pricing-box:hover {
+                background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+            }
         </style>
 
 
@@ -62,7 +69,7 @@
                                         <p:link outcome="medical-centre-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-hospital-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>#{currentEmployee.role == 'SUPER_USER' ? 'Medical Center Management' : 'Medical Centers'}</h2>
                                                     </div>
@@ -79,7 +86,7 @@
                                         <p:link outcome="employee-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-user-md p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Employee Account Management</h2>
                                                     </div>
@@ -96,7 +103,7 @@
                                         <p:link outcome="serviceman-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-user p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Serviceman Account Management</h2>
                                                     </div>
@@ -113,7 +120,7 @@
                                         <p:link outcome="report-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-files-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Report Management</h2>
                                                     </div>
@@ -130,7 +137,7 @@
                                         <p:link outcome="form-util.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-file-code-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>E-Form Utility</h2>
                                                     </div>
@@ -147,7 +154,7 @@
                                         <p:link outcome="consultation-util.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-file-code-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Consultation Utility</h2>
                                                     </div>
@@ -164,7 +171,7 @@
                                         <p:link outcome="booking-slot-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-calendar p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Booking Slot Management</h2>
                                                     </div>
@@ -181,7 +188,7 @@
                                         <p:link outcome="medical-board-slot-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-calendar-o p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Medical Board Slot Management</h2>
                                                     </div>
@@ -198,7 +205,7 @@
                                         <p:link outcome="medical-board-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-group p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Medical Board Management</h2>
                                                     </div>
@@ -215,7 +222,7 @@
                                         <p:link outcome="booking-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="pi pi-calendar p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Booking Management</h2>
                                                     </div>
@@ -232,7 +239,7 @@
                                         <p:link outcome="queue-display.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="pi pi-desktop p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Queue Display</h2>
                                                     </div>
@@ -249,7 +256,7 @@
                                         <p:link outcome="past-consultations.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-user-md p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Past Consultations</h2>
                                                     </div>
@@ -266,7 +273,7 @@
                                         <p:link outcome="serviceman-consultation-records.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-users p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Service Consultation Records</h2>
                                                     </div>
@@ -284,7 +291,7 @@
                                         <p:link outcome="queue-management.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-rocket p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Queue Management</h2>
                                                     </div>
@@ -302,7 +309,7 @@
                                         <p:link outcome="current-consultation.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-stethoscope p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Current Consultation</h2>
                                                     </div>
@@ -319,7 +326,7 @@
                                         <p:link outcome="medical-board.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-clipboard p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Medical Board</h2>
                                                     </div>
@@ -336,7 +343,7 @@
                                         <p:link outcome="notification-blast.xhtml">
                                             <div class="pricing-box">
                                                 <div class="pricing-box-header">
-                                                    <div>
+                                                    <div class="inner">
                                                         <i class="fa fa-bullhorn p-mb-3" style="font-size: 3rem"></i>
                                                         <h2>Notification Blast</h2>
                                                     </div>
