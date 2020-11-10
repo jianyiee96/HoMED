@@ -8,6 +8,7 @@ import entity.ConditionStatus;
 import entity.Consultation;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
+import entity.Notification;
 import entity.Serviceman;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,10 @@ import javax.persistence.Query;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.enumeration.PesStatusEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
@@ -32,6 +35,9 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
+
+    @EJB
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -57,6 +63,12 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         em.persist(medicalBoardCase);
         em.flush();
 
+        Notification n = new Notification("New Medical Board Case", "A medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+        } catch (CreateNotificationException ex) {
+            System.out.println("Error in creating notification " + ex);
+        }
     }
 
     @Override
@@ -77,6 +89,13 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
         em.persist(medicalBoardCase);
         em.flush();
+
+        Notification n = new Notification("Follow up Medical Board Case", "A  follow up follow up medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+        } catch (CreateNotificationException ex) {
+            System.out.println("Error in creating notification " + ex);
+        }
 
     }
 
@@ -188,6 +207,14 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public List<MedicalBoardCase> retrieveAllMedicalBoardCases() {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc");
 
+        return query.getResultList();
+    }
+
+    @Override
+    public List<MedicalBoardCase> retrieveAllMedicalBoardInPresenceCases() {
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardType = :type");
+        query.setParameter("type", MedicalBoardTypeEnum.PRESENCE);
+        
         return query.getResultList();
     }
 
