@@ -63,7 +63,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         em.persist(medicalBoardCase);
         em.flush();
 
-        Notification n = new Notification("New Medical Board Case", "A medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        Notification n = new Notification("New Medical Board Case", "You have been assigned a medical board case. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
         } catch (CreateNotificationException ex) {
