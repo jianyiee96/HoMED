@@ -8,7 +8,9 @@ import entity.ConditionStatus;
 import entity.Consultation;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
+import entity.Notification;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
@@ -19,13 +21,18 @@ import javax.persistence.Query;
 import util.enumeration.MedicalBoardCaseStatusEnum;
 import util.enumeration.MedicalBoardSlotStatusEnum;
 import util.enumeration.MedicalBoardTypeEnum;
+import util.enumeration.NotificationTypeEnum;
 import util.enumeration.PesStatusEnum;
 import util.exceptions.CreateMedicalBoardCaseException;
+import util.exceptions.CreateNotificationException;
 import util.exceptions.SignMedicalBoardCaseException;
 import util.exceptions.UpdateMedicalBoardSlotException;
 
 @Stateless
 public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanLocal {
+
+    @EJB(name = "NotificationSessionBeanLocal")
+    private NotificationSessionBeanLocal notificationSessionBeanLocal;
 
     @EJB(name = "SlotSessionBeanLocal")
     private SlotSessionBeanLocal slotSessionBeanLocal;
@@ -150,37 +157,86 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     }
 
     @Override
-    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<MedicalBoardCase> medicalBoardCases) throws UpdateMedicalBoardSlotException {
+    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<MedicalBoardCase> medicalBoardCases, List<MedicalBoardCase> addedMedicalBoardCases, List<MedicalBoardCase> removedMedicalBoardCases) throws UpdateMedicalBoardSlotException {
         String errorMessage = "Failed to allocate Medical Board Cases to Medical Board Slot: ";
 
-        if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
-            MedicalBoardSlot medicalBoardSlotToUpdate = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
+        try {
+            if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
+                MedicalBoardSlot medicalBoardSlotToUpdate = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
 
-            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInPresenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase());
-            medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInAbsenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase());
+                medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInPresenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase());
+                medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInAbsenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase());
 
-            // To reset all the relationship
-            for (int i = 0; i < medicalBoardSlotToUpdate.getMedicalBoardCases().size(); i++) {
-                medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardSlot(null);
-                medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.WAITING);
-            }
-            medicalBoardSlotToUpdate.getMedicalBoardCases().clear();
+                // To reset all the relationship
+                for (int i = 0; i < medicalBoardSlotToUpdate.getMedicalBoardCases().size(); i++) {
+                    medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardSlot(null);
+                    medicalBoardSlotToUpdate.getMedicalBoardCases().get(i).setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.WAITING);
+                }
+                medicalBoardSlotToUpdate.getMedicalBoardCases().clear();
 
-            medicalBoardCases.forEach(mbc -> {
-                MedicalBoardCase medicalBoardCaseToUpdate = retrieveMedicalBoardCaseById(mbc.getMedicalBoardCaseId());
-                medicalBoardCaseToUpdate.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.SCHEDULED);
+                medicalBoardCases.forEach(mbc -> {
+                    MedicalBoardCase medicalBoardCaseToUpdate = retrieveMedicalBoardCaseById(mbc.getMedicalBoardCaseId());
+                    medicalBoardCaseToUpdate.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.SCHEDULED);
 
-                medicalBoardCaseToUpdate.setMedicalBoardSlot(medicalBoardSlotToUpdate);
-                medicalBoardSlotToUpdate.getMedicalBoardCases().add(medicalBoardCaseToUpdate);
-            });
+                    medicalBoardCaseToUpdate.setMedicalBoardSlot(medicalBoardSlotToUpdate);
+                    medicalBoardSlotToUpdate.getMedicalBoardCases().add(medicalBoardCaseToUpdate);
+                });
 
-            if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
-                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ASSIGNED);
+                if (medicalBoardSlotToUpdate.getMedicalBoardCases().isEmpty()) {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ASSIGNED);
+                } else {
+                    medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ALLOCATED);
+                }
+
+                String pattern = "EEEE, d MMM yyyy HH:mm";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+                String title = "";
+                String body = "";
+
+                for (MedicalBoardCase addedMbc : addedMedicalBoardCases) {
+                    MedicalBoardCase mbc = this.retrieveMedicalBoardCaseById(addedMbc.getMedicalBoardCaseId());
+                    String dateForBoard = simpleDateFormat.format(mbc.getMedicalBoardSlot().getStartDateTime());
+
+                    if (mbc.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE) {
+                        title = "Medical Board In-Absence Allocated";
+                        body = "Your Medical Board In-Absence Case [ID: " + mbc.getMedicalBoardCaseId() + "] has been scheduled on " + dateForBoard + ".\n\nYou are NOT required to turn up for the medical board.";
+                    } else {
+                        title = "Medical Board In-Presence Allocated";
+                        body = "Your Medical Board In-Presence Case [ID: " + mbc.getMedicalBoardCaseId() + "] has been scheduled on " + dateForBoard + ".\n\nYou are required to turn up for the medical board. Do remember to come early for your medical board.";
+                    }
+
+                    Notification n = new Notification(title, body, NotificationTypeEnum.MEDICAL_BOARD, mbc.getMedicalBoardCaseId());
+                    notificationSessionBeanLocal.createNewNotification(n, mbc.getConsultation().getBooking().getServiceman().getServicemanId(), true);
+                    notificationSessionBeanLocal.sendPushNotification(title, body, mbc.getConsultation().getBooking().getServiceman().getFcmToken());
+
+                    title = "";
+                    body = "";
+                }
+
+                for (MedicalBoardCase removedMbc : removedMedicalBoardCases) {
+                    String originalDateForBoard = simpleDateFormat.format(removedMbc.getMedicalBoardSlot().getStartDateTime());
+
+                    if (removedMbc.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE) {
+                        title = "Medical Board In-Absence Removed";
+                        body = "Your original Medical Board In-Absence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " is cancelled.\n\nThe medical board admin will schedule another board for you soon.";
+                    } else {
+                        title = "Medical Board In-Presence Removed";
+                        body = "Your original Medical Board In-Presence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " is cancelled.\n\nPlease do NOT turn up for the medical board. The medical board admin will schedule another board for you soon.";
+                    }
+
+                    Notification n = new Notification(title, body, NotificationTypeEnum.MEDICAL_BOARD, removedMbc.getMedicalBoardCaseId());
+                    notificationSessionBeanLocal.createNewNotification(n, removedMbc.getConsultation().getBooking().getServiceman().getServicemanId(), true);
+                    notificationSessionBeanLocal.sendPushNotification(title, body, removedMbc.getConsultation().getBooking().getServiceman().getFcmToken());
+
+                    title = "";
+                    body = "";
+                }
             } else {
-                medicalBoardSlotToUpdate.setMedicalBoardSlotStatusEnum(MedicalBoardSlotStatusEnum.ALLOCATED);
+                throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
             }
-        } else {
-            throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
+        } catch (CreateNotificationException ex) {
+            System.out.println("> " + ex.getMessage());
         }
     }
 

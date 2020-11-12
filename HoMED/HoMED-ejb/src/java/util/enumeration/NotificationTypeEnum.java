@@ -12,5 +12,6 @@ public enum NotificationTypeEnum {
     GENERAL,
     BOOKING,
     CONSULTATION,
-    FORM
+    FORM,
+    MEDICAL_BOARD
 }
