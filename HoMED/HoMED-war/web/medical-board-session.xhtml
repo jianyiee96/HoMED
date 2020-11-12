@@ -25,6 +25,12 @@
             .ui-autocomplete-input {
                 width: 100%;
             }
+            .ui-selectonemenu {
+                width: 100%;
+            }
+            .ui-selectonemenu-label {
+                width: 100%;
+            }
         </style>
 
         <ui:fragment rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum != 'ALLOCATED'}">
@@ -357,13 +363,16 @@
 
                                                     </p:dataTable>
                                                     <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2" width="100%">
-                                                        <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="2">
-                                                            <p:commandButton value="Add Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.addConditionStatus()}"></p:commandButton>
+                                                        <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="3">
+                                                            <p:splitButton value="Add Status Field" actionListener="#{medicalBoardSessionManagedBean.addConditionStatus()}" update="statusDT" icon="pi pi-plus">
+                                                                <p:menuitem value="Add Status Fields by Group" oncomplete="PF('dialogAddGroup2').show()"/>
+                                                            </p:splitButton>  
+
                                                             <p:commandButton value="Clear All Empty Status" update="statusDT" actionListener="#{medicalBoardSessionManagedBean.clearEmptyConditionStatus()}"></p:commandButton>
                                                         </h:panelGrid>
                                                         <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" style="float: right" columns="2">
                                                             <p:commandButton value="Pre Defined Condition Statuses" update="statusDT"
-                                                                             oncomplete="PF('dialogManagePreDefinedStatus').show()" actionListener="#{medicalBoardSessionManagedBean.manageStatus()}"></p:commandButton>
+                                                                             oncomplete="PF('dialogManagePreDefinedStatus').show()"></p:commandButton>
                                                         </h:panelGrid>
                                                         <h:panelGrid rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned}" columns="1">
 
@@ -380,7 +389,6 @@
 
 
                                         </p:panelGrid>
-
                                     </li>
 
                                     <ui:fragment rendered="#{not medicalBoardSessionManagedBean.selectedCase.isSigned and medicalBoardSessionManagedBean.hasFollowUp}">
@@ -483,11 +491,11 @@
 
                 <p:dialog id="dialogManagePreDefinedStatus" widgetVar="dialogManagePreDefinedStatus" header="Pre Defined Condition Status" showEffect="fade"
                           draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManagePreDefinedStatus').initPosition()"
-                          minWidth="500" width="500">
+                          minWidth="500" width="500" minHeight="480" height="480">
 
 
 
-                    <p:dataTable id="pdsDT" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="preDefStatus" value="#{medicalBoardSessionManagedBean.preDefinedConditionStatuses}">
+                    <p:dataTable id="pdsDT" scrollable="true" scrollHeight="340" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="preDefStatus" value="#{medicalBoardSessionManagedBean.preDefinedConditionStatuses}">
 
                         <p:column headerText="Status">
                             <h:outputText value="#{preDefStatus.description}" />
@@ -495,7 +503,7 @@
 
                         <p:column style="width: 30px">
 
-                            <p:commandButton class="rounded-button danger-button" icon="pi pi-trash" title="Remove Status" update="pdsDT" actionListener="#{medicalBoardSessionManagedBean.removePreDefinedConditionStatus}">
+                            <p:commandButton class="rounded-button danger-button" icon="pi pi-trash" title="Remove Status" update="pdsDT sessionForm:dialogManagePreDefinedStatusGroup" actionListener="#{medicalBoardSessionManagedBean.removePreDefinedConditionStatus}">
                                 <f:attribute name="statusToDelete" value="#{preDefStatus}" />
                             </p:commandButton>
                         </p:column>
@@ -511,9 +519,102 @@
                         </p:commandButton>
 
                     </div>
+                    <div class="p-field" style="margin-top: 1rem;">
+
+                        <p:commandButton value="Manage Status Groups" 
+                                         oncomplete="PF('dialogManagePreDefinedStatusGroup').show()"></p:commandButton>
+
+                    </div>
 
                 </p:dialog>
 
+                <p:dialog id="dialogManagePreDefinedStatusGroup" widgetVar="dialogManagePreDefinedStatusGroup" header="Pre Defined Condition Status Group" showEffect="fade"
+                          draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManagePreDefinedStatusGroup').initPosition()"
+                          minWidth="500" width="500" minHeight="490" height="490">
+
+
+
+                    <p:dataTable id="pdsgDT" scrollable="true" scrollHeight="400" styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" var="preDefStatusGroup" value="#{medicalBoardSessionManagedBean.preDefinedConditionStatusGroups}">
+
+                        <p:column style="width:20px">
+                            <p:rowToggler />
+                        </p:column>
+                        <p:column headerText="Status Groups">
+                            <h:outputText value="#{preDefStatusGroup.groupName}" />
+                        </p:column>
+
+                        <p:column style="width: 30px">
+                            <p:commandButton class="rounded-button danger-button" icon="pi pi-trash" title="Remove Status" update="pdsgDT" actionListener="#{medicalBoardSessionManagedBean.removePreDefinedConditionStatusGroup}">
+                                <f:attribute name="statusGroupToDelete" value="#{preDefStatusGroup}" />
+                            </p:commandButton>
+                        </p:column>
+
+                        <p:rowExpansion>
+                            <p:outputLabel value="Condition Status List: " rendered="#{preDefStatusGroup.statuses.size() != 0}"></p:outputLabel>
+                            <p:outputLabel value="Condition Status List is Empty!" rendered="#{preDefStatusGroup.statuses.size() == 0}"></p:outputLabel>
+
+                            <ul>
+                                <ui:repeat value="#{preDefStatusGroup.statuses}" var="statusesFromGroup">
+                                    <li>
+                                        #{statusesFromGroup.description}
+                                    </li>
+                                </ui:repeat>
+                            </ul>
+
+                            <p:commandButton value="Add/Remove status" oncomplete="PF('dialogManagePreDefinedStatusGroupAdd').show()" 
+                                             update="sessionForm:dialogManagePreDefinedStatusGroupAdd" actionListener="#{medicalBoardSessionManagedBean.updateGroupToEdit(preDefStatusGroup)}"></p:commandButton>
+                        </p:rowExpansion>
+
+                    </p:dataTable>
+
+                    <div class="p-field" style="margin-top: 1rem;">
+
+                        <p:inputText style="width: 90%; margin-right: 8px;" id="newPDSG" value="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatusGroup}" placeholder="New Pre Defined Condition Status Group" >
+                            <p:ajax event="keyup" update="createGroup"/>
+                        </p:inputText>
+                        <p:commandButton id="createGroup" style="width: 30px;" icon="pi pi-plus" update="pdsgDT newPDSG" action="#{medicalBoardSessionManagedBean.addPreDefinedConditionStatusGroup()}" disabled="#{medicalBoardSessionManagedBean.newPreDefinedConditionStatusGroup == null || medicalBoardSessionManagedBean.newPreDefinedConditionStatusGroup == ''}" >
+                        </p:commandButton>
+
+                    </div>
+
+                </p:dialog>
+
+                <p:dialog id="dialogManagePreDefinedStatusGroupAdd" widgetVar="dialogManagePreDefinedStatusGroupAdd" header="Add condition status" showEffect="fade"
+                          draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManagePreDefinedStatusGroupAdd').initPosition()"
+                          minWidth="500" width="500" minHeight="440" height="440">
+
+                    <p:selectManyMenu id="selectMenu" value="#{medicalBoardSessionManagedBean.selectedStatus}" scrollHeight="380" showCheckbox="true">
+                        <f:selectItems value="#{medicalBoardSessionManagedBean.preDefinedConditionStatuses}" var="stt" itemLabel="#{stt.description}" itemValue="#{stt}" />
+                    </p:selectManyMenu>
+
+
+                    <div style="width: 100%; margin-top: 20px">
+
+                        <p:commandButton value="Update" update="sessionForm:dialogManagePreDefinedStatusGroup sessionForm:dialogManagePreDefinedStatusGroupAdd sessionForm:dialogAddGroup2"
+                                         oncomplete="PF('dialogManagePreDefinedStatusGroup').show()" style="width: 100%"
+                                         actionListener="#{medicalBoardSessionManagedBean.saveGroupToEdit()}"></p:commandButton>
+                    </div>
+
+
+                </p:dialog>
+
+                <p:dialog id="dialogAddGroup2" widgetVar="dialogAddGroup2" header="Add Condition Status by Group" showEffect="fade"
+                          draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogAddGroup2').initPosition()">
+
+
+                    <p:selectOneMenu value="#{medicalBoardSessionManagedBean.selectedGroupFieldIdToAdd}">
+                        <f:selectItems value="#{medicalBoardSessionManagedBean.preDefinedConditionStatusGroups}" var="pdcsg" itemLabel="#{pdcsg.groupName}"  itemValue="#{pdcsg.preDefinedConditionStatusGroupId}"/> 
+                    </p:selectOneMenu>
+
+                    <div style="width: 100%; margin-top: 20px">
+
+                        <p:commandButton value="Add Condition Status Group" update="@form"
+                                         style="width: 100%"
+                                         actionListener="#{medicalBoardSessionManagedBean.addSelectedGroupFieldToAddStatuses()}"></p:commandButton>
+                    </div>
+
+
+                </p:dialog>
 
 
 

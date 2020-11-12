@@ -13,6 +13,7 @@ import entity.ConditionStatus;
 import entity.MedicalBoardCase;
 import entity.MedicalBoardSlot;
 import entity.PreDefinedConditionStatus;
+import entity.PreDefinedConditionStatusGroup;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -65,13 +66,23 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     List<PreDefinedConditionStatus> preDefinedConditionStatuses;
 
+    List<PreDefinedConditionStatusGroup> preDefinedConditionStatusGroups;
+
     String newPreDefinedConditionStatus;
+
+    String newPreDefinedConditionStatusGroup;
 
     Boolean hasFollowUp;
 
     String currentFollowUpAction;
 
     String followUpStatement;
+
+    PreDefinedConditionStatusGroup groupToEdit;
+
+    Long selectedGroupFieldIdToAdd;
+
+    List<PreDefinedConditionStatus> selectedStatus;
 
     public MedicalBoardSessionManagedBean() {
         servicemanCurrentConditionStatuses = new ArrayList<>();
@@ -106,6 +117,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         } else {
 
             this.preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
+            this.preDefinedConditionStatusGroups = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatusGroup();
             sortMedicalBoardCases(medicalBoardSlot.getMedicalBoardCases());
             if (medicalBoardSlot.getMedicalBoardCases().size() > 0) {
                 hasFollowUp = false;
@@ -190,6 +202,22 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void addConditionStatus() {
         this.selectedCase.getConditionStatuses().add(new ConditionStatus());
+    }
+
+    public void addSelectedGroupFieldToAddStatuses() {
+
+        for (PreDefinedConditionStatusGroup pdcsg : preDefinedConditionStatusGroups) {
+            if (pdcsg.getPreDefinedConditionStatusGroupId().equals(this.selectedGroupFieldIdToAdd)) {
+                for (PreDefinedConditionStatus c : pdcsg.getStatuses()) {
+                    ConditionStatus cs = new ConditionStatus();
+                    cs.setDescription(c.getDescription());
+                    this.selectedCase.getConditionStatuses().add(cs);
+                }
+                break;
+            }
+        }
+
+        this.selectedGroupFieldIdToAdd = null;
     }
 
     public void doChangeDate(ConditionStatus conditionStatus, Integer duration) {
@@ -292,6 +320,13 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         PreDefinedConditionStatus cs = (PreDefinedConditionStatus) event.getComponent().getAttributes().get("statusToDelete");
         conditionStatusSessionBeanLocal.removePreDefinedConditionStatus(cs.getPreDefinedConditionStatusId());
         preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
+        preDefinedConditionStatusGroups = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatusGroup();
+    }
+
+    public void removePreDefinedConditionStatusGroup(ActionEvent event) {
+        PreDefinedConditionStatusGroup csg = (PreDefinedConditionStatusGroup) event.getComponent().getAttributes().get("statusGroupToDelete");
+        conditionStatusSessionBeanLocal.removePreDefinedConditionStatusGroup(csg.getPreDefinedConditionStatusGroupId());
+        preDefinedConditionStatusGroups = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatusGroup();
     }
 
     public void addPreDefinedConditionStatus() {
@@ -300,9 +335,29 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             conditionStatusSessionBeanLocal.addPreDefinedConditionStatus(newPreDefinedConditionStatus);
             newPreDefinedConditionStatus = "";
             preDefinedConditionStatuses = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatus();
+        }
+
+    }
+
+    public void addPreDefinedConditionStatusGroup() {
+
+        if (newPreDefinedConditionStatusGroup != null && !newPreDefinedConditionStatusGroup.isEmpty()) {
+            conditionStatusSessionBeanLocal.createPreDefinedConditionStatusGroup(newPreDefinedConditionStatusGroup);
+            newPreDefinedConditionStatusGroup = "";
+            preDefinedConditionStatusGroups = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatusGroup();
 
         }
 
+    }
+
+    public void updateGroupToEdit(PreDefinedConditionStatusGroup group) {
+        this.groupToEdit = group;
+        this.selectedStatus = group.getStatuses();
+    }
+
+    public void saveGroupToEdit() {
+        conditionStatusSessionBeanLocal.updatePreDefinedConditionStatusGroupList(groupToEdit.getPreDefinedConditionStatusGroupId(), selectedStatus);
+        this.preDefinedConditionStatusGroups = conditionStatusSessionBeanLocal.retrieveAllPreDefinedConditionStatusGroup();
     }
 
     public void rowSelectListener() {
@@ -417,6 +472,46 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
     public void setCurrentFollowUpAction(String currentFollowUpAction) {
         this.currentFollowUpAction = currentFollowUpAction;
+    }
+
+    public List<PreDefinedConditionStatusGroup> getPreDefinedConditionStatusGroups() {
+        return preDefinedConditionStatusGroups;
+    }
+
+    public void setPreDefinedConditionStatusGroups(List<PreDefinedConditionStatusGroup> preDefinedConditionStatusGroups) {
+        this.preDefinedConditionStatusGroups = preDefinedConditionStatusGroups;
+    }
+
+    public String getNewPreDefinedConditionStatusGroup() {
+        return newPreDefinedConditionStatusGroup;
+    }
+
+    public void setNewPreDefinedConditionStatusGroup(String newPreDefinedConditionStatusGroup) {
+        this.newPreDefinedConditionStatusGroup = newPreDefinedConditionStatusGroup;
+    }
+
+    public PreDefinedConditionStatusGroup getGroupToEdit() {
+        return groupToEdit;
+    }
+
+    public void setGroupToEdit(PreDefinedConditionStatusGroup groupToEdit) {
+        this.groupToEdit = groupToEdit;
+    }
+
+    public List<PreDefinedConditionStatus> getSelectedStatus() {
+        return selectedStatus;
+    }
+
+    public void setSelectedStatus(List<PreDefinedConditionStatus> selectedStatus) {
+        this.selectedStatus = selectedStatus;
+    }
+
+    public Long getSelectedGroupFieldIdToAdd() {
+        return selectedGroupFieldIdToAdd;
+    }
+
+    public void setSelectedGroupFieldIdToAdd(Long selectedGroupFieldIdToAdd) {
+        this.selectedGroupFieldIdToAdd = selectedGroupFieldIdToAdd;
     }
 
     public String renderDateTime(Date date) {
