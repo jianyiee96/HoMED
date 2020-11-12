@@ -231,11 +231,11 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                     String originalDateForBoard = simpleDateFormat.format(removedMbc.getMedicalBoardSlot().getStartDateTime());
 
                     if (removedMbc.getMedicalBoardType() == MedicalBoardTypeEnum.ABSENCE) {
-                        title = "Medical Board In-Absence Removed";
-                        body = "Your original Medical Board In-Absence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " is cancelled.\n\nThe medical board admin will schedule another board for you soon.";
+                        title = "Medical Board In-Absence Updated";
+                        body = "Your original Medical Board In-Absence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " has been put back into waiting list.\n\nThe medical board admin will schedule another board for you soon.";
                     } else {
-                        title = "Medical Board In-Presence Removed";
-                        body = "Your original Medical Board In-Presence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " is cancelled.\n\nPlease do NOT turn up for the medical board. The medical board admin will schedule another board for you soon.";
+                        title = "Medical Board In-Presence Updated";
+                        body = "Your original Medical Board In-Presence Case [ID: " + removedMbc.getMedicalBoardCaseId() + "] on " + originalDateForBoard + " has been put back into waiting list.\n\nPlease do NOT turn up for the medical board. The medical board admin will schedule another board for you soon.";
                     }
 
                     Notification n = new Notification(title, body, NotificationTypeEnum.MEDICAL_BOARD, removedMbc.getMedicalBoardCaseId());
