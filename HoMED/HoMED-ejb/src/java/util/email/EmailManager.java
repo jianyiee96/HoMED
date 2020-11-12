@@ -1,8 +1,11 @@
 package util.email;
 
+import entity.ConditionStatus;
 import entity.Employee;
 import entity.Serviceman;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -13,6 +16,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import util.enumeration.PesStatusEnum;
 
 public class EmailManager {
 
@@ -23,6 +27,9 @@ public class EmailManager {
 
     private String linkToHomed = "http://localhost:8080/HoMED-war/login.xhtml";
 
+    String pattern = "EEEE, d MMM yyyy";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
     public EmailManager() {
     }
 
@@ -30,7 +37,7 @@ public class EmailManager {
         this.smtpAuthUser = smtpAuthUser;
         this.smtpAuthPassword = smtpAuthPassword;
     }
-    
+
     public Boolean emailEmployeeChangeEmail(Employee employee, String fromEmailAddress) {
         String toEmail = employee.getEmail();
         String emailSubject = "HoMED Employee Email Change Notice";
@@ -75,7 +82,7 @@ public class EmailManager {
 
         return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
     }
-    
+
     public Boolean emailServicemanChangeEmail(Serviceman serviceman, String fromEmailAddress) {
         String toEmail = serviceman.getEmail();
         String emailSubject = "HoMED Serviceman Email Change Notice";
@@ -105,7 +112,7 @@ public class EmailManager {
 
         return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
     }
-    
+
     public Boolean emailServicemanResetPassword(Serviceman serviceman, String otp, String fromEmailAddress) {
         String toEmail = serviceman.getEmail();
         String emailSubject = "HoMED Serviceman Account Password Reset";
@@ -114,6 +121,38 @@ public class EmailManager {
         String header2 = "Password Reset";
         String header3 = "OTP: " + otp;
         String body = "The admin has received a request to reset your password. Please proceed to reset your account at the HoMED Serviceman System with the given OTP. Should you encounter any technical difficulties, immediately contact your system admin.";
+        String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
+
+        String emailBody = createEmailBodyServiceman(recipientName, header1, header2, header3, body, disclaimer);
+
+        return sendEmail(fromEmailAddress, toEmail, emailSubject, emailBody);
+    }
+
+    public Boolean emailServicemanBoardResult(Serviceman serviceman, String fromEmailAddress, PesStatusEnum pesStatusEnum, List<ConditionStatus> conditionStatuses) {
+        String toEmail = serviceman.getEmail();
+        String emailSubject = "HoMED Serviceman Medical Board Result";
+        String recipientName = serviceman.getName();
+        String header1 = "HoMED Medical Board System";
+        String header2 = "Board Result";
+        String header3 = "";
+
+        String status = "<ul>";
+
+        for (int idx = 0; idx < conditionStatuses.size(); idx++) {
+            Date endDate = conditionStatuses.get(idx).getStatusEndDate();
+
+            if (endDate != null) {
+                String formattedDate = simpleDateFormat.format(conditionStatuses.get(idx).getStatusEndDate());
+                status += "<br/><li><b>" + conditionStatuses.get(idx).getDescription() + "</b></li><b>End Date</b>: " + formattedDate + "<br/>";
+            } else {
+                status += "<br/><li><b>" + conditionStatuses.get(idx).getDescription() + "</b></li><b>End Date</b>: PERMANENT<br/>";
+            }
+        }
+
+        status += "</ul>";
+
+        String body = "Your latest PES status is: <b>" + pesStatusEnum + "</b>.<br/><br/>You have been assigned the following status:" + status;
+
         String disclaimer = "Any person receiving this email and any attachment(s) contained, shall treat the information as confidential and not misuse, copy, disclose, distribute or retain the information in any way that amounts to a breach of confidentiality. If you are not the intended recipient, please delete all copies of this email from your computer system.";
 
         String emailBody = createEmailBodyServiceman(recipientName, header1, header2, header3, body, disclaimer);

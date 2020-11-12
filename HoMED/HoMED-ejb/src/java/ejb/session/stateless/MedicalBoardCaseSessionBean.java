@@ -38,6 +38,9 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
     @EJB
     private NotificationSessionBeanLocal notificationSessionBeanLocal;
+    
+    @EJB
+    private EmailSessionBeanLocal emailSessionBeanLocal;
 
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
@@ -137,7 +140,9 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                 medicalBoardCase.getConditionStatuses().add(cs);
                 em.flush();
             }
-
+            
+            emailSessionBeanLocal.emailServicemanBoardResult(serviceman, medicalBoardCase.getFinalPesStatus(), conditionStatuses);
+        
         } catch (Exception ex) {
             throw new SignMedicalBoardCaseException("Unable to sign medical board case: " + ex.getMessage());
         }
@@ -174,7 +179,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
         if (medicalBoardSlot != null && medicalBoardSlot.getSlotId() != null) {
             MedicalBoardSlot medicalBoardSlotToUpdate = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlot.getSlotId());
-
+            
             medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInPresenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInPresenceCase());
             medicalBoardSlotToUpdate.setEstimatedTimeForEachBoardInAbsenceCase(medicalBoardSlot.getEstimatedTimeForEachBoardInAbsenceCase());
 
@@ -214,7 +219,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public List<MedicalBoardCase> retrieveAllMedicalBoardInPresenceCases() {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardType = :type");
         query.setParameter("type", MedicalBoardTypeEnum.PRESENCE);
-        
+
         return query.getResultList();
     }
 
