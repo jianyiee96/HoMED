@@ -5,9 +5,7 @@
 package jsf.managedBean;
 
 import ejb.session.stateless.ConditionStatusSessionBeanLocal;
-import ejb.session.stateless.MedicalBoardCaseSessionBean;
 import ejb.session.stateless.MedicalBoardCaseSessionBeanLocal;
-import ejb.session.stateless.ServicemanSessionBeanLocal;
 import ejb.session.stateless.SlotSessionBeanLocal;
 import entity.ConditionStatus;
 import entity.MedicalBoardCase;
@@ -94,12 +92,13 @@ public class MedicalBoardSessionManagedBean implements Serializable {
         try {
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
             medicalBoardSlot = (MedicalBoardSlot) flash.get("medicalBoardSlot");
+            selectedCase = (MedicalBoardCase) flash.get("selectedMedicalBoardCase");
 
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException nullPointerException) {
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
-            } catch (IOException exx) {
-                System.out.println(exx);
+            } catch (IOException iOException) {
+                System.out.println(iOException);
             }
         }
 
@@ -127,6 +126,17 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             }
         }
 
+        try {
+            Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            selectedCase = (MedicalBoardCase) flash.get("selectedMedicalBoardCase");
+        } catch (NullPointerException nullPointerException) {
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");
+            } catch (IOException iOException) {
+                System.out.println(iOException);
+            }
+        }
+
     }
 
     public void back() {
@@ -136,6 +146,21 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             System.out.println("Fail to redirect: " + ex);
         }
 
+    }
+
+    public void viewServicemanPastConsultations() {
+        if (this.selectedCase != null) {
+            Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            flash.put("selectedMedicalBoardCase", this.selectedCase);
+            flash.put("medicalBoardSlot", medicalBoardSlot);
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("serviceman-consultation-records.xhtml");
+            } catch (IOException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            }
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", "No medical board case is selected!"));
+        }
     }
 
     public void sortMedicalBoardCases(List<MedicalBoardCase> mbs) {

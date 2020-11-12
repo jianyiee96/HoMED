@@ -75,74 +75,10 @@
                         <p:menuitem rendered="#{currentEmployee.role == 'CLERK' or currentEmployee.role == 'MB_ADMIN'}" value="Queue Display" icon="pi pi-desktop" outcome="/queue-display" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Queue Management" icon="fa fa-rocket" outcome="/queue-management" />
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Current Consultation" icon="fa fa-stethoscope" outcome="/current-consultation" />
-                        <p:submenu rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" label="Consultation History" icon="fa fa-history" >
-                            <p:menuitem value="Past Consultations" icon="fa fa-user-md" outcome="/past-consultations" />
-                            <p:menuitem value="Serviceman Consultation Records" icon="fa fa-users" outcome="/serviceman-consultation-records" />
-                        </p:submenu>
                         <p:menuitem rendered="#{currentEmployee.role == 'MEDICAL_OFFICER'}" value="Medical Board" icon="fa fa-clipboard" outcome="/medical-board" />
                         <p:menuitem rendered="#{currentEmployee.role == 'SUPER_USER'}" value="Notification Blast" icon="fa fa-bullhorn" outcome="/notification-blast" />
                     </po:menu>
                 </h:form>
-                <!--                        <p:submenu id="om_components" label="UI Kit" icon="pi pi-star">
-                                            <p:menuitem id="om_formlayout" value="Form Layout" icon="pi pi-id-card" outcome="/login" />
-                                            <p:menuitem id="om_input" value="Input" icon="pi pi-check-square" outcome="/login" />
-                                            <p:menuitem id="om_button" value="Button" icon="pi pi-mobile" outcome="/login" styleClass="index-icon"/>
-                                            <p:menuitem id="om_table" value="Table" icon="pi pi-table" outcome="/login" />
-                                            <p:menuitem id="om_list" value="List" icon="pi pi-list" outcome="/login" />
-                                            <p:menuitem id="om_tree" value="Tree" icon="pi pi-share-alt" outcome="/login" />
-                                            <p:menuitem id="om_panel" value="Panel" icon="pi pi-tablet" outcome="/login" />
-                                            <p:menuitem id="om_overlay" value="Overlay" icon="pi pi-clone" outcome="/login" />
-                                            <p:menuitem id="om_menu" value="Menu" icon="pi pi-bars" outcome="/login" />
-                                            <p:menuitem id="om_message" value="Message" icon="pi pi-comment" outcome="/login" />
-                                            <p:menuitem id="om_file" value="File" icon="pi pi-file" outcome="/login" />
-                                            <p:menuitem id="om_chart" value="Chart" icon="pi pi-chart-bar" outcome="/login" />
-                                            <p:menuitem id="om_misc" value="Misc" icon="pi pi-circle-off" outcome="/login" />
-                                        </p:submenu>
-                                        <p:submenu id="om_utils" label="Utilities" icon="pi pi-compass">
-                                            <p:menuitem id="om_icons" value="Icons" icon="pi pi-search" outcome="/login" />
-                                            <p:menuitem id="om_widgets" value="Widgets" icon="pi pi-star-o" outcome="/login" />
-                                            <p:menuitem id="om_grid" value="Grid System" icon="pi pi-th-large" outcome="/login" />
-                                            <p:menuitem id="om_spacing" value="Spacing" icon="pi pi-arrow-right" outcome="/login" />
-                                            <p:menuitem id="om_elevation" value="Elevation" icon="pi pi-external-link" outcome="/login" />
-                                            <p:menuitem id="om_typography" value="Typography" icon="pi pi-align-center" outcome="/login" />
-                                        </p:submenu>
-                                        <p:submenu id="om_default" label="Pages" icon="pi pi-briefcase">
-                                            <p:menuitem id="om_crud" value="Crud" icon="pi pi-pencil" outcome="/login" />
-                                            <p:menuitem id="om_calendar" value="Calendar" icon="pi pi-calendar-plus" outcome="/login" />
-                                            <p:menuitem id="om_landing" value="Landing" icon="pi pi-user-plus" outcome="/login" />
-                                            <p:menuitem id="om_login" value="Login" icon="pi pi-sign-in" outcome="/login" />
-                                            <p:menuitem id="om_invoice" value="Invoice" icon="pi pi-dollar" outcome="/login" />
-                                            <p:menuitem id="om_help" value="Help" icon="pi pi-question-circle" outcome="/login" />
-                                            <p:menuitem id="om_error" value="Error" icon="pi pi-times-circle" outcome="/login" />
-                                            <p:menuitem id="om_notfound" value="Not Found" icon="pi pi-exclamation-circle" outcome="/login" />
-                                            <p:menuitem id="om_access" value="Access Denied" icon="pi pi-lock" outcome="/login" />
-                                            <p:menuitem id="om_empty" value="Empty" icon="pi pi-circle-off" outcome="/login" />
-                                        </p:submenu>
-                                        <p:submenu id="om_hierarchy" label="Hierarchy" icon="pi pi-align-left">
-                                            <p:submenu id="om_sm1" label="Submenu 1" icon="pi pi-align-left">
-                                                <p:submenu id="om_sm11" label="Submenu 1.1" icon="pi pi-align-left">
-                                                    <p:menuitem id="om_lnk111" value="Link 1.1.1" icon="pi pi-align-left" url="#" />
-                                                    <p:menuitem id="om_lnk112" value="Link 1.1.2" icon="pi pi-align-left" url="#" />
-                                                    <p:menuitem id="om_lnk113" value="Link 1.1.3" icon="pi pi-align-left" url="#" />
-                                                </p:submenu>
-                                                <p:submenu id="om_sm12" label="Submenu 1.2" icon="pi pi-align-left">
-                                                    <p:menuitem id="om_lnk121" value="Link 1.2.1" icon="pi pi-align-left" url="#" />
-                                                </p:submenu>
-                                            </p:submenu>
-                                            <p:submenu id="om_sm2" label="Submenu 2" icon="pi pi-align-left">
-                                                <p:submenu id="om_sm21" label="Submenu 2.1" icon="pi pi-align-left">
-                                                    <p:menuitem id="om_lnk211" value="Link 2.1.1" icon="pi pi-align-left" url="#" />
-                                                    <p:menuitem id="om_lnk212" value="Link 2.1.2" icon="pi pi-align-left" url="#" />
-                                                </p:submenu>
-                                                <p:submenu id="om_sm22" label="Submenu 2.2" icon="pi pi-align-left">
-                                                    <p:menuitem id="om_lnk221" value="Link 2.2.1" icon="pi pi-align-left" url="#" />
-                                                </p:submenu>
-                                            </p:submenu>
-                                        </p:submenu>
-                                        <p:submenu id="om_getstarted" label="Start" icon="pi pi-download">
-                                            <p:menuitem id="om_buy" value="Buy Now" icon="pi pi-shopping-cart" url="https://www.primefaces.org/store" />
-                                            <p:menuitem id="om_doc" value="Documentation" icon="pi pi-info-circle" outcome="/login"/>
-                                        </p:submenu>-->
             </div>
         </div>
     </div>

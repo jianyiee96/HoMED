@@ -135,7 +135,14 @@
 
                         <div class="p-col-6">                        
                             <div class="timeline card card-w-title">
-                                <h2>Medical Board Case [#{medicalBoardSessionManagedBean.selectedCase.medicalBoardCaseId}]</h2>
+
+                                <div class="buttonbar">
+                                    <h2 style="display: inline">Medical Board Case [#{medicalBoardSessionManagedBean.selectedCase.medicalBoardCaseId}]</h2>
+                                    <p:commandButton styleClass="info-button rounded-button text-button p-mr-2 p-mb-2" style="margin-left: 3px;"
+                                                     icon="pi pi-window-maximize" title="View Serviceman Past Consultations"
+                                                     process="@this" actionListener="#{medicalBoardSessionManagedBean.viewServicemanPastConsultations}" />
+                                </div>
+
                                 <ul>
                                     <li>
                                         <p:panelGrid columns="2" layout="flex">
