@@ -138,8 +138,10 @@ public class MedicalBoardSlotManagementManagedBean implements Serializable {
             for (MedicalBoardSlotWrapper mbsWrapper : this.selectedMedicalBoardSlotWrappersTreeSet) {
                 mbsWrapper.setIndex(++idx);
                 MedicalBoardSlot medicalBoardSlotInner = mbsWrapper.getMedicalBoardSlot();
-
-                if (medicalBoardSlotInner.equals(medicalBoardSlotOuter)) {
+                MedicalBoardSlot retrievedMedicalBoardSlotInner = slotSessionBeanLocal.retrieveMedicalBoardSlotById(medicalBoardSlotInner.getSlotId());
+                mbsWrapper.setMedicalBoardSlot(retrievedMedicalBoardSlotInner);
+                
+                if (retrievedMedicalBoardSlotInner.equals(medicalBoardSlotOuter)) {
                     title += "[" + mbsWrapper.getIndex() + "]";
                     styleClass = "selected-medical-board-slot";
                     break;

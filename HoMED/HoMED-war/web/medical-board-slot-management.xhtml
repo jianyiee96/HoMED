@@ -78,46 +78,46 @@
                                         <div class="p-grid">
                                             <div class="p-col-8" style="padding-bottom: 0">
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Board Status:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotWrapper.medicalBoardSlot.medicalBoardSlotStatusEnum.stringVal}" />                                      
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Board Date:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDate(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Start Time:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="End Time:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderTime(medicalBoardSlotWrapper.medicalBoardSlot.endDateTime)}" />                                      
                                                     </div>
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Duration:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:outputLabel value="#{medicalBoardSlotManagementManagedBean.renderDuration(medicalBoardSlotWrapper.medicalBoardSlot.startDateTime, medicalBoardSlotWrapper.medicalBoardSlot.endDateTime)}" />                                          
                                                     </div>
                                                 </div>
@@ -129,10 +129,10 @@
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
+                                                    <div class="p-col-5">
                                                         <h:outputText value="Chairman:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:selectOneMenu  value="#{medicalBoardSlotWrapper.chairmanId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedChairmen}" var="chairman" itemValue="#{chairman.employeeId}" itemLabel="#{chairman.name}"/>
@@ -151,10 +151,10 @@
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
-                                                        <h:outputText value="Medical Officer 1" />
+                                                    <div class="p-col-5">
+                                                        <h:outputText value="Medical Officer 1:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:selectOneMenu value="#{medicalBoardSlotWrapper.medicalOfficerOneId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersOne}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
@@ -172,10 +172,10 @@
                                                 </div>
 
                                                 <div class="p-grid">
-                                                    <div class="p-col-4">
-                                                        <h:outputText value="Medical Officer 2" />
+                                                    <div class="p-col-5">
+                                                        <h:outputText value="Medical Officer 2:" />
                                                     </div>
-                                                    <div class="p-col-8">
+                                                    <div class="p-col-7">
                                                         <p:selectOneMenu value="#{medicalBoardSlotWrapper.medicalOfficerTwoId}" rendered="#{medicalBoardSlotWrapper.isEditMode}" >
                                                             <f:selectItem value="#{null}" itemLabel="N.A." />
                                                             <f:selectItems value="#{medicalBoardSlotWrapper.unallocatedMedicalOfficersTwo}" var="medicalOfficer" itemValue="#{medicalOfficer.employeeId}" itemLabel="#{medicalOfficer.name}"/>
