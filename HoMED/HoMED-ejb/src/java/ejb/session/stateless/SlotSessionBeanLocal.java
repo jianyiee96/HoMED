@@ -47,5 +47,7 @@ public interface SlotSessionBeanLocal {
     public void startMedicalBoardSession(Long medicalBoardSlotId) throws StartMedicalBoardSessionException;
 
     public void endMedicalBoardSession(Long medicalBoardSlotId) throws EndMedicalBoardSessionException;
+
+    public MedicalBoardSlot createMedicalBoardSlotByInit(Date startDate, Date endDate) throws ScheduleMedicalBoardSlotException;
     
 }
