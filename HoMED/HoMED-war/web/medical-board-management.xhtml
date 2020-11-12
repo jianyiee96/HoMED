@@ -451,7 +451,7 @@
                                                 <h5>Notifications will be sent to the following servicemen. Are you sure you want to proceed?</h5>
                                                 <p:separator />
                                                 <p:accordionPanel multiple="true" activeIndex="0,1">
-                                                    <p:tab title="Added Cases" rendered="#{medicalBoardManagementManagedBean.addedMedicalBoardCases.size() != 0}">
+                                                    <p:tab title="Newly Allocated Cases" rendered="#{medicalBoardManagementManagedBean.addedMedicalBoardCases.size() != 0}">
                                                         <p:dataTable  reflow="true" value="#{medicalBoardManagementManagedBean.addedMedicalBoardCases}" var="mbipCase"
                                                                       rowKey="#{mbipCase.medicalBoardCaseId}" scrollHeight="250">
                                                             <p:column headerText="Name" width="60%">
@@ -463,7 +463,7 @@
                                                             </p:column>
                                                         </p:dataTable>
                                                     </p:tab>
-                                                    <p:tab title="Removed Cases" rendered="#{medicalBoardManagementManagedBean.removedMedicalBoardCases.size() != 0}">
+                                                    <p:tab title="Unallocated Cases" rendered="#{medicalBoardManagementManagedBean.removedMedicalBoardCases.size() != 0}">
                                                         <p:dataTable  reflow="true" value="#{medicalBoardManagementManagedBean.removedMedicalBoardCases}" var="mbia"
                                                                       rowKey="#{mbia.medicalBoardCaseId}" scrollHeight="250">
                                                             <p:column headerText="Name" width="60%">
