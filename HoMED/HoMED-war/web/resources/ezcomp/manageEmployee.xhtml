@@ -48,7 +48,7 @@
                                     <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
                                         <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
                                             <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
-                                            <p:ajax event="valueChange" update="@this panelGroupAttachedMedicalCentre panelGroupMedicalOfficerChairmanStatus" oncomplete="PF('dialogManageEmployee').show()" />
+                                            <p:ajax event="valueChange" update="@this panelGroupAttachedMedicalCentre panelGroupMedicalOfficerChairmanStatus" oncomplete="PF('dialogManageEmployee').show()"/>
                                         </p:selectOneMenu>
                                     </ui:fragment>
                                 </div>
