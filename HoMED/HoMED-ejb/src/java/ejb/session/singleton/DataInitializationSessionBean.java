@@ -879,10 +879,10 @@ public class DataInitializationSessionBean {
     private List<Employee> initializeEmployees(List<MedicalCentre> medicalCentres) throws CreateEmployeeException, EmployeeNotFoundException, AssignMedicalStaffToMedicalCentreException {
         List<Employee> employees = new ArrayList<>();
 
-        Employee emp1 = new SuperUser("Adrian Tan", "password", "dummyemailx1@hotmail.com", new Address("16 Raffles Quay", "#01-00", "Hong Leong Building", "Singapore", "048581"), "98765432", GenderEnum.MALE);
-        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "dummyemailx2@hotmail.com", new Address("115A Commonwealth Drive", "#02-14", "", "Singapore", "149596"), "81234567", GenderEnum.FEMALE, Boolean.TRUE);
-        Employee emp3 = new Clerk("Clyde", "password", "dummyemailx3@hotmail.com", new Address("501 Orchard Road", "#07-02", "Wheelock Place", "Singapore", "238880"), "92675567", GenderEnum.MALE);
-        Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "dummyemailx4@hotmail.com", new Address("woodlands east industrial estate 06-30", "06-30", "", "Singapore", "738733"), "88831888", GenderEnum.MALE);
+        Employee emp1 = new SuperUser("Adrian Tan", "password", "super_user@homed.com", new Address("16 Raffles Quay", "#01-00", "Hong Leong Building", "Singapore", "048581"), "98765432", GenderEnum.MALE);
+        Employee emp2 = new MedicalOfficer("Melissa Lim", "password", "mo_senior@homed.com", new Address("115A Commonwealth Drive", "#02-14", "", "Singapore", "149596"), "81234567", GenderEnum.FEMALE, Boolean.TRUE);
+        Employee emp3 = new Clerk("Clyde", "password", "clerk@homed.com", new Address("501 Orchard Road", "#07-02", "Wheelock Place", "Singapore", "238880"), "92675567", GenderEnum.MALE);
+        Employee emp4 = new MedicalBoardAdmin("Dylan", "password", "mb_admin@homed.com", new Address("woodlands east industrial estate 06-30", "06-30", "", "Singapore", "738733"), "88831888", GenderEnum.MALE);
         Employee emp5 = new Clerk("Elgin", "password", "dummyemailx5@hotmail.com", new Address("101 Eunos Avenue 3 EUNOS INDUSTRIAL ESTATE", "", "", "Singapore", "409835"), "87241222", GenderEnum.MALE);
 
         // NO Medical Centre Staff
