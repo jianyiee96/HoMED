@@ -30,7 +30,7 @@
 
         <h:form id="formManageEmployee">
             <p:dialog id="dialogManageEmployee" widgetVar="dialogManageEmployee" header="#{manageEmployeeManagedBean.isCreateState ? 'Create Employee' : 'Employee Details'}" showEffect="fade"
-                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageEmployee').initPosition()" position="center top"
+                      draggable="false" modal="true" responsive="true" fitViewport="true" onShow="PF('dialogManageEmployee').initPosition()"
                       minWidth="500" width="700">
                 <p:outputPanel id="panelManageEmployee" rendered="#{not empty manageEmployeeManagedBean.employeeToView}">
                     <div class="p-grid">
@@ -48,7 +48,7 @@
                                     <ui:fragment rendered="#{manageEmployeeManagedBean.isEditMode and manageEmployeeManagedBean.isCreateState}">
                                         <p:selectOneMenu id="view-role" disabled="#{not manageEmployeeManagedBean.isEditMode}" value="#{manageEmployeeManagedBean.employeeToView.role}" style="width: 180px">
                                             <f:selectItems value="#{employeeAccountManagementManagedBean.getEmployeeRoles()}" var="role" itemLabel="#{role.stringVal}"/>
-                                            <p:ajax event="valueChange" update="@this panelGroupAttachedMedicalCentre panelGroupMedicalOfficerChairmanStatus" oncomplete="PF('dialogManageEmployee').show()" />
+                                            <p:ajax event="valueChange" update="@this panelGroupAttachedMedicalCentre panelGroupMedicalOfficerChairmanStatus" oncomplete="PF('dialogManageEmployee').show();PF('dialogManageEmployee').initPosition()" />
                                         </p:selectOneMenu>
                                     </ui:fragment>
                                 </div>
