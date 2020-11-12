@@ -227,6 +227,7 @@ public class MedicalBoardSessionManagedBean implements Serializable {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
             c.add(Calendar.MONTH, duration);
+            c.add(Calendar.DATE, -1);
             conditionStatus.setStatusEndDate(c.getTime());
         } else {
             conditionStatus.setStatusEndDate(null);
