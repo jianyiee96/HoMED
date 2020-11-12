@@ -40,6 +40,9 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     @EJB
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
+    @EJB
+    private EmailSessionBeanLocal emailSessionBeanLocal;
+
     @PersistenceContext(unitName = "HoMED-ejbPU")
     private EntityManager em;
 
@@ -64,7 +67,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         em.persist(medicalBoardCase);
         em.flush();
 
-        Notification n = new Notification("New Medical Board Case", "A medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        Notification n = new Notification("New Medical Board Case", "You have been assigned a medical board case. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
         } catch (CreateNotificationException ex) {
@@ -138,6 +141,8 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                 medicalBoardCase.getConditionStatuses().add(cs);
                 em.flush();
             }
+
+            emailSessionBeanLocal.emailServicemanBoardResult(serviceman, medicalBoardCase.getFinalPesStatus(), conditionStatuses);
 
         } catch (Exception ex) {
             throw new SignMedicalBoardCaseException("Unable to sign medical board case: " + ex.getMessage());
@@ -264,7 +269,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public List<MedicalBoardCase> retrieveAllMedicalBoardInPresenceCases() {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardType = :type");
         query.setParameter("type", MedicalBoardTypeEnum.PRESENCE);
-        
+
         return query.getResultList();
     }
 
