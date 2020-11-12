@@ -165,7 +165,7 @@
                                                             </p:column>
 
                                                             <p:column style="text-align: right;">
-                                                                <p:commandButton id="medicalBoardInPresenceCasesMultiselectButton" icon="fa fa-caret-square-o-down" class="primary-button rounded-button" />
+                                                                <p:commandButton id="medicalBoardInPresenceCasesMultiselectButton" icon="fa fa-check-square-o" class="primary-button rounded-button" />
                                                                 <p:menu overlay="true" trigger="medicalBoardInPresenceCasesMultiselectButton" my="left top" at="left bottom">
                                                                     <p:submenu label="Multiselect Cases">
                                                                         <p:menuitem value="25 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(true, 25)}"
@@ -185,9 +185,12 @@
                                                             <p:dataTable id="dataTableMedicalBoardInPresenceCases" widgetVar="dataTableMedicalBoardInPresenceCases" reflow="true" 
                                                                          value="#{medicalBoardManagementManagedBean.medicalBoardInPresenceCases}" var="mbipCase"
                                                                          selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInPresenceCases}" rowKey="#{mbipCase.medicalBoardCaseId}"
-                                                                         scrollHeight="250" scrollable="true"  rowSelectMode="add">
+                                                                         scrollHeight="250" scrollable="true" rowSelectMode="add">
                                                                 <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="rowSelectCheckbox" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
                                                                 <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="rowUnselectCheckbox" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="toggleSelect" update="formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
 
                                                                 <p:column selectionMode="multiple"></p:column>
                                                                 <p:column headerText="ID" width="10%">
@@ -284,7 +287,7 @@
                                                             </p:column>
 
                                                             <p:column style="text-align: right;">
-                                                                <p:commandButton id="medicalBoardInAbsenceCasesMultiselectButton" icon="fa fa-caret-square-o-down" class="primary-button rounded-button" />
+                                                                <p:commandButton style="text-align: center;" id="medicalBoardInAbsenceCasesMultiselectButton" icon="fa fa-check-square-o" class="primary-button rounded-button" />
                                                                 <p:menu overlay="true" trigger="medicalBoardInAbsenceCasesMultiselectButton" my="left top" at="left bottom">
                                                                     <p:submenu label="Multiselect Cases">
                                                                         <p:menuitem value="25 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(false, 25)}"
@@ -306,7 +309,10 @@
                                                                          selection="#{medicalBoardManagementManagedBean.selectedMedicalBoardInAbsenceCases}" rowKey="#{mbiaCase.medicalBoardCaseId}"
                                                                          scrollHeight="250" scrollable="true" rowSelectMode="add">
                                                                 <p:ajax event="rowSelect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="rowSelectCheckbox" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
                                                                 <p:ajax event="rowUnselect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="rowUnselectCheckbox" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                <p:ajax event="toggleSelect" update="formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
 
                                                                 <p:column selectionMode="multiple"></p:column>
                                                                 <p:column headerText="ID" width="10%">
