@@ -94,6 +94,30 @@ public class MedicalBoardManagementManagedBean implements Serializable {
         }
     }
 
+    public void multiselectCases(Boolean isForBoardInPresence, int numCases) {
+        if (isForBoardInPresence) {
+            this.selectedMedicalBoardInPresenceCases.clear();
+            for (int i = 0; numCases > i; i++) {
+
+                if (i < medicalBoardInPresenceCases.size()) {
+                    this.selectedMedicalBoardInPresenceCases.add(medicalBoardInPresenceCases.get(i));
+                } else {
+                    break;
+                }
+            }
+        } else {
+            this.selectedMedicalBoardInAbsenceCases.clear();
+            for (int i = 0; numCases > i; i++) {
+
+                if (i < medicalBoardInAbsenceCases.size()) {
+                    this.selectedMedicalBoardInAbsenceCases.add(medicalBoardInAbsenceCases.get(i));
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
     public void saveChanges() {
         List<MedicalBoardCase> selectedMedicalBoardCases = new ArrayList<>();
         selectedMedicalBoardCases.addAll(selectedMedicalBoardInPresenceCases);

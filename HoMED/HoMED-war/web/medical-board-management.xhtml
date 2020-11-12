@@ -19,6 +19,9 @@
                 color: black !important;
                 padding-bottom: 5px;
             }
+            .ui-panelgrid-cell {
+                padding: 0.5rem !important;
+            }
         </style>
 
         <p:growl id="growl-message" for="growl-message" showDetail="true" />
@@ -143,23 +146,40 @@
                                                 <!-- Currently selected MBIP slot is ASSIGNED (All 3 MOs are assigned) or ALLOCATED (ASSIGNED + Cases allocated) -->
                                                 <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
 
-                                                    <div>
+                                                    <div style="margin-top: 1rem;">
                                                         <i class="fa fa-user icon-style"></i>
                                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Presence Cases</span>
                                                     </div>
 
                                                     <!-- Reviewing Medical Officers are assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
-                                                        <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:panelGrid style="width: 100%;">
+                                                            <p:column>
+                                                                <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
 
-                                                            <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Presence Case: " style="font-weight: bold" />
-                                                            <p:inplace id="inplaceEstTimeForEachBoardInPresence">
-                                                                <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInPresenceCase}" size="3">
-                                                                    <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInPresence" />
-                                                                </p:inputNumber>
-                                                            </p:inplace>
+                                                                <p:inplace id="inplaceEstTimeForEachBoardInPresence">
+                                                                    <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInPresenceCase}" size="3">
+                                                                        <p:ajax update="outputTextNumBoardInPresenceSelected outputTextEstTimeBoardInPresence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInPresence" />
+                                                                    </p:inputNumber>
+                                                                </p:inplace>
+                                                            </p:column>
 
-                                                        </h:panelGrid>
+                                                            <p:column style="text-align: right;">
+                                                                <p:commandButton id="medicalBoardInPresenceCasesMultiselectButton" icon="fa fa-caret-square-o-down" class="primary-button rounded-button" />
+                                                                <p:menu overlay="true" trigger="medicalBoardInPresenceCasesMultiselectButton" my="left top" at="left bottom">
+                                                                    <p:submenu label="Multiselect Cases">
+                                                                        <p:menuitem value="25 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(true, 25)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInPresenceCases formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary"  />
+                                                                        <p:menuitem value="50 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(true, 50)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInPresenceCases formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary"  />
+                                                                        <p:menuitem value="100 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(true, 100)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInPresenceCases formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary"  />
+                                                                        <p:menuitem value="150 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(true, 150)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInPresenceCases formMedicalBoardManagement:outputTextNumBoardInPresenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInPresence formMedicalBoardManagement:panelGridMedicalBoardSummary"  />
+                                                                    </p:submenu>
+                                                                </p:menu>
+                                                            </p:column>
+                                                        </p:panelGrid>
 
                                                         <div style="height: 325px;">
                                                             <p:dataTable id="dataTableMedicalBoardInPresenceCases" widgetVar="dataTableMedicalBoardInPresenceCases" reflow="true" 
@@ -245,23 +265,40 @@
                                                 <!-- Currently selected MBIA slot is ASSIGNED or ALLOCATED  -->
                                                 <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'UNASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
 
-                                                    <div>
+                                                    <div style="margin-top: 1rem;">
                                                         <i class="fa fa-users icon-style"></i>
                                                         <span style="font-size: 1.25rem; font-weight: bold;">Medical Board In-Absence Cases</span>
                                                     </div>
 
                                                     <!-- Reviewing Medical Officers are assigned -->
                                                     <ui:fragment rendered="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ASSIGNED' or medicalBoardManagementManagedBean.selectedMedicalBoardSlot.medicalBoardSlotStatusEnum == 'ALLOCATED'}">
-                                                        <h:panelGrid columns="2" cellpadding="8">
+                                                        <p:panelGrid style="width: 100%;">
+                                                            <p:column>
+                                                                <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
 
-                                                            <p:outputLabel value="Estimated Time (in minutes) for Each Board In-Absence Case: " style="font-weight: bold" />
-                                                            <p:inplace id="inplaceEstTimeForEachBoardInAbsence">
-                                                                <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInAbsenceCase}" size="3">
-                                                                    <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInAbsence" />
-                                                                </p:inputNumber>
-                                                            </p:inplace>
+                                                                <p:inplace id="inplaceEstTimeForEachBoardInAbsence">
+                                                                    <p:inputNumber value="#{medicalBoardManagementManagedBean.selectedMedicalBoardSlot.estimatedTimeForEachBoardInAbsenceCase}" size="3">
+                                                                        <p:ajax update="outputTextNumBoardInAbsenceSelected outputTextEstTimeBoardInAbsence panelGridMedicalBoardSummary inplaceEstTimeForEachBoardInAbsence" />
+                                                                    </p:inputNumber>
+                                                                </p:inplace>
+                                                            </p:column>
 
-                                                        </h:panelGrid>
+                                                            <p:column style="text-align: right;">
+                                                                <p:commandButton id="medicalBoardInAbsenceCasesMultiselectButton" icon="fa fa-caret-square-o-down" class="primary-button rounded-button" />
+                                                                <p:menu overlay="true" trigger="medicalBoardInAbsenceCasesMultiselectButton" my="left top" at="left bottom">
+                                                                    <p:submenu label="Multiselect Cases">
+                                                                        <p:menuitem value="25 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(false, 25)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInAbsenceCases formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                        <p:menuitem value="50 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(false, 50)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInAbsenceCases formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                        <p:menuitem value="100 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(false, 100)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInAbsenceCases formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                        <p:menuitem value="150 cases" actionListener="#{medicalBoardManagementManagedBean.multiselectCases(false, 150)}"
+                                                                                    process="@this" update="dataTableMedicalBoardInAbsenceCases formMedicalBoardManagement:outputTextNumBoardInAbsenceSelected formMedicalBoardManagement:outputTextEstTimeBoardInAbsence formMedicalBoardManagement:panelGridMedicalBoardSummary" />
+                                                                    </p:submenu>
+                                                                </p:menu>
+                                                            </p:column>
+                                                        </p:panelGrid>
 
                                                         <div style="height: 325px;">
                                                             <p:dataTable id="dataTableMedicalBoardInAbsenceCases" widgetVar="dataTableMedicalBoardInAbsenceCases" reflow="true" 
