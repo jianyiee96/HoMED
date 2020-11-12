@@ -21,6 +21,8 @@ public enum ReportFieldType {
         if (reportDataGrouping == ReportDataGrouping.S_PES
                 || reportDataGrouping == ReportDataGrouping.S_BT
                 || reportDataGrouping == ReportDataGrouping.S_BK
+                || reportDataGrouping == ReportDataGrouping.S_ROLE
+                || reportDataGrouping == ReportDataGrouping.S_PES
                 || reportDataGrouping == ReportDataGrouping.MO_CS
                 || reportDataGrouping == ReportDataGrouping.MO_FI
                 || reportDataGrouping == ReportDataGrouping.MO_MC
@@ -28,11 +30,14 @@ public enum ReportFieldType {
                 || reportDataGrouping == ReportDataGrouping.C_Q_CP
                 || reportDataGrouping == ReportDataGrouping.C_W_MC
                 || reportDataGrouping == ReportDataGrouping.C_D_MC
-                || reportDataGrouping == ReportDataGrouping.C_D_CP) {
+                || reportDataGrouping == ReportDataGrouping.C_D_CP
+                || reportDataGrouping == ReportDataGrouping.MB_Q_C
+                || reportDataGrouping == ReportDataGrouping.MB_Q_T) {
             return new ReportFieldType[]{BAR, PIE};
         } else if (reportDataGrouping == ReportDataGrouping.C_QT_MC
                 || reportDataGrouping == ReportDataGrouping.C_QT_CP
-                || reportDataGrouping == ReportDataGrouping.C_W_HR) {
+                || reportDataGrouping == ReportDataGrouping.C_W_HR
+                || reportDataGrouping == ReportDataGrouping.MB_QT_T) {
             return new ReportFieldType[]{LINE};
         }
         return new ReportFieldType[]{};

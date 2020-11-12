@@ -4,8 +4,7 @@ public enum ReportDataType {
     SERVICEMAN("Serviceman"),
     MEDICAL_OFFICER("Medical Officer"),
     CONSULTATION("Consultation"),
-    MEDICAL_BOARD("Medical Board"),
-    FORM("Form");
+    MEDICAL_BOARD("Medical Board");
 
     private String text;
 

@@ -64,6 +64,12 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         em.persist(medicalBoardCase);
         em.flush();
 
+        Notification n = new Notification("New Medical Board Case", "A medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+        } catch (CreateNotificationException ex) {
+            System.out.println("Error in creating notification " + ex);
+        }
     }
 
     @Override
@@ -84,6 +90,13 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
         em.persist(medicalBoardCase);
         em.flush();
+
+        Notification n = new Notification("Follow up Medical Board Case", "A  follow up follow up medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
+        try {
+            notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+        } catch (CreateNotificationException ex) {
+            System.out.println("Error in creating notification " + ex);
+        }
 
     }
 
@@ -236,7 +249,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                 throw new UpdateMedicalBoardSlotException(errorMessage + "Medical Board Slot ID not found!");
             }
         } catch (CreateNotificationException ex) {
-            System.out.println("> " + ex.getMessage());
+            System.out.println("[MedicalBoardCaseSessionBean > allocateMedicalBoardCasesToMedicalBoardSlot] Error in creating notification" + ex.getMessage());
         }
     }
 
@@ -244,6 +257,14 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
     public List<MedicalBoardCase> retrieveAllMedicalBoardCases() {
         Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc");
 
+        return query.getResultList();
+    }
+
+    @Override
+    public List<MedicalBoardCase> retrieveAllMedicalBoardInPresenceCases() {
+        Query query = em.createQuery("SELECT mbc FROM MedicalBoardCase mbc WHERE mbc.medicalBoardType = :type");
+        query.setParameter("type", MedicalBoardTypeEnum.PRESENCE);
+        
         return query.getResultList();
     }
 

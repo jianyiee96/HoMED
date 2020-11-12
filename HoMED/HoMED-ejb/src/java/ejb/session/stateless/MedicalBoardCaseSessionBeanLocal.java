@@ -34,13 +34,12 @@ public interface MedicalBoardCaseSessionBeanLocal {
 
     public List<MedicalBoardCase> retrieveUnallocatedMedicalBoardCases(MedicalBoardTypeEnum medicalBoardTypeEnum);
 
-//    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<MedicalBoardCase> medicalBoardCases) throws UpdateMedicalBoardSlotException;
-
     public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<MedicalBoardCase> medicalBoardCases, List<MedicalBoardCase> addedMedicalBoardCases, List<MedicalBoardCase> removedMedicalBoardCases) throws UpdateMedicalBoardSlotException;
 
-//    public void allocateMedicalBoardCasesToMedicalBoardSlot(MedicalBoardSlot medicalBoardSlot, List<Long> medicalBoardCaseIds) throws UpdateMedicalBoardSlotException;
     public List<MedicalBoardCase> retrieveAllMedicalBoardCases();
-
+    
+    public List<MedicalBoardCase> retrieveAllMedicalBoardInPresenceCases();
+    
     public List<MedicalBoardCase> retrieveMedicalBoardCasesByServiceman(Long servicemanId);
-
+    
 }
