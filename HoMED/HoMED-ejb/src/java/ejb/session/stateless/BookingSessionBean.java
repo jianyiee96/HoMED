@@ -319,7 +319,7 @@ public class BookingSessionBean implements BookingSessionBeanLocal {
         String title = "Attendance Marked for Booking [ID: " + booking.getBookingId() + "]";
         String body = "Please view the queue display at the medical centre or enable push notifications to be informed when your consultation is ready.";
 
-        Notification n = new Notification(title, body, NotificationTypeEnum.BOOKING, booking.getBookingId());
+        Notification n = new Notification(title, body, NotificationTypeEnum.CONSULTATION, booking.getConsultation().getConsultationId());
 
         try {
             notificationSessionBeanLocal.createNewNotification(n, booking.getServiceman().getServicemanId(), true);

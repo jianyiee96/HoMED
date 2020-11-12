@@ -93,7 +93,7 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
 
             String queueNumber = String.format("%03d", consultation.getBooking().getBookingId() % 1000);
             String title = "Your consultation [Queue No. " + queueNumber + "] is ready";
-            String body = "Please proceed to the consultation room immediately.";
+            String body = "Medical Officer: Dr " + consultation.getMedicalOfficer().getName() + "\nPlease proceed to the consultation room immediately.";
 
             Notification n = new Notification(title, body, NotificationTypeEnum.CONSULTATION, consultationId);
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
@@ -134,11 +134,11 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             throw new StartConsultationException("Unknown exception: " + ex.getMessage());
         }
 
-        Notification n = new Notification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is beginning. Please proceed to consultation room", NotificationTypeEnum.CONSULTATION, consultationId);
+        Notification n = new Notification("Your consultation has started", "Your consultation with Consultation ID[" + consultationId + "] is beginning. Please proceed to consultation room", NotificationTypeEnum.CONSULTATION, consultationId);
 
         try {
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
-            notificationSessionBeanLocal.sendPushNotification("Your consultation has started", "Your consultation with Consultation Id[" + consultationId + "] is beginning. Please proceed to consultation room", consultation.getBooking().getServiceman().getFcmToken());
+            notificationSessionBeanLocal.sendPushNotification("Your consultation has started", "Your consultation with Consultation ID[" + consultationId + "] is beginning. Please proceed to consultation room", consultation.getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }
@@ -193,10 +193,13 @@ public class ConsultationSessionBean implements ConsultationSessionBeanLocal {
             throw new EndConsultationException("Unknown exception: " + ex.getMessage());
         }
 
-        Notification n = new Notification("Consultation completed", "Your consultation with Consultation Id[" + consultationId + "] has been completed", NotificationTypeEnum.CONSULTATION, consultationId);
+        String title = "Consultation Completed";
+        String body = "Your consultation [ID: " + consultationId + "] has been completed.";
+
+        Notification n = new Notification(title, body, NotificationTypeEnum.CONSULTATION, consultationId);
         try {
             notificationSessionBeanLocal.createNewNotification(n, consultation.getBooking().getServiceman().getServicemanId(), true);
-            notificationSessionBeanLocal.sendPushNotification("Consultation completed", "Your consultation with Consultation Id[" + consultationId + "] has been completed", consultation.getBooking().getServiceman().getFcmToken());
+            notificationSessionBeanLocal.sendPushNotification(title, body, consultation.getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("> " + ex.getMessage());
         }

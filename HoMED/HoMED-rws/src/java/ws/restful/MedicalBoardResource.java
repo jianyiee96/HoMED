@@ -117,7 +117,6 @@ public class MedicalBoardResource {
         }
 
         try {
-            System.out.println("jkkjwr");
             List<MedicalBoardCase> medicalBoardCases = medicalBoardCaseSessionBeanLocal.retrieveMedicalBoardCasesByServiceman(Long.parseLong(servicemanId));
 
             List<MedicalBoardCaseWrapper> medicalBoardCaseWrappers = new ArrayList<>();

@@ -1,12 +1,15 @@
 package ejb.session.stateless;
 
+import entity.ConditionStatus;
 import entity.Employee;
 import entity.Serviceman;
+import java.util.List;
 import java.util.concurrent.Future;
 import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import util.email.EmailManager;
+import util.enumeration.PesStatusEnum;
 
 @Stateless
 public class EmailSessionBean implements EmailSessionBeanLocal {
@@ -17,7 +20,7 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
     public EmailSessionBean() {
     }
-    
+
     @Asynchronous
     @Override
     public Future<Boolean> emailEmployeeChangeEmailAsync(Employee employee) throws InterruptedException {
@@ -26,7 +29,7 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
         return new AsyncResult<>(result);
     }
-    
+
     @Asynchronous
     @Override
     public Future<Boolean> emailEmployeeOtpAsync(Employee employee, String otp) throws InterruptedException {
@@ -53,7 +56,7 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
         return new AsyncResult<>(result);
     }
-    
+
     @Asynchronous
     @Override
     public Future<Boolean> emailServicemanOtpAsync(Serviceman serviceman, String otp) throws InterruptedException {
@@ -71,4 +74,14 @@ public class EmailSessionBean implements EmailSessionBeanLocal {
 
         return new AsyncResult<>(result);
     }
+
+    @Asynchronous
+    @Override
+    public Future<Boolean> emailServicemanBoardResult(Serviceman serviceman, PesStatusEnum pesStatusEnum, List<ConditionStatus> conditionStatuses) throws InterruptedException {
+        EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
+        Boolean result = emailManager.emailServicemanBoardResult(serviceman, FROM_EMAIL, pesStatusEnum, conditionStatuses);
+
+        return new AsyncResult<>(result);
+    }
+
 }
