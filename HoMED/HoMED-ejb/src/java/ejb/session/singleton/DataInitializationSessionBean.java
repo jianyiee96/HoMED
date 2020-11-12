@@ -845,8 +845,8 @@ public class DataInitializationSessionBean {
 //        PREVENT Audi More & Bee Am D. You from having past bookings
 //        servicemen.add(serviceman1);
 //        servicemen.add(serviceman2);
-        servicemen.add(serviceman3);
-        servicemen.add(serviceman4);
+//        servicemen.add(serviceman3);
+//        servicemen.add(serviceman4);
         servicemen.add(serviceman5);
         servicemen.add(serviceman6);
         servicemen.add(serviceman7);
