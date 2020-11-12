@@ -220,7 +220,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                     }
 
                     Notification n = new Notification(title, body, NotificationTypeEnum.MEDICAL_BOARD, mbc.getMedicalBoardCaseId());
-                    notificationSessionBeanLocal.createNewNotification(n, mbc.getConsultation().getBooking().getServiceman().getServicemanId(), true);
+                    notificationSessionBeanLocal.createNewNotification(n, mbc.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.TRUE);
                     notificationSessionBeanLocal.sendPushNotification(title, body, mbc.getConsultation().getBooking().getServiceman().getFcmToken());
 
                     title = "";
@@ -239,7 +239,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
                     }
 
                     Notification n = new Notification(title, body, NotificationTypeEnum.MEDICAL_BOARD, removedMbc.getMedicalBoardCaseId());
-                    notificationSessionBeanLocal.createNewNotification(n, removedMbc.getConsultation().getBooking().getServiceman().getServicemanId(), true);
+                    notificationSessionBeanLocal.createNewNotification(n, removedMbc.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.TRUE);
                     notificationSessionBeanLocal.sendPushNotification(title, body, removedMbc.getConsultation().getBooking().getServiceman().getFcmToken());
 
                     title = "";
