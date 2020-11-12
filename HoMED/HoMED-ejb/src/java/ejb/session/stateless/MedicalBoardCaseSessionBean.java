@@ -118,10 +118,10 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
 
             Serviceman serviceman = medicalBoardCase.getConsultation().getBooking().getServiceman();
 
-            if (newPesStatus != null && newPesStatus != serviceman.getPesStatus()) {
+            if (newPesStatus != null) {
                 medicalBoardCase.setFinalPesStatus(newPesStatus);
                 serviceman.setPesStatus(newPesStatus);
-            } else if (newPesStatus == null) {
+            } else {
                 medicalBoardCase.setFinalPesStatus(serviceman.getPesStatus());
             }
 
