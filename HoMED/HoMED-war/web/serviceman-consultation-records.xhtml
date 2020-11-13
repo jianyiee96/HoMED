@@ -17,80 +17,9 @@
             }
         </style>
 
-        <ezcomp:manageServiceman id="ccManageServiceman" />
         <ezcomp:manageFormInstance id="ccManageFormInstance" />
 
         <h:form>
-            <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedServiceman == null}">
-                <div class="p-grid crud-table">
-                    <div class="p-col-12">
-                        <div class="card ui-fluid">
-                            <h2>Serviceman Consultation Records</h2>
-
-                            <p:dataTable id="dataTableServicemen" widgetVar="dataTableServicemen"
-                                         var="serviceman" value="#{servicemanConsultationRecordsManagedBean.servicemen}" 
-                                         sortBy="#{serviceman.servicemanId}" rowKey="#{serviceman.servicemanId}" 
-                                         selectionMode="single" selection="#{servicemanConsultationRecordsManagedBean.selectedServiceman}"
-                                         styleClass="crud-management-table" paginator="true" rows="10" paginatorPosition="bottom">
-                                <p:ajax event="rowSelect" update="@form" process="@this" listener="#{servicemanConsultationRecordsManagedBean.onSelectServiceman}"/>
-
-                                <f:facet name="header">
-                                    <div class="crud-table-header">
-                                        <span style="font-weight: bold">SERVICEMEN</span>
-
-                                        <span class="filter-container ui-input-icon-left">
-                                            <i class="pi pi-search" />
-                                            <p:inputText id="globalFilter" onkeyup="PF('dataTableServicemen').filter()" placeholder="Search" />
-                                        </span>
-                                    </div>
-                                </f:facet>
-
-                                <p:column headerText="ID" width="2.5%" sortBy="#{serviceman.servicemanId}" filterBy="#{serviceman.servicemanId}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.servicemanId}" />
-                                </p:column>
-
-                                <p:column headerText="Name" width="10%" sortBy="#{serviceman.name}" filterBy="#{serviceman.name}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.name}" />
-                                </p:column>
-
-                                <p:column headerText="Role" width="5%" sortBy="#{serviceman.role}" filterBy="#{serviceman.role}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.role}" />
-                                </p:column>
-
-                                <p:column headerText="Email" width="15%" sortBy="#{serviceman.email}" filterBy="#{serviceman.email}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.email}" />
-                                </p:column>
-
-                                <p:column headerText="Gender" width="5%" sortBy="#{serviceman.gender}" filterBy="#{serviceman.gender}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.gender}" />
-                                </p:column>
-
-                                <p:column headerText="Phone Number" width="5%" sortBy="#{serviceman.phoneNumber}" filterBy="#{serviceman.phoneNumber}" filterMatchMode="contains">
-                                    <h:outputText value="#{serviceman.phoneNumber}" />
-                                </p:column>
-
-                                <p:column headerText="Action" width="2.5%">
-                                    <p:commandButton styleClass="info-button rounded-button p-mr-2 p-mb-2" icon="pi pi-user" title="View Serviceman Info"
-                                                     process="@this" update="ccManageServiceman:formManageServiceman:panelManageServiceman" oncomplete="PF('dialogManageServiceman').show()">
-                                        <f:setPropertyActionListener target="#{manageServicemanManagedBean.servicemanToView}" value="#{serviceman}" />
-                                    </p:commandButton>
-                                </p:column>
-
-                            </p:dataTable>
-                        </div>
-                    </div>
-                </div>
-
-                <p:dialog id="dlgNoConsultationRecords" widgetVar="dlgNoConsultationRecords" closable="false" responsive="true" modal="true" draggable="false"
-                          header="No Consultation Records" width="400">
-                    <p:outputLabel value='The selected serviceman has no consultation records to display.' />
-
-                    <f:facet name="footer">
-                        <p:commandButton value="Dismiss" styleClass="ui-confirmdialog-yes" icon="pi pi-check" onclick="PF('dlgNoConsultationRecords').hide()" />
-                    </f:facet>
-                </p:dialog>
-            </ui:fragment>
-
             <div class="p-grid crud-table">
                 <ui:fragment rendered="#{servicemanConsultationRecordsManagedBean.selectedServiceman != null}">
                     <div class="p-col-12 p-sm-12 p-md-6 p-lg-6">
@@ -100,10 +29,7 @@
                                     <h2>Serviceman Information</h2>
                                 </div>
                                 <div class="p-col-3" style="text-align: right;">
-                                    <p:commandButton icon="pi pi-arrow-circle-left" value="Back" update="@form">
-                                        <f:setPropertyActionListener value="#{null}" target="#{servicemanConsultationRecordsManagedBean.selectedServiceman}" />
-                                        <f:setPropertyActionListener value="#{null}" target="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation}" />
-                                    </p:commandButton>
+                                    <p:commandButton icon="pi pi-arrow-circle-left" value="Back" actionListener="#{servicemanConsultationRecordsManagedBean.back}" />
                                 </div>
                             </div>
 
@@ -136,7 +62,8 @@
 
                             <p:dataTable widgetVar="queueDT" id="queueDT" var="consultation" value="#{servicemanConsultationRecordsManagedBean.pastConsultationsForSelectedServiceman}"
                                          rowKey="#{consultation.consultationId}" selectionMode="single" selection="#{servicemanConsultationRecordsManagedBean.selectedPastConsultation}"
-                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending">
+                                         styleClass="ui-datatable-striped ui-datatable-sm ui-datatable-gridlines" sortBy="#{consultation.startDateTime}" sortOrder="descending"
+                                         scrollHeight="500" scrollable="true">
                                 <p:ajax event="rowSelect" update="@form" process="@this"/>
 
                                 <f:facet id="dataViewListHeader" name="header">

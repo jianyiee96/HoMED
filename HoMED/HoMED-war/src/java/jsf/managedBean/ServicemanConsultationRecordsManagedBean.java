@@ -7,56 +7,78 @@ package jsf.managedBean;
 import ejb.session.stateless.ConsultationSessionBeanLocal;
 import ejb.session.stateless.ServicemanSessionBeanLocal;
 import entity.Consultation;
+import entity.MedicalBoardCase;
+import entity.MedicalBoardSlot;
 import entity.Serviceman;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
-import org.primefaces.PrimeFaces;
 
 @Named(value = "servicemanConsultationRecordsManagedBean")
 @ViewScoped
 public class ServicemanConsultationRecordsManagedBean implements Serializable {
 
-    @EJB(name = "ServicemanSessionBeanLocal")
-    private ServicemanSessionBeanLocal servicemanSessionBeanLocal;
     @EJB(name = "ConsultationSessionBeanLocal")
     private ConsultationSessionBeanLocal consultationSessionBeanLocal;
 
-    private List<Serviceman> servicemen;
+    private MedicalBoardSlot selectedMedicalBoardSlot;
+
+    private MedicalBoardCase selectedMedicalBoardCase;
     private Serviceman selectedServiceman;
 
     private List<Consultation> pastConsultationsForSelectedServiceman;
     private Consultation selectedPastConsultation;
 
     public ServicemanConsultationRecordsManagedBean() {
-        this.servicemen = new ArrayList<>();
         this.pastConsultationsForSelectedServiceman = new ArrayList<>();
     }
 
     @PostConstruct
     public void postConstruct() {
-        this.servicemen = servicemanSessionBeanLocal.retrieveAllServicemen();
-    }
+        try {
+            Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            this.selectedMedicalBoardSlot = (MedicalBoardSlot) flash.get("medicalBoardSlot");
 
-    public void onSelectServiceman() {
-        this.pastConsultationsForSelectedServiceman = consultationSessionBeanLocal.retrieveCompletedConsultationsByServicemanId(this.selectedServiceman.getServicemanId());
-        
-        if (this.pastConsultationsForSelectedServiceman.isEmpty()) {
-            this.selectedServiceman = null;
-            PrimeFaces.current().executeScript("PF('dlgNoConsultationRecords').show();");
+            this.selectedMedicalBoardCase = (MedicalBoardCase) flash.get("selectedMedicalBoardCase");
+            this.selectedServiceman = selectedMedicalBoardCase.getConsultation().getBooking().getServiceman();
+
+            this.pastConsultationsForSelectedServiceman = consultationSessionBeanLocal.retrieveCompletedConsultationsByServicemanId(this.selectedServiceman.getServicemanId());
+            
+            if (this.pastConsultationsForSelectedServiceman.size() != 0) {
+                this.selectedPastConsultation = this.pastConsultationsForSelectedServiceman.get(this.pastConsultationsForSelectedServiceman.size() - 1);
+            }
+            
+        } catch (NullPointerException nullPointerException) {
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("homepage.xhtml");
+            } catch (IOException iOException) {
+                System.out.println(iOException);
+            }
         }
     }
 
-    public List<Serviceman> getServicemen() {
-        return servicemen;
-    }
+    public void back() {
+        if (this.selectedMedicalBoardSlot != null) {
+            Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            flash.put("medicalBoardSlot", this.selectedMedicalBoardSlot);
+            flash.put("selectedMedicalBoardCase", this.selectedMedicalBoardCase);
 
-    public void setServicemen(List<Serviceman> servicemen) {
-        this.servicemen = servicemen;
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board-session.xhtml");
+            } catch (IOException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", ex.getMessage()));
+            }
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to redirect!", "No medical board slot is provided!"));
+        }
     }
 
     public Serviceman getSelectedServiceman() {

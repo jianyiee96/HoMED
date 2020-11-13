@@ -135,12 +135,22 @@
 
                         <div class="p-col-6">                        
                             <div class="timeline card card-w-title">
-                                <h2>Medical Board Case [#{medicalBoardSessionManagedBean.selectedCase.medicalBoardCaseId}]</h2>
+
+                                <h:panelGrid columns="1" cellpadding="4">
+                                    <h2 style="display: inline">Medical Board Case [#{medicalBoardSessionManagedBean.selectedCase.medicalBoardCaseId}]</h2>
+                                </h:panelGrid>
+
                                 <ul>
                                     <li>
                                         <p:panelGrid columns="2" layout="flex">
                                             <h:panelGroup>
-                                                <h5>Serviceman Information</h5>
+                                                <h:panelGrid columns="2">
+                                                    <h5 style="margin-top: 0.75rem;">Serviceman Information</h5>
+                                                    <p:commandButton styleClass="info-button p-ml-2" rendered="#{medicalBoardSessionManagedBean.medicalBoardSlot.medicalBoardSlotStatusEnum == 'ONGOING'}"
+                                                                     icon="pi pi-window-maximize" title="View Serviceman Past Consultations" value="View Past Consultations" style="font-size: 12px;"
+                                                                     process="@this" actionListener="#{medicalBoardSessionManagedBean.viewServicemanPastConsultations}" />
+                                                </h:panelGrid>
+
                                                 <h:panelGrid columns="2" cellpadding="5">
                                                     <p:outputLabel value="Name: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.booking.serviceman.name}" class="display-text"/>                                
@@ -167,7 +177,10 @@
                                                 </h:panelGrid>
                                             </h:panelGroup>
                                             <h:panelGroup>
-                                                <h5>Reviewing Doctor Information</h5>
+                                                <h:panelGrid columns="1">
+                                                    <h5 style="margin-top: 0.75rem;">Reviewing Doctor Information</h5>
+                                                </h:panelGrid>
+                                                
                                                 <h:panelGrid columns="2" cellpadding="5">
                                                     <p:outputLabel value="Name: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.medicalOfficer.name}" class="display-text" />                                
@@ -177,7 +190,7 @@
 
                                                     <p:outputLabel value="Phone Number: " />
                                                     <p:outputLabel value="#{medicalBoardSessionManagedBean.selectedCase.consultation.medicalOfficer.phoneNumber}" class="display-text" />
-                                                </h:panelGrid>
+                                                </h:panelGrid>       
                                             </h:panelGroup>
                                         </p:panelGrid>
                                     </li>
