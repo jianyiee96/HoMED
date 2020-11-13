@@ -62,6 +62,7 @@ public class ReminderNotificationSender {
 
         Calendar c = Calendar.getInstance();
         c.setTime(now);
+//        c.add(Calendar.DATE, 1);
 
         System.out.println("- Daily Notification Sender: Sending Notifications for upcoming bookings");
 
@@ -90,6 +91,8 @@ public class ReminderNotificationSender {
                 Notification n = new Notification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming booking today at " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", NotificationTypeEnum.BOOKING, b.getBookingId());
                 try {
                     notificationSessionBeanLocal.createNewNotification(n, b.getServiceman().getServicemanId(), Boolean.FALSE);
+                    notificationSessionBeanLocal.sendPushNotification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming booking today at " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", b.getServiceman().getFcmToken());
+
                 } catch (CreateNotificationException ex) {
                     System.out.println("Error in creating notification " + ex);
                 }
@@ -101,6 +104,8 @@ public class ReminderNotificationSender {
                 Notification n = new Notification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming booking 3 days later on " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", NotificationTypeEnum.BOOKING, b.getBookingId());
                 try {
                     notificationSessionBeanLocal.createNewNotification(n, b.getServiceman().getServicemanId(), Boolean.FALSE);
+                    notificationSessionBeanLocal.sendPushNotification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming booking 3 days later on " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", b.getServiceman().getFcmToken());
+
                 } catch (CreateNotificationException ex) {
                     System.out.println("Error in creating notification " + ex);
                 }
@@ -111,6 +116,8 @@ public class ReminderNotificationSender {
                 Notification n = new Notification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming booking next week on " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", NotificationTypeEnum.BOOKING, b.getBookingId());
                 try {
                     notificationSessionBeanLocal.createNewNotification(n, b.getServiceman().getServicemanId(), Boolean.FALSE);
+                    notificationSessionBeanLocal.sendPushNotification("Upcoming Booking Reminder", "Please be reminded that you have an upcoming next week on " + df2.format(b.getBookingSlot().getStartDateTime()) + ". Please remember to submit linked forms (if any) before heading down to the medical centre.", b.getServiceman().getFcmToken());
+
                 } catch (CreateNotificationException ex) {
                     System.out.println("Error in creating notification " + ex);
                 }
@@ -146,6 +153,7 @@ public class ReminderNotificationSender {
                     Notification n = new Notification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence today at " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", NotificationTypeEnum.MEDICAL_BOARD, b.getMedicalBoardCaseId());
                     try {
                         notificationSessionBeanLocal.createNewNotification(n, b.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+                        notificationSessionBeanLocal.sendPushNotification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence today at " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", b.getConsultation().getBooking().getServiceman().getFcmToken());
                     } catch (CreateNotificationException ex) {
                         System.out.println("Error in creating notification " + ex);
                     }
@@ -157,6 +165,8 @@ public class ReminderNotificationSender {
                     Notification n = new Notification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence three days later on " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", NotificationTypeEnum.MEDICAL_BOARD, b.getMedicalBoardCaseId());
                     try {
                         notificationSessionBeanLocal.createNewNotification(n, b.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+                        notificationSessionBeanLocal.sendPushNotification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence three days later on " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", b.getConsultation().getBooking().getServiceman().getFcmToken());
+
                     } catch (CreateNotificationException ex) {
                         System.out.println("Error in creating notification " + ex);
                     }
@@ -167,6 +177,7 @@ public class ReminderNotificationSender {
                     Notification n = new Notification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence next week on " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", NotificationTypeEnum.MEDICAL_BOARD, b.getMedicalBoardCaseId());
                     try {
                         notificationSessionBeanLocal.createNewNotification(n, b.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+                        notificationSessionBeanLocal.sendPushNotification("Upcoming Medical Board in Presence Reminder", "Please be reminded that you have an upcoming medical board in presence next week on " + df2.format(b.getMedicalBoardSlot().getStartDateTime()) + ".", b.getConsultation().getBooking().getServiceman().getFcmToken());
                     } catch (CreateNotificationException ex) {
                         System.out.println("Error in creating notification " + ex);
                     }

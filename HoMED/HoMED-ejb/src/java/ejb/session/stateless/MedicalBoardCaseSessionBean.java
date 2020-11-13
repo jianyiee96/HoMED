@@ -70,6 +70,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         Notification n = new Notification("New Medical Board Case", "You have been assigned a medical board case. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+            notificationSessionBeanLocal.sendPushNotification("New Medical Board Case", "You have been assigned a medical board case. You may view the details now.", medicalBoardCase.getConsultation().getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("Error in creating notification " + ex);
         }
@@ -97,6 +98,7 @@ public class MedicalBoardCaseSessionBean implements MedicalBoardCaseSessionBeanL
         Notification n = new Notification("Follow up Medical Board Case", "A  follow up follow up medical board case has been scheduled for you. You may view the details now.", NotificationTypeEnum.MEDICAL_BOARD, medicalBoardCase.getMedicalBoardCaseId());
         try {
             notificationSessionBeanLocal.createNewNotification(n, medicalBoardCase.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+            notificationSessionBeanLocal.sendPushNotification("Follow up Medical Board Case", "A  follow up follow up medical board case has been scheduled for you. You may view the details now.", medicalBoardCase.getConsultation().getBooking().getServiceman().getFcmToken());
         } catch (CreateNotificationException ex) {
             System.out.println("Error in creating notification " + ex);
         }
