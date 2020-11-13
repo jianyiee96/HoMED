@@ -145,7 +145,7 @@ public class DataInitializationSessionBean {
 
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
-            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
 
 //            initializePastMedicalBoards(bookings, NUM_OF_PAST_DAYS_SLOTS);
             initializePreDefinedConditionStatuses();
@@ -161,7 +161,7 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException | ScheduleMedicalBoardSlotException
+                | ScheduleBookingSlotException
                 | ServicemanNotFoundException
                 | MarkBookingAttendanceException | StartConsultationException
                 | SubmitFormInstanceException | EndConsultationException
@@ -651,7 +651,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Do you own a pet?", 1, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, formFieldOptions));
         formFields.add(new FormField("If yes, what pet do you own?", 2, InputTypeEnum.TEXT, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN, null));
 
-        formFields.add(new FormField("Who is your favaourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
+        formFields.add(new FormField("Who is your favourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
         formFields.add(new FormField("Who is your favourite serviceman?", 4, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.MO, null));
         formFields.add(new FormField("Who is your favourite chairman?", 5, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN_MO, null));
 
