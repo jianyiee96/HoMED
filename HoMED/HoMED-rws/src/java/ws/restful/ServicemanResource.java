@@ -10,8 +10,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -208,6 +210,50 @@ public class ServicemanResource {
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
         }
+    }
+
+    @Path("retrieveServicemanDetails")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveServicemanDetails(@Context HttpHeaders headers, @QueryParam("servicemanId") String servicemanId) {
+
+        try {
+            String token = headers.getRequestHeader("Token").get(0);
+            String id = headers.getRequestHeader("Id").get(0);
+
+            if (!(servicemanSessionBeanLocal.verifyToken(Long.parseLong(id), token))) {
+                ErrorRsp errorRsp = new ErrorRsp("Invalid JSON Token");
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorRsp).build();
+            }
+
+        } catch (Exception ex) {
+            ErrorRsp errorRsp = new ErrorRsp("Missing JSON Token");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
+        if (servicemanId != null) {
+            try {
+                Serviceman serviceman = servicemanSessionBeanLocal.retrieveServicemanById(Long.parseLong(servicemanId));
+                serviceman.setFormInstances(null);
+                serviceman.setBookings(null);
+                serviceman.setSalt(null);
+                serviceman.setPassword(null);
+                serviceman.setNotifications(null);
+                serviceman.setConditionStatuses(null);
+                return Response.status(Response.Status.OK).entity(new ServicemanLoginRsp(serviceman)).build();
+            } catch (ServicemanNotFoundException ex) {
+                ErrorRsp errorRsp = new ErrorRsp(ex.getMessage());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorRsp).build();
+            }
+
+        } else {
+
+            ErrorRsp errorRsp = new ErrorRsp("Invalid update serviceman request");
+
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorRsp).build();
+        }
+
     }
 
     @Path("resetPassword")
