@@ -128,7 +128,12 @@ public class MedicalBoardSessionManagedBean implements Serializable {
 
         try {
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-            selectedCase = (MedicalBoardCase) flash.get("selectedMedicalBoardCase");
+            MedicalBoardCase medicalBoardCase = (MedicalBoardCase) flash.get("selectedMedicalBoardCase");
+
+            if (medicalBoardCase != null) {
+                selectedCase = medicalBoardCase;
+            }
+            
         } catch (NullPointerException nullPointerException) {
             try {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("medical-board.xhtml");

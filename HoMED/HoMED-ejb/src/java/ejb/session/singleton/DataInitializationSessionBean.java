@@ -145,7 +145,7 @@ public class DataInitializationSessionBean {
 
             List<Booking> bookings = initializeBookings(bookingSlots, consultationPurposes, servicemen, RATE_OF_CREATING_BOOKINGS);
 
-            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
+//            List<MedicalBoardSlot> medicalBoardSlots = initializeMedicalBoardSlots();
 
 //            initializePastMedicalBoards(bookings, NUM_OF_PAST_DAYS_SLOTS);
             initializePreDefinedConditionStatuses();
@@ -161,7 +161,7 @@ public class DataInitializationSessionBean {
                 | CreateMedicalCentreException | CreateConsultationPurposeException
                 | CreateFormTemplateException | EmployeeNotFoundException
                 | RelinkFormTemplatesException | CreateBookingException
-                | ScheduleBookingSlotException | ScheduleMedicalBoardSlotException
+                | ScheduleBookingSlotException
                 | ServicemanNotFoundException
                 | MarkBookingAttendanceException | StartConsultationException
                 | SubmitFormInstanceException | EndConsultationException
@@ -651,7 +651,7 @@ public class DataInitializationSessionBean {
         formFields.add(new FormField("Do you own a pet?", 1, InputTypeEnum.RADIO_BUTTON, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, formFieldOptions));
         formFields.add(new FormField("If yes, what pet do you own?", 2, InputTypeEnum.TEXT, Boolean.FALSE, FormFieldAccessEnum.SERVICEMAN, null));
 
-        formFields.add(new FormField("Who is your favaourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
+        formFields.add(new FormField("Who is your favourite doctor?", 3, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN, null));
         formFields.add(new FormField("Who is your favourite serviceman?", 4, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.MO, null));
         formFields.add(new FormField("Who is your favourite chairman?", 5, InputTypeEnum.TEXT, Boolean.TRUE, FormFieldAccessEnum.SERVICEMAN_MO, null));
 
@@ -784,9 +784,9 @@ public class DataInitializationSessionBean {
 
     private List<Serviceman> initializeServiceman() throws CreateServicemanException, ServicemanNotFoundException {
         List<Serviceman> servicemen = new ArrayList<>();
-        Serviceman serviceman1 = new Serviceman("Audi More", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
-        Serviceman serviceman2 = new Serviceman("Bee Am D. You", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
-        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "svcman3_user@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, PesStatusEnum.B4, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
+        Serviceman serviceman1 = new Serviceman("Albert Tan", "password", "ionic_user@hotmail.com", "98765432", ServicemanRoleEnum.REGULAR, PesStatusEnum.B1, new Date(), GenderEnum.MALE, BloodTypeEnum.A_POSITIVE, new Address("31 Kaki Bukit Road", "#06-08/11", "Techlink", "Singapore", "417818"));
+        Serviceman serviceman2 = new Serviceman("Benedict Bay", "password", "angular_user@hotmail.com", "98758434", ServicemanRoleEnum.NSF, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.A_NEGATIVE, new Address("487 Bedok South Avenue 2", "#01-00", "", "Singapore", "469316"));
+        Serviceman serviceman3 = new Serviceman("Hew Jian Yiee", "password", "hew1521@hotmail.com", "97255472", ServicemanRoleEnum.NSMEN, PesStatusEnum.B4, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("172a 6th Ave", "", "", "Singapore", "276545"));
         Serviceman serviceman4 = new Serviceman("Herbert Mohr", "password", "svcman4_user@hotmail.com", "90094859", ServicemanRoleEnum.REGULAR, PesStatusEnum.C2, new Date(), GenderEnum.MALE, BloodTypeEnum.AB_POSITIVE, new Address("73 Jalan Reilly Alley", "", "", "Singapore", "333206"));
         Serviceman serviceman5 = new Serviceman("Anita Toy", "password", "svcman5_user@hotmail.com", "83683716", ServicemanRoleEnum.OTHERS, PesStatusEnum.BP, new Date(), GenderEnum.FEMALE, BloodTypeEnum.A_NEGATIVE, new Address("Blk 853 Jalan Medhurst Bridge", "#09-12", "", "Singapore", "673894"));
         Serviceman serviceman6 = new Serviceman("Naimah Ishak", "password", "svcman6_user@hotmail.com", "87241222", ServicemanRoleEnum.REGULAR, PesStatusEnum.A, new Date(), GenderEnum.MALE, BloodTypeEnum.O_NEGATIVE, new Address("Blk 180F Upton Lane Place", "#16-01", "", "Singapore", "956263"));
@@ -847,7 +847,7 @@ public class DataInitializationSessionBean {
 //        servicemen.add(serviceman2);
 //        servicemen.add(serviceman3);
 //        servicemen.add(serviceman4);
-        servicemen.add(serviceman5);
+//        servicemen.add(serviceman5);
         servicemen.add(serviceman6);
         servicemen.add(serviceman7);
         servicemen.add(serviceman8);
@@ -890,10 +890,10 @@ public class DataInitializationSessionBean {
         Employee emp7 = new Clerk("Clerk No MC", "password", "dummyemailx7@hotmail.com", new Address("141 Market Street", "#01-00", "INTERNATIONAL FACTORS BUILDING", "Singapore", "048944"), "91758375", GenderEnum.MALE);
 
         // ADDITIONAL DOCTORS
-        Employee emp8 = new MedicalOfficer("Huang  Lin", "password", "dummyemailx8@hotmail.com", new Address("40 Jalan Pemimpin", "#05-112", "", "Singapore", "149596"), "90192012", GenderEnum.MALE, Boolean.TRUE);
-        Employee emp9 = new MedicalOfficer("Joseph Gordon", "password", "dummyemailx9@hotmail.com", new Address("158 Kallang Way", "#03-605", "Kallang Basin", "Singapore", "349245"), "84423122", GenderEnum.MALE, Boolean.FALSE);
-        Employee emp10 = new MedicalOfficer("Victoria Tan", "password", "dummyemailx10@hotmail.com", new Address("118 Lorong 23 Geylang", "#02-14", "SCN INDUSTRIAL BUILDING", "Singapore", "388402"), "89958237", GenderEnum.FEMALE, Boolean.FALSE);
-        Employee emp11 = new MedicalOfficer("Tan Kin Lian", "password", "dummyemailx11@hotmail.com", new Address("77 Tuas Avenue 1", "#55-13", "", "Singapore", "412634"), "90019911", GenderEnum.MALE, Boolean.FALSE);
+        Employee emp8 = new MedicalOfficer("Huang  Lin", "password", "mo_one@homed.com", new Address("40 Jalan Pemimpin", "#05-112", "", "Singapore", "149596"), "90192012", GenderEnum.MALE, Boolean.TRUE);
+        Employee emp9 = new MedicalOfficer("Joseph Gordon", "password", "mo_two@homed.com", new Address("158 Kallang Way", "#03-605", "Kallang Basin", "Singapore", "349245"), "84423122", GenderEnum.MALE, Boolean.FALSE);
+        Employee emp10 = new MedicalOfficer("Victoria Tan", "password", "mo_three@homed.com", new Address("118 Lorong 23 Geylang", "#02-14", "SCN INDUSTRIAL BUILDING", "Singapore", "388402"), "89958237", GenderEnum.FEMALE, Boolean.FALSE);
+        Employee emp11 = new MedicalOfficer("Tan Kin Lian", "password", "mo_four@homed.com", new Address("77 Tuas Avenue 1", "#55-13", "", "Singapore", "412634"), "90019911", GenderEnum.MALE, Boolean.FALSE);
 
         // ADDITIONAL CLERKS
         Employee emp12 = new Clerk("Charles Seah", "password", "dummyemailx12@hotmail.com", new Address("77 Robinson Road", "#11-11", "", "Singapore", "068896"), "94604931", GenderEnum.MALE);

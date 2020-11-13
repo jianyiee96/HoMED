@@ -200,7 +200,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
         if (!isSameDay(startDate, endDate)) {
             throw new ScheduleMedicalBoardSlotException("Invalid Date Range: medical board slot is not scheduled for the same day");
         }
-        
+
         MedicalBoardSlot mbs = new MedicalBoardSlot(startDate, endDate);
         em.persist(mbs);
         em.flush();
@@ -337,9 +337,10 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             mbc.getMedicalBoardSlot().getMedicalBoardCases().remove(mbc);
             mbc.setMedicalBoardSlot(null);
             mbc.setMedicalBoardCaseStatus(MedicalBoardCaseStatusEnum.WAITING);
-            Notification n = new Notification("Medical Board Case", "You medical board case have been been reviewed by the board. The case has been placed back into the waiting list.", NotificationTypeEnum.MEDICAL_BOARD, mbc.getMedicalBoardCaseId());
+            Notification n = new Notification("Medical Board Case", "You medical board case have not been reviewed by the board. The case has been placed back into the waiting list.", NotificationTypeEnum.MEDICAL_BOARD, mbc.getMedicalBoardCaseId());
             try {
                 notificationSessionBeanLocal.createNewNotification(n, mbc.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+                notificationSessionBeanLocal.sendPushNotification("Medical Board Case", "You medical board case have not been reviewed by the board. The case has been placed back into the waiting list.", mbc.getConsultation().getBooking().getServiceman().getFcmToken());
             } catch (CreateNotificationException ex) {
                 System.out.println("Error in creating notification " + ex);
             }
@@ -350,6 +351,7 @@ public class SlotSessionBean implements SlotSessionBeanLocal {
             Notification n = new Notification("Medical Board Case", "You medical board case has been reviewed by the board. You may view the medical board results now.", NotificationTypeEnum.MEDICAL_BOARD, mbc.getMedicalBoardCaseId());
             try {
                 notificationSessionBeanLocal.createNewNotification(n, mbc.getConsultation().getBooking().getServiceman().getServicemanId(), Boolean.FALSE);
+                notificationSessionBeanLocal.sendPushNotification("Medical Board Case", "You medical board case has been reviewed by the board. You may view the medical board results now.", mbc.getConsultation().getBooking().getServiceman().getFcmToken());
             } catch (CreateNotificationException ex) {
                 System.out.println("Error in creating notification " + ex);
             }
