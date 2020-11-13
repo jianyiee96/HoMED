@@ -80,7 +80,7 @@ public class MedicalBoardSlotExpiryManager {
                 try {
                     System.out.println("MedicalBoardSlot has Expired -> Marking Absent! id: " + mbs.getSlotId());
 
-                    medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(mbs, new ArrayList<>());
+                    medicalBoardCaseSessionBeanLocal.allocateMedicalBoardCasesToMedicalBoardSlot(mbs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
                     slotSessionBeanLocal.expireMedicalBoardSlot(mbs.getSlotId());
 
                 } catch (UpdateMedicalBoardSlotException ex) {

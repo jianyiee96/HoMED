@@ -79,15 +79,14 @@ public class SecurityFilter implements Filter {
             "/booking-management.xhtml", // 12
             "/medical-board-management.xhtml", // 13
             "/queue-management.xhtml", // 14
-            "/past-consultations.xhtml", // 15
-            "/serviceman-consultation-records.xhtml", // 16
-            "/current-consultation.xhtml", // 17
-            "/queue-display.xhtml", // 18
-            "/medical-board.xhtml", // 19
-            "/medical-board-session.xhtml", // 20
-            "/report-management.xhtml", // 21
-            "/manage-report.xhtml", // 22
-            "/notification-blast.xhtml" // 23
+            "/serviceman-consultation-records.xhtml", // 15
+            "/current-consultation.xhtml", // 16
+            "/queue-display.xhtml", // 17
+            "/medical-board.xhtml", // 18
+            "/medical-board-session.xhtml", // 19
+            "/report-management.xhtml", // 20
+            "/manage-report.xhtml", // 21
+            "/notification-blast.xhtml" // 22
         };
 
         // Pages that all logged in users can enter
@@ -96,8 +95,8 @@ public class SecurityFilter implements Filter {
                 || path.equals(pathArr[2])
                 || path.equals(pathArr[3])
                 || path.equals(pathArr[4])
-                || path.equals(pathArr[21])
-                || path.equals(pathArr[22])) {
+                || path.equals(pathArr[20])
+                || path.equals(pathArr[21])) {
             return 1;
         }
 
@@ -107,22 +106,21 @@ public class SecurityFilter implements Filter {
                     || path.equals(pathArr[7])
                     || path.equals(pathArr[8])
                     || path.equals(pathArr[9])
-                    || path.equals(pathArr[23])) {
+                    || path.equals(pathArr[22])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MEDICAL_OFFICER) {
             if (path.equals(pathArr[14])
                     || path.equals(pathArr[15])
                     || path.equals(pathArr[16])
-                    || path.equals(pathArr[17])
-                    || path.equals(pathArr[19])
-                    || path.equals(pathArr[20])) {
+                    || path.equals(pathArr[18])
+                    || path.equals(pathArr[19])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.CLERK) {
             if (path.equals(pathArr[10])
                     || path.equals(pathArr[12])
-                    || path.equals(pathArr[18])) {
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         } else if (accessRight == EmployeeRoleEnum.MB_ADMIN) {
@@ -130,7 +128,7 @@ public class SecurityFilter implements Filter {
                     || path.equals(pathArr[11])
                     || path.equals(pathArr[12])
                     || path.equals(pathArr[13])
-                    || path.equals(pathArr[18])) {
+                    || path.equals(pathArr[17])) {
                 return 1;
             }
         }
