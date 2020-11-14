@@ -173,13 +173,20 @@ public class DataInitializationSessionBean {
 
     private void initializePreDefinedConditionStatuses() {
 
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running, Marching and Jumping");
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Fire arms");
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Sunlight");
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Running and ");
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Spicy Food");
-        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Guard Duty");
-
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Firearms");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse PDT");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Upper Limb");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Lower Limb");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse RMJ");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Kneeling");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Squatting");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Kneeling");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Heavy Load");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Driving");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Heavy Machinery");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Regimental Duties");
+        conditionStatusSessionBeanLocal.addPreDefinedConditionStatus("Excuse Uniform");
+        
     }
 
 //    private void initializePastMedicalBoards(List<Booking> bookings, Integer numOfPastDaysCreated) throws ScheduleMedicalBoardSlotException, UpdateMedicalBoardSlotException {
