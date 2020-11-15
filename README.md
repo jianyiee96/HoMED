@@ -42,5 +42,5 @@ This project aims to automate and digitalise the entire end-to-end medical proce
 
 ##### The required URL to access the Web Application is "http://localhost:8080/HoMED-war/".
 
-### Attachment
+## Attachment
 <img src="https://imgur.com/ov6owwU.png" alt="HoMED Project Poster" width="500"/>
