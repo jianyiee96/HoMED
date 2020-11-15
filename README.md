@@ -5,6 +5,8 @@ Home Team Medical Services Divison (HTMSD), a division within Home Team under th
 ## Project Description
 This project aims to automate and digitalise the entire end-to-end medical process within HTMSD, enabling newfound capabilities and allowing HTMSD to fully unleash the potential of technology.
 
+<img src="https://i.imgur.com/iKvNvbX.gif" alt="HoMED Project Description" width="375"/>
+
 ## Project Solution - Home Team Medical System (HoMED)
 + <b>Dynamic E-form Builder</b> - A utility tool that provides the flexibility for Home Team administrators to dynamically create e-forms out of the box.
 
@@ -39,3 +41,6 @@ This project aims to automate and digitalise the entire end-to-end medical proce
       + <b>Windows</b>: "[PATH_TO_JAVA_JDK_BIN_KEYTOOL.EXE] -import -alias [NAME_OF_CERT] -file [PATH_TO_CERT] -keystore [PATH_TO_GLASSFISH_DOMAINS_DOMAIN1_CONFIG_CACERTS.JKS]"
 
 ##### The required URL to access the Web Application is "http://localhost:8080/HoMED-war/".
+
+### Attachment
+<img src="https://imgur.com/ov6owwU.png" alt="HoMED Project Poster" width="500"/>
