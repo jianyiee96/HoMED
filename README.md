@@ -23,8 +23,8 @@ This project aims to automate and digitalise the entire end-to-end medical proce
   1. Create a MySQL database and name it as "HoMED". The version of MySQL used in this project is 8.0.
   2. Create 3 Library variables:
      + "Bean_Validation_API_2.0.1" and include the "validation-api-2.0.1.jar" file from the "lib" subfolder to the variable.
-	   + "JSON_In_Java" and include the "json-20200518.jar" file from the "lib" subfolder to the variable.
-	   + "Apache_Http" and include all the files in "lib/httpcomponents-client-4.5.13" subfolder to the variable.
+	 + "JSON_In_Java" and include the "json-20200518.jar" file from the "lib" subfolder to the variable.
+	 + "Apache_Http" and include all the files in "lib/httpcomponents-client-4.5.13" subfolder to the variable.
   3. Attach the library to the EJB module.
 
 + <b>HoMED-war (HoMED Employee Web Application)</b>
@@ -37,7 +37,7 @@ This project aims to automate and digitalise the entire end-to-end medical proce
 + <b>To activate the firing of Push Notification to mobile devices from the Glassfish Server:</b>
   1. Navigate to https://fcm.googleapis.com/fcm/send and retrieve the GlobalSign certificate in .cer format. 
   2. With the certificate, add it to GlassFish cacerts.jks using the following commands:
-	    + <b>macOS</b>: "sudo keytool -import -alias [NAME_OF_CERT] -file [PATH_TO_CERT] -keystore [PATH_TO_GLASSFISH_DOMAINS_DOMAIN1_CONFIG_CACERTS.JKS]"
+	  + <b>macOS</b>: "sudo keytool -import -alias [NAME_OF_CERT] -file [PATH_TO_CERT] -keystore [PATH_TO_GLASSFISH_DOMAINS_DOMAIN1_CONFIG_CACERTS.JKS]"
       + <b>Windows</b>: "[PATH_TO_JAVA_JDK_BIN_KEYTOOL.EXE] -import -alias [NAME_OF_CERT] -file [PATH_TO_CERT] -keystore [PATH_TO_GLASSFISH_DOMAINS_DOMAIN1_CONFIG_CACERTS.JKS]"
 
 ##### The required URL to access the Web Application is "http://localhost:8080/HoMED-war/".
