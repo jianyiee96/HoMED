@@ -31,7 +31,7 @@ This project aims to automate and digitalise the entire end-to-end medical proce
   1. Create 3 Library variables:
      + "PrimeFaces 8.0" and include the "primefaces-8.0.jar" file from the lib subfolder to the variable.
      + "Roma 2.2.0" and include the "roma-theme-2.2.0.jar" file from the lib subfolder to the variable.
-	   + "HTML Sanitizer" and include all the files in "lib/HTML Sanitizer" subfolder to the variable.
+     + "HTML Sanitizer" and include all the files in "lib/HTML Sanitizer" subfolder to the variable.
   2. Attach the library to the Web application.
 
 + <b>To activate the firing of Push Notification to mobile devices from the Glassfish Server:</b>
@@ -42,5 +42,5 @@ This project aims to automate and digitalise the entire end-to-end medical proce
 
 ##### The required URL to access the Web Application is "http://localhost:8080/HoMED-war/".
 
-### Attachment
+## Attachment
 <img src="https://imgur.com/ov6owwU.png" alt="HoMED Project Poster" width="500"/>
